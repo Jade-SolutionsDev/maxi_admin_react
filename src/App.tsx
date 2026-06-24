@@ -1,4 +1,4 @@
-import { Admin } from 'react-admin';
+import { Admin, ListGuesser, Resource } from 'react-admin';
 import { authProvider } from './authProvider';
 import { dataProvider } from './dataProvider';
 import { LoginPage } from './LoginPage';
@@ -11,7 +11,7 @@ export default function App() {
       loginPage={LoginPage}
       requireAuth
     >
-      {/* Resources will be added in follow-up tasks */}
+      <Resource options={{label:"CLIENTS"}} name="clients" list={ListGuesser} />
     </Admin>
   );
 }
