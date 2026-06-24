@@ -1,7 +1,7 @@
 import { fetchUtils, type DataProvider } from 'react-admin';
 import { getApiToken } from './clerkRefs';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
   const token = await getApiToken();
@@ -53,7 +53,7 @@ export const dataProvider: DataProvider = {
 
   async getOne(resource, params) {
     const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`);
-    return { data: json };
+    return { data: json.data ?? json };
   },
 
   async getMany(resource, params) {
@@ -78,7 +78,7 @@ export const dataProvider: DataProvider = {
       method: 'POST',
       body: JSON.stringify(params.data),
     });
-    return { data: json };
+    return { data: json.data ?? json };
   },
 
   async update(resource, params) {
@@ -86,7 +86,7 @@ export const dataProvider: DataProvider = {
       method: 'PATCH',
       body: JSON.stringify(params.data),
     });
-    return { data: json };
+    return { data: json.data ?? json };
   },
 
   async updateMany(resource, params) {
@@ -105,7 +105,7 @@ export const dataProvider: DataProvider = {
     const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
       method: 'DELETE',
     });
-    return { data: json ?? params.previousData };
+    return { data: json?.data ?? json ?? params.previousData };
   },
 
   async deleteMany(resource, params) {
