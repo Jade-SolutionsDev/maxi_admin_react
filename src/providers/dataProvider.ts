@@ -1,5 +1,6 @@
-import { fetchUtils, type DataProvider } from 'react-admin';
-import { getApiToken } from './clerkRefs';
+
+import { DataProvider, fetchUtils } from 'ra-core';
+import { getApiToken } from '../lib/clerk/clerkRefs';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 

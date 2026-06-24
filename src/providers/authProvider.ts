@@ -1,5 +1,5 @@
 import type { AuthProvider } from "react-admin";
-import { getApiToken, clerkSignOut } from "./clerkRefs";
+import { getApiToken, clerkSignOut } from "../lib/clerk/clerkRefs";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 

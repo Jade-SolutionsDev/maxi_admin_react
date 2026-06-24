@@ -1,7 +1,10 @@
-import { Admin, ListGuesser, Resource } from 'react-admin';
-import { authProvider } from './authProvider';
-import { dataProvider } from './dataProvider';
-import { LoginPage } from './LoginPage';
+
+import { authProvider } from "./providers/authProvider";
+import { dataProvider } from "./providers/dataProvider";
+import { LoginPage } from "./components/layout/LoginPage";
+import Dashboard from "./pages/dashboard";
+import { Admin, EditGuesser, ListGuesser } from "./components/admin";
+import { Resource } from "ra-core";
 
 export default function App() {
   return (
@@ -10,8 +13,24 @@ export default function App() {
       dataProvider={dataProvider}
       loginPage={LoginPage}
       requireAuth
+      dashboard={Dashboard}
+      // layout={CustomLayout}
     >
-      <Resource options={{label:"CLIENTS"}} name="clients" list={ListGuesser} />
+      {/* <CustomRoutes>
+        <Route path="/" element={<Dashboard />} />
+      </CustomRoutes> */}
+      <Resource
+        options={{ label: "CLIENTS" }}
+        name="clients"
+        list={ListGuesser}
+      />
+      <Resource options={{ label: "ROLES" }} name="roles" list={ListGuesser} />
+      <Resource
+        options={{ label: "USERS" }}
+        name="users"
+        list={ListGuesser}
+        edit={<EditGuesser />}
+      />
     </Admin>
   );
 }
