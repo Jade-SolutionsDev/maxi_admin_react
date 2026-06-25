@@ -47,7 +47,7 @@ const ShowViewGuesser = (props: ShowGuesserProps) => {
 
   const { record } = useShowContext();
   const [child, setChild] = useState<ReactNode>(null);
-  const { enableLog = process.env.NODE_ENV === "development", ...rest } = props;
+  const { enableLog = import.meta.env.NODE_ENV === "development", ...rest } = props;
 
   useEffect(() => {
     setChild(null);

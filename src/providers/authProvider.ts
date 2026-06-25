@@ -1,4 +1,4 @@
-import type { AuthProvider } from "react-admin";
+import { AuthProvider } from "ra-core";
 import { getApiToken, clerkSignOut } from "../lib/clerk/clerkRefs";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
@@ -18,7 +18,7 @@ let permissionsCache: PermissionsMap | null = null;
 async function api(path: string, init: RequestInit = {}) {
   const token = await getApiToken();
   const headers = new Headers(init.headers ?? {});
-  
+
   headers.set("Accept", "application/json");
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);

@@ -43,7 +43,7 @@ const AdminUI = (props: CoreAdminUIProps) => {
   useEffect(() => {
     if (
       disableTelemetry ||
-      process.env.NODE_ENV !== "production" ||
+      import.meta.env.NODE_ENV !== "production" ||
       typeof window === "undefined" ||
       typeof window.location === "undefined" ||
       typeof Image === "undefined"

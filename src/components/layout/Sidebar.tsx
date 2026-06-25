@@ -84,10 +84,8 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
 
   return (
     <aside
-      className={cn("fixed left-0 top-0 h-screen flex flex-col z-50 transition-[width] duration-300 ease-in-out", collapsed ? "w-18" : 'w-64' , sidebarBg)}
+      className={cn("fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300 ease-in-out", collapsed ? "w-18" : 'w-64' , sidebarBg)}
       style={{
-        // width: collapsed ? 72 : 256,
-        // backgroundColor: sidebarBg,
         boxShadow: '4px 0 16px rgba(0,0,0,0.06)',
       }}
     >

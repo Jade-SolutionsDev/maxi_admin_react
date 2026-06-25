@@ -6,6 +6,11 @@
     "list": {
         "fields": {
             "id": "ID",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "defaultMunicipality": "Default Municipality",
+            "isActive": "Is Active",
+            "onboardingStatus": "Onboarding Status",
             "name": "Name",
             "email": "Email",
             "phone": "Phone",
