@@ -247,6 +247,11 @@
     "@babel/helper-string-parser" "^7.29.7"
     "@babel/helper-validator-identifier" "^7.29.7"
 
+"@blackbox-vision/ra-language-spanish@^4.11.3":
+  version "4.11.3"
+  resolved "http://localhost:4873/@blackbox-vision/ra-language-spanish/-/ra-language-spanish-4.11.3.tgz#5e0b67ba8c4460de462773459080ff9602646ddb"
+  integrity sha512-8qqN5dyqZw3Pv6LfpIi9WvNb5MonELy86ZEegE4PmtxHHOfkjoLd7qSa/Szz+kPiwYur6LLPmh+f9uHNwvAtLw==
+
 "@clerk/react@^6.11.0":
   version "6.11.0"
   resolved "http://localhost:4873/@clerk/react/-/react-6.11.0.tgz#fb231b6573cce7c7589d3daf58dce0cb57c7299f"
