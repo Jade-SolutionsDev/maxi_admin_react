@@ -7,6 +7,7 @@ const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
   '/': { title: 'Dashboard', breadcrumb: 'Inicio / Dashboard' },
   '/productos': { title: 'Productos', breadcrumb: 'Inicio / Productos' },
   '/ordenes': { title: 'Órdenes', breadcrumb: 'Inicio / Órdenes' },
+  '/clients': { title: 'Clientes', breadcrumb: 'Inicio / Clientes' },
 };
 
 interface LayoutProps {

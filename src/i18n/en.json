@@ -1,0 +1,16 @@
+{
+    "client": {
+        "name": "Client",
+        "name_plural": "Clients"
+    },
+    "list": {
+        "fields": {
+            "id": "ID",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "createdAt": "Created At",
+            "updatedAt": "Updated At"
+        }
+    }
+}

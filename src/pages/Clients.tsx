@@ -1,4 +1,4 @@
-import { DateField, SearchInput } from "@/components/admin";
+import { ColumnsButton, CreateButton, DateField, SearchInput } from "@/components/admin";
 import { DataTable } from "@/components/admin/data-table";
 import { List } from "@/components/admin/list";
 import { ReferenceField } from "@/components/admin/reference-field";
@@ -7,8 +7,15 @@ const clientFilters = [
     <SearchInput source="q" alwaysOn />
 ];
 
+const ClientActions = () => (
+    <div className="flex gap-2">
+        <CreateButton />
+        <ColumnsButton />
+    </div>
+);
+
 export const ClientList = () => (
-    <List filters={clientFilters} resource="clients" title="Clients">
+    <List filters={clientFilters} actions={<ClientActions />} resource="clients" title="Clients">
         <DataTable>
             <DataTable.Col source="id" />
             {/* <DataTable.Col source="clerkId">
@@ -24,10 +31,12 @@ export const ClientList = () => (
             </DataTable.Col>
             <DataTable.Col source="isActive" />
             <DataTable.Col source="onboardingCompleted" />
-            <DataTable.Col label='Creado' source="createdAt"  >
+            <DataTable.Col label='list.fields.createdAt' source="createdAt"  >
                 <DateField source="createdAt" />
             </DataTable.Col>
-            <DataTable.Col source="updatedAt" />
+            <DataTable.Col label='list.fields.updatedAt'  source="updatedAt" >
+                <DateField source="updatedAt" />
+            </DataTable.Col>
         </DataTable>
     </List>
 );

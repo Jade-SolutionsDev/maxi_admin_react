@@ -6,7 +6,7 @@ import {
   type CoreAdminProps,
   localStorageStore,
 } from "ra-core";
-import { i18nProvider as defaultI18nProvider } from "@/lib/i18nProvider";
+import { i18nProvider as defaultI18nProvider } from "@/providers/i18nProvider";
 import { Layout } from "@/components/admin/layout";
 import { LoginPage } from "@/components/admin/login-page";
 import { NotFound } from "@/components/admin/not-found";

@@ -1,5 +1,6 @@
-import { Search, Bell, Menu } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Bell, Menu } from "lucide-react";
+import { useState } from "react";
+import { ThemeModeToggle } from "@/components/admin";
 
 interface TopBarProps {
   title: string;
@@ -7,8 +8,12 @@ interface TopBarProps {
   onMenuClick: () => void;
 }
 
-export default function TopBar({ title, breadcrumb, onMenuClick }: TopBarProps) {
-  const [searchValue, setSearchValue] = useState('');
+export default function TopBar({
+  title,
+  breadcrumb,
+  onMenuClick,
+}: TopBarProps) {
+  const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
@@ -23,7 +28,9 @@ export default function TopBar({ title, breadcrumb, onMenuClick }: TopBarProps) 
             <Menu size={20} className="text-[#64748B]" />
           </button>
           <div>
-            <h1 className="text-[22px] font-semibold text-[#1E293B] leading-tight">{title}</h1>
+            <h1 className="text-[22px] font-semibold text-[#1E293B] leading-tight">
+              {title}
+            </h1>
             {breadcrumb && (
               <p className="text-[12px] text-[#64748B] mt-0.5">{breadcrumb}</p>
             )}
@@ -56,28 +63,49 @@ export default function TopBar({ title, breadcrumb, onMenuClick }: TopBarProps) 
 
             {showNotifications && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowNotifications(false)}
+                />
                 <div
                   className="absolute right-0 top-12 w-[320px] bg-white rounded-xl shadow-dropdown z-50 overflow-hidden"
-                  style={{ animation: 'fadeInUp 150ms ease-out' }}
+                  style={{ animation: "fadeInUp 150ms ease-out" }}
                 >
                   <div className="px-4 py-3 border-b border-[#E2E8F0]">
-                    <p className="text-[14px] font-semibold text-[#1E293B]">Notificaciones</p>
+                    <p className="text-[14px] font-semibold text-[#1E293B]">
+                      Notificaciones
+                    </p>
                   </div>
                   <div className="max-h-[300px] overflow-y-auto">
                     {[
-                      { text: 'Nueva orden recibida', time: 'Hace 5 min', unread: true },
-                      { text: 'Stock bajo: Teclado RGB', time: 'Hace 30 min', unread: true },
-                      { text: 'Pago confirmado ORD-001', time: 'Hace 1 hora', unread: false },
+                      {
+                        text: "Nueva orden recibida",
+                        time: "Hace 5 min",
+                        unread: true,
+                      },
+                      {
+                        text: "Stock bajo: Teclado RGB",
+                        time: "Hace 30 min",
+                        unread: true,
+                      },
+                      {
+                        text: "Pago confirmado ORD-001",
+                        time: "Hace 1 hora",
+                        unread: false,
+                      },
                     ].map((notif, i) => (
                       <div
                         key={i}
                         className={`px-4 py-3 hover:bg-[#F1F5F9] transition-colors duration-80 cursor-pointer ${
-                          notif.unread ? 'bg-[#F0FDFA]' : ''
+                          notif.unread ? "bg-[#F0FDFA]" : ""
                         }`}
                       >
-                        <p className="text-[13px] text-[#1E293B]">{notif.text}</p>
-                        <p className="text-[11px] text-[#94A3B8] mt-0.5">{notif.time}</p>
+                        <p className="text-[13px] text-[#1E293B]">
+                          {notif.text}
+                        </p>
+                        <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                          {notif.time}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -85,6 +113,8 @@ export default function TopBar({ title, breadcrumb, onMenuClick }: TopBarProps) 
               </>
             )}
           </div>
+          
+          <ThemeModeToggle />
 
           {/* Avatar */}
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#10B981] to-[#0D9488] flex items-center justify-center border-2 border-[#10B981]">

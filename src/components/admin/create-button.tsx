@@ -56,7 +56,7 @@ export const CreateButton = (props: CreateButtonProps) => {
   });
   return (
     <LinkBase
-      className={buttonVariants({ variant: "outline" })}
+      className={buttonVariants({ variant: "default", size: 'lg' })}
       to={link}
       onClick={stopPropagation}
       aria-label={typeof label === "string" ? label : undefined}
