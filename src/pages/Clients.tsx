@@ -1,5 +1,6 @@
 import {
     BadgeField,
+    BooleanField,
     ColumnsButton,
     CreateButton,
     DateField,
@@ -19,8 +20,8 @@ const clientFilters = [<SearchInput source="q" alwaysOn />, <SelectInput label="
 
 const ClientActions = () => (
   <div className="flex gap-2">
-    <CreateButton />
     <RefreshButton />
+    <CreateButton />
     <ColumnsButton />
     <FilterButton variant="default" size="lg" />
   </div>
@@ -33,11 +34,11 @@ export const ClientList = () => (
     resource="clients"
     title="Clients"
   >
-    <DataTable hiddenColumns={["id"]}>
+    <DataTable hiddenColumns={["id","onboardingCompleted"]}>
       <DataTable.Col source="id">
         <BadgeField source="id" variant="default" truncate />
       </DataTable.Col>
-      <DataTable.Col source="avatarUrl" disableSort>
+      <DataTable.Col source="avatarUrl" disableSort label='list.fields.avatar'>
         <img
           src="https://via.placeholder.com/40"
           alt="Avatar"
@@ -47,15 +48,19 @@ export const ClientList = () => (
       <DataTable.Col source="email" label='list.fields.email' />
       <DataTable.Col source="firstName" label='list.fields.firstName' />
       <DataTable.Col source="lastName" label='list.fields.lastName' />
-      <DataTable.Col source="phone" label='list.fields.phone' />
+      <DataTable.Col source="phone" label='list.fields.phone' disableSort/>
       <DataTable.Col source="defaultMunicipalityId" label='list.fields.defaultMunicipality' disableSort>
         <ReferenceField
           source="defaultMunicipalityId"
           reference="defaultMunicipalities"
         />
       </DataTable.Col>
-      <DataTable.Col source="isActive" label='list.fields.isActive' />
-      <DataTable.Col source="onboardingCompleted" label='list.fields.onboardingStatus' />
+      <DataTable.Col source="isActive" label='list.fields.isActive' >
+        <BooleanField source="isActive" />
+      </DataTable.Col>
+      <DataTable.Col source="onboardingCompleted" label='list.fields.onboardingStatus' >
+        <BooleanField source="onboardingCompleted" valueLabelFalse="list.fields.incomplete" valueLabelTrue="list.fields.complete" />
+      </DataTable.Col>
       <DataTable.Col label="list.fields.createdAt" source="createdAt">
         <DateField source="createdAt" />
       </DataTable.Col>

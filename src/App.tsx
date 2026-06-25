@@ -10,10 +10,16 @@ import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
 
+declare global {
+  interface Window {
+    __TANSTACK_QUERY_CLIENT__: import("@tanstack/query-core").QueryClient;
+  }
+}
+
 export default function App() {
   return (
     <Admin
-      title={'MaxiHabana Admin'}
+      title={"MaxiHabana Admin"}
       authProvider={authProvider}
       dataProvider={dataProvider}
       loginPage={LoginPage}
@@ -25,10 +31,7 @@ export default function App() {
       <CustomRoutes>
         <Route path="/productos" element={<Productos />} />
       </CustomRoutes>
-      <Resource
-        name="clients"
-        list={ClientList}
-      />
+      <Resource name="clients" list={ClientList} />
       {/* <Resource options={{ label: "ROLES" }} name="roles" list={ListGuesser} />
       <Resource
         options={{ label: "USERS" }}

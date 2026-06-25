@@ -14,6 +14,7 @@ import { Ready } from "@/components/admin/ready";
 import { ThemeProvider } from "@/components/admin/theme-provider";
 import { AuthCallback } from "@/components/admin/authentication";
 import { useEffect } from "react";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const defaultStore = localStorageStore();
 
@@ -148,6 +149,7 @@ export const Admin = (props: CoreAdminProps) => {
       >
         {children}
       </AdminUI>
+      <ReactQueryDevtools initialIsOpen={true} />
     </AdminContext>
   );
 };

@@ -14,7 +14,10 @@
             "email": "Email",
             "phone": "Teléfono",
             "createdAt": "Creado",
-            "updatedAt": "Actualizado"
+            "updatedAt": "Actualizado",
+            "incomplete": "Incompleto",
+            "complete": "Completo",
+            "avatar": "Avatar"
         }
     }
 }

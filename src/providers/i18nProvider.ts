@@ -14,8 +14,8 @@ export const i18nProvider = polyglotI18nProvider(
   (locale) => messages[locale],
   "es",
   [
-    { name: "en", value: "English" },
-    { name: "es", value: "Spanish" },
+    { locale: "en", name: "English" },
+    { locale: "es", name: "Spanish" },
   ],
   { allowMissing: true },
 );
