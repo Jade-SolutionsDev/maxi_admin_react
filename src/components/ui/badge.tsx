@@ -18,9 +18,13 @@ const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
       },
+      truncate: {
+        true: "max-w-20 truncate min-w-0",
+      },
     },
     defaultVariants: {
       variant: "default",
+      truncate: false,
     },
   }
 )
@@ -28,16 +32,17 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant,
+  truncate = false,
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  VariantProps<typeof badgeVariants> & { asChild?: boolean; truncate?: boolean; }) {
   const Comp = asChild ? Slot : "span"
 
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, truncate }), className)}
       {...props}
     />
   )

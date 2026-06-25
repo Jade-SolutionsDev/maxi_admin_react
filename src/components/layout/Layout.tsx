@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
-import TopBar from './TopBar';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import TopBar from "./TopBar";
+import { useTheme } from "../admin";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
-  '/': { title: 'Dashboard', breadcrumb: 'Inicio / Dashboard' },
-  '/productos': { title: 'Productos', breadcrumb: 'Inicio / Productos' },
-  '/ordenes': { title: 'Órdenes', breadcrumb: 'Inicio / Órdenes' },
-  '/clients': { title: 'Clientes', breadcrumb: 'Inicio / Clientes' },
+  "/": { title: "Dashboard", breadcrumb: "Inicio / Dashboard" },
+  "/productos": { title: "Productos", breadcrumb: "Inicio / Productos" },
+  "/ordenes": { title: "Órdenes", breadcrumb: "Inicio / Órdenes" },
 };
 
 interface LayoutProps {
@@ -15,14 +15,17 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { theme: mode } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
   const location = useLocation();
 
-  const pageInfo = pageTitles[location.pathname] || { title: 'Dashboard', breadcrumb: 'Inicio' };
+  const pageInfo = pageTitles[location.pathname] || {
+    title: "Dashboard",
+    breadcrumb: "Inicio",
+  };
 
-  // Handle responsive sidebar
   useEffect(() => {
     const handleResize = () => {
       const desktop = window.innerWidth >= 1024;
@@ -34,17 +37,23 @@ export default function Layout({ children }: LayoutProps) {
       }
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const sidebarWidth = isDesktop ? (sidebarCollapsed ? 72 : 256) : 0;
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div
+      className="min-h-screen transition-colors duration-200"
+      style={{ backgroundColor: mode === "dark" ? "#0C1117" : "#FFFBF5" }}
+    >
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
-        <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -54,8 +63,14 @@ export default function Layout({ children }: LayoutProps) {
             className="fixed inset-0 bg-black/40 z-40 lg:hidden"
             onClick={() => setMobileSidebarOpen(false)}
           />
-          <div className="fixed left-0 top-0 z-50 lg:hidden" style={{ animation: 'slideIn 300ms ease' }}>
-            <Sidebar collapsed={false} onToggleCollapse={() => setMobileSidebarOpen(false)} />
+          <div
+            className="fixed left-0 top-0 z-50 lg:hidden animate-slideIn"
+            // style={{ animation: "slideIn 300ms ease" }}
+          >
+            <Sidebar
+              collapsed={false}
+              onToggleCollapse={() => setMobileSidebarOpen(false)}
+            />
           </div>
         </>
       )}

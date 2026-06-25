@@ -21,8 +21,8 @@ export const RefreshButton = () => {
   return (
     <Button
       onClick={handleRefresh}
-      variant="ghost"
-      size="icon"
+      // variant="ghost"
+      size="icon-lg"
       className="hidden sm:inline-flex"
     >
       {loading ? <LoaderCircle className="animate-spin" /> : <RotateCw />}

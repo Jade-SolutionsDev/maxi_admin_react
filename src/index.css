@@ -3,19 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
-  html {
-    @apply font-sans;
-    }
-}
+/* @custom-variant dark (&:is(.dark *)); */
 
 @layer base {
   :root {
@@ -48,6 +36,83 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 168 50% 25%;
     --sidebar-ring: 160 84% 39%;
+
+    /* Custom theme tokens */
+    --cream-bg: #FFFBF5;
+    --content-bg: #FFFBF5;
+    --card-bg: #FFFFFF;
+    --card-bg-rgb: 255 255 255;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --border-color: #E2E8F0;
+    --border-light: #F1F5F9;
+    --input-bg: #F1F5F9;
+    --topbar-bg: #FFFBF5;
+    --table-header-bg: #F8FAFC;
+    --table-row-hover: #F0FDFA;
+    --badge-bg: #F1F5F9;
+    --chart-grid: #E2E8F0;
+    --dropdown-bg: #FFFFFF;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 210 20% 94%;
+    --card: 220 15% 12%;
+    --card-foreground: 210 20% 94%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 210 20% 94%;
+    --primary: 158 64% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 210 20% 94%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 12% 55%;
+    --accent: 174 60% 38%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 158 64% 46%;
+
+    --sidebar-background: 168 72% 14%;
+    --sidebar-foreground: 213 25% 75%;
+    --sidebar-primary: 158 64% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 174 60% 33%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 168 50% 20%;
+    --sidebar-ring: 158 64% 46%;
+
+    /* Custom dark theme tokens */
+    --cream-bg: #0C1117;
+    --content-bg: #0C1117;
+    --card-bg: #161D27;
+    --card-bg-rgb: 22 29 39;
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-color: #1E293B;
+    --border-light: #1A2535;
+    --input-bg: #1A2535;
+    --topbar-bg: #0C1117;
+    --table-header-bg: #161D27;
+    --table-row-hover: #0F2E2E;
+    --badge-bg: #1A2535;
+    --chart-grid: #1E293B;
+    --dropdown-bg: #161D27;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
@@ -55,8 +120,14 @@
   .sidebar-dark {
     background-color: #134E4A;
   }
+  .dark .sidebar-dark {
+    background-color: #0D3634;
+  }
   .cream-bg {
     background-color: #FFFBF5;
+  }
+  .dark .cream-bg {
+    background-color: #0C1117;
   }
   .text-brand {
     color: #10B981;
@@ -73,11 +144,13 @@
   .bg-cream {
     background-color: #FFFBF5;
   }
+  .dark .bg-cream {
+    background-color: #0C1117;
+  }
   .border-brand {
     border-color: #10B981;
   }
 }
-
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
@@ -93,6 +166,12 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 /* Shimmer loading animation */
@@ -110,26 +189,48 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
+.dark .animate-shimmer {
+  background: linear-gradient(90deg, #1A2535 25%, #243044 50%, #1A2535 75%);
+  background-size: 200% 100%;
+}
 
-/* Dropdown and sidebar animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
+@theme {
+  --animate-fadeInUp: fadeInUp 150ms ease-out;
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  --animate-slideIn: slideIn 300ms ease;
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+/* Smooth theme transition */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease-out;
 }
+
+/* Prevent layout shift from transitions */
+svg, path, circle, rect {
+  transition: none !important;
+}
+
 
 @config "../tailwind.config.js";

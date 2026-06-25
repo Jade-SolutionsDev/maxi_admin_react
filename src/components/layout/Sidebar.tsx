@@ -19,6 +19,8 @@ import {
   User,
 } from 'lucide-react';
 import Logo from '@/assets/maxi_habana_logo.png'
+import { useTheme } from '../admin';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
@@ -62,6 +64,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
+  const { theme:mode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
@@ -75,11 +78,16 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
     return location.pathname === path;
   };
 
+  const sidebarBg = mode === 'dark' ? 'bg-[#0D3634]' : 'bg-[#134E4A]';
+  const textColor = mode === 'dark' ? '#94A3B8' : '#CBD5E1';
+  const activeBg = mode === 'dark' ? '#0A5C56' : '#0D9488';
+
   return (
     <aside
-      className="sidebar-dark fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300 ease-in-out"
+      className={cn("fixed left-0 top-0 h-screen flex flex-col z-50 transition-[width] duration-300 ease-in-out", collapsed ? "w-18" : 'w-64' , sidebarBg)}
       style={{
-        width: collapsed ? 72 : 256,
+        // width: collapsed ? 72 : 256,
+        // backgroundColor: sidebarBg,
         boxShadow: '4px 0 16px rgba(0,0,0,0.06)',
       }}
     >
@@ -93,8 +101,8 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
         </div>
         <button
           onClick={onToggleCollapse}
-          className="text-[#94A3B8] hover:text-white transition-colors duration-150 shrink-0"
-          style={{ marginLeft: collapsed ? 0 : 8 }}
+          className="shrink-0 transition-colors duration-150"
+          style={{ color: textColor, marginLeft: collapsed ? 0 : 8 }}
         >
           <ChevronLeft
             size={18}
@@ -124,11 +132,28 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                   w-full flex items-center gap-3 rounded-[10px] transition-all duration-150 ease-out
                   ${collapsed ? 'justify-center px-0' : 'px-3'}
                   ${active
-                    ? 'bg-[#0D9488] text-white border-l-[3px] border-[#10B981]'
-                    : 'text-[#CBD5E1] hover:bg-white/[0.06] hover:text-white border-l-[3px] border-transparent'
+                    ? 'text-white border-l-[3px] border-[#10B981]'
+                    : 'border-l-[3px] border-transparent'
                   }
                 `}
-                style={{ height: 44, minHeight: 44 }}
+                style={{
+                  height: 44,
+                  minHeight: 44,
+                  backgroundColor: active ? activeBg : 'transparent',
+                  color: active ? '#FFFFFF' : textColor,
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)';
+                    (e.currentTarget as HTMLElement).style.color = '#FFFFFF';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    (e.currentTarget as HTMLElement).style.color = textColor;
+                  }
+                }}
                 title={collapsed ? item.label : undefined}
               >
                 <span className="shrink-0" style={{ marginRight: collapsed ? 0 : undefined }}>
@@ -156,11 +181,19 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                     <button
                       key={child.label}
                       onClick={() => child.path !== '#' && navigate(child.path)}
-                      className="
-                        w-full flex items-center px-4 py-2 rounded-lg
-                        text-[13px] text-[#CBD5E1] hover:text-white hover:bg-white/[0.04]
-                        transition-colors duration-100 text-left
-                      "
+                      className="w-full flex items-center px-4 py-2 rounded-lg text-[13px] transition-colors duration-100 text-left"
+                      style={{
+                        color: textColor,
+                        backgroundColor: 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)';
+                        (e.currentTarget as HTMLElement).style.color = '#FFFFFF';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                        (e.currentTarget as HTMLElement).style.color = textColor;
+                      }}
                     >
                       {child.label}
                     </button>
@@ -174,24 +207,27 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
 
       {/* User profile */}
       <div
-        className={`
-          border-t border-white/10 shrink-0 flex items-center gap-3
-          ${collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'}
-        `}
+        className="border-t border-white/10 shrink-0 flex items-center gap-3 py-3"
+        style={{ paddingLeft: collapsed ? 0 : 16, paddingRight: collapsed ? 0 : 16, justifyContent: collapsed ? 'center' : 'flex-start' }}
       >
-        <div className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: activeBg }}>
           <User size={16} className="text-white" />
         </div>
         {!collapsed && (
-          <div className="overflow-hidden">
-            <p className="text-white text-[13px] font-medium truncate">Admin Maxi</p>
-            <p className="text-[#94A3B8] text-[11px] truncate">admin@maxihabana.com</p>
-          </div>
-        )}
-        {!collapsed && (
-          <button className="ml-auto text-[#94A3B8] hover:text-white transition-colors">
-            <LogOut size={16} />
-          </button>
+          <>
+            <div className="overflow-hidden">
+              <p className="text-white text-[13px] font-medium truncate">Admin Maxi</p>
+              <p className="text-[11px] truncate" style={{ color: '#94A3B8' }}>admin@maxihabana.com</p>
+            </div>
+            <button
+              className="ml-auto transition-colors"
+              style={{ color: '#94A3B8' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
+            >
+              <LogOut size={16} />
+            </button>
+          </>
         )}
       </div>
     </aside>

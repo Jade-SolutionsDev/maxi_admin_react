@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { useTheme } from '../admin';
 
 interface KpiCardProps {
-  title: string;
   value: string;
   subtitle: string;
   trend: string;
@@ -27,7 +27,7 @@ function AnimatedNumber({ value, duration = 800 }: { value: string; duration?: n
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;
       const progress = Math.min((timestamp - startTimeRef.current) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       const current = numericValue * eased;
 
       if (isCurrency) {
@@ -54,9 +54,14 @@ function AnimatedNumber({ value, duration = 800 }: { value: string; duration?: n
 }
 
 export default function KpiCard({ value, subtitle, trend, trendUp, icon: Icon, iconBg, iconColor }: KpiCardProps) {
+  const { theme: mode } = useTheme();
+
   return (
     <div
-      className="bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-default"
+      className="rounded-2xl p-6 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-default"
+      style={{
+        backgroundColor: mode === 'dark' ? '#161D27' : '#FFFFFF',
+      }}
     >
       <div className="flex items-start justify-between">
         <div
@@ -76,10 +81,15 @@ export default function KpiCard({ value, subtitle, trend, trendUp, icon: Icon, i
           {trend}
         </div>
       </div>
-      <p className="text-[28px] font-bold text-[#1E293B] mt-3 leading-tight tracking-tight">
+      <p
+        className="text-[28px] font-bold mt-3 leading-tight tracking-tight"
+        style={{ color: mode === 'dark' ? '#E2E8F0' : '#1E293B' }}
+      >
         <AnimatedNumber value={value} />
       </p>
-      <p className="text-[13px] text-[#64748B] mt-1">{subtitle}</p>
+      <p className="text-[13px] mt-1" style={{ color: mode === 'dark' ? '#94A3B8' : '#64748B' }}>
+        {subtitle}
+      </p>
     </div>
   );
 }
