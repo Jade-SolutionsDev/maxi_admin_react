@@ -9,12 +9,7 @@ import { Route } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
-
-declare global {
-  interface Window {
-    __TANSTACK_QUERY_CLIENT__: import("@tanstack/query-core").QueryClient;
-  }
-}
+import UsersList from "./pages/Users";
 
 export default function App() {
   return (
@@ -32,6 +27,7 @@ export default function App() {
         <Route path="/productos" element={<Productos />} />
       </CustomRoutes>
       <Resource name="clients" list={ClientList} />
+      <Resource name="users" list={UsersList} />
       {/* <Resource options={{ label: "ROLES" }} name="roles" list={ListGuesser} />
       <Resource
         options={{ label: "USERS" }}

@@ -52,7 +52,7 @@ const navItems: NavItem[] = [
     label: 'Administración',
     icon: <Shield size={20} />,
     children: [
-      { label: 'Usuarios', path: '#' },
+      { label: 'Usuarios', path: '/users' },
       { label: 'Roles', path: '#' },
     ],
   },

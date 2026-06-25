@@ -12,6 +12,7 @@ import {
 import { DataTable } from "@/components/admin/data-table";
 import { List } from "@/components/admin/list";
 import { ReferenceField } from "@/components/admin/reference-field";
+import { useTranslate } from "ra-core";
 
 const clientFilters = [<SearchInput source="q" alwaysOn />, <SelectInput label="list.fields.isActive" source="isActive" choices={[
     { id: 'true', name: 'Yes' },
@@ -27,12 +28,16 @@ const ClientActions = () => (
   </div>
 );
 
-export const ClientList = () => (
+export const ClientList = () => {
+  const translate = useTranslate()
+
+  return(
+
   <List
     filters={clientFilters}
     actions={<ClientActions />}
     resource="clients"
-    title="Clients"
+    title={translate("resources.clients.name_plural")}
   >
     <DataTable hiddenColumns={["id","onboardingCompleted"]}>
       <DataTable.Col source="id">
@@ -69,4 +74,4 @@ export const ClientList = () => (
       </DataTable.Col>
     </DataTable>
   </List>
-);
+)};

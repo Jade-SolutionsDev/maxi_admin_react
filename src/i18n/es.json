@@ -1,23 +1,29 @@
 {
-    "client": {
-        "name": "Cliente",
-        "name_plural": "Clientes"  
+  "resources": {
+    "clients": {
+      "name": "Cliente",
+      "name_plural": "Clientes"
     },
-    "list": {
-        "fields": {
-            "id": "ID",
-            "firstName": "Nombre",
-            "lastName": "Apellido",
-            "defaultMunicipality": "Municipio predeterminado",
-            "isActive": "Activo",
-            "onboardingStatus": "Estado de incorporación",
-            "email": "Email",
-            "phone": "Teléfono",
-            "createdAt": "Creado",
-            "updatedAt": "Actualizado",
-            "incomplete": "Incompleto",
-            "complete": "Completo",
-            "avatar": "Avatar"
-        }
+    "users": {
+        "name": "Usuario",
+        "name_plural": "Usuarios"
     }
+  },
+  "list": {
+    "fields": {
+      "id": "ID",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "defaultMunicipality": "Municipio predeterminado",
+      "isActive": "Activo",
+      "onboardingStatus": "Estado de incorporación",
+      "email": "Email",
+      "phone": "Teléfono",
+      "createdAt": "Creado",
+      "updatedAt": "Actualizado",
+      "incomplete": "Incompleto",
+      "complete": "Completo",
+      "avatar": "Avatar"
+    }
+  }
 }
