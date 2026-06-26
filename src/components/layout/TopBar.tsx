@@ -1,6 +1,7 @@
 import { Search, Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { LocalesMenuButton, ThemeModeToggle } from '../admin';
+import { cn } from '@/lib/utils';
 
 interface TopBarProps {
   title: string;
@@ -73,21 +74,16 @@ export default function TopBar({
                   onClick={() => setShowNotifications(false)}
                 />
                 <div
-                  className="absolute right-0 top-12 w-[320px] rounded-xl shadow-dropdown z-50 overflow-hidden"
+                  className="absolute right-0 top-12 w-[320px] dark:bg-[#161D27] bg-white rounded-xl shadow-dropdown z-50 overflow-hidden"
                   style={{
-                    backgroundColor: mode === "dark" ? "#161D27" : "#FFFFFF",
                     animation: "fadeInUp 150ms ease-out",
                   }}
                 >
                   <div
-                    className="px-4 py-3 border-b"
-                    style={{
-                      borderColor: mode === "dark" ? "#1E293B" : "#E2E8F0",
-                    }}
+                    className="px-4 py-3 border-b dark:border-[#1E293B] border-[#E2E8F0]"
                   >
                     <p
-                      className="text-[14px] font-semibold"
-                      style={{ color: mode === "dark" ? "#E2E8F0" : "#1E293B" }}
+                      className="text-[14px] font-semibold dark:text-[#E2E8F0] text-[#1E293B]"
                     >
                       Notificaciones
                     </p>
@@ -112,35 +108,16 @@ export default function TopBar({
                     ].map((notif, i) => (
                       <div
                         key={i}
-                        className="px-4 py-3 cursor-pointer transition-colors duration-80"
-                        style={{
-                          backgroundColor: notif.unread
-                            ? mode === "dark"
-                              ? "#0F2E2E"
-                              : "#F0FDFA"
-                            : "transparent",
-                        }}
-                        onMouseEnter={(e) => {
-                          (
-                            e.currentTarget as HTMLElement
-                          ).style.backgroundColor =
-                            mode === "dark" ? "#1A2535" : "#F1F5F9";
-                        }}
-                        onMouseLeave={(e) => {
-                          (
-                            e.currentTarget as HTMLElement
-                          ).style.backgroundColor = notif.unread
-                            ? mode === "dark"
-                              ? "#0F2E2E"
-                              : "#F0FDFA"
-                            : "transparent";
-                        }}
+                        className={cn("px-4 py-3 cursor-pointer transition-colors duration-80",
+                          notif.unread
+                            ? "bg-[#F0FDFA] dark:bg-[#0F2E2E]"
+                            : "bg-transparent",
+                          "hover:bg-[#F1F5F9] dark:hover:bg-[#1A2535]"
+                        )
+                        }
                       >
                         <p
-                          className="text-[13px]"
-                          style={{
-                            color: mode === "dark" ? "#E2E8F0" : "#1E293B",
-                          }}
+                          className="text-[13px] dark:text-[#E2E8F0] text-[#1E293B]"
                         >
                           {notif.text}
                         </p>

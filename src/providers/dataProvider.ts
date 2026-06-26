@@ -4,6 +4,18 @@ import { getApiToken } from '../lib/clerk/clerkRefs';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
+export interface InviteUserPayload {
+  email: string;
+  userType: string;
+  firstName?: string;
+  lastName?: string;
+  organizationId?: string;
+}
+
+export interface ExtendedDataProvider extends DataProvider {
+  inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
+}
+
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
   const token = await getApiToken();
 
@@ -118,5 +130,13 @@ export const dataProvider: DataProvider = {
       ),
     );
     return { data: params.ids };
+  },
+
+  async inviteUser(payload: InviteUserPayload) {
+    const { json } = await httpClient(`${API_URL}/users/invite`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return { data: json?.data ?? json };
   },
 };

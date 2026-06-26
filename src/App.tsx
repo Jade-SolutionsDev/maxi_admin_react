@@ -18,7 +18,7 @@ export default function App() {
       authProvider={authProvider}
       dataProvider={dataProvider}
       loginPage={LoginPage}
-      requireAuth={!import.meta.env.DEV}
+      requireAuth
       dashboard={Dashboard}
       layout={Layout}
       i18nProvider={i18nProvider}

@@ -120,9 +120,13 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
         {navItems.map((item) => {
-          const active = isActive(item.path);
           const hasChildren = !!item.children;
+          const active =
+            isActive(item.path) ||
+            (hasChildren &&
+              item.children?.some((child) => isActive(child.path)));
           const isExpanded = expandedMenus[item.label];
+          const activeChild = item.children?.find((child) => isActive(child.path));
 
           return (
             <div key={item.label}>
@@ -136,7 +140,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                 }}
                 className={cn(
                   `
-                  w-full flex items-center gap-3 rounded-[10px] transition-all duration-150 ease-out
+                  w-full flex items-center gap-3 rounded-[10px] transition-all duration-150 ease-out hover:bg-[#0D9488] hover:dark:bg-[#0A5C56] hover:text-white
                   ${collapsed ? "justify-center px-0" : "px-3"}
                 `,
                   active
@@ -147,20 +151,6 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                   height: 44,
                   minHeight: 44,
                 }}
-                // onMouseEnter={(e) => {
-                //   if (!active) {
-                //     (e.currentTarget as HTMLElement).style.backgroundColor =
-                //       "rgba(255,255,255,0.06)";
-                //     (e.currentTarget as HTMLElement).style.color = "#FFFFFF";
-                //   }
-                // }}
-                // onMouseLeave={(e) => {
-                //   if (!active) {
-                //     (e.currentTarget as HTMLElement).style.backgroundColor =
-                //       "transparent";
-                //     // (e.currentTarget as HTMLElement).style.color = textColor;
-                //   }
-                // }}
                 title={collapsed ? item.label : undefined}
               >
                 <span
@@ -191,22 +181,11 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                     <button
                       key={child.label}
                       onClick={() => child.path !== "#" && navigate(child.path)}
-                      className="w-full flex items-center px-4 py-2 rounded-lg text-[13px] transition-colors duration-100 text-left dark:text-[#94A3B8] text-[#CBD5E1]"
-                      style={{
-                        backgroundColor: "transparent",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.backgroundColor =
-                          "rgba(255,255,255,0.04)";
-                        (e.currentTarget as HTMLElement).style.color =
-                          "#FFFFFF";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.backgroundColor =
-                          "transparent";
-                        // (e.currentTarget as HTMLElement).style.color =
-                        //   textColor;
-                      }}
+                      className={cn(
+                        "w-full flex items-center px-4 py-2 rounded-lg text-[13px] transition-colors duration-100 text-left dark:text-[#94A3B8] text-[#CBD5E1] hover:bg-black/5",
+                        activeChild && activeChild.path === child.path && "bg-black/10 dark:bg-[#0A5C56] text-white",
+                      )}
+                      
                     >
                       {child.label}
                     </button>
@@ -227,9 +206,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
           justifyContent: collapsed ? "center" : "flex-start",
         }}
       >
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 dark:bg-[#0A5C56] bg-[#0D9488]"
-        >
+        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 dark:bg-[#0A5C56] bg-[#0D9488]">
           <User size={16} className="text-white" />
         </div>
         {!collapsed && (
