@@ -1,6 +1,5 @@
 import { authProvider } from "./providers/authProvider";
 import { dataProvider } from "./providers/dataProvider";
-import { LoginPage } from "./components/layout/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import { Admin } from "./components/admin";
 import { CustomRoutes, Resource } from "ra-core";
@@ -10,6 +9,7 @@ import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
 import UsersList from "./pages/Users";
+import LoginPage from "./components/layout/LoginPage";
 
 export default function App() {
   return (
@@ -18,7 +18,7 @@ export default function App() {
       authProvider={authProvider}
       dataProvider={dataProvider}
       loginPage={LoginPage}
-      requireAuth
+      requireAuth={!import.meta.env.DEV}
       dashboard={Dashboard}
       layout={Layout}
       i18nProvider={i18nProvider}

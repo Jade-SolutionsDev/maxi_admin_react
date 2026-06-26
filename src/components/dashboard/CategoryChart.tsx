@@ -8,26 +8,13 @@ import {
   Cell,
 } from 'recharts';
 import { categoryData } from '@/data/mockData';
-import { useTheme } from '../admin';
 
-const barColors = ['#10B981', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4'];
+const barColors = ["#10B981", "#0D9488", "#14B8A6", "#2DD4BF", "#5EEAD4"];
 
 export default function CategoryChart() {
-  const { theme:mode } = useTheme();
-
-  const textColor = mode === 'dark' ? '#94A3B8' : '#1E293B';
-  const mutedColor = mode === 'dark' ? '#64748B' : '#94A3B8';
-  const gridColor = mode === 'dark' ? '#1E293B' : '#F1F5F9';
-
   return (
-    <div
-      className="rounded-2xl p-6 shadow-card"
-      style={{ backgroundColor: mode === 'dark' ? '#161D27' : '#FFFFFF' }}
-    >
-      <h3
-        className="text-[18px] font-semibold mb-6"
-        style={{ color: mode === 'dark' ? '#E2E8F0' : '#1E293B' }}
-      >
+    <div className="rounded-2xl p-6 shadow-card dark:bg-[#161D27] bg-[#FFFFFF]">
+      <h3 className="text-[18px] font-semibold mb-6 dark:text-[#E2E8F0] text-[#1E293B]">
         Ventas por Categoría
       </h3>
 
@@ -37,29 +24,34 @@ export default function CategoryChart() {
           layout="vertical"
           margin={{ top: 0, right: 40, left: 0, bottom: 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            className="stroke-[#F1F5F9] dark:stroke-[#1E293B]"
+            horizontal={false}
+          />
           <XAxis
             type="number"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: mutedColor, fontSize: 11 }}
+            className="fill-[#94A3B8] dark:fill-[#64748B]"
+            tick={{ fontSize: 11 }}
             tickFormatter={(value: number) => `$${(value / 1000).toFixed(0)}k`}
           />
           <YAxis
+            className="fill-[#1E293B] dark:fill-[#94A3B8]"
             type="category"
             dataKey="category"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: textColor, fontSize: 12, fontWeight: 500 }}
+            tick={{ fontSize: 12, fontWeight: 500 }}
             width={90}
           />
-          <Bar
-            dataKey="value"
-            radius={[0, 8, 8, 0]}
-            barSize={16}
-          >
+          <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={16}>
             {categoryData.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+              <Cell
+                key={`cell-${index}`}
+                fill={barColors[index % barColors.length]}
+              />
             ))}
           </Bar>
         </BarChart>

@@ -385,7 +385,7 @@ function DataTableHeadCell<
               <Button
                 variant="ghost"
                 size="sm"
-                className="-ml-3 -mr-3 h-8 data-[state=open]:bg-accent cursor-pointer hover:bg-transparent"
+                className="-ml-3 -mr-3 h-8 data-[state=open]:bg-accent cursor-pointer hover:bg-transparent dark:hover:bg-transparent"
                 data-field={source}
                 onClick={handleSort}
               >

@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
-import { useTheme } from "../admin";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
   "/": { title: "Dashboard", breadcrumb: "Inicio / Dashboard" },
   "/productos": { title: "Productos", breadcrumb: "Inicio / Productos" },
+  "/clients": { title: "Clientes", breadcrumb: "Inicio / Clientes" },
   "/ordenes": { title: "Órdenes", breadcrumb: "Inicio / Órdenes" },
 };
 
@@ -15,7 +15,6 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { theme: mode } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
@@ -44,10 +43,7 @@ export default function Layout({ children }: LayoutProps) {
   const sidebarWidth = isDesktop ? (sidebarCollapsed ? 72 : 256) : 0;
 
   return (
-    <div
-      className="min-h-screen transition-colors duration-200"
-      style={{ backgroundColor: mode === "dark" ? "#0C1117" : "#FFFBF5" }}
-    >
+    <div className="min-h-screen transition-colors duration-200 bg-[#FFFBF5] dark:bg-[#0C1117]">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar
