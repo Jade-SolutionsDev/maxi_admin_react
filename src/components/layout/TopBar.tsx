@@ -1,6 +1,6 @@
 import { Search, Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
-import { LocalesMenuButton, ThemeModeToggle } from '../admin';
+import { LocalesMenuButton, ThemeModeToggle, UserMenu } from '../admin';
 import { cn } from '@/lib/utils';
 
 interface TopBarProps {
@@ -137,11 +137,7 @@ export default function TopBar({
 
           <LocalesMenuButton />
           <ThemeModeToggle />
-
-          {/* Avatar */}
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#10B981] to-[#0D9488] flex items-center justify-center border-2 border-[#10B981]">
-            <span className="text-white text-[13px] font-semibold">A</span>
-          </div>
+          <UserMenu />
         </div>
       </div>
     </header>

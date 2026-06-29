@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
     Mail,
@@ -10,8 +10,10 @@ import {
     CheckCircle2,
     Upload,
     X,
+    Lock,
+    LogOut,
 } from "lucide-react";
-import { useSignUp } from "@clerk/react";
+import { useAuth, useSignUp } from "@clerk/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -37,18 +39,39 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 // Form validation schema
-const formSchema = z.object({
-  email: z.string().email("Email inválido"),
-  firstName: z.string().min(1, "El nombre es requerido"),
-  lastName: z.string().min(1, "El apellido es requerido"),
-  phone: z.string().optional(),
-  businessName: z.string().optional(),
-  avatar: z.string().nullable().optional(),
-});
+const formSchema = z
+  .object({
+    // email: z.string().email("Email inválido"),
+    firstName: z.string().min(1, "El nombre es requerido"),
+    lastName: z.string().min(1, "El apellido es requerido"),
+    phone: z.string().optional(),
+    businessName: z.string().optional(),
+    password: z
+      .string()
+      .min(8, "La contraseña debe tener al menos 8 caracteres"),
+    confirmPassword: z.string().min(1, "Confirma tu contraseña"),
+    avatar: z.string().nullable().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
 
 type FormData = z.infer<typeof formSchema>;
 
+/** Best-effort extraction of a human-readable message from a Clerk error. */
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === "object" && "message" in err) {
+    const message = (err as { message?: unknown }).message;
+    if (typeof message === "string" && message.length > 0) {
+      return message;
+    }
+  }
+  return fallback;
+}
+
 export default function Invitation() {
+  const { isLoaded: isAuthLoaded, isSignedIn, signOut } = useAuth();
   const { signUp } = useSignUp();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -61,29 +84,56 @@ export default function Invitation() {
   // Get the ticket from the query params
   const ticket = searchParams.get("__clerk_ticket");
 
-  useEffect(() => {
-    // Only leave the invite page once this sign-up actually completes.
-    // Do NOT redirect merely because Clerk already has a session: that
-    // session may not be a provisioned backoffice user, so navigating to
-    // "/" (which is behind requireAuth) would 401 on /api/auth/me and
-    // bounce the user to /login.
-    if (signUp?.status === "complete") {
-      navigate("/");
-    }
-  }, [signUp?.status, navigate]);
-
   // Initialize form
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      // email: "",
       firstName: "",
       lastName: "",
       phone: "",
       businessName: "",
+      password: "",
+      confirmPassword: "",
       avatar: null,
     },
   });
+
+  // Block already-signed-in users: an invitation must be accepted as a brand
+  // new session. Instead of redirecting to "/" (which is behind requireAuth and
+  // would 401 on /api/auth/me for a non-backoffice session), gate them in place
+  // and let them sign out to continue — keeping the ticket in the URL.
+  if (isAuthLoaded && isSignedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <Card className="w-full max-w-[400px]">
+          <CardContent className="pt-8 text-center">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-primary/10">
+              <LogOut className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-xl mb-2">
+              Ya tienes una sesión activa
+            </CardTitle>
+            <CardDescription className="text-sm mb-6">
+              Para aceptar esta invitación necesitas cerrar la sesión actual y
+              continuar como nuevo usuario.
+            </CardDescription>
+            <Button
+              onClick={() =>
+                void signOut({
+                  redirectUrl: `${window.location.pathname}${window.location.search}`,
+                })
+              }
+              className="w-full"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Cerrar sesión y continuar
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!ticket) {
     return (
@@ -133,15 +183,58 @@ export default function Invitation() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Replace with actual API call
-      // await markInvitationAccepted(token!);
+      // Consume the Clerk invitation ticket and create the account in one call:
+      // - password sets the user's credentials (the instance requires it);
+      // - firstName/lastName are read by the backoffice `user.created` webhook;
+      // - phone/businessName ride along in unsafeMetadata, which Clerk copies
+      //   onto the user and the webhook persists to the local User record.
+      const { error: ticketError } = await signUp.create({
+        strategy: "ticket",
+        ticket,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        unsafeMetadata: {
+          phone: data.phone ?? "",
+          businessName: data.businessName ?? "",
+        },
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (ticketError) {
+        setError(
+          getErrorMessage(ticketError, "No se pudo validar la invitación."),
+        );
+        return;
+      }
+
+      if (signUp.status !== "complete") {
+        // The backoffice Clerk instance needs more than the ticket (e.g. a
+        // password). Surface it instead of silently doing nothing.
+        const missing = signUp.missingFields.join(", ");
+        setError(
+          missing
+            ? `Faltan datos para completar el registro: ${missing}.`
+            : `No se pudo completar el registro (estado: ${signUp.status}).`,
+        );
+        return;
+      }
+
+      // Activate the new session, then leave the invite page.
+      await signUp.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            // Pending session tasks (e.g. org selection) are out of scope here.
+            return;
+          }
+          navigate(decorateUrl("/"), { replace: true });
+        },
+      });
 
       setIsSuccess(true);
     } catch (err) {
-      setError("Error al activar la cuenta. Intenta nuevamente.");
+      setError(
+        getErrorMessage(err, "Error al activar la cuenta. Intenta nuevamente."),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -275,7 +368,7 @@ export default function Invitation() {
               </div>
 
               {/* Email - Read only */}
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -301,7 +394,7 @@ export default function Invitation() {
                     </p>
                   </FormItem>
                 )}
-              />
+              /> */}
 
               {/* Name row */}
               <div className="grid grid-cols-2 gap-3">
@@ -387,6 +480,59 @@ export default function Invitation() {
                         <Input
                           {...field}
                           placeholder="Mi Empresa S.A."
+                          className="pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Password */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Contraseña <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Mínimo 8 caracteres"
+                          className="pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Confirm Password */}
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Confirmar contraseña{" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Repite tu contraseña"
                           className="pl-10"
                         />
                       </div>

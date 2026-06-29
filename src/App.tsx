@@ -2,15 +2,25 @@ import { authProvider } from "./providers/authProvider";
 import { dataProvider } from "./providers/dataProvider";
 import Dashboard from "./pages/Dashboard";
 import { Admin } from "./components/admin";
-import { CustomRoutes, localStorageStore, Resource } from "ra-core";
+import { ThemeProvider } from "./components/admin/theme-provider";
+import {
+  CustomRoutes,
+  localStorageStore,
+  Resource,
+  StoreContextProvider,
+} from "ra-core";
 import Layout from "./components/layout/Layout";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
 import UsersList from "./pages/Users";
 import LoginPage from "./components/layout/LoginPage";
 import Invitation from "./pages/Invitation";
+
+// Shared store so the standalone invite route and the Admin app read the same
+// persisted preferences (e.g. the light/dark theme).
+const store = localStorageStore();
 
 const AdminApp = () => (
   <Admin
@@ -22,17 +32,8 @@ const AdminApp = () => (
     dashboard={Dashboard}
     layout={Layout}
     i18nProvider={i18nProvider}
-    store={localStorageStore()}
+    store={store}
   >
-    {/*
-      Public route: `noLayout` custom routes are rendered by ra-core in every
-      branch (even when `requireAuth` fails), outside <Layout> but still inside
-      ThemeProvider + CoreAdminContext, so <Invitation /> keeps theme + i18n +
-      store and is reachable without authentication.
-    */}
-    <CustomRoutes noLayout>
-      <Route path="/confirm-invite" element={<Invitation />} />
-    </CustomRoutes>
     <CustomRoutes>
       <Route path="/productos" element={<Productos />} />
     </CustomRoutes>
@@ -41,13 +42,34 @@ const AdminApp = () => (
   </Admin>
 );
 
+// The invitation page is rendered OUTSIDE <Admin> on purpose. It must be
+// reachable without authentication, and while it lived inside <Admin> (even as
+// a `noLayout` custom route) the react-admin auth machinery stayed in its tree
+// — any active Clerk session flipped `authenticated` true, mounted the
+// identity/permission hooks, and fired authProvider.getIdentity -> GET
+// /api/auth/me, which 401s for a session that isn't a provisioned backoffice
+// user. Standalone, the authProvider is never in scope, so that call cannot
+// happen. We still wrap it in the theme store/provider so the page keeps the
+// app's light/dark styling (the only context <Invitation /> would otherwise
+// miss — it uses no other react-admin context).
+const InviteApp = () => (
+  <StoreContextProvider value={store}>
+    <ThemeProvider>
+      <Invitation />
+    </ThemeProvider>
+  </StoreContextProvider>
+);
+
 export default function App() {
   // Keep the BrowserRouter so the app uses path-based URLs (ra-core would
-  // otherwise default to a HashRouter). ra-core's AdminRouter detects this
-  // existing router and reuses it instead of creating its own.
+  // otherwise default to a HashRouter). The /confirm-invite route is matched
+  // here, before the Admin catch-all, so <Admin> never sees it.
   return (
     <BrowserRouter>
-      <AdminApp />
+      <Routes>
+        <Route path="/confirm-invite" element={<InviteApp />} />
+        <Route path="/*" element={<AdminApp />} />
+      </Routes>
     </BrowserRouter>
   );
 }

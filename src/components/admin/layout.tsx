@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import type { CoreLayoutProps } from "ra-core";
 import { ErrorBoundary } from "react-error-boundary";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { UserMenu } from "@/components/admin/user-menu";
+// import { UserMenu } from "@/components/admin/user-menu"; // re-enable with <UserMenu /> below
 import { ThemeModeToggle } from "@/components/admin/theme-mode-toggle";
 import { Notification } from "@/components/admin/notification";
 import { AppSidebar } from "@/components/admin/app-sidebar";
