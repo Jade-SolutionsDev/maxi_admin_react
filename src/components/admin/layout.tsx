@@ -46,7 +46,7 @@ export const Layout = (props: CoreLayoutProps) => {
           <LocalesMenuButton />
           <ThemeModeToggle />
           <RefreshButton />
-          <UserMenu />
+          {/* <UserMenu /> */}
         </header>
         <ErrorBoundary
           onError={handleError}

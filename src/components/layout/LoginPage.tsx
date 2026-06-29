@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
-import { useSignIn } from '@clerk/react';
+import { useSignIn, useUser } from '@clerk/react';
 
 export default function LoginPage() {
+  const { isSignedIn } = useUser()
   const { signIn } = useSignIn();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -48,10 +49,11 @@ export default function LoginPage() {
     }
   };
 
-  // const inputBg = mode === 'dark' ? '#1A2535' : '#F1F5F9';
-  // const textPrimary = mode === 'dark' ? '#E2E8F0' : '#1E293B';
-  // const textSecondary = mode === 'dark' ? '#94A3B8' : '#64748B';
-  // const borderColor = mode === 'dark' ? '#1E293B' : '#E2E8F0';
+  useEffect(() => {
+    if (isSignedIn) {
+      navigate('/', {replace: true});
+    }
+  }, [isSignedIn, navigate])
 
   return (
     <div
