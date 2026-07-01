@@ -7,6 +7,14 @@
     "users": {
       "name": "Usuario",
       "name_plural": "Usuarios"
+    },
+    "departments": {
+      "name": "Departamento",
+      "name_plural": "Departamentos"
+    },
+    "categories": {
+      "name": "Categoría",
+      "name_plural": "Categorías"
     }
   },
   "list": {
@@ -26,7 +34,10 @@
       "avatar": "Avatar",
       "userType": "Tipo de usuario",
       "status": "Estado",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "description": "Descripción",
+      "sortOrder": "Orden",
+      "slug": "Slug"
     }
   },
   "users": {
@@ -55,6 +66,20 @@
     "status": {
       "active": "Activo",
       "inactive": "Inactivo"
+    }
+  },
+  "shared": {
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "create_title": "Crear %{name}",
+      "edit_title": "Editar %{name}",
+      "save": "Guardar",
+      "form_subtitle": "Completa los datos a continuación.",
+      "delete_confirm_title": "Eliminar %{name}",
+      "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
     }
   },
   "app": {

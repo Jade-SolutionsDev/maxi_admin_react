@@ -48,8 +48,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { labelKey: "app.menu.dashboard", icon: <LayoutDashboard size={20} />, path: "/" },
-  { labelKey: "app.menu.departments", icon: <Building2 size={20} />, resource: "locations" },
-  { labelKey: "app.menu.categories", icon: <Tags size={20} />, resource: "categories" },
+  { labelKey: "app.menu.departments", icon: <Building2 size={20} />, path: "/departments", resource: "categories" },
+  { labelKey: "app.menu.categories", icon: <Tags size={20} />, path: "/categories", resource: "categories" },
   { labelKey: "app.menu.products", icon: <Package size={20} />, path: "/productos", resource: "products" },
   { labelKey: "app.menu.orders", icon: <ShoppingCart size={20} />, path: "/ordenes", resource: "orders" },
   { labelKey: "app.menu.paymentCharges", icon: <CreditCard size={20} /> },

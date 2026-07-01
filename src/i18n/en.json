@@ -7,6 +7,14 @@
     "users": {
       "name": "User",
       "name_plural": "Users"
+    },
+    "departments": {
+      "name": "Department",
+      "name_plural": "Departments"
+    },
+    "categories": {
+      "name": "Category",
+      "name_plural": "Categories"
     }
   },
   "list": {
@@ -27,7 +35,10 @@
       "avatar": "Avatar",
       "userType": "User type",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "description": "Description",
+      "sortOrder": "Sort Order",
+      "slug": "Slug"
     }
   },
   "users": {
@@ -56,6 +67,20 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    }
+  },
+  "shared": {
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "create_title": "Create %{name}",
+      "edit_title": "Edit %{name}",
+      "save": "Save",
+      "form_subtitle": "Fill in the details below.",
+      "delete_confirm_title": "Delete %{name}",
+      "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "app": {

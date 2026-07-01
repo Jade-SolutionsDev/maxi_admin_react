@@ -19,6 +19,13 @@ import LoginPage from "./components/layout/LoginPage";
 import Invitation from "./pages/Invitation";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
+import UserCreate from "./pages/users/UserCreate";
+import { DepartmentsLayout } from "./pages/departments/DepartmentsLayout";
+import DepartmentCreate from "./pages/departments/DepartmentCreate";
+import DepartmentEdit from "./pages/departments/DepartmentEdit";
+import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
+import CategoryCreate from "./pages/categories/CategoryCreate";
+import CategoryEdit from "./pages/categories/CategoryEdit";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
@@ -40,11 +47,22 @@ const AdminApp = () => (
     <CustomRoutes>
       <Route path="/productos" element={<Productos />} />
       <Route path="/users/*" element={<UsersLayout />}>
+        <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />
+      </Route>
+      <Route path="/departments/*" element={<DepartmentsLayout />}>
+        <Route path="create" element={<DepartmentCreate />} />
+        <Route path="edit/:id" element={<DepartmentEdit />} />
+      </Route>
+      <Route path="/categories/*" element={<CategoriesLayout />}>
+        <Route path="create" element={<CategoryCreate />} />
+        <Route path="edit/:id" element={<CategoryEdit />} />
       </Route>
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
     <Resource name="users" />
+    <Resource name="departments" />
+    <Resource name="categories" />
   </Admin>
 );
 

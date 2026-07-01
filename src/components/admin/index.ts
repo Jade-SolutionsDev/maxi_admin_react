@@ -23,7 +23,7 @@ export * from "./date-input";
 export * from "./date-time-input";
 export * from "./delete-button";
 export * from "./edit-button";
-export * from "./edit-guesser";
+export * from "./entity-form-modal";
 export * from "./edit";
 export * from "./email-field";
 export * from "./error";

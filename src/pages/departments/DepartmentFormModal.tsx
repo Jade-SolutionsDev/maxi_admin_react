@@ -1,0 +1,163 @@
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  CreateBase,
+  EditBase,
+  required,
+  useEditContext,
+  useSaveContext,
+  useTranslate,
+} from "ra-core";
+import { useFormContext, useFormState } from "react-hook-form";
+import { Loader2, Save } from "lucide-react";
+
+import {
+  BooleanInput,
+  EntityFormModal,
+  NumberInput,
+  SimpleForm,
+  TextInput,
+} from "@/components/admin";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface DepartmentFormModalProps {
+  mode: "create" | "edit";
+}
+
+export default function DepartmentFormModal({ mode }: DepartmentFormModalProps) {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const translate = useTranslate();
+
+  const isEdit = mode === "edit";
+  const title = translate(
+    isEdit ? "shared.actions.edit_title" : "shared.actions.create_title",
+    { name: translate("resources.departments.name", { _: "Department" }) },
+  );
+
+  const onClose = () => navigate("/departments");
+
+  return (
+    <EntityFormModal
+      open
+      onOpenChange={(open) => !open && onClose()}
+      title={title}
+      description={translate("shared.actions.form_subtitle", {
+        _: "Fill in the details below.",
+      })}
+    >
+      {isEdit ? (
+        <EditBase id={id} mutationMode="pessimistic">
+          <ModalFormShell onClose={onClose} />
+        </EditBase>
+      ) : (
+        <CreateBase redirect="list" mutationMode="pessimistic">
+          <ModalFormShell onClose={onClose} />
+        </CreateBase>
+      )}
+    </EntityFormModal>
+  );
+}
+
+function ModalFormShell({ onClose }: { onClose: () => void }) {
+  const editContext = useEditContext();
+  const isLoading = editContext?.isLoading ?? false;
+
+  return (
+    <SimpleForm
+      toolbar={<ModalFormToolbar onClose={onClose} />}
+      className="px-6 py-5 gap-5 max-h-[70vh] overflow-y-auto"
+    >
+      {isLoading ? <FormSkeleton /> : <DepartmentFormFields />}
+    </SimpleForm>
+  );
+}
+
+function DepartmentFormFields() {
+  const translate = useTranslate();
+
+  return (
+    <>
+      <TextInput
+        source="name"
+        label={translate("list.fields.name")}
+        validate={required()}
+      />
+      <TextInput source="slug" label={translate("list.fields.slug")} />
+      <TextInput
+        source="description"
+        label={translate("list.fields.description")}
+        multiline
+      />
+      <NumberInput
+        source="sortOrder"
+        label={translate("list.fields.sortOrder")}
+        defaultValue={0}
+      />
+      <BooleanInput
+        source="isActive"
+        label={translate("list.fields.isActive")}
+        defaultValue={true}
+      />
+    </>
+  );
+}
+
+function FormSkeleton() {
+  return (
+    <div className="space-y-5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+          <div className="h-10 w-full rounded bg-muted animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ModalFormToolbar({ onClose }: { onClose: () => void }) {
+  const translate = useTranslate();
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t",
+      )}
+    >
+      <Button type="button" variant="outline" onClick={onClose}>
+        {translate("shared.actions.cancel", { _: "Cancel" })}
+      </Button>
+      <SaveButton label={translate("shared.actions.save", { _: "Save" })} />
+    </div>
+  );
+}
+
+function SaveButton({ label }: { label: string }) {
+  const form = useFormContext();
+  const saveContext = useSaveContext();
+  const { isSubmitting, isValidating } = useFormState();
+  const disabled = isSubmitting || isValidating;
+
+  const handleClick = async () => {
+    await form.handleSubmit(async (values) => {
+      await saveContext?.save?.(values);
+    })();
+  };
+
+  return (
+    <Button
+      type="button"
+      disabled={disabled}
+      onClick={handleClick}
+      className={cn(disabled && "opacity-50 cursor-not-allowed")}
+    >
+      {isSubmitting ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <Save className="mr-2 h-4 w-4" />
+      )}
+      {label}
+    </Button>
+  );
+}
