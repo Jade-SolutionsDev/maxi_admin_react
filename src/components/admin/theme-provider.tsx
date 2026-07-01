@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useStore } from "ra-core";
+import { useEffect, useState } from "react";
 
 import { ThemeProviderContext, type Theme } from "./theme-context";
 
@@ -17,10 +16,17 @@ type ThemeProviderProps = {
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "theme",
+  // storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useStore<Theme>(storageKey, defaultTheme);
+  const STORAGE_KEY = "maxi-theme";
+  const [theme, setThemeState] = useState<Theme>(
+    () => (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? defaultTheme,
+  );
+  const setTheme = (t: Theme) => {
+    localStorage.setItem(STORAGE_KEY, t);
+    setThemeState(t);
+  };
 
   useEffect(() => {
     const root = window.document.documentElement;

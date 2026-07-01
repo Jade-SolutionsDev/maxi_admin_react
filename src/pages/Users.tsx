@@ -1,15 +1,13 @@
 import {
   BooleanField,
-  ColumnsButton,
-  CreateButton,
-  DataTable,
+  ColumnsButton, DataTable,
   DateField,
   FilterButton,
   List,
   ReferenceField,
   RefreshButton,
   SearchInput,
-  SelectInput,
+  SelectInput
 } from "@/components/admin";
 import { InviteUserDialog } from "@/components/users/InviteUserDialog";
 import { useTranslate } from "ra-core";
@@ -29,7 +27,7 @@ const userFilters = [
 const UserActions = () => (
   <div className="flex gap-2">
     <RefreshButton />
-    <CreateButton />
+    {/* <CreateButton /> */}
     <InviteUserDialog />
     <ColumnsButton />
     <FilterButton variant="default" size="lg" />

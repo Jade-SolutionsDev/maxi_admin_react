@@ -5,6 +5,7 @@ import { Admin } from "./components/admin";
 import { ThemeProvider } from "./components/admin/theme-provider";
 import {
   CustomRoutes,
+  I18nContextProvider,
   localStorageStore,
   Resource,
   StoreContextProvider,
@@ -20,7 +21,7 @@ import Invitation from "./pages/Invitation";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
-const store = localStorageStore();
+const store = localStorageStore("1", "maxi-admin-react");
 
 const AdminApp = () => (
   <Admin
@@ -33,6 +34,7 @@ const AdminApp = () => (
     layout={Layout}
     i18nProvider={i18nProvider}
     store={store}
+    disableTelemetry
   >
     <CustomRoutes>
       <Route path="/productos" element={<Productos />} />
@@ -54,9 +56,11 @@ const AdminApp = () => (
 // miss — it uses no other react-admin context).
 const InviteApp = () => (
   <StoreContextProvider value={store}>
-    <ThemeProvider>
-      <Invitation />
-    </ThemeProvider>
+    <I18nContextProvider value={i18nProvider}>
+      <ThemeProvider>
+        <Invitation />
+      </ThemeProvider>
+    </I18nContextProvider>
   </StoreContextProvider>
 );
 
