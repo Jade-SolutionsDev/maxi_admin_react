@@ -56,5 +56,28 @@
       "active": "Activo",
       "inactive": "Inactivo"
     }
+  },
+  "app": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "departments": "Departamento",
+      "categories": "Categoría",
+      "products": "Producto",
+      "orders": "Órdenes",
+      "paymentCharges": "Cargos de Pago",
+      "paymentMethods": "Métodos de Pago",
+      "coupons": "Cupones",
+      "clients": "Clientes",
+      "messages": "Mensajes",
+      "clientWeb": "Web Cliente",
+      "clientWebSettings": "Configuración",
+      "clientWebBanners": "Banners",
+      "administration": "Administración",
+      "users": "Usuarios",
+      "roles": "Roles"
+    },
+    "user": {
+      "profile": "Perfil"
+    }
   }
 }

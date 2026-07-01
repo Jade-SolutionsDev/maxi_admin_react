@@ -2,6 +2,7 @@ import { Search, Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { LocalesMenuButton, ThemeModeToggle, UserMenu } from '../admin';
 import { cn } from '@/lib/utils';
+import { ProfileMenuItem } from './ProfileMenuItem';
 
 interface TopBarProps {
   title: string;
@@ -137,7 +138,9 @@ export default function TopBar({
 
           <LocalesMenuButton />
           <ThemeModeToggle />
-          <UserMenu />
+          <UserMenu>
+            <ProfileMenuItem />
+          </UserMenu>
         </div>
       </div>
     </header>

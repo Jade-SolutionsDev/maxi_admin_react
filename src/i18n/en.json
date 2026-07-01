@@ -57,5 +57,28 @@
       "active": "Active",
       "inactive": "Inactive"
     }
+  },
+  "app": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "departments": "Department",
+      "categories": "Category",
+      "products": "Product",
+      "orders": "Orders",
+      "paymentCharges": "Payment Charges",
+      "paymentMethods": "Payment Methods",
+      "coupons": "Coupons",
+      "clients": "Clients",
+      "messages": "Messages",
+      "clientWeb": "Client Web",
+      "clientWebSettings": "Settings",
+      "clientWebBanners": "Banners",
+      "administration": "Administration",
+      "users": "Users",
+      "roles": "Roles"
+    },
+    "user": {
+      "profile": "Profile"
+    }
   }
 }
