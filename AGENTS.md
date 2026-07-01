@@ -132,14 +132,41 @@ export const App = () => (
 
 Use the example above to generate the component code and adapt the resources to your needs.
 
-## Users List Design Conventions
+## Users Routing and CRUD Conventions
 
-- The users list (`src/pages/Users.tsx`) uses the shadcn-admin-kit `\u003cList\u003e` + `\u003cDataTable\u003e` primitives from `@/components/admin`.
-- Filters are declared as an array of filter inputs and passed to `\u003cList filters={...}\u003e`.
-- Use `SearchInput` for full-text search (`source="q"`), `SelectInput` for enum filters (`source="userType"`), and a custom toggle component (`StatusToggleInput`) for boolean filters (`source="isActive"`).
-- The status toggle filter uses three pills (All / Active / Inactive) and updates the filter value to `""`, `"true"` or `"false"`.
-- Inline row actions are rendered in a `\u003cDataTable.Col\u003e` with custom icon buttons. Use `useCreatePath` for edit links and `useDeleteWithUndoController` for deletes.
+- Users CRUD lives under `src/pages/users/` and uses **nested React Router routes** inside `\u003cCustomRoutes\u003e` instead of `\u003cResource list={...} edit={...} create={...}\u003e`.
+- The "slot" for nested routes is React Router's `\u003cOutlet /\u003e`, rendered by `src/pages/users/UsersLayout.tsx`.
+- `UsersLayout` wraps its outlet with `\u003cResourceContextProvider value="users"\u003e` so ra-core hooks (`useRecordContext`, `useResourceContext`, etc.) work without a `\u003cResource\u003e` route.
+- `App.tsx` still declares `\u003cResource name="users" /\u003e` (no list/edit/create props) so react-admin registers the resource metadata; the actual routes come from `CustomRoutes`.
+
+### Route map
+
+```
+/users              -> UsersList
+/users/create       -> UserCreate
+/users/edit/:id     -> UserEdit
+```
+
+### Components
+
+- `src/pages/users/UsersList.tsx`: list page with filters, avatar, inline edit/delete actions.
+- `src/pages/users/UserEdit.tsx`: edit form using `\u003cEdit id={idFromParams}\u003e` + `\u003cSimpleForm\u003e`.
+- `src/pages/users/UserCreate.tsx`: create form using `\u003cCreate redirect="list"\u003e` + `\u003cSimpleForm\u003e`.
+
+### List behaviour
+
+- Filters: `SearchInput source="q"`, `SelectInput source="userType"`, `StatusToggleInput source="isActive"`.
+- Status toggle uses three pills (All / Active / Inactive) and updates the filter value to `""`, `"true"` or `"false"`.
+- Edit navigation uses `useNavigate` to `/users/edit/${record.id}`.
+- Delete uses a shadcn `AlertDialog` confirmation and `useDelete` from `ra-core` with `mutationMode: "pessimistic"`, then refreshes the list.
 - Signed-in users cannot delete themselves: compare `record.id` with `identity.id` from `useGetIdentity()`.
 - Avatars use `\u003cAvatar\u003e` from `@/components/ui/avatar` with initials fallback.
-- The backend `GET /users` endpoint supports `q`, `isActive` and `userType` query parameters for server-side filtering.
+
+### Backend filtering
+
+- `GET /users` supports `q`, `isActive` and `userType` query parameters for server-side filtering.
+
+### i18n
+
 - Add new translation keys to both `src/i18n/en.json` and `src/i18n/es.json`; keys are merged into the react-admin i18n provider.
+- Reusable keys live under `list.fields` and `users.actions` / `users.filters`.
