@@ -5,8 +5,8 @@
       "name_plural": "Clientes"
     },
     "users": {
-        "name": "Usuario",
-        "name_plural": "Usuarios"
+      "name": "Usuario",
+      "name_plural": "Usuarios"
     }
   },
   "list": {
@@ -23,7 +23,29 @@
       "updatedAt": "Actualizado",
       "incomplete": "Incompleto",
       "complete": "Completo",
-      "avatar": "Avatar"
+      "avatar": "Avatar",
+      "userType": "Tipo de usuario",
+      "status": "Estado",
+      "actions": "Acciones"
+    }
+  },
+  "users": {
+    "filters": {
+      "all": "Todos",
+      "active": "Activos",
+      "inactive": "Inactivos",
+      "userType": "Tipo de usuario",
+      "status": "Estado"
+    },
+    "actions": {
+      "add": "Añadir Usuario",
+      "invite": "Invitar usuario",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
     }
   }
 }

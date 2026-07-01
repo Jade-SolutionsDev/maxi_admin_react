@@ -103,7 +103,7 @@ export function InviteUserDialog() {
       <DialogTrigger asChild>
         <Button variant="default" size="lg">
           <UserPlus />
-          Invite user
+          {translate("users.actions.add", { _: "Invite user" })}
         </Button>
       </DialogTrigger>
       <DialogContent>
