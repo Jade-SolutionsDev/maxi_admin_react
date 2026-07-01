@@ -2,14 +2,13 @@ import { useState } from "react";
 import {
   useDelete,
   useGetIdentity,
-  useGetRecordRepresentation,
   useRecordContext,
   useRefresh,
   useResourceContext,
   useTranslate,
 } from "ra-core";
-import { Pencil, Trash2, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { AlertTriangle, Pencil, Trash2, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   BooleanField,
@@ -116,7 +115,6 @@ const UserDeleteButton = () => {
   const resource = useResourceContext();
   const { data: identity } = useGetIdentity();
   const translate = useTranslate();
-  const getRecordRepresentation = useGetRecordRepresentation(resource);
   const refresh = useRefresh();
   const [open, setOpen] = useState(false);
 
@@ -130,6 +128,12 @@ const UserDeleteButton = () => {
   if (isSelf) {
     return null;
   }
+
+  const firstName = (record?.firstName as string | null) ?? "";
+  const lastName = (record?.lastName as string | null) ?? "";
+  const email = (record?.email as string | null) ?? "";
+  const fullName = `${firstName} ${lastName}`.trim();
+  const displayName = fullName || email;
 
   const handleConfirm = async () => {
     await deleteOne(
@@ -170,21 +174,24 @@ const UserDeleteButton = () => {
         </Tooltip>
       </TooltipProvider>
 
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader className="space-y-3">
+          <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+            <AlertTriangle className="h-6 w-6 text-destructive" />
+          </div>
+          <AlertDialogTitle className="text-center sm:text-left text-lg">
             {translate("users.actions.delete_confirm_title", {
               _: "Delete user",
             })}
           </AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-center sm:text-left">
             {translate("users.actions.delete_confirm_description", {
               _: "Are you sure you want to delete %{name}? This action cannot be undone.",
-              name: getRecordRepresentation(record),
+              name: displayName,
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="sm:justify-end">
           <AlertDialogCancel disabled={isPending}>
             {translate("users.actions.cancel", { _: "Cancel" })}
           </AlertDialogCancel>
@@ -206,24 +213,21 @@ const UserDeleteButton = () => {
 const UserEditButton = () => {
   const record = useRecordContext();
   const translate = useTranslate();
-  const navigate = useNavigate();
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
+          <Link
+            to={`/users/edit/${record?.id}`}
             className={cn(
-              "h-8 w-8 text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
+              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
+              "text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
             )}
-            onClick={() => navigate(`/users/edit/${record?.id}`)}
             aria-label={translate("users.actions.edit", { _: "Edit" })}
           >
             <Pencil size={16} />
-          </Button>
+          </Link>
         </TooltipTrigger>
         <TooltipContent>
           <p>{translate("users.actions.edit", { _: "Edit" })}</p>
