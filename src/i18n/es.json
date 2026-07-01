@@ -41,7 +41,12 @@
       "add": "Añadir Usuario",
       "invite": "Invitar usuario",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "create": "Crear usuario",
+      "delete_confirm_title": "Eliminar usuario",
+      "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
     },
     "status": {
       "active": "Activo",
