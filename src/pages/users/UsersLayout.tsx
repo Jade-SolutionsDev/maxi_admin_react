@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { ResourceContextProvider } from "ra-core";
+import UsersList from "./UsersList";
 
 /**
  * Users section layout.
@@ -11,6 +12,7 @@ import { ResourceContextProvider } from "ra-core";
 export function UsersLayout() {
   return (
     <ResourceContextProvider value="users">
+      <UsersList />
       <Outlet />
     </ResourceContextProvider>
   );

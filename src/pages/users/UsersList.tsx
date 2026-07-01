@@ -5,7 +5,7 @@ import {
   useRecordContext,
   useRefresh,
   useResourceContext,
-  useTranslate,
+  useTranslate
 } from "ra-core";
 import { AlertTriangle, Pencil, Trash2, User } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -51,7 +51,7 @@ const userTypeChoices = [
 ];
 
 const userFilters = [
-  <SearchInput source="q" alwaysOn placeholder="ra.action.search" />,
+  <SearchInput source="q" alwaysOn />,
   <SelectInput
     source="userType"
     label="users.filters.userType"

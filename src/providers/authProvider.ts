@@ -9,6 +9,7 @@ interface Identity {
   id: string;
   fullName: string;
   avatar?: string;
+  email?: string;
   userType: string;
 }
 
@@ -65,6 +66,7 @@ async function loadIdentity(): Promise<Identity> {
     firstName: string | null;
     lastName: string | null;
     avatarUrl: string | null;
+    email: string | null;
     userType: string;
   };
 
@@ -73,6 +75,7 @@ async function loadIdentity(): Promise<Identity> {
     fullName:
       [user.firstName, user.lastName].filter(Boolean).join(" ") || user.id,
     avatar: user.avatarUrl ?? undefined,
+    email: user.email ?? undefined,
     userType: user.userType,
   };
 
