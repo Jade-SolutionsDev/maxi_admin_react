@@ -131,3 +131,15 @@ export const App = () => (
 ```
 
 Use the example above to generate the component code and adapt the resources to your needs.
+
+## Users List Design Conventions
+
+- The users list (`src/pages/Users.tsx`) uses the shadcn-admin-kit `\u003cList\u003e` + `\u003cDataTable\u003e` primitives from `@/components/admin`.
+- Filters are declared as an array of filter inputs and passed to `\u003cList filters={...}\u003e`.
+- Use `SearchInput` for full-text search (`source="q"`), `SelectInput` for enum filters (`source="userType"`), and a custom toggle component (`StatusToggleInput`) for boolean filters (`source="isActive"`).
+- The status toggle filter uses three pills (All / Active / Inactive) and updates the filter value to `""`, `"true"` or `"false"`.
+- Inline row actions are rendered in a `\u003cDataTable.Col\u003e` with custom icon buttons. Use `useCreatePath` for edit links and `useDeleteWithUndoController` for deletes.
+- Signed-in users cannot delete themselves: compare `record.id` with `identity.id` from `useGetIdentity()`.
+- Avatars use `\u003cAvatar\u003e` from `@/components/ui/avatar` with initials fallback.
+- The backend `GET /users` endpoint supports `q`, `isActive` and `userType` query parameters for server-side filtering.
+- Add new translation keys to both `src/i18n/en.json` and `src/i18n/es.json`; keys are merged into the react-admin i18n provider.
