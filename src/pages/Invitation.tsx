@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-    Mail,
     User,
     Phone,
     Building2,
