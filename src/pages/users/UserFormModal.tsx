@@ -8,7 +8,7 @@ import {
   useTranslate,
 } from "ra-core";
 import { useFormContext, useFormState } from "react-hook-form";
-import { Loader2, Save, X } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 
 import {
   BooleanInput,
@@ -131,7 +131,7 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
               })}
             </DialogDescription>
           </div>
-          <Button
+          {/* <Button
             type="button"
             variant="ghost"
             size="icon"
@@ -139,7 +139,7 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
             className="h-8 w-8 rounded-full"
           >
             <X size={18} />
-          </Button>
+          </Button> */}
         </div>
       </DialogHeader>
 
