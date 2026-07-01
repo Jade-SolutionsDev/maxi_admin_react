@@ -15,9 +15,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
-import UsersList from "./pages/Users";
 import LoginPage from "./components/layout/LoginPage";
 import Invitation from "./pages/Invitation";
+import { UsersLayout } from "./pages/users/UsersLayout";
+import UsersList from "./pages/users/UsersList";
+import UserEdit from "./pages/users/UserEdit";
+import UserCreate from "./pages/users/UserCreate";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
@@ -38,9 +41,14 @@ const AdminApp = () => (
   >
     <CustomRoutes>
       <Route path="/productos" element={<Productos />} />
+      <Route path="/users/*" element={<UsersLayout />}>
+        <Route index element={<UsersList />} />
+        <Route path="create" element={<UserCreate />} />
+        <Route path="edit/:id" element={<UserEdit />} />
+      </Route>
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
-    <Resource name="users" list={UsersList} />
+    <Resource name="users" />
   </Admin>
 );
 

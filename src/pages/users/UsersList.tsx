@@ -1,14 +1,15 @@
+import { useState } from "react";
 import {
-  LinkBase,
-  useCreatePath,
-  useDeleteWithUndoController,
+  useDelete,
   useGetIdentity,
   useGetRecordRepresentation,
   useRecordContext,
+  useRefresh,
   useResourceContext,
   useTranslate,
 } from "ra-core";
 import { Pencil, Trash2, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import {
   BooleanField,
@@ -21,10 +22,21 @@ import {
   SearchInput,
   SelectInput,
 } from "@/components/admin";
+
 import { InviteUserDialog } from "@/components/users/InviteUserDialog";
 import { StatusToggleInput } from "@/components/users/StatusToggleInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -105,16 +117,96 @@ const UserDeleteButton = () => {
   const { data: identity } = useGetIdentity();
   const translate = useTranslate();
   const getRecordRepresentation = useGetRecordRepresentation(resource);
+  const refresh = useRefresh();
+  const [open, setOpen] = useState(false);
+
+  const [deleteOne, { isPending }] = useDelete(resource, {
+    id: record?.id,
+    previousData: record,
+  });
 
   const isSelf = record?.id === identity?.id;
-  const { isPending, handleDelete } = useDeleteWithUndoController({
-    record,
-    resource,
-  });
 
   if (isSelf) {
     return null;
   }
+
+  const handleConfirm = async () => {
+    await deleteOne(
+      resource,
+      { id: record?.id, previousData: record },
+      {
+        mutationMode: "pessimistic",
+        onSuccess: () => {
+          setOpen(false);
+          refresh();
+        },
+        onError: () => {
+          setOpen(false);
+        },
+      },
+    );
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-destructive hover:bg-destructive/10"
+              onClick={() => setOpen(true)}
+              aria-label={translate("users.actions.delete", { _: "Delete" })}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{translate("users.actions.delete", { _: "Delete" })}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {translate("users.actions.delete_confirm_title", {
+              _: "Delete user",
+            })}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {translate("users.actions.delete_confirm_description", {
+              _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+              name: getRecordRepresentation(record),
+            })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>
+            {translate("users.actions.cancel", { _: "Cancel" })}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            disabled={isPending}
+            className={cn(buttonVariants({ variant: "destructive" }))}
+          >
+            {isPending
+              ? translate("ra.action.loading", { _: "Deleting…" })
+              : translate("users.actions.confirm", { _: "Delete" })}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
+const UserEditButton = () => {
+  const record = useRecordContext();
+  const translate = useTranslate();
+  const navigate = useNavigate();
 
   return (
     <TooltipProvider>
@@ -124,53 +216,14 @@ const UserDeleteButton = () => {
             type="button"
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-destructive hover:bg-destructive/10"
-            onClick={handleDelete}
-            disabled={isPending}
-            aria-label={translate("users.actions.delete", { _: "Delete" })}
-          >
-            <Trash2 size={16} />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>
-            {translate("ra.action.delete_item", {
-              _: "Delete %{name}",
-              name: getRecordRepresentation(record),
-            })}
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
-const UserEditButton = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const translate = useTranslate();
-  const createPath = useCreatePath();
-
-  const link = createPath({
-    resource,
-    type: "edit",
-    id: record?.id,
-  });
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <LinkBase
-            to={link}
             className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
-              "text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
+              "h-8 w-8 text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
             )}
+            onClick={() => navigate(`/users/edit/${record?.id}`)}
             aria-label={translate("users.actions.edit", { _: "Edit" })}
           >
             <Pencil size={16} />
-          </LinkBase>
+          </Button>
         </TooltipTrigger>
         <TooltipContent>
           <p>{translate("users.actions.edit", { _: "Edit" })}</p>
@@ -189,7 +242,7 @@ const UserActionsCell = () => {
   );
 };
 
-const UsersList = () => {
+export default function UsersList() {
   const translate = useTranslate();
 
   return (
@@ -236,12 +289,14 @@ const UsersList = () => {
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
         </DataTable.Col>
-        <DataTable.Col label="list.fields.actions" disableSort cellClassName="text-center w-24">
+        <DataTable.Col
+          label="list.fields.actions"
+          disableSort
+          cellClassName="text-center w-24"
+        >
           <UserActionsCell />
         </DataTable.Col>
       </DataTable>
     </List>
   );
-};
-
-export default UsersList;
+}
