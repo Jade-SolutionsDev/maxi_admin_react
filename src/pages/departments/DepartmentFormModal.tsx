@@ -68,8 +68,6 @@ interface ModalFormShellProps {
 
 function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
   const translate = useTranslate();
-  const editContext = useEditContext();
-  const isLoading = mode === "edit" && (editContext?.isLoading ?? false);
 
   return (
     <>
@@ -88,10 +86,17 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
         toolbar={<ModalFormToolbar onClose={onClose} />}
         className="px-6 py-5 gap-5 max-h-[70vh] overflow-y-auto"
       >
-        {isLoading ? <FormSkeleton /> : <DepartmentFormFields />}
+        {mode === 'edit' ? <EditLoading /> : <DepartmentFormFields />}
       </SimpleForm>
     </>
   );
+}
+
+function EditLoading() {
+  const editContext = useEditContext();
+  const isLoading = (editContext?.isLoading ?? false);
+  
+  return isLoading && <FormSkeleton />
 }
 
 function DepartmentFormFields() {
