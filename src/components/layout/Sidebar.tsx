@@ -70,7 +70,7 @@ const navItems: NavItem[] = [
     icon: <Shield size={20} />,
     children: [
       { labelKey: "app.menu.users", path: "/users", resource: "users" },
-      { labelKey: "app.menu.roles", path: "#", resource: "roles" },
+      { labelKey: "app.menu.roles", path: "/roles", resource: "roles" },
     ],
   },
 ];

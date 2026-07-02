@@ -12,8 +12,29 @@ export interface InviteUserPayload {
   organizationId?: string;
 }
 
+export interface RoleSummary {
+  id: string;
+  name: string;
+  description?: string | null;
+}
+
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
+  getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
+  setUserRoles: (
+    userId: string,
+    roleIds: string[],
+  ) => Promise<{ data: unknown }>;
+}
+
+// Some backend resources live under a different path than their react-admin
+// resource name. The RBAC roles endpoints are nested under /permissions.
+const RESOURCE_PATHS: Record<string, string> = {
+  roles: 'permissions/roles',
+};
+
+function resourcePath(resource: string): string {
+  return RESOURCE_PATHS[resource] ?? resource;
 }
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
@@ -55,7 +76,9 @@ export const dataProvider: DataProvider = {
       _end: page * perPage,
     });
 
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const data = Array.isArray(json) ? json : (json.data ?? []);
 
     return {
@@ -65,13 +88,17 @@ export const dataProvider: DataProvider = {
   },
 
   async getOne(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+    );
     return { data: json.data ?? json };
   },
 
   async getMany(resource, params) {
     const query = toQueryString({ id: params.ids.join(',') });
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const data = Array.isArray(json) ? json : (json.data ?? []);
     return { data };
   },
@@ -81,13 +108,15 @@ export const dataProvider: DataProvider = {
       ...params.filter,
       [params.target]: params.id,
     });
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const data = Array.isArray(json) ? json : (json.data ?? []);
     return { data, total: data.length };
   },
 
   async create(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}`, {
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}`, {
       method: 'POST',
       body: JSON.stringify(params.data),
     });
@@ -95,17 +124,51 @@ export const dataProvider: DataProvider = {
   },
 
   async update(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(params.data),
-    });
+    // Roles keep their editable fields and their permission matrix on two
+    // separate backend endpoints, so split the payload accordingly.
+    if (resource === 'roles') {
+      const data = params.data as Record<string, unknown>;
+      const roleFields = {
+        name: data.name,
+        description: data.description,
+        isActive: data.isActive,
+      };
+      const { json } = await httpClient(
+        `${API_URL}/permissions/roles/${params.id}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(roleFields),
+        },
+      );
+      let result = json.data ?? json;
+
+      if (Array.isArray(data.permissionIds)) {
+        const { json: permJson } = await httpClient(
+          `${API_URL}/permissions/roles/${params.id}/permissions`,
+          {
+            method: 'PUT',
+            body: JSON.stringify({ permissionIds: data.permissionIds }),
+          },
+        );
+        result = permJson.data ?? result;
+      }
+      return { data: result };
+    }
+
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(params.data),
+      },
+    );
     return { data: json.data ?? json };
   },
 
   async updateMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, {
+        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
           method: 'PATCH',
           body: JSON.stringify(params.data),
         }),
@@ -115,16 +178,19 @@ export const dataProvider: DataProvider = {
   },
 
   async delete(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
-      method: 'DELETE',
-    });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: 'DELETE',
+      },
+    );
     return { data: json?.data ?? json ?? params.previousData };
   },
 
   async deleteMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, {
+        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
           method: 'DELETE',
         }),
       ),
@@ -139,4 +205,23 @@ export const dataProvider: DataProvider = {
     });
     return { data: json?.data ?? json };
   },
-};
+
+  async getUserRoles(userId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/permissions/users/${userId}/roles`,
+    );
+    const data = Array.isArray(json) ? json : (json.data ?? []);
+    return { data };
+  },
+
+  async setUserRoles(userId: string, roleIds: string[]) {
+    const { json } = await httpClient(
+      `${API_URL}/permissions/users/${userId}/roles`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ roleIds }),
+      },
+    );
+    return { data: json?.data ?? json };
+  },
+} as ExtendedDataProvider;

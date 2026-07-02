@@ -117,7 +117,7 @@ interface ModalFormShellProps {
 function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
   const translate = useTranslate();
   const editContext = useEditContext();
-  const isLoading = editContext?.isLoading ?? false;
+  const isLoading = mode === "edit" && (editContext?.isLoading ?? false);
 
   return (
     <>
@@ -131,15 +131,6 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
               })}
             </DialogDescription>
           </div>
-          {/* <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-8 w-8 rounded-full"
-          >
-            <X size={18} />
-          </Button> */}
         </div>
       </DialogHeader>
 

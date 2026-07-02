@@ -23,6 +23,7 @@ import {
 } from "@/components/admin";
 
 import { InviteUserDialog } from "@/components/users/InviteUserDialog";
+import { ManageUserRolesDialog } from "@/components/users/ManageUserRolesDialog";
 import { StatusToggleInput } from "@/components/users/StatusToggleInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -240,6 +241,7 @@ const UserEditButton = () => {
 const UserActionsCell = () => {
   return (
     <div className="flex items-center justify-center gap-1">
+      <ManageUserRolesDialog />
       <UserEditButton />
       <UserDeleteButton />
     </div>

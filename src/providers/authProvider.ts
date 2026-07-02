@@ -139,6 +139,9 @@ export const authProvider: AuthProvider = {
     }
 
     const backendAction = mapAction(action ?? "");
-    return permissionsCache?.[resource ?? ""]?.includes(backendAction) ?? false;
+    // Departments and categories share the same backend permission module
+    // (both are rows in the categories table with different parentId values).
+    const permissionResource = resource === "departments" ? "categories" : resource;
+    return permissionsCache?.[permissionResource ?? ""]?.includes(backendAction) ?? false;
   },
 };

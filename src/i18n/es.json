@@ -15,6 +15,10 @@
     "categories": {
       "name": "Categoría",
       "name_plural": "Categorías"
+    },
+    "roles": {
+      "name": "Rol",
+      "name_plural": "Roles"
     }
   },
   "list": {
@@ -66,6 +70,58 @@
     "status": {
       "active": "Activo",
       "inactive": "Inactivo"
+    }
+  },
+  "permissions": {
+    "modules": {
+      "products": "Productos",
+      "categories": "Categorías",
+      "orders": "Órdenes",
+      "providers": "Proveedores",
+      "clients": "Clientes",
+      "coverage": "Cobertura",
+      "locations": "Ubicaciones",
+      "team": "Equipo",
+      "users": "Usuarios",
+      "roles": "Roles",
+      "analytics": "Analíticas",
+      "settings": "Configuración"
+    },
+    "actions": {
+      "create": "Crear",
+      "read": "Ver",
+      "update": "Editar",
+      "delete": "Eliminar",
+      "list": "Listar"
+    }
+  },
+  "roles": {
+    "system": "Sistema",
+    "custom": "Personalizado",
+    "admin_only": "Solo los administradores pueden gestionar roles.",
+    "system_role_title": "Rol del sistema",
+    "system_role_notice": "Los roles del sistema son de solo lectura y no se pueden modificar ni eliminar.",
+    "delete_confirm_title": "Eliminar rol",
+    "fields": {
+      "type": "Tipo",
+      "permissionsCount": "Permisos"
+    },
+    "matrix": {
+      "title": "Permisos",
+      "module": "Módulo",
+      "toggle_all": "Alternar todo"
+    },
+    "actions": {
+      "manage_user_roles": "Gestionar roles"
+    },
+    "assign_dialog": {
+      "title": "Gestionar roles",
+      "description": "Selecciona los roles asignados a este usuario.",
+      "admin_notice": "Los administradores tienen acceso total sin importar los roles asignados.",
+      "empty": "Aún no hay roles.",
+      "save": "Guardar",
+      "saved": "Roles actualizados",
+      "error": "No se pudieron actualizar los roles"
     }
   },
   "shared": {

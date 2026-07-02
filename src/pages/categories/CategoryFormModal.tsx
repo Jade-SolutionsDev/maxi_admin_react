@@ -50,20 +50,20 @@ export default function CategoryFormModal({ mode }: CategoryFormModalProps) {
     >
       {isEdit ? (
         <EditBase id={id} mutationMode="pessimistic">
-          <ModalFormShell onClose={onClose} />
+          <ModalFormShell onClose={onClose} mode="edit" />
         </EditBase>
       ) : (
         <CreateBase redirect="list" mutationMode="pessimistic">
-          <ModalFormShell onClose={onClose} />
+          <ModalFormShell onClose={onClose} mode="create" />
         </CreateBase>
       )}
     </EntityFormModal>
   );
 }
 
-function ModalFormShell({ onClose }: { onClose: () => void }) {
+function ModalFormShell({ onClose, mode }: { onClose: () => void; mode: "create" | "edit" }) {
   const editContext = useEditContext();
-  const isLoading = editContext?.isLoading ?? false;
+  const isLoading = mode === "edit" && (editContext?.isLoading ?? false);
 
   return (
     <SimpleForm
