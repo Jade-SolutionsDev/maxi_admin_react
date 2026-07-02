@@ -41,7 +41,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const departmentFilters = [
-  <SearchInput source="q" alwaysOn placeholder="ra.action.search" />,
+  <SearchInput source="q" alwaysOn />,
 ];
 
 const DepartmentActions = () => (

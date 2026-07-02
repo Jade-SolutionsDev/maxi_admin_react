@@ -29,6 +29,7 @@
       "defaultMunicipality": "Municipio predeterminado",
       "isActive": "Activo",
       "onboardingStatus": "Estado de incorporación",
+      "name": "Nombre",
       "email": "Email",
       "phone": "Teléfono",
       "createdAt": "Creado",

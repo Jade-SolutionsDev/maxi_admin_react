@@ -27,6 +27,7 @@ import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
 import roles from "./pages/roles";
+import Loading from "./pages/Loading";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
@@ -44,6 +45,7 @@ const AdminApp = () => (
     i18nProvider={i18nProvider}
     store={store}
     disableTelemetry
+    loading={Loading}
   >
     <CustomRoutes>
       <Route path="/productos" element={<Productos />} />

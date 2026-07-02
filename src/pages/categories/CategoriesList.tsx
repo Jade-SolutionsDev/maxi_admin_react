@@ -43,7 +43,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const categoryFilters = [
-  <SearchInput source="q" alwaysOn placeholder="ra.action.search" />,
+  <SearchInput source="q" alwaysOn />,
   <ReferenceInput
     source="departmentId"
     reference="departments"

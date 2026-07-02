@@ -93,7 +93,7 @@ export default function UserFormModal({ mode }: UserFormModalProps) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-xl p-0 gap-0 overflow-hidden">
+      <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
         {isEdit ? (
           <EditBase id={id} mutationMode="pessimistic">
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
@@ -121,7 +121,7 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
 
   return (
     <>
-      <DialogHeader className="px-6 py-4 border-b">
+      <DialogHeader className="shrink-0 px-6 py-4 border-b">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <DialogTitle className="text-xl">{title}</DialogTitle>
@@ -136,9 +136,11 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
 
       <SimpleForm
         toolbar={<ModalFormToolbar onClose={onClose} />}
-        className="px-6 py-5 gap-5 max-h-[70vh] overflow-y-auto"
+        className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
-        {isLoading ? <FormSkeleton /> : <UserFormFields mode={mode} />}
+        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
+          {isLoading ? <FormSkeleton /> : <UserFormFields mode={mode} />}
+        </div>
       </SimpleForm>
     </>
   );
@@ -167,7 +169,7 @@ function ModalFormToolbar({ onClose }: ModalFormToolbarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t",
+        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t",
       )}
     >
       <Button type="button" variant="outline" onClick={onClose}>

@@ -63,6 +63,28 @@ const userFilters = [
   <StatusToggleInput source="isActive" alwaysOn />,
 ];
 
+const StatusBadge = () => {
+  const record = useRecordContext();
+  const translate = useTranslate();
+  if (!record) return null;
+
+  const status = record.status ?? "active";
+  const isPending = status === "pending";
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+        isPending
+          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+          : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+      )}
+    >
+      {translate(`users.status.${status}`, { _: isPending ? "Pending" : "Active" })}
+    </span>
+  );
+};
+
 const UserActions = () => (
   <div className="flex items-center gap-2">
     <RefreshButton />
@@ -254,6 +276,7 @@ export default function UsersList() {
   return (
     <List
       filters={userFilters}
+      filterDefaultValues={{ includeInvitations: true }}
       actions={<UserActions />}
       resource="users"
       title={translate("resources.users.name_plural")}
@@ -269,6 +292,8 @@ export default function UsersList() {
           "updatedAt",
           "createdBy",
           "clerkId",
+          "status",
+          "isPending",
         ]}
       >
         <DataTable.Col
@@ -285,6 +310,9 @@ export default function UsersList() {
           cellClassName="min-w-[180px]"
         >
           <UserNameCell />
+        </DataTable.Col>
+        <DataTable.Col source="status" label="list.fields.status" disableSort>
+          <StatusBadge />
         </DataTable.Col>
         <DataTable.Col source="userType" label="list.fields.userType" />
         <DataTable.Col source="email" label="list.fields.email" />
