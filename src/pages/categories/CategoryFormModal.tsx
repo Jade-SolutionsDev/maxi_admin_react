@@ -13,12 +13,18 @@ import { Loader2, Save } from "lucide-react";
 import {
   AutocompleteInput,
   BooleanInput,
-  EntityFormModal,
   NumberInput,
   ReferenceInput,
   SimpleForm,
   TextInput,
 } from "@/components/admin";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -40,38 +46,53 @@ export default function CategoryFormModal({ mode }: CategoryFormModalProps) {
   const onClose = () => navigate("/categories");
 
   return (
-    <EntityFormModal
-      open
-      onOpenChange={(open) => !open && onClose()}
-      title={title}
-      description={translate("shared.actions.form_subtitle", {
-        _: "Fill in the details below.",
-      })}
-    >
-      {isEdit ? (
-        <EditBase id={id} mutationMode="pessimistic">
-          <ModalFormShell onClose={onClose} mode="edit" />
-        </EditBase>
-      ) : (
-        <CreateBase redirect="list" mutationMode="pessimistic">
-          <ModalFormShell onClose={onClose} mode="create" />
-        </CreateBase>
-      )}
-    </EntityFormModal>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-xl p-0 gap-0 overflow-hidden">
+        {isEdit ? (
+          <EditBase id={id} mutationMode="pessimistic">
+            <ModalFormShell title={title} onClose={onClose} mode={mode} />
+          </EditBase>
+        ) : (
+          <CreateBase redirect="list" mutationMode="pessimistic">
+            <ModalFormShell title={title} onClose={onClose} mode={mode} />
+          </CreateBase>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
-function ModalFormShell({ onClose, mode }: { onClose: () => void; mode: "create" | "edit" }) {
+interface ModalFormShellProps {
+  title: string;
+  onClose: () => void;
+  mode: "create" | "edit";
+}
+
+function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
+  const translate = useTranslate();
   const editContext = useEditContext();
   const isLoading = mode === "edit" && (editContext?.isLoading ?? false);
 
   return (
-    <SimpleForm
-      toolbar={<ModalFormToolbar onClose={onClose} />}
-      className="px-6 py-5 gap-5 max-h-[70vh] overflow-y-auto"
-    >
-      {isLoading ? <FormSkeleton /> : <CategoryFormFields />}
-    </SimpleForm>
+    <>
+      <DialogHeader className="px-6 py-4 border-b">
+        <div className="space-y-1">
+          <DialogTitle className="text-xl">{title}</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {translate("shared.actions.form_subtitle", {
+              _: "Fill in the details below.",
+            })}
+          </DialogDescription>
+        </div>
+      </DialogHeader>
+
+      <SimpleForm
+        toolbar={<ModalFormToolbar onClose={onClose} />}
+        className="px-6 py-5 gap-5 max-h-[70vh] overflow-y-auto"
+      >
+        {isLoading ? <FormSkeleton /> : <CategoryFormFields />}
+      </SimpleForm>
+    </>
   );
 }
 
