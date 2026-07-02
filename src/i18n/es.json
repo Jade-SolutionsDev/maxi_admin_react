@@ -41,7 +41,8 @@
       "actions": "Acciones",
       "description": "Descripción",
       "sortOrder": "Orden",
-      "slug": "Slug"
+      "slug": "Slug",
+      "provider": "Proveedor"
     }
   },
   "users": {

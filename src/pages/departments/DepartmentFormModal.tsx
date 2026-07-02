@@ -4,6 +4,7 @@ import {
   EditBase,
   required,
   useEditContext,
+  useGetIdentity,
   useSaveContext,
   useTranslate,
 } from "ra-core";
@@ -13,9 +14,11 @@ import { Loader2, Save } from "lucide-react";
 import {
   BooleanInput,
   NumberInput,
+  ReferenceInput,
   SimpleForm,
   TextInput,
 } from "@/components/admin";
+import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import {
   Dialog,
   DialogContent,
@@ -101,9 +104,21 @@ function EditLoading() {
 
 function DepartmentFormFields() {
   const translate = useTranslate();
+  const { data: identity } = useGetIdentity();
+  const isProvider = identity?.userType === "provider";
 
   return (
     <>
+      {!isProvider && (
+        <ReferenceInput
+          source="providerId"
+          reference="users"
+          label={translate("list.fields.provider")}
+          filter={{ userType: "provider" }}
+        >
+          <AutocompleteInput validate={required()} />
+        </ReferenceInput>
+      )}
       <TextInput
         source="name"
         label={translate("list.fields.name")}

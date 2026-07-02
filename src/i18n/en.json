@@ -42,7 +42,8 @@
       "actions": "Actions",
       "description": "Description",
       "sortOrder": "Sort Order",
-      "slug": "Slug"
+      "slug": "Slug",
+      "provider": "Provider"
     }
   },
   "users": {

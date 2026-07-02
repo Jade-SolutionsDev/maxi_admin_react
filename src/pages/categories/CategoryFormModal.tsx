@@ -4,6 +4,7 @@ import {
   EditBase,
   required,
   useEditContext,
+  useGetIdentity,
   useSaveContext,
   useTranslate,
 } from "ra-core";
@@ -103,9 +104,21 @@ function EditLoading() {
 
 function CategoryFormFields() {
   const translate = useTranslate();
+  const { data: identity } = useGetIdentity();
+  const isProvider = identity?.userType === "provider";
 
   return (
     <>
+      {!isProvider && (
+        <ReferenceInput
+          source="providerId"
+          reference="users"
+          label={translate("list.fields.provider")}
+          filter={{ userType: "provider" }}
+        >
+          <AutocompleteInput validate={required()} />
+        </ReferenceInput>
+      )}
       <ReferenceInput
         source="departmentId"
         reference="departments"
