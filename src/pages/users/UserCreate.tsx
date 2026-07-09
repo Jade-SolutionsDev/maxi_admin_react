@@ -1,5 +1,5 @@
-import UserFormModal from "./UserFormModal";
+import InviteUserModal from "./InviteUserModal";
 
 export default function UserCreate() {
-  return <UserFormModal mode="create" />;
+  return <InviteUserModal />;
 }

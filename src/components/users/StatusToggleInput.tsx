@@ -3,12 +3,13 @@ import type { RaRecord } from "ra-core";
 import { useInput, useTranslate } from "ra-core";
 import { cn } from "@/lib/utils";
 
-type StatusValue = "all" | "true" | "false";
+type StatusValue = "" | "active" | "inactive" | "pending";
 
 const options: { value: StatusValue; key: string }[] = [
-  { value: "all", key: "users.filters.all" },
-  { value: "true", key: "users.filters.active" },
-  { value: "false", key: "users.filters.inactive" },
+  { value: "", key: "users.filters.all" },
+  { value: "active", key: "users.filters.active" },
+  { value: "inactive", key: "users.filters.inactive" },
+  { value: "pending", key: "users.filters.pending" },
 ];
 
 export function StatusToggleInput(props: StatusToggleInputProps) {
@@ -16,12 +17,13 @@ export function StatusToggleInput(props: StatusToggleInputProps) {
   const { field } = useInput({ source, resource });
   const translate = useTranslate();
 
-  const current: StatusValue =
-    field.value === "true" ? "true" : field.value === "false" ? "false" : "all";
+  const current: StatusValue = options.some((o) => o.value === field.value)
+    ? (field.value as StatusValue)
+    : "";
 
   const handleChange = useCallback(
     (value: StatusValue) => {
-      field.onChange(value === "all" ? "" : value);
+      field.onChange(value);
     },
     [field],
   );
@@ -29,7 +31,7 @@ export function StatusToggleInput(props: StatusToggleInputProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-1 bg-[#F1F5F9] dark:bg-[#1A2535] p-1 rounded-[10px] h-10 pointer-events-auto",
+        "flex items-center gap-1 bg-muted p-1 rounded-[10px] h-10 pointer-events-auto",
         className,
       )}
     >
@@ -37,14 +39,14 @@ export function StatusToggleInput(props: StatusToggleInputProps) {
         const active = current === option.value;
         return (
           <button
-            key={option.value}
+            key={option.value || "all"}
             type="button"
             onClick={() => handleChange(option.value)}
             className={cn(
               "px-4 py-1.5 rounded-[8px] text-[13px] font-medium transition-all duration-150 h-full",
               active
-                ? "bg-[#10B981] text-white"
-                : "text-[#64748B] dark:text-[#94A3B8] hover:bg-white/50 dark:hover:bg-white/5",
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-background/60",
             )}
           >
             {translate(option.key)}

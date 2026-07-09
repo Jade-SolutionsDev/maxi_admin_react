@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  CreateBase,
   EditBase,
   required,
   useEditContext,
+  useNotify,
+  useRecordContext,
   useSaveContext,
   useTranslate,
 } from "ra-core";
@@ -25,18 +26,25 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { roleChoices } from "./roleChoices";
 
-const userTypeChoices = [
-  { id: "admin", name: "Admin" },
-  { id: "provider", name: "Provider" },
-  { id: "staff", name: "Staff" },
-];
-
-interface UserFormFieldsProps {
-  mode: "create" | "edit";
+/** Read-only display of the account email (email is immutable after creation). */
+function EmailField() {
+  const record = useRecordContext();
+  const translate = useTranslate();
+  return (
+    <div className="space-y-1.5">
+      <span className="text-sm font-medium text-foreground">
+        {translate("list.fields.email", { _: "Email" })}
+      </span>
+      <div className="flex h-10 items-center rounded-md border border-input bg-muted/50 px-3 text-sm text-muted-foreground">
+        {(record?.email as string | null) ?? "—"}
+      </div>
+    </div>
+  );
 }
 
-function UserFormFields({ mode }: UserFormFieldsProps) {
+function UserEditFields() {
   const translate = useTranslate();
 
   return (
@@ -51,58 +59,63 @@ function UserFormFields({ mode }: UserFormFieldsProps) {
         label={translate("list.fields.lastName")}
         validate={required()}
       />
-      <TextInput
-        source="email"
-        label={translate("list.fields.email")}
-        validate={required()}
-        type="email"
-      />
+      <EmailField />
       <TextInput source="phone" label={translate("list.fields.phone")} />
       <SelectInput
-        source="userType"
-        label={translate("list.fields.userType")}
-        choices={userTypeChoices}
+        source="role"
+        label={translate("list.fields.role")}
+        choices={roleChoices}
         validate={required()}
-        defaultValue={mode === "create" ? "staff" : undefined}
       />
       <BooleanInput
         source="isActive"
         label={translate("list.fields.isActive")}
-        defaultValue={mode === "create" ? true : undefined}
       />
     </>
   );
 }
 
-interface UserFormModalProps {
-  mode: "create" | "edit";
+interface HttpErrorLike {
+  message?: string;
+  body?: { error?: { message?: string } };
 }
 
-export default function UserFormModal({ mode }: UserFormModalProps) {
+export default function UserFormModal() {
   const navigate = useNavigate();
+  const notify = useNotify();
   const { id } = useParams<{ id: string }>();
   const translate = useTranslate();
 
-  const isEdit = mode === "edit";
-  const title = translate(
-    isEdit ? "users.actions.edit_title" : "users.actions.create_title",
-    { _: isEdit ? "Edit user" : "Create user" },
-  );
-
+  const title = translate("users.actions.edit_title", { _: "Edit user" });
   const onClose = () => navigate("/users");
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
-        {isEdit ? (
-          <EditBase id={id} mutationMode="pessimistic">
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </EditBase>
-        ) : (
-          <CreateBase redirect="list" mutationMode="pessimistic">
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </CreateBase>
-        )}
+        <EditBase
+          id={id}
+          mutationMode="pessimistic"
+          redirect={false}
+          mutationOptions={{
+            onSuccess: () => {
+              notify("users.actions.update_success", {
+                type: "success",
+                messageArgs: { _: "User updated" },
+              });
+              navigate("/users");
+            },
+            onError: (error: HttpErrorLike) => {
+              notify(
+                error?.body?.error?.message ??
+                  error?.message ??
+                  "ra.notification.http_error",
+                { type: "error" },
+              );
+            },
+          }}
+        >
+          <ModalFormShell title={title} onClose={onClose} />
+        </EditBase>
       </DialogContent>
     </Dialog>
   );
@@ -111,26 +124,23 @@ export default function UserFormModal({ mode }: UserFormModalProps) {
 interface ModalFormShellProps {
   title: string;
   onClose: () => void;
-  mode: "create" | "edit";
 }
 
-function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
+function ModalFormShell({ title, onClose }: ModalFormShellProps) {
   const translate = useTranslate();
   const editContext = useEditContext();
-  const isLoading = mode === "edit" && (editContext?.isLoading ?? false);
+  const isLoading = editContext?.isLoading ?? false;
 
   return (
     <>
       <DialogHeader className="shrink-0 px-6 py-4 border-b">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <DialogTitle className="text-xl">{title}</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              {translate("users.actions.form_subtitle", {
-                _: "Fill in the user details below.",
-              })}
-            </DialogDescription>
-          </div>
+        <div className="space-y-1">
+          <DialogTitle className="text-xl">{title}</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {translate("users.actions.form_subtitle", {
+              _: "Update the user's role, status and details.",
+            })}
+          </DialogDescription>
         </div>
       </DialogHeader>
 
@@ -139,7 +149,7 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
         className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {isLoading ? <FormSkeleton /> : <UserFormFields mode={mode} />}
+          {isLoading ? <FormSkeleton /> : <UserEditFields />}
         </div>
       </SimpleForm>
     </>
@@ -159,19 +169,11 @@ function FormSkeleton() {
   );
 }
 
-interface ModalFormToolbarProps {
-  onClose: () => void;
-}
-
-function ModalFormToolbar({ onClose }: ModalFormToolbarProps) {
+function ModalFormToolbar({ onClose }: { onClose: () => void }) {
   const translate = useTranslate();
 
   return (
-    <div
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t",
-      )}
-    >
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t">
       <Button type="button" variant="outline" onClick={onClose}>
         {translate("users.actions.cancel", { _: "Cancel" })}
       </Button>
@@ -187,6 +189,7 @@ function SaveButton({ label }: { label: string }) {
   const disabled = isSubmitting || isValidating;
 
   const handleClick = async () => {
+    // Close/notify are handled by EditBase mutationOptions (success/error).
     await form.handleSubmit(async (values) => {
       await saveContext?.save?.(values);
     })();
