@@ -3,18 +3,21 @@ import { getApiToken, clerkSignOut } from "../lib/clerk/clerkRefs";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
-type PermissionsMap = Record<string, string[]>;
+/** Backoffice system roles (mirrors the backend `Role` enum). */
+export type Role = "SUPER_ADMIN" | "ADMIN" | "GROCER" | "KARDIST";
 
-interface Identity {
+/** Roles allowed to manage users and other privileged backoffice areas. */
+export const MANAGER_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
+
+export interface Identity {
   id: string;
   fullName: string;
   avatar?: string;
   email?: string;
-  userType: string;
+  role: Role;
 }
 
 let identityCache: Identity | null = null;
-let permissionsCache: PermissionsMap | null = null;
 
 async function api(path: string, init: RequestInit = {}) {
   const token = await getApiToken();
@@ -45,17 +48,6 @@ async function api(path: string, init: RequestInit = {}) {
   return data;
 }
 
-function mapAction(action: string): string {
-  const mapping: Record<string, string> = {
-    list: "list",
-    create: "create",
-    show: "read",
-    edit: "update",
-    delete: "delete",
-  };
-  return mapping[action] ?? action;
-}
-
 async function loadIdentity(): Promise<Identity> {
   if (identityCache) {
     return identityCache;
@@ -67,7 +59,7 @@ async function loadIdentity(): Promise<Identity> {
     lastName: string | null;
     avatarUrl: string | null;
     email: string | null;
-    userType: string;
+    role: Role;
   };
 
   identityCache = {
@@ -76,24 +68,10 @@ async function loadIdentity(): Promise<Identity> {
       [user.firstName, user.lastName].filter(Boolean).join(" ") || user.id,
     avatar: user.avatarUrl ?? undefined,
     email: user.email ?? undefined,
-    userType: user.userType,
+    role: user.role,
   };
 
   return identityCache;
-}
-
-async function loadPermissions(): Promise<PermissionsMap> {
-  if (permissionsCache) {
-    return permissionsCache;
-  }
-
-  const user = await loadIdentity();
-  const payload = (await api(`/permissions/users/${user.id}`)) as {
-    permissions: PermissionsMap;
-  };
-
-  permissionsCache = payload.permissions ?? {};
-  return permissionsCache;
 }
 
 export const authProvider: AuthProvider = {
@@ -104,7 +82,6 @@ export const authProvider: AuthProvider = {
 
   async logout() {
     identityCache = null;
-    permissionsCache = null;
     await clerkSignOut();
     return Promise.resolve();
   },
@@ -131,17 +108,25 @@ export const authProvider: AuthProvider = {
 
   getIdentity: loadIdentity,
 
-  getPermissions: loadPermissions,
+  // The permission-by-module RBAC is parked on the backend; authorization is
+  // now role-based. We expose the current role so `usePermissions()` keeps
+  // resolving, but gating is done through `canAccess` below.
+  async getPermissions() {
+    const identity = await loadIdentity();
+    return [identity.role];
+  },
 
-  async canAccess({ resource, action }) {
-    if (!permissionsCache) {
-      await loadPermissions();
+  async canAccess({ resource }) {
+    const identity = identityCache ?? (await loadIdentity());
+    const isManager = MANAGER_ROLES.includes(identity.role);
+
+    switch (resource) {
+      case "users":
+        return isManager;
+      default:
+        // Clients / products / categories remain readable by any authenticated
+        // backoffice user for now; tighten per-resource when needed.
+        return true;
     }
-
-    const backendAction = mapAction(action ?? "");
-    // Departments and categories share the same backend permission module
-    // (both are rows in the categories table with different parentId values).
-    const permissionResource = resource === "departments" ? "categories" : resource;
-    return permissionsCache?.[permissionResource ?? ""]?.includes(backendAction) ?? false;
   },
 };

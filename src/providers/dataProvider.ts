@@ -1,4 +1,3 @@
-
 import { DataProvider, fetchUtils } from 'ra-core';
 import { getApiToken } from '../lib/clerk/clerkRefs';
 
@@ -6,35 +5,17 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
 export interface InviteUserPayload {
   email: string;
-  userType: string;
+  role: string;
   firstName?: string;
   lastName?: string;
   organizationId?: string;
 }
 
-export interface RoleSummary {
-  id: string;
-  name: string;
-  description?: string | null;
-}
-
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
-  getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
-  setUserRoles: (
-    userId: string,
-    roleIds: string[],
-  ) => Promise<{ data: unknown }>;
-}
-
-// Some backend resources live under a different path than their react-admin
-// resource name. The RBAC roles endpoints are nested under /permissions.
-const RESOURCE_PATHS: Record<string, string> = {
-  roles: 'permissions/roles',
-};
-
-function resourcePath(resource: string): string {
-  return RESOURCE_PATHS[resource] ?? resource;
+  revokeInvitation: (id: string) => Promise<{ data: unknown }>;
+  resendInvitation: (id: string) => Promise<{ data: unknown }>;
+  restoreUser: (id: string) => Promise<{ data: unknown }>;
 }
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
@@ -55,12 +36,47 @@ async function httpClient(url: string, options: fetchUtils.Options = {}) {
 function toQueryString(filter: Record<string, unknown>): string {
   const params = new URLSearchParams();
   Object.entries(filter).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
+    if (value !== undefined && value !== null && value !== '') {
       params.set(key, String(value));
     }
   });
   const qs = params.toString();
   return qs ? `?${qs}` : '';
+}
+
+/**
+ * The API wraps every response as `{ data }`; `fetchJson` returns that as
+ * `json`, so the payload lives at `json.data`. List endpoints come in two
+ * shapes: paginated (`{ data: { data: [...], meta } }`, e.g. GET /users) and
+ * flat (`{ data: [...] }`, e.g. clients/products). Handle both.
+ */
+function unwrapList(json: unknown): { rows: unknown[]; total: number } {
+  const body = json as { data?: unknown } | unknown[] | null;
+  const payload = Array.isArray(body) ? body : (body?.data ?? body);
+
+  if (Array.isArray(payload)) {
+    return { rows: payload, total: payload.length };
+  }
+
+  const paginated = payload as {
+    data?: unknown[];
+    meta?: { total?: number };
+  } | null;
+
+  if (paginated && Array.isArray(paginated.data) && paginated.meta) {
+    return {
+      rows: paginated.data,
+      total: paginated.meta.total ?? paginated.data.length,
+    };
+  }
+
+  const rows = (paginated?.data as unknown[] | undefined) ?? [];
+  return { rows, total: rows.length };
+}
+
+function unwrapOne(json: unknown): unknown {
+  const body = json as { data?: unknown } | null;
+  return body?.data ?? json;
 }
 
 export const dataProvider: DataProvider = {
@@ -70,37 +86,27 @@ export const dataProvider: DataProvider = {
 
     const query = toQueryString({
       ...params.filter,
-      _sort: field,
-      _order: order,
-      _start: (page - 1) * perPage,
-      _end: page * perPage,
+      page,
+      limit: perPage,
+      sortBy: field,
+      sortOrder: order.toLowerCase(),
     });
 
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}${query}`,
-    );
-    const data = Array.isArray(json) ? json : (json.data ?? []);
-
-    return {
-      data,
-      total: data.length,
-    };
+    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { rows, total } = unwrapList(json);
+    return { data: rows as never[], total };
   },
 
   async getOne(resource, params) {
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}/${params.id}`,
-    );
-    return { data: json.data ?? json };
+    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`);
+    return { data: unwrapOne(json) as never };
   },
 
   async getMany(resource, params) {
     const query = toQueryString({ id: params.ids.join(',') });
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}${query}`,
-    );
-    const data = Array.isArray(json) ? json : (json.data ?? []);
-    return { data };
+    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { rows } = unwrapList(json);
+    return { data: rows as never[] };
   },
 
   async getManyReference(resource, params) {
@@ -108,67 +114,31 @@ export const dataProvider: DataProvider = {
       ...params.filter,
       [params.target]: params.id,
     });
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}${query}`,
-    );
-    const data = Array.isArray(json) ? json : (json.data ?? []);
-    return { data, total: data.length };
+    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { rows, total } = unwrapList(json);
+    return { data: rows as never[], total };
   },
 
   async create(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}`, {
+    const { json } = await httpClient(`${API_URL}/${resource}`, {
       method: 'POST',
       body: JSON.stringify(params.data),
     });
-    return { data: json.data ?? json };
+    return { data: unwrapOne(json) as never };
   },
 
   async update(resource, params) {
-    // Roles keep their editable fields and their permission matrix on two
-    // separate backend endpoints, so split the payload accordingly.
-    if (resource === 'roles') {
-      const data = params.data as Record<string, unknown>;
-      const roleFields = {
-        name: data.name,
-        description: data.description,
-        isActive: data.isActive,
-      };
-      const { json } = await httpClient(
-        `${API_URL}/permissions/roles/${params.id}`,
-        {
-          method: 'PATCH',
-          body: JSON.stringify(roleFields),
-        },
-      );
-      let result = json.data ?? json;
-
-      if (Array.isArray(data.permissionIds)) {
-        const { json: permJson } = await httpClient(
-          `${API_URL}/permissions/roles/${params.id}/permissions`,
-          {
-            method: 'PUT',
-            body: JSON.stringify({ permissionIds: data.permissionIds }),
-          },
-        );
-        result = permJson.data ?? result;
-      }
-      return { data: result };
-    }
-
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}/${params.id}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify(params.data),
-      },
-    );
-    return { data: json.data ?? json };
+    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(params.data),
+    });
+    return { data: unwrapOne(json) as never };
   },
 
   async updateMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
+        httpClient(`${API_URL}/${resource}/${id}`, {
           method: 'PATCH',
           body: JSON.stringify(params.data),
         }),
@@ -178,19 +148,16 @@ export const dataProvider: DataProvider = {
   },
 
   async delete(resource, params) {
-    const { json } = await httpClient(
-      `${API_URL}/${resourcePath(resource)}/${params.id}`,
-      {
-        method: 'DELETE',
-      },
-    );
-    return { data: json?.data ?? json ?? params.previousData };
+    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+      method: 'DELETE',
+    });
+    return { data: (unwrapOne(json) ?? params.previousData) as never };
   },
 
   async deleteMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
+        httpClient(`${API_URL}/${resource}/${id}`, {
           method: 'DELETE',
         }),
       ),
@@ -203,25 +170,29 @@ export const dataProvider: DataProvider = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    return { data: json?.data ?? json };
+    return { data: unwrapOne(json) };
   },
 
-  async getUserRoles(userId: string) {
+  async revokeInvitation(id: string) {
     const { json } = await httpClient(
-      `${API_URL}/permissions/users/${userId}/roles`,
+      `${API_URL}/users/invitations/${id}/revoke`,
+      { method: 'POST' },
     );
-    const data = Array.isArray(json) ? json : (json.data ?? []);
-    return { data };
+    return { data: unwrapOne(json) };
   },
 
-  async setUserRoles(userId: string, roleIds: string[]) {
+  async resendInvitation(id: string) {
     const { json } = await httpClient(
-      `${API_URL}/permissions/users/${userId}/roles`,
-      {
-        method: 'PUT',
-        body: JSON.stringify({ roleIds }),
-      },
+      `${API_URL}/users/invitations/${id}/resend`,
+      { method: 'POST' },
     );
-    return { data: json?.data ?? json };
+    return { data: unwrapOne(json) };
+  },
+
+  async restoreUser(id: string) {
+    const { json } = await httpClient(`${API_URL}/users/${id}/restore`, {
+      method: 'POST',
+    });
+    return { data: unwrapOne(json) };
   },
 } as ExtendedDataProvider;
