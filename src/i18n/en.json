@@ -15,10 +15,6 @@
     "categories": {
       "name": "Category",
       "name_plural": "Categories"
-    },
-    "roles": {
-      "name": "Role",
-      "name_plural": "Roles"
     }
   },
   "list": {
@@ -37,7 +33,7 @@
       "incomplete": "Incomplete",
       "complete": "Complete",
       "avatar": "Avatar",
-      "userType": "User type",
+      "role": "Role",
       "status": "Status",
       "actions": "Actions",
       "description": "Description",
@@ -51,79 +47,57 @@
       "all": "All",
       "active": "Active",
       "inactive": "Inactive",
-      "userType": "User type",
-      "status": "Status"
+      "pending": "Pending",
+      "status": "Status",
+      "show_deleted": "Show deleted"
+    },
+    "roles": {
+      "SUPER_ADMIN": "Super admin",
+      "ADMIN": "Administrator",
+      "GROCER": "Grocer",
+      "KARDIST": "Kardist"
     },
     "actions": {
-      "add": "Add User",
+      "add": "Invite user",
       "invite": "Invite user",
       "edit": "Edit",
-      "delete": "Delete",
-      "create": "Create user",
-      "create_title": "Create user",
+      "create_title": "Create new user",
+      "create_subtitle": "Fill in the details to invite a new user.",
       "edit_title": "Edit user",
       "save": "Save",
-      "form_subtitle": "Fill in the user details below.",
+      "form_subtitle": "Update the user's role, status and details.",
+      "firstName_placeholder": "Enter the first name",
+      "lastName_placeholder": "Enter the last name",
+      "email_placeholder": "Enter the email address",
+      "role_placeholder": "Select a role",
+      "invite_note_title": "Important information",
+      "invite_note": "The user will receive an email to create their password and activate their account.",
+      "invite_submit": "Send invitation",
+      "invite_sending": "Sending…",
+      "invite_success": "Invitation sent to %{email}",
+      "invite_error": "Could not send the invitation",
+      "resend": "Resend invitation",
+      "resend_success": "Invitation resent",
+      "revoke": "Revoke invitation",
+      "revoke_success": "Invitation revoked",
+      "restore": "Restore",
+      "restore_success": "User restored",
+      "enable": "Enable",
+      "enable_success": "User enabled",
+      "disable": "Disable",
+      "disable_success": "User disabled",
+      "delete": "Delete",
+      "delete_success": "User deleted",
       "delete_confirm_title": "Delete user",
-      "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "delete_confirm_description": "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
+      "update_success": "User updated",
+      "cancel": "Cancel"
     },
     "status": {
       "active": "Active",
-      "inactive": "Inactive"
-    }
-  },
-  "permissions": {
-    "modules": {
-      "products": "Products",
-      "categories": "Categories",
-      "orders": "Orders",
-      "providers": "Providers",
-      "clients": "Clients",
-      "coverage": "Coverage",
-      "locations": "Locations",
-      "team": "Team",
-      "users": "Users",
-      "roles": "Roles",
-      "analytics": "Analytics",
-      "settings": "Settings"
-    },
-    "actions": {
-      "create": "Create",
-      "read": "Read",
-      "update": "Update",
-      "delete": "Delete",
-      "list": "List"
-    }
-  },
-  "roles": {
-    "system": "System",
-    "custom": "Custom",
-    "admin_only": "Only administrators can manage roles.",
-    "system_role_title": "System role",
-    "system_role_notice": "System roles are read-only and cannot be modified or deleted.",
-    "delete_confirm_title": "Delete role",
-    "fields": {
-      "type": "Type",
-      "permissionsCount": "Permissions"
-    },
-    "matrix": {
-      "title": "Permissions",
-      "module": "Module",
-      "toggle_all": "Toggle all"
-    },
-    "actions": {
-      "manage_user_roles": "Manage roles"
-    },
-    "assign_dialog": {
-      "title": "Manage roles",
-      "description": "Select the roles assigned to this user.",
-      "admin_notice": "Admin users have full access regardless of assigned roles.",
-      "empty": "No roles yet.",
-      "save": "Save",
-      "saved": "Roles updated",
-      "error": "Failed to update roles"
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "deleted": "Deleted"
     }
   },
   "shared": {
@@ -142,22 +116,16 @@
   },
   "app": {
     "menu": {
-      "dashboard": "Dashboard",
-      "departments": "Department",
-      "categories": "Category",
-      "products": "Product",
-      "orders": "Orders",
-      "paymentCharges": "Payment Charges",
-      "paymentMethods": "Payment Methods",
-      "coupons": "Coupons",
-      "clients": "Clients",
-      "messages": "Messages",
-      "clientWeb": "Client Web",
-      "clientWebSettings": "Settings",
-      "clientWebBanners": "Banners",
-      "administration": "Administration",
-      "users": "Users",
-      "roles": "Roles"
+      "panel": "Dashboard",
+      "pedidos": "Orders",
+      "productos": "Products",
+      "inventario": "Inventory",
+      "almacenes": "Warehouses",
+      "usuarios": "Users",
+      "clientes": "Clients",
+      "reportes": "Reports",
+      "configuracion": "Settings",
+      "soon": "Coming soon"
     },
     "user": {
       "profile": "Profile"
