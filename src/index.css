@@ -28,13 +28,14 @@
     --ring: 160 84% 39%;
     --radius: 0.625rem;
 
-    --sidebar-background: 168 72% 19%;
-    --sidebar-foreground: 213 27% 84%;
+    /* Light sidebar (green-accent redesign) */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 20% 40%;
     --sidebar-primary: 160 84% 39%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 174 72% 31%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 168 50% 25%;
+    --sidebar-accent: 160 84% 39%;
+    --sidebar-accent-foreground: 222 47% 17%;
+    --sidebar-border: 214 32% 91%;
     --sidebar-ring: 160 84% 39%;
 
     /* Custom theme tokens */
@@ -77,13 +78,14 @@
     --input: 220 15% 22%;
     --ring: 158 64% 46%;
 
-    --sidebar-background: 168 72% 14%;
-    --sidebar-foreground: 213 25% 75%;
+    /* Dark sidebar */
+    --sidebar-background: 220 15% 12%;
+    --sidebar-foreground: 215 15% 65%;
     --sidebar-primary: 158 64% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 174 60% 33%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 168 50% 20%;
+    --sidebar-accent: 158 64% 46%;
+    --sidebar-accent-foreground: 210 20% 94%;
+    --sidebar-border: 220 15% 22%;
     --sidebar-ring: 158 64% 46%;
 
     /* Custom dark theme tokens */
@@ -130,25 +132,22 @@
     background-color: #0C1117;
   }
   .text-brand {
-    color: #10B981;
+    color: hsl(var(--primary));
   }
   .bg-brand {
-    background-color: #10B981;
+    background-color: hsl(var(--primary));
   }
   .bg-teal-mid {
-    background-color: #0D9488;
+    background-color: hsl(var(--accent));
   }
   .text-teal-light {
     color: #5EEAD4;
   }
   .bg-cream {
-    background-color: #FFFBF5;
-  }
-  .dark .bg-cream {
-    background-color: #0C1117;
+    background-color: hsl(var(--background));
   }
   .border-brand {
-    border-color: #10B981;
+    border-color: hsl(var(--primary));
   }
 }
 

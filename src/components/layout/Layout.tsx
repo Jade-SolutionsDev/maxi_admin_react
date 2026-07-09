@@ -4,11 +4,10 @@ import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
-  "/": { title: "Dashboard", breadcrumb: "Inicio / Dashboard" },
+  "/": { title: "Panel", breadcrumb: "Inicio / Panel" },
   "/productos": { title: "Productos", breadcrumb: "Inicio / Productos" },
   "/clients": { title: "Clientes", breadcrumb: "Inicio / Clientes" },
-  "/ordenes": { title: "Órdenes", breadcrumb: "Inicio / Órdenes" },
-  "/roles": { title: "Roles", breadcrumb: "Inicio / Administración / Roles" },
+  "/users": { title: "Usuarios", breadcrumb: "Inicio / Usuarios" },
 };
 
 interface LayoutProps {
@@ -44,7 +43,7 @@ export default function Layout({ children }: LayoutProps) {
   const sidebarWidth = isDesktop ? (sidebarCollapsed ? 72 : 256) : 0;
 
   return (
-    <div className="min-h-screen transition-colors duration-200 bg-[#FFFBF5] dark:bg-[#0C1117]">
+    <div className="min-h-screen transition-colors duration-200 bg-background">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar
