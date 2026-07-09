@@ -80,16 +80,20 @@ export default function Invitation() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  // Get the ticket from the query params
+  // Get the ticket and any prefilled profile data from the query params.
+  // The backend appends firstName/lastName (set by the admin) to the Clerk
+  // invitation redirect URL so the user sees them pre-filled and can edit them.
   const ticket = searchParams.get("__clerk_ticket");
+  const prefilledFirstName = searchParams.get("firstName") ?? "";
+  const prefilledLastName = searchParams.get("lastName") ?? "";
 
   // Initialize form
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       // email: "",
-      firstName: "",
-      lastName: "",
+      firstName: prefilledFirstName,
+      lastName: prefilledLastName,
       phone: "",
       businessName: "",
       password: "",
