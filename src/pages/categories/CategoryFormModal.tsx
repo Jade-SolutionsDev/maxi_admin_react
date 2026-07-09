@@ -107,7 +107,7 @@ function EditLoading() {
 function CategoryFormFields() {
   const translate = useTranslate();
   const { data: identity } = useGetIdentity();
-  const isProvider = identity?.userType === "provider";
+  const isProvider = identity?.role === "GROCER";
   const providerId = useWatch({ name: "providerId" });
 
   return (
@@ -117,7 +117,7 @@ function CategoryFormFields() {
           source="providerId"
           reference="users"
           label={translate("list.fields.provider")}
-          filter={{ userType: "provider" }}
+          filter={{ role: "GROCER" }}
         >
           <AutocompleteInput validate={required()} />
         </ReferenceInput>
