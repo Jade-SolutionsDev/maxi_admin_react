@@ -39,7 +39,10 @@
       "description": "Descripción",
       "sortOrder": "Orden",
       "slug": "Slug",
-      "provider": "Proveedor"
+      "provider": "Proveedor",
+      "imageDesktop": "Imagen (escritorio)",
+      "imageMobile": "Imagen (móvil)",
+      "featured": "Destacado"
     }
   },
   "users": {
@@ -118,6 +121,7 @@
     "actions": {
       "edit": "Editar",
       "delete": "Eliminar",
+      "view": "Ver detalles",
       "create_title": "Crear %{name}",
       "edit_title": "Editar %{name}",
       "save": "Guardar",
@@ -126,6 +130,13 @@
       "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
       "cancel": "Cancelar",
       "confirm": "Eliminar"
+    },
+    "upload": {
+      "choose": "Subir imagen",
+      "remove": "Quitar",
+      "invalid_type": "Formato de imagen no admitido",
+      "too_large": "La imagen supera el límite de 2 MB",
+      "failed": "No se pudo subir la imagen"
     }
   },
   "app": {

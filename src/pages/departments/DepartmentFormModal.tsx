@@ -12,6 +12,7 @@ import { Loader2, Save } from "lucide-react";
 
 import {
   BooleanInput,
+  ImageUploadInput,
   NumberInput,
   SimpleForm,
   TextInput,
@@ -35,6 +36,9 @@ const sanitizeDepartment = (data: Record<string, unknown>) => ({
   name: data.name,
   slug: data.slug,
   description: data.description,
+  imageDesktopUrl: data.imageDesktopUrl,
+  imageMobileUrl: data.imageMobileUrl,
+  isFeatured: data.isFeatured,
   sortOrder: data.sortOrder,
   isActive: data.isActive,
 });
@@ -134,6 +138,19 @@ function DepartmentFormFields() {
         label={translate("list.fields.description")}
         multiline
       />
+      <ImageUploadInput
+        source="imageDesktopUrl"
+        label={translate("list.fields.imageDesktop")}
+      />
+      <ImageUploadInput
+        source="imageMobileUrl"
+        label={translate("list.fields.imageMobile")}
+      />
+      <BooleanInput
+        source="isFeatured"
+        label={translate("list.fields.featured")}
+        defaultValue={false}
+      />
       <NumberInput
         source="sortOrder"
         label={translate("list.fields.sortOrder")}
@@ -151,7 +168,7 @@ function DepartmentFormFields() {
 function FormSkeleton() {
   return (
     <div className="space-y-5">
-      {Array.from({ length: 5 }).map((_, i) => (
+      {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="space-y-2">
           <div className="h-4 w-24 rounded bg-muted animate-pulse" />
           <div className="h-10 w-full rounded bg-muted animate-pulse" />

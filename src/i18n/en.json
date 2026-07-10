@@ -39,7 +39,10 @@
       "description": "Description",
       "sortOrder": "Sort Order",
       "slug": "Slug",
-      "provider": "Provider"
+      "provider": "Provider",
+      "imageDesktop": "Image (desktop)",
+      "imageMobile": "Image (mobile)",
+      "featured": "Featured"
     }
   },
   "users": {
@@ -118,6 +121,7 @@
     "actions": {
       "edit": "Edit",
       "delete": "Delete",
+      "view": "View details",
       "create_title": "Create %{name}",
       "edit_title": "Edit %{name}",
       "save": "Save",
@@ -126,6 +130,13 @@
       "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "upload": {
+      "choose": "Upload image",
+      "remove": "Remove",
+      "invalid_type": "Unsupported image format",
+      "too_large": "Image exceeds the 2MB limit",
+      "failed": "Could not upload the image"
     }
   },
   "app": {

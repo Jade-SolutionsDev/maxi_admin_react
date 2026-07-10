@@ -1,0 +1,34 @@
+import { getApiToken } from "./clerk/clerkRefs";
+
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+
+export const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB (mirrors backend)
+export const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
+
+/**
+ * Upload an image to the backend (multipart) and return its stored public URL.
+ * The backend stores it in S3-compatible storage; the record only keeps the URL.
+ */
+export async function uploadImage(file: File): Promise<string> {
+  const token = await getApiToken();
+  const body = new FormData();
+  body.append("file", file);
+
+  const response = await fetch(`${API_URL}/uploads/image`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload failed (${response.status})`);
+  }
+
+  const { data } = await response.json();
+  return data.url as string;
+}

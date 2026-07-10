@@ -22,6 +22,7 @@ import {
   RefreshButton,
   ReferenceInput,
   SearchInput,
+  TaxonomyViewButton,
 } from "@/components/admin";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -189,11 +190,15 @@ const CategoryActionsCell = () => {
     resource: "categories",
     action: "edit",
   });
-  if (!canEdit) return null;
   return (
     <div className="flex items-center justify-center gap-1">
-      <CategoryEditButton />
-      <CategoryDeleteButton />
+      <TaxonomyViewButton />
+      {canEdit && (
+        <>
+          <CategoryEditButton />
+          <CategoryDeleteButton />
+        </>
+      )}
     </div>
   );
 };

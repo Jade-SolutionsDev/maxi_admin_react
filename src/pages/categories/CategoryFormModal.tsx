@@ -13,6 +13,7 @@ import { Loader2, Save } from "lucide-react";
 import {
   AutocompleteInput,
   BooleanInput,
+  ImageUploadInput,
   NumberInput,
   ReferenceInput,
   SimpleForm,
@@ -39,6 +40,8 @@ const sanitizeCategory = (data: Record<string, unknown>) => ({
   name: data.name,
   slug: data.slug,
   description: data.description,
+  imageDesktopUrl: data.imageDesktopUrl,
+  imageMobileUrl: data.imageMobileUrl,
   sortOrder: data.sortOrder,
   isActive: data.isActive,
 });
@@ -149,6 +152,14 @@ function CategoryFormFields() {
         label={translate("list.fields.description")}
         multiline
       />
+      <ImageUploadInput
+        source="imageDesktopUrl"
+        label={translate("list.fields.imageDesktop")}
+      />
+      <ImageUploadInput
+        source="imageMobileUrl"
+        label={translate("list.fields.imageMobile")}
+      />
       <NumberInput
         source="sortOrder"
         label={translate("list.fields.sortOrder")}
@@ -166,7 +177,7 @@ function CategoryFormFields() {
 function FormSkeleton() {
   return (
     <div className="space-y-5">
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="space-y-2">
           <div className="h-4 w-24 rounded bg-muted animate-pulse" />
           <div className="h-10 w-full rounded bg-muted animate-pulse" />
