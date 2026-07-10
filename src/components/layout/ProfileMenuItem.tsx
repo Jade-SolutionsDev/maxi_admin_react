@@ -1,16 +1,16 @@
 import { useContext } from "react";
 import { Translate, UserMenuContext } from "ra-core";
-import { useClerk } from "@clerk/react";
+import { useNavigate } from "react-router-dom";
 import { UserCog } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 /**
- * Top-bar user-menu entry that opens Clerk's user profile (account settings)
- * modal. Rendered as a child of the admin-kit `<UserMenu>`, so it appears
- * between the identity header and the logout action.
+ * Top-bar user-menu entry that opens the in-app profile page. Rendered as a
+ * child of the admin-kit `<UserMenu>`, so it appears between the identity header
+ * and the logout action.
  */
 export function ProfileMenuItem() {
-  const { openUserProfile } = useClerk();
+  const navigate = useNavigate();
   const userMenu = useContext(UserMenuContext);
 
   return (
@@ -18,7 +18,7 @@ export function ProfileMenuItem() {
       className="cursor-pointer"
       onClick={() => {
         userMenu?.onClose?.();
-        openUserProfile();
+        navigate("/perfil");
       }}
     >
       <UserCog />
