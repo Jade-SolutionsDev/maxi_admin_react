@@ -146,5 +146,61 @@
     "user": {
       "profile": "Perfil"
     }
+  },
+  "invitation": {
+    "brand_tagline": "Panel de Proveedores",
+    "title": "Aceptar Invitación",
+    "subtitle": "Completa tus datos para activar tu cuenta",
+    "go_to_login": "Ir al Login",
+    "footer": {
+      "have_account": "¿Ya tienes cuenta?",
+      "sign_in": "Inicia sesión"
+    },
+    "signed_in": {
+      "title": "Ya tienes una sesión activa",
+      "description": "Para aceptar esta invitación necesitas cerrar la sesión actual y continuar como nuevo usuario.",
+      "action": "Cerrar sesión y continuar"
+    },
+    "invalid": {
+      "title": "Invitación Inválida",
+      "description": "No se encontró ticket de invitación. Contacta al administrador."
+    },
+    "success": {
+      "title": "¡Cuenta Creada!",
+      "description": "Tu cuenta ha sido activada exitosamente.",
+      "description_credentials": "Recibirás tus credenciales de acceso por correo electrónico en breve."
+    },
+    "form": {
+      "avatar": "Foto",
+      "avatar_upload": "Subir foto de perfil (opcional)",
+      "avatar_preview": "Vista previa del avatar",
+      "first_name": "Nombre",
+      "first_name_placeholder": "Juan",
+      "last_name": "Apellido",
+      "last_name_placeholder": "Pérez",
+      "phone": "Teléfono",
+      "phone_placeholder": "+53 5 1234567",
+      "business_name": "Nombre del Negocio",
+      "business_name_placeholder": "Mi Empresa S.A.",
+      "password": "Contraseña",
+      "password_placeholder": "Mínimo 8 caracteres",
+      "confirm_password": "Confirmar contraseña",
+      "confirm_password_placeholder": "Repite tu contraseña",
+      "submit": "Activar Cuenta",
+      "submitting": "Procesando..."
+    },
+    "validation": {
+      "first_name_required": "El nombre es requerido",
+      "last_name_required": "El apellido es requerido",
+      "password_min": "La contraseña debe tener al menos 8 caracteres",
+      "confirm_password_required": "Confirma tu contraseña",
+      "passwords_mismatch": "Las contraseñas no coinciden"
+    },
+    "errors": {
+      "ticket_invalid": "No se pudo validar la invitación.",
+      "missing_fields": "Faltan datos para completar el registro: %{fields}.",
+      "incomplete_status": "No se pudo completar el registro (estado: %{status}).",
+      "generic": "Error al activar la cuenta. Intenta nuevamente."
+    }
   }
 }

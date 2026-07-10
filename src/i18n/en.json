@@ -146,5 +146,61 @@
     "user": {
       "profile": "Profile"
     }
+  },
+  "invitation": {
+    "brand_tagline": "Provider Panel",
+    "title": "Accept Invitation",
+    "subtitle": "Fill in your details to activate your account",
+    "go_to_login": "Go to Login",
+    "footer": {
+      "have_account": "Already have an account?",
+      "sign_in": "Sign in"
+    },
+    "signed_in": {
+      "title": "You already have an active session",
+      "description": "To accept this invitation you need to sign out of the current session and continue as a new user.",
+      "action": "Sign out and continue"
+    },
+    "invalid": {
+      "title": "Invalid Invitation",
+      "description": "No invitation ticket was found. Contact the administrator."
+    },
+    "success": {
+      "title": "Account Created!",
+      "description": "Your account has been activated successfully.",
+      "description_credentials": "You will receive your access credentials by email shortly."
+    },
+    "form": {
+      "avatar": "Photo",
+      "avatar_upload": "Upload profile photo (optional)",
+      "avatar_preview": "Avatar preview",
+      "first_name": "First name",
+      "first_name_placeholder": "John",
+      "last_name": "Last name",
+      "last_name_placeholder": "Doe",
+      "phone": "Phone",
+      "phone_placeholder": "+53 5 1234567",
+      "business_name": "Business name",
+      "business_name_placeholder": "My Company Inc.",
+      "password": "Password",
+      "password_placeholder": "At least 8 characters",
+      "confirm_password": "Confirm password",
+      "confirm_password_placeholder": "Repeat your password",
+      "submit": "Activate Account",
+      "submitting": "Processing..."
+    },
+    "validation": {
+      "first_name_required": "First name is required",
+      "last_name_required": "Last name is required",
+      "password_min": "Password must be at least 8 characters",
+      "confirm_password_required": "Confirm your password",
+      "passwords_mismatch": "Passwords do not match"
+    },
+    "errors": {
+      "ticket_invalid": "The invitation could not be validated.",
+      "missing_fields": "Missing data to complete the registration: %{fields}.",
+      "incomplete_status": "The registration could not be completed (status: %{status}).",
+      "generic": "Error activating the account. Please try again."
+    }
   }
 }

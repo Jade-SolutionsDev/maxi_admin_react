@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRef } from "react";
+import { useTranslate } from "ra-core";
 import type { InvitationFlow } from "./useInvitationFlow";
 
 /**
@@ -40,6 +41,7 @@ import type { InvitationFlow } from "./useInvitationFlow";
  * and let them sign out to continue — keeping the ticket in the URL.
  */
 export function SignedInGate({ flow }: { flow: InvitationFlow }) {
+  const translate = useTranslate();
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-[400px]">
@@ -48,15 +50,14 @@ export function SignedInGate({ flow }: { flow: InvitationFlow }) {
             <LogOut className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-xl mb-2">
-            Ya tienes una sesión activa
+            {translate("invitation.signed_in.title")}
           </CardTitle>
           <CardDescription className="text-sm mb-6">
-            Para aceptar esta invitación necesitas cerrar la sesión actual y
-            continuar como nuevo usuario.
+            {translate("invitation.signed_in.description")}
           </CardDescription>
           <Button onClick={flow.handleSignOut} className="w-full">
             <LogOut className="h-4 w-4 mr-2" />
-            Cerrar sesión y continuar
+            {translate("invitation.signed_in.action")}
           </Button>
         </CardContent>
       </Card>
@@ -66,6 +67,7 @@ export function SignedInGate({ flow }: { flow: InvitationFlow }) {
 
 /** No `__clerk_ticket` in the URL: the invitation link is unusable. */
 export function InvalidTicketScreen({ flow }: { flow: InvitationFlow }) {
+  const translate = useTranslate();
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-[400px]">
@@ -73,12 +75,14 @@ export function InvalidTicketScreen({ flow }: { flow: InvitationFlow }) {
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-destructive/10">
             <AlertCircle className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="text-xl mb-2">Invitación Inválida</CardTitle>
+          <CardTitle className="text-xl mb-2">
+            {translate("invitation.invalid.title")}
+          </CardTitle>
           <CardDescription className="text-sm mb-6">
-            No se encontró ticket de invitación. Contacta al administrador.
+            {translate("invitation.invalid.description")}
           </CardDescription>
           <Button onClick={() => flow.navigate("/login")} className="w-full">
-            Ir al Login
+            {translate("invitation.go_to_login")}
           </Button>
         </CardContent>
       </Card>
@@ -88,6 +92,7 @@ export function InvalidTicketScreen({ flow }: { flow: InvitationFlow }) {
 
 /** Success state */
 export function SuccessScreen({ flow }: { flow: InvitationFlow }) {
+  const translate = useTranslate();
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-[400px]">
@@ -95,16 +100,17 @@ export function SuccessScreen({ flow }: { flow: InvitationFlow }) {
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-primary/10">
             <CheckCircle2 className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-xl mb-2">¡Cuenta Creada!</CardTitle>
+          <CardTitle className="text-xl mb-2">
+            {translate("invitation.success.title")}
+          </CardTitle>
           <CardDescription className="text-sm mb-2">
-            Tu cuenta ha sido activada exitosamente.
+            {translate("invitation.success.description")}
           </CardDescription>
           <CardDescription className="text-sm mb-6">
-            Recibirás tus credenciales de acceso por correo electrónico en
-            breve.
+            {translate("invitation.success.description_credentials")}
           </CardDescription>
           <Button onClick={() => flow.navigate("/login")} className="w-full">
-            Ir al Login
+            {translate("invitation.go_to_login")}
           </Button>
         </CardContent>
       </Card>
@@ -115,6 +121,7 @@ export function SuccessScreen({ flow }: { flow: InvitationFlow }) {
 /** The sign-up form that consumes the invitation ticket. */
 export function SignUpForm({ flow }: { flow: InvitationFlow }) {
   const { form } = flow;
+  const translate = useTranslate();
   // Local so the flow hook stays ref-free (react-compiler lint).
   const fileInputRef = useRef<HTMLInputElement>(null);
   const openFilePicker = () => fileInputRef.current?.click();
@@ -135,7 +142,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
                 <Avatar className="w-24 h-24 border-2 border-primary">
                   <AvatarImage
                     src={form.watch("avatar")!}
-                    alt="Avatar preview"
+                    alt={translate("invitation.form.avatar_preview")}
                   />
                   <AvatarFallback>
                     {form.watch("firstName")?.[0] || "U"}
@@ -160,7 +167,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
               >
                 <Camera className="h-6 w-6 mb-1 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  Foto
+                  {translate("invitation.form.avatar")}
                 </span>
               </Button>
             )}
@@ -180,7 +187,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
               onClick={openFilePicker}
             >
               <Upload className="h-3 w-3 mr-1" />
-              Subir foto de perfil (opcional)
+              {translate("invitation.form.avatar_upload")}
             </Button>
           )}
         </div>
@@ -222,14 +229,15 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Nombre <span className="text-destructive">*</span>
+                  {translate("invitation.form.first_name")}{" "}
+                  <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       {...field}
-                      placeholder="Juan"
+                      placeholder={translate("invitation.form.first_name_placeholder")}
                       className="pl-10"
                     />
                   </div>
@@ -245,14 +253,15 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Apellido <span className="text-destructive">*</span>
+                  {translate("invitation.form.last_name")}{" "}
+                  <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       {...field}
-                      placeholder="Pérez"
+                      placeholder={translate("invitation.form.last_name_placeholder")}
                       className="pl-10"
                     />
                   </div>
@@ -269,13 +278,13 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Teléfono</FormLabel>
+              <FormLabel>{translate("invitation.form.phone")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     {...field}
-                    placeholder="+53 5 1234567"
+                    placeholder={translate("invitation.form.phone_placeholder")}
                     className="pl-10"
                   />
                 </div>
@@ -291,13 +300,13 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           name="businessName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Negocio</FormLabel>
+              <FormLabel>{translate("invitation.form.business_name")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     {...field}
-                    placeholder="Mi Empresa S.A."
+                    placeholder={translate("invitation.form.business_name_placeholder")}
                     className="pl-10"
                   />
                 </div>
@@ -314,7 +323,8 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Contraseña <span className="text-destructive">*</span>
+                {translate("invitation.form.password")}{" "}
+                <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <div className="relative">
@@ -322,7 +332,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
                   <PasswordInput
                     {...field}
                     autoComplete="new-password"
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder={translate("invitation.form.password_placeholder")}
                     className="pl-10"
                   />
                 </div>
@@ -339,7 +349,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Confirmar contraseña{" "}
+                {translate("invitation.form.confirm_password")}{" "}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
@@ -348,7 +358,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
                   <PasswordInput
                     {...field}
                     autoComplete="new-password"
-                    placeholder="Repite tu contraseña"
+                    placeholder={translate("invitation.form.confirm_password_placeholder")}
                     className="pl-10"
                   />
                 </div>
@@ -367,10 +377,10 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           {flow.isSubmitting ? (
             <>
               <div className="h-5 w-5 border-2 border-background border-t-transparent rounded-full animate-spin mr-2" />
-              Procesando...
+              {translate("invitation.form.submitting")}
             </>
           ) : (
-            "Activar Cuenta"
+            translate("invitation.form.submit")
           )}
         </Button>
       </form>

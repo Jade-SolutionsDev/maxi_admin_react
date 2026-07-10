@@ -1,30 +1,37 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, useSignUp } from "@clerk/react";
+import { useTranslate } from "ra-core";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-// Form validation schema
-const formSchema = z
-  .object({
-    // email: z.string().email("Email inválido"),
-    firstName: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
-    phone: z.string().optional(),
-    businessName: z.string().optional(),
-    password: z
-      .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres"),
-    confirmPassword: z.string().min(1, "Confirma tu contraseña"),
-    avatar: z.string().nullable().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
+// Form validation schema. Built per-locale so zod messages come from the
+// translation catalogs (es is the default locale).
+const makeFormSchema = (translate: (key: string) => string) =>
+  z
+    .object({
+      // email: z.string().email("Email inválido"),
+      firstName: z
+        .string()
+        .min(1, translate("invitation.validation.first_name_required")),
+      lastName: z
+        .string()
+        .min(1, translate("invitation.validation.last_name_required")),
+      phone: z.string().optional(),
+      businessName: z.string().optional(),
+      password: z.string().min(8, translate("invitation.validation.password_min")),
+      confirmPassword: z
+        .string()
+        .min(1, translate("invitation.validation.confirm_password_required")),
+      avatar: z.string().nullable().optional(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: translate("invitation.validation.passwords_mismatch"),
+      path: ["confirmPassword"],
+    });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof makeFormSchema>>;
 
 /**
  * Best-effort extraction of a human-readable message from a Clerk error.
@@ -53,6 +60,8 @@ export function useInvitationFlow() {
   const { signUp } = useSignUp();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const translate = useTranslate();
+  const formSchema = useMemo(() => makeFormSchema(translate), [translate]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -129,7 +138,7 @@ export function useInvitationFlow() {
 
       if (ticketError) {
         setError(
-          getErrorMessage(ticketError, "No se pudo validar la invitación."),
+          getErrorMessage(ticketError, translate("invitation.errors.ticket_invalid")),
         );
         return;
       }
@@ -140,8 +149,10 @@ export function useInvitationFlow() {
         const missing = signUp.missingFields.join(", ");
         setError(
           missing
-            ? `Faltan datos para completar el registro: ${missing}.`
-            : `No se pudo completar el registro (estado: ${signUp.status}).`,
+            ? translate("invitation.errors.missing_fields", { fields: missing })
+            : translate("invitation.errors.incomplete_status", {
+                status: signUp.status,
+              }),
         );
         return;
       }
@@ -160,7 +171,7 @@ export function useInvitationFlow() {
       setIsSuccess(true);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Error al activar la cuenta. Intenta nuevamente."),
+        getErrorMessage(err, translate("invitation.errors.generic")),
       );
     } finally {
       setIsSubmitting(false);

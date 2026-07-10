@@ -1,4 +1,5 @@
 import { AlertCircle } from "lucide-react";
+import { useTranslate } from "ra-core";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +23,7 @@ import {
  */
 export default function InvitationPage() {
   const flow = useInvitationFlow();
+  const translate = useTranslate();
 
   // Block already-signed-in users: an invitation must be accepted as a brand
   // new session. Instead of redirecting to "/" (which is behind requireAuth and
@@ -62,14 +64,14 @@ export default function InvitationPage() {
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Panel de Proveedores
+              {translate("invitation.brand_tagline")}
             </p>
           </div>
 
-          <CardTitle className="text-xl">Aceptar Invitación</CardTitle>
-          <CardDescription>
-            Completa tus datos para activar tu cuenta
-          </CardDescription>
+          <CardTitle className="text-xl">
+            {translate("invitation.title")}
+          </CardTitle>
+          <CardDescription>{translate("invitation.subtitle")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -86,13 +88,13 @@ export default function InvitationPage() {
           {/* Footer */}
           <div className="mt-6 pt-5 text-center text-sm border-t text-muted-foreground">
             <p>
-              ¿Ya tienes cuenta?{" "}
+              {translate("invitation.footer.have_account")}{" "}
               <Button
                 variant="link"
                 className="p-0 h-auto font-medium text-primary hover:text-primary/80"
                 onClick={() => flow.navigate("/login")}
               >
-                Inicia sesión
+                {translate("invitation.footer.sign_in")}
               </Button>
             </p>
           </div>
