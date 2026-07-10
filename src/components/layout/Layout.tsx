@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import { Notification } from "@/components/admin/notification";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
   "/": { title: "Panel", breadcrumb: "Inicio / Panel" },
@@ -83,6 +84,8 @@ export default function Layout({ children }: LayoutProps) {
         />
         <main className="p-6 lg:p-8">{children}</main>
       </div>
+      {/* Bridges ra-core useNotify() to sonner toasts and mounts the <Toaster>. */}
+      <Notification />
     </div>
   );
 }
