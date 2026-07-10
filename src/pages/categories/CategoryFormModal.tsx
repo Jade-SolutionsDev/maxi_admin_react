@@ -32,6 +32,17 @@ interface CategoryFormModalProps {
   mode: "create" | "edit";
 }
 
+// The form record carries server-managed fields (id, parentId, timestamps)
+// that the backend's whitelist rejects — send only what the DTO accepts.
+const sanitizeCategory = (data: Record<string, unknown>) => ({
+  departmentId: data.departmentId,
+  name: data.name,
+  slug: data.slug,
+  description: data.description,
+  sortOrder: data.sortOrder,
+  isActive: data.isActive,
+});
+
 export default function CategoryFormModal({ mode }: CategoryFormModalProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -49,11 +60,19 @@ export default function CategoryFormModal({ mode }: CategoryFormModalProps) {
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
         {isEdit ? (
-          <EditBase id={id} mutationMode="pessimistic">
+          <EditBase
+            id={id}
+            mutationMode="pessimistic"
+            transform={sanitizeCategory}
+          >
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
           </EditBase>
         ) : (
-          <CreateBase redirect="list" mutationMode="pessimistic">
+          <CreateBase
+            redirect="list"
+            mutationMode="pessimistic"
+            transform={sanitizeCategory}
+          >
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
           </CreateBase>
         )}
@@ -86,6 +105,10 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
 
       <SimpleForm
         toolbar={<ModalFormToolbar onClose={onClose} />}
+        // On edit the parent lives on `parentId`; the input reads `departmentId`.
+        defaultValues={(record?: Record<string, unknown>) => ({
+          departmentId: record?.parentId,
+        })}
         className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">

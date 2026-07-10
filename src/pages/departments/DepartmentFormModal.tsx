@@ -30,6 +30,15 @@ interface DepartmentFormModalProps {
   mode: "create" | "edit";
 }
 
+// Strip server-managed fields (id, parentId, timestamps) the backend rejects.
+const sanitizeDepartment = (data: Record<string, unknown>) => ({
+  name: data.name,
+  slug: data.slug,
+  description: data.description,
+  sortOrder: data.sortOrder,
+  isActive: data.isActive,
+});
+
 export default function DepartmentFormModal({ mode }: DepartmentFormModalProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -47,11 +56,19 @@ export default function DepartmentFormModal({ mode }: DepartmentFormModalProps) 
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
         {isEdit ? (
-          <EditBase id={id} mutationMode="pessimistic">
+          <EditBase
+            id={id}
+            mutationMode="pessimistic"
+            transform={sanitizeDepartment}
+          >
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
           </EditBase>
         ) : (
-          <CreateBase redirect="list" mutationMode="pessimistic">
+          <CreateBase
+            redirect="list"
+            mutationMode="pessimistic"
+            transform={sanitizeDepartment}
+          >
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
           </CreateBase>
         )}
