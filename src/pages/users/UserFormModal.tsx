@@ -27,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { roleChoices } from "./roleChoices";
+import { backendMessage } from "./errors";
 
 /** Read-only display of the account email (email is immutable after creation). */
 function EmailField() {
@@ -75,11 +76,6 @@ function UserEditFields() {
   );
 }
 
-interface HttpErrorLike {
-  message?: string;
-  body?: { error?: { message?: string } };
-}
-
 export default function UserFormModal() {
   const navigate = useNavigate();
   const notify = useNotify();
@@ -104,13 +100,10 @@ export default function UserFormModal() {
               });
               navigate("/users");
             },
-            onError: (error: HttpErrorLike) => {
-              notify(
-                error?.body?.error?.message ??
-                  error?.message ??
-                  "ra.notification.http_error",
-                { type: "error" },
-              );
+            onError: (error) => {
+              notify(backendMessage(error, "ra.notification.http_error"), {
+                type: "error",
+              });
             },
           }}
         >

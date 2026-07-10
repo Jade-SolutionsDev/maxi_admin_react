@@ -24,6 +24,7 @@ import {
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
+import { backendMessage } from "./errors";
 
 /**
  * Admin action to set another user's password. A user's own password is changed
@@ -62,12 +63,9 @@ export default function ChangePasswordModal() {
       toast.success(t("users.password.success", "Password updated"));
       navigate("/users");
     } catch (error) {
-      const message =
-        (error as { body?: { error?: { message?: string } } })?.body?.error
-          ?.message ??
-        (error instanceof Error ? error.message : "") ??
-        t("users.password.error", "Could not update the password");
-      toast.error(message);
+      toast.error(
+        backendMessage(error, t("users.password.error", "Could not update the password")),
+      );
     }
   };
 

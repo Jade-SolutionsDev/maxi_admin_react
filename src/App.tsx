@@ -15,8 +15,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
 import Productos from "./pages/Productos";
 import { i18nProvider } from "./providers/i18nProvider";
-import LoginPage from "./components/layout/LoginPage";
-import Invitation from "./pages/Invitation";
+import LoginPage from "./pages/login/LoginPage";
+import Invitation from "./pages/invitation/InvitationPage";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
 import UserCreate from "./pages/users/UserCreate";
@@ -65,8 +65,8 @@ const AdminApp = () => (
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
     {/* users / departments / categories are handled via CustomRoutes above. */}
-    {/* The permissions-by-module RBAC (roles) is parked on the backend; the
-        Roles admin UI is removed until managed roles return. */}
+    {/* The permissions-by-module RBAC vertical was removed from the backend
+        (refactor/audit-cleanup); revive from git history if managed roles return. */}
   </Admin>
 );
 
