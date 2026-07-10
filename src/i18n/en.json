@@ -91,7 +91,21 @@
       "delete_confirm_title": "Delete user",
       "delete_confirm_description": "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
       "update_success": "User updated",
+      "change_password": "Change password",
       "cancel": "Cancel"
+    },
+    "password": {
+      "title": "Change password",
+      "subtitle": "Set a new password for this user.",
+      "subtitle_named": "Set a new password for %{name}.",
+      "new_label": "New password",
+      "confirm_label": "Confirm password",
+      "too_short": "Minimum 8 characters",
+      "mismatch": "Passwords do not match",
+      "submit": "Update password",
+      "saving": "Saving…",
+      "success": "Password updated",
+      "error": "Could not update the password"
     },
     "status": {
       "active": "Active",

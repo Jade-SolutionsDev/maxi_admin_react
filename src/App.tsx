@@ -20,6 +20,7 @@ import Invitation from "./pages/Invitation";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
 import UserCreate from "./pages/users/UserCreate";
+import ChangePasswordModal from "./pages/users/ChangePasswordModal";
 import { DepartmentsLayout } from "./pages/departments/DepartmentsLayout";
 import DepartmentCreate from "./pages/departments/DepartmentCreate";
 import DepartmentEdit from "./pages/departments/DepartmentEdit";
@@ -51,6 +52,7 @@ const AdminApp = () => (
       <Route path="/users/*" element={<UsersLayout />}>
         <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />
+        <Route path="password/:id" element={<ChangePasswordModal />} />
       </Route>
       <Route path="/departments/*" element={<DepartmentsLayout />}>
         <Route path="create" element={<DepartmentCreate />} />

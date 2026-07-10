@@ -28,6 +28,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
     Card,
     CardContent,
@@ -503,10 +504,9 @@ export default function Invitation() {
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-4 w-4 text-muted-foreground" />
+                        <PasswordInput
                           {...field}
-                          type="password"
                           autoComplete="new-password"
                           placeholder="Mínimo 8 caracteres"
                           className="pl-10"
@@ -530,10 +530,9 @@ export default function Invitation() {
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 h-4 w-4 text-muted-foreground" />
+                        <PasswordInput
                           {...field}
-                          type="password"
                           autoComplete="new-password"
                           placeholder="Repite tu contraseña"
                           className="pl-10"

@@ -12,6 +12,7 @@ import {
 } from "ra-core";
 import {
   AlertTriangle,
+  KeyRound,
   MailCheck,
   Pencil,
   RotateCcw,
@@ -348,6 +349,39 @@ const UserEditButton = () => {
   );
 };
 
+const UserPasswordButton = () => {
+  const record = useRecordContext();
+  const { data: identity } = useGetIdentity();
+  const translate = useTranslate();
+
+  // Own password is changed from the profile, not here (backend enforces too).
+  if (!record || record.id === identity?.id) return null;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            to={`/users/password/${record.id}`}
+            className={cn(
+              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
+              "text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30",
+            )}
+            aria-label={translate("users.actions.change_password", {
+              _: "Change password",
+            })}
+          >
+            <KeyRound size={16} />
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{translate("users.actions.change_password", { _: "Change password" })}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const UserRestoreButton = () => {
   const record = useRecordContext();
   const dataProvider = useDataProvider() as ExtendedDataProvider;
@@ -496,6 +530,7 @@ const UserActionsCell = () => {
   return (
     <div className="flex items-center justify-center gap-1">
       <UserEditButton />
+      <UserPasswordButton />
       <UserDeleteButton />
     </div>
   );

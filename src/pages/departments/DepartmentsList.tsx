@@ -205,7 +205,6 @@ export default function DepartmentsList() {
         hiddenColumns={[
           "id",
           "parentId",
-          "description",
           "deletedAt",
           "updatedAt",
         ]}
@@ -216,6 +215,7 @@ export default function DepartmentsList() {
           cellClassName="min-w-[180px]"
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
+        <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
         <DataTable.Col
           source="sortOrder"
           label="list.fields.sortOrder"

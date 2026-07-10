@@ -16,6 +16,7 @@ export interface ExtendedDataProvider extends DataProvider {
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
+  setUserPassword: (id: string, password: string) => Promise<void>;
 }
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
@@ -194,5 +195,12 @@ export const dataProvider: DataProvider = {
       method: 'POST',
     });
     return { data: unwrapOne(json) };
+  },
+
+  async setUserPassword(id: string, password: string) {
+    await httpClient(`${API_URL}/users/${id}/password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ password }),
+    });
   },
 } as ExtendedDataProvider;

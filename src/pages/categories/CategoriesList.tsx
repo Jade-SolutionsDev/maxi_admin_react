@@ -210,7 +210,7 @@ export default function CategoriesList() {
       perPage={10}
     >
       <DataTable
-        hiddenColumns={["id", "parentId", "description", "deletedAt"]}
+        hiddenColumns={["id", "parentId", "deletedAt"]}
       >
         <DataTable.Col
           label="resources.departments.name"
@@ -226,6 +226,7 @@ export default function CategoriesList() {
           cellClassName="min-w-[180px]"
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
+        <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
         <DataTable.Col
           source="sortOrder"
           label="list.fields.sortOrder"

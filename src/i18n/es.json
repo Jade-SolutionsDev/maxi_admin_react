@@ -91,7 +91,21 @@
       "delete_confirm_title": "Eliminar usuario",
       "delete_confirm_description": "¿Seguro que quieres eliminar a %{name}? Podrás restaurarlo luego desde «Mostrar eliminados».",
       "update_success": "Usuario actualizado",
+      "change_password": "Cambiar contraseña",
       "cancel": "Cancelar"
+    },
+    "password": {
+      "title": "Cambiar contraseña",
+      "subtitle": "Establece una nueva contraseña para este usuario.",
+      "subtitle_named": "Establece una nueva contraseña para %{name}.",
+      "new_label": "Nueva contraseña",
+      "confirm_label": "Confirmar contraseña",
+      "too_short": "Mínimo 8 caracteres",
+      "mismatch": "Las contraseñas no coinciden",
+      "submit": "Actualizar contraseña",
+      "saving": "Guardando…",
+      "success": "Contraseña actualizada",
+      "error": "No se pudo actualizar la contraseña"
     },
     "status": {
       "active": "Activo",
