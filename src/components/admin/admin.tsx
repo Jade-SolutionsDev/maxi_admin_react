@@ -7,8 +7,6 @@ import {
   localStorageStore,
 } from "ra-core";
 import { i18nProvider as defaultI18nProvider } from "@/providers/i18nProvider";
-import { Layout } from "@/components/admin/layout";
-import { LoginPage } from "@/components/admin/login-page";
 import { NotFound } from "@/components/admin/not-found";
 import { Ready } from "@/components/admin/ready";
 import { ThemeProvider } from "@/components/admin/theme-provider";
@@ -58,8 +56,6 @@ const AdminUI = (props: CoreAdminUIProps) => {
   return (
     <ThemeProvider>
       <CoreAdminUI
-        layout={Layout}
-        loginPage={LoginPage}
         ready={Ready}
         authCallbackPage={AuthCallback}
         disableTelemetry // Disable telemetry in CoreAdminUI to avoid double logging
@@ -114,9 +110,9 @@ export const Admin = (props: CoreAdminProps) => {
     disableTelemetry,
     error,
     i18nProvider = defaultI18nProvider,
-    layout = Layout,
+    layout,
     loading,
-    loginPage = LoginPage,
+    loginPage,
     queryClient,
     ready = Ready,
     requireAuth,
@@ -149,7 +145,7 @@ export const Admin = (props: CoreAdminProps) => {
       >
         {children}
       </AdminUI>
-      <ReactQueryDevtools initialIsOpen={true} />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </AdminContext>
   );
 };
