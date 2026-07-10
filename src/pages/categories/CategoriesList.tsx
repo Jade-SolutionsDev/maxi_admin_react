@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  useCanAccess,
   useDelete,
   useRecordContext,
   useRefresh,
@@ -52,14 +53,20 @@ const categoryFilters = [
   />,
 ];
 
-const CategoryActions = () => (
-  <div className="flex items-center gap-2">
-    <RefreshButton />
-    <CreateButton />
-    <ColumnsButton />
-    <FilterButton variant="outline" size="lg" />
-  </div>
-);
+const CategoryActions = () => {
+  const { canAccess: canCreate } = useCanAccess({
+    resource: "categories",
+    action: "create",
+  });
+  return (
+    <div className="flex items-center gap-2">
+      <RefreshButton />
+      {canCreate && <CreateButton />}
+      <ColumnsButton />
+      <FilterButton variant="outline" size="lg" />
+    </div>
+  );
+};
 
 const CategoryDeleteButton = () => {
   const record = useRecordContext();
@@ -177,12 +184,19 @@ const CategoryEditButton = () => {
   );
 };
 
-const CategoryActionsCell = () => (
-  <div className="flex items-center justify-center gap-1">
-    <CategoryEditButton />
-    <CategoryDeleteButton />
-  </div>
-);
+const CategoryActionsCell = () => {
+  const { canAccess: canEdit } = useCanAccess({
+    resource: "categories",
+    action: "edit",
+  });
+  if (!canEdit) return null;
+  return (
+    <div className="flex items-center justify-center gap-1">
+      <CategoryEditButton />
+      <CategoryDeleteButton />
+    </div>
+  );
+};
 
 export default function CategoriesList() {
   const translate = useTranslate();
@@ -196,13 +210,7 @@ export default function CategoriesList() {
       perPage={10}
     >
       <DataTable
-        hiddenColumns={[
-          "id",
-          "providerId",
-          "parentId",
-          "description",
-          "deletedAt",
-        ]}
+        hiddenColumns={["id", "parentId", "description", "deletedAt"]}
       >
         <DataTable.Col
           label="resources.departments.name"

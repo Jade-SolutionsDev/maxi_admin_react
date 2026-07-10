@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  useCanAccess,
   useDelete,
   useRecordContext,
   useRefresh,
@@ -44,14 +45,20 @@ const departmentFilters = [
   <SearchInput source="q" alwaysOn />,
 ];
 
-const DepartmentActions = () => (
-  <div className="flex items-center gap-2">
-    <RefreshButton />
-    <CreateButton />
-    <ColumnsButton />
-    <FilterButton variant="outline" size="lg" />
-  </div>
-);
+const DepartmentActions = () => {
+  const { canAccess: canCreate } = useCanAccess({
+    resource: "departments",
+    action: "create",
+  });
+  return (
+    <div className="flex items-center gap-2">
+      <RefreshButton />
+      {canCreate && <CreateButton />}
+      <ColumnsButton />
+      <FilterButton variant="outline" size="lg" />
+    </div>
+  );
+};
 
 const DepartmentDeleteButton = () => {
   const record = useRecordContext();
@@ -169,12 +176,19 @@ const DepartmentEditButton = () => {
   );
 };
 
-const DepartmentActionsCell = () => (
-  <div className="flex items-center justify-center gap-1">
-    <DepartmentEditButton />
-    <DepartmentDeleteButton />
-  </div>
-);
+const DepartmentActionsCell = () => {
+  const { canAccess: canEdit } = useCanAccess({
+    resource: "departments",
+    action: "edit",
+  });
+  if (!canEdit) return null;
+  return (
+    <div className="flex items-center justify-center gap-1">
+      <DepartmentEditButton />
+      <DepartmentDeleteButton />
+    </div>
+  );
+};
 
 export default function DepartmentsList() {
   const translate = useTranslate();
@@ -190,7 +204,6 @@ export default function DepartmentsList() {
       <DataTable
         hiddenColumns={[
           "id",
-          "providerId",
           "parentId",
           "description",
           "deletedAt",

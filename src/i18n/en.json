@@ -119,6 +119,8 @@
       "panel": "Dashboard",
       "pedidos": "Orders",
       "productos": "Products",
+      "departamentos": "Departments",
+      "categorias": "Categories",
       "inventario": "Inventory",
       "almacenes": "Warehouses",
       "usuarios": "Users",

@@ -119,6 +119,8 @@
       "panel": "Panel",
       "pedidos": "Pedidos",
       "productos": "Productos",
+      "departamentos": "Departamentos",
+      "categorias": "Categorías",
       "inventario": "Inventario",
       "almacenes": "Almacenes",
       "usuarios": "Usuarios",

@@ -4,11 +4,10 @@ import {
   EditBase,
   required,
   useEditContext,
-  useGetIdentity,
   useSaveContext,
   useTranslate,
 } from "ra-core";
-import { useFormContext, useFormState, useWatch } from "react-hook-form";
+import { useFormContext, useFormState } from "react-hook-form";
 import { Loader2, Save } from "lucide-react";
 
 import {
@@ -106,28 +105,13 @@ function EditLoading() {
 
 function CategoryFormFields() {
   const translate = useTranslate();
-  const { data: identity } = useGetIdentity();
-  const isProvider = identity?.role === "GROCER";
-  const providerId = useWatch({ name: "providerId" });
 
   return (
     <>
-      {!isProvider && (
-        <ReferenceInput
-          source="providerId"
-          reference="users"
-          label={translate("list.fields.provider")}
-          filter={{ role: "GROCER" }}
-        >
-          <AutocompleteInput validate={required()} />
-        </ReferenceInput>
-      )}
       <ReferenceInput
         source="departmentId"
         reference="departments"
         label={translate("resources.departments.name")}
-        filter={isProvider ? {} : { providerId }}
-        enableGetChoices={isProvider ? undefined : () => Boolean(providerId)}
       >
         <AutocompleteInput validate={required()} />
       </ReferenceInput>

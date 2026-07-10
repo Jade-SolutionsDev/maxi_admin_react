@@ -116,16 +116,22 @@ export const authProvider: AuthProvider = {
     return [identity.role];
   },
 
-  async canAccess({ resource }) {
+  async canAccess({ resource, action }) {
     const identity = identityCache ?? (await loadIdentity());
     const isManager = MANAGER_ROLES.includes(identity.role);
 
     switch (resource) {
       case "users":
         return isManager;
+      case "categories":
+      case "departments":
+        // Everyone reads the shared taxonomy; only managers write.
+        return ["create", "edit", "delete"].includes(action ?? "")
+          ? isManager
+          : true;
       default:
-        // Clients / products / categories remain readable by any authenticated
-        // backoffice user for now; tighten per-resource when needed.
+        // Clients / products remain readable by any authenticated backoffice
+        // user for now; tighten per-resource when needed.
         return true;
     }
   },
