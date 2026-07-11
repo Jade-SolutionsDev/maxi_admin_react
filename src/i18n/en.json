@@ -1,4 +1,11 @@
 {
+  "search": {
+    "placeholder": "Search...",
+    "description": "Search the application",
+    "hint": "Type at least 2 characters",
+    "loading": "Searching…",
+    "empty": "No results"
+  },
   "resources": {
     "clients": {
       "name": "Client",

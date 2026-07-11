@@ -1,8 +1,9 @@
-import { Search, Bell, Menu } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { LocalesMenuButton, ThemeModeToggle, UserMenu } from '../admin';
 import { cn } from '@/lib/utils';
 import { ProfileMenuItem } from './ProfileMenuItem';
+import { GlobalSearch } from './GlobalSearch';
 
 interface TopBarProps {
   title: string;
@@ -15,7 +16,6 @@ export default function TopBar({
   breadcrumb,
   onMenuClick,
 }: TopBarProps) {
-  const [searchValue, setSearchValue] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
@@ -43,20 +43,8 @@ export default function TopBar({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          {/* Search */}
-          <div className="hidden sm:flex items-center rounded-[10px] px-3 h-10 w-[280px] bg-[#F1F5F9] dark:bg-[#1A2535]">
-            <Search
-              size={18}
-              className="shrink-0 text-[#64748B] dark:text-[#94A3B8]"
-            />
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="bg-transparent border-none outline-none text-[14px] ml-2 w-full dark:text-[#E2E8F0] text-[#1E293B] placeholder:text-[#94A3B8]"
-            />
-          </div>
+          {/* Global search (⌘K command palette) */}
+          <GlobalSearch />
 
           {/* Notifications */}
           <div className="relative">
