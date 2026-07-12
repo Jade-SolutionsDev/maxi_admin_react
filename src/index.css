@@ -264,11 +264,15 @@
   }
 }
 
-/* Smooth theme transition */
-*, *::before, *::after {
-  transition-property: background-color, border-color, color;
-  transition-duration: 200ms;
-  transition-timing-function: ease-out;
+/* Smooth theme transition. Must live in @layer base so element-specific
+   transition utilities (e.g. the sidebar's transition-[width]) still win —
+   an unlayered rule here would override every layered utility. */
+@layer base {
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
 }
 
 /* Prevent layout shift from transitions */

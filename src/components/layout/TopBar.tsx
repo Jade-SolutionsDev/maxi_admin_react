@@ -25,7 +25,7 @@ export default function TopBar({
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuClick}
-            className="lg:hidden p-2 rounded-lg transition-colors bg-[#F1F5F9] dark:bg-[#1A2535]"
+            className="p-2 rounded-lg transition-colors bg-[#F1F5F9] dark:bg-[#1A2535]"
           >
             <Menu size={20} className="text-[#64748B] dark:text-[#94A3B8]" />
           </button>
