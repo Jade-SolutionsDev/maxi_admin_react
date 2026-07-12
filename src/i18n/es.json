@@ -1,4 +1,11 @@
 {
+  "search": {
+    "placeholder": "Buscar...",
+    "description": "Buscar en la aplicación",
+    "hint": "Escribe al menos 2 caracteres",
+    "loading": "Buscando…",
+    "empty": "Sin resultados"
+  },
   "resources": {
     "clients": {
       "name": "Cliente",
@@ -156,6 +163,47 @@
     },
     "user": {
       "profile": "Perfil"
+    }
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "subtitle": "Administra tu cuenta y tus preferencias.",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "coming_soon": "Próximamente",
+    "tabs": {
+      "personal": "Información personal",
+      "security": "Seguridad",
+      "notifications": "Notificaciones",
+      "store": "Ajustes de la tienda"
+    },
+    "personal": {
+      "title": "Información personal",
+      "subtitle": "Actualiza tu nombre y revisa los datos de tu cuenta.",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo",
+      "email_hint": "Contacta a un administrador para cambiar tu correo.",
+      "saved": "Perfil actualizado"
+    },
+    "security": {
+      "title": "Seguridad",
+      "subtitle": "Cambia tu contraseña. Seguirás con la sesión iniciada en este dispositivo.",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar contraseña",
+      "submit": "Actualizar contraseña",
+      "too_short": "La contraseña debe tener al menos 8 caracteres",
+      "mismatch": "Las contraseñas no coinciden",
+      "success": "Contraseña actualizada"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Las preferencias de notificaciones estarán disponibles pronto."
+    },
+    "store": {
+      "title": "Ajustes de la tienda",
+      "description": "Aquí podrás gestionar las opciones globales de la tienda."
     }
   },
   "invitation": {

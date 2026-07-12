@@ -27,6 +27,7 @@ import DepartmentEdit from "./pages/departments/DepartmentEdit";
 import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
+import ProfilePage from "./pages/profile/ProfilePage";
 import Loading from "./pages/Loading";
 
 // Shared store so the standalone invite route and the Admin app read the same
@@ -48,6 +49,7 @@ const AdminApp = () => (
     loading={Loading}
   >
     <CustomRoutes>
+      <Route path="/perfil" element={<ProfilePage />} />
       <Route path="/productos" element={<Productos />} />
       <Route path="/users/*" element={<UsersLayout />}>
         <Route path="create" element={<UserCreate />} />

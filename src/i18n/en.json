@@ -1,4 +1,11 @@
 {
+  "search": {
+    "placeholder": "Search...",
+    "description": "Search the application",
+    "hint": "Type at least 2 characters",
+    "loading": "Searching…",
+    "empty": "No results"
+  },
   "resources": {
     "clients": {
       "name": "Client",
@@ -156,6 +163,47 @@
     },
     "user": {
       "profile": "Profile"
+    }
+  },
+  "profile": {
+    "title": "My profile",
+    "subtitle": "Manage your account and preferences.",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "coming_soon": "Coming soon",
+    "tabs": {
+      "personal": "Personal information",
+      "security": "Security",
+      "notifications": "Notifications",
+      "store": "Store settings"
+    },
+    "personal": {
+      "title": "Personal information",
+      "subtitle": "Update your name and review your account details.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "email_hint": "Contact an administrator to change your email.",
+      "saved": "Profile updated"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Change your password. You will stay signed in on this device.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm password",
+      "submit": "Update password",
+      "too_short": "Password must be at least 8 characters",
+      "mismatch": "Passwords do not match",
+      "success": "Password updated"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Notification preferences are coming soon."
+    },
+    "store": {
+      "title": "Store settings",
+      "description": "Global store options will live here."
     }
   },
   "invitation": {
