@@ -22,6 +22,10 @@
     "categories": {
       "name": "Category",
       "name_plural": "Categories"
+    },
+    "roles": {
+      "name": "Role",
+      "name_plural": "Roles & permissions"
     }
   },
   "list": {
@@ -204,6 +208,49 @@
     "store": {
       "title": "Store settings",
       "description": "Global store options will live here."
+    }
+  },
+  "permissions": {
+    "modules": {
+      "products": "Products",
+      "categories": "Categories",
+      "departments": "Departments"
+    },
+    "actions": {
+      "list": "List",
+      "read": "View",
+      "create": "Create",
+      "update": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "roles": {
+    "system": "System",
+    "custom": "Custom",
+    "admin_only": "Only administrators can manage roles.",
+    "system_role_title": "System role",
+    "system_role_notice": "System roles cannot be edited.",
+    "delete_confirm_title": "Delete role",
+    "fields": {
+      "type": "Type",
+      "permissionsCount": "Permissions"
+    },
+    "matrix": {
+      "title": "Permissions by module",
+      "module": "Module",
+      "toggle_all": "Toggle all"
+    },
+    "actions": {
+      "manage_user_roles": "Manage roles"
+    },
+    "assign_dialog": {
+      "title": "Manage roles",
+      "description": "Select the roles assigned to this user.",
+      "admin_notice": "Administrators have full access regardless of assigned roles.",
+      "empty": "No roles yet.",
+      "save": "Save",
+      "saved": "Roles updated",
+      "error": "Could not update roles"
     }
   },
   "invitation": {

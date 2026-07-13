@@ -11,12 +11,29 @@ export interface InviteUserPayload {
   organizationId?: string;
 }
 
+export interface RoleSummary {
+  id: string;
+  name: string;
+  description?: string | null;
+}
+
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
+  getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
+  setUserRoles: (userId: string, roleIds: string[]) => Promise<{ data: unknown }>;
+}
+
+// The managed-roles resource lives under the nested /permissions route.
+const RESOURCE_PATHS: Record<string, string> = {
+  roles: 'permissions/roles',
+};
+
+function resourcePath(resource: string): string {
+  return RESOURCE_PATHS[resource] ?? resource;
 }
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
@@ -93,19 +110,19 @@ export const dataProvider: DataProvider = {
       sortOrder: order.toLowerCase(),
     });
 
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
     const { rows, total } = unwrapList(json);
     return { data: rows as never[], total };
   },
 
   async getOne(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`);
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`);
     return { data: unwrapOne(json) as never };
   },
 
   async getMany(resource, params) {
     const query = toQueryString({ id: params.ids.join(',') });
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
     const { rows } = unwrapList(json);
     return { data: rows as never[] };
   },
@@ -115,13 +132,13 @@ export const dataProvider: DataProvider = {
       ...params.filter,
       [params.target]: params.id,
     });
-    const { json } = await httpClient(`${API_URL}/${resource}${query}`);
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
     const { rows, total } = unwrapList(json);
     return { data: rows as never[], total };
   },
 
   async create(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}`, {
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}`, {
       method: 'POST',
       body: JSON.stringify(params.data),
     });
@@ -129,7 +146,36 @@ export const dataProvider: DataProvider = {
   },
 
   async update(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+    // A managed role stores its editable fields and its permission matrix on two
+    // separate endpoints — PATCH the fields, then bulk-set the permissions.
+    if (resource === 'roles') {
+      const data = params.data as Record<string, unknown>;
+      const { json } = await httpClient(
+        `${API_URL}/permissions/roles/${params.id}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({
+            name: data.name,
+            description: data.description,
+            isActive: data.isActive,
+          }),
+        },
+      );
+      let result = unwrapOne(json);
+      if (Array.isArray(data.permissionIds)) {
+        const { json: permJson } = await httpClient(
+          `${API_URL}/permissions/roles/${params.id}/permissions`,
+          {
+            method: 'PUT',
+            body: JSON.stringify({ permissionIds: data.permissionIds }),
+          },
+        );
+        result = unwrapOne(permJson) ?? result;
+      }
+      return { data: result as never };
+    }
+
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
       method: 'PATCH',
       body: JSON.stringify(params.data),
     });
@@ -139,7 +185,7 @@ export const dataProvider: DataProvider = {
   async updateMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, {
+        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
           method: 'PATCH',
           body: JSON.stringify(params.data),
         }),
@@ -149,7 +195,7 @@ export const dataProvider: DataProvider = {
   },
 
   async delete(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
       method: 'DELETE',
     });
     return { data: (unwrapOne(json) ?? params.previousData) as never };
@@ -158,7 +204,7 @@ export const dataProvider: DataProvider = {
   async deleteMany(resource, params) {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, {
+        httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
           method: 'DELETE',
         }),
       ),
@@ -202,5 +248,21 @@ export const dataProvider: DataProvider = {
       method: 'PATCH',
       body: JSON.stringify({ password }),
     });
+  },
+
+  async getUserRoles(userId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/permissions/users/${userId}/roles`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as RoleSummary[] };
+  },
+
+  async setUserRoles(userId: string, roleIds: string[]) {
+    const { json } = await httpClient(
+      `${API_URL}/permissions/users/${userId}/roles`,
+      { method: 'PUT', body: JSON.stringify({ roleIds }) },
+    );
+    return { data: unwrapOne(json) };
   },
 } as ExtendedDataProvider;

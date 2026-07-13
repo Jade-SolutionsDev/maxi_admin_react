@@ -22,6 +22,10 @@
     "categories": {
       "name": "Categoría",
       "name_plural": "Categorías"
+    },
+    "roles": {
+      "name": "Rol",
+      "name_plural": "Roles y permisos"
     }
   },
   "list": {
@@ -204,6 +208,49 @@
     "store": {
       "title": "Ajustes de la tienda",
       "description": "Aquí podrás gestionar las opciones globales de la tienda."
+    }
+  },
+  "permissions": {
+    "modules": {
+      "products": "Productos",
+      "categories": "Categorías",
+      "departments": "Departamentos"
+    },
+    "actions": {
+      "list": "Listar",
+      "read": "Ver",
+      "create": "Crear",
+      "update": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "roles": {
+    "system": "Sistema",
+    "custom": "Personalizado",
+    "admin_only": "Solo los administradores pueden gestionar roles.",
+    "system_role_title": "Rol del sistema",
+    "system_role_notice": "Los roles del sistema no se pueden editar.",
+    "delete_confirm_title": "Eliminar rol",
+    "fields": {
+      "type": "Tipo",
+      "permissionsCount": "Permisos"
+    },
+    "matrix": {
+      "title": "Permisos por módulo",
+      "module": "Módulo",
+      "toggle_all": "Seleccionar todo"
+    },
+    "actions": {
+      "manage_user_roles": "Gestionar roles"
+    },
+    "assign_dialog": {
+      "title": "Gestionar roles",
+      "description": "Selecciona los roles asignados a este usuario.",
+      "admin_notice": "Los administradores tienen acceso total sin importar los roles asignados.",
+      "empty": "Aún no hay roles.",
+      "save": "Guardar",
+      "saved": "Roles actualizados",
+      "error": "No se pudieron actualizar los roles"
     }
   },
   "invitation": {

@@ -28,6 +28,7 @@ import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
 import ProfilePage from "./pages/profile/ProfilePage";
+import roles from "./pages/roles";
 import Loading from "./pages/Loading";
 
 // Shared store so the standalone invite route and the Admin app read the same
@@ -66,9 +67,10 @@ const AdminApp = () => (
       </Route>
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
+    {/* Managed roles (Settings): full-page List/Create/Edit with the permission
+        matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
+    <Resource name="roles" {...roles} />
     {/* users / departments / categories are handled via CustomRoutes above. */}
-    {/* The permissions-by-module RBAC vertical was removed from the backend
-        (refactor/audit-cleanup); revive from git history if managed roles return. */}
   </Admin>
 );
 

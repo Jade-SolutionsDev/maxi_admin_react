@@ -122,7 +122,8 @@ const navItems: NavItem[] = [
   {
     labelKey: "app.menu.configuracion",
     icon: <Settings size={20} />,
-    soon: true,
+    path: "/roles",
+    managerOnly: true,
   },
 ];
 

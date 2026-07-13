@@ -17,7 +17,25 @@ export interface Identity {
   role: Role;
 }
 
+/** Effective permissions map: `{ module: [action, ...] }` from GET /auth/me. */
+type PermissionMap = Record<string, string[]>;
+
 let identityCache: Identity | null = null;
+let permissionsCache: PermissionMap = {};
+
+// Modules governed by managed permissions; other resources gate by role only.
+const MANAGED_MODULES = ["products", "categories", "departments"];
+
+// react-admin actions -> backend permission actions.
+const ACTION_MAP: Record<string, string> = {
+  list: "list",
+  show: "read",
+  read: "read",
+  create: "create",
+  edit: "update",
+  update: "update",
+  delete: "delete",
+};
 
 async function api(path: string, init: RequestInit = {}) {
   const token = await getApiToken();
@@ -60,6 +78,7 @@ async function loadIdentity(): Promise<Identity> {
     avatarUrl: string | null;
     email: string | null;
     role: Role;
+    permissions?: PermissionMap;
   };
 
   identityCache = {
@@ -70,6 +89,7 @@ async function loadIdentity(): Promise<Identity> {
     email: user.email ?? undefined,
     role: user.role,
   };
+  permissionsCache = user.permissions ?? {};
 
   return identityCache;
 }
@@ -82,6 +102,7 @@ export const authProvider: AuthProvider = {
 
   async logout() {
     identityCache = null;
+    permissionsCache = {};
     await clerkSignOut();
     return Promise.resolve();
   },
@@ -120,18 +141,23 @@ export const authProvider: AuthProvider = {
     const identity = identityCache ?? (await loadIdentity());
     const isManager = MANAGER_ROLES.includes(identity.role);
 
+    // System admins bypass every check (mirrors the backend).
+    if (isManager) return true;
+
     switch (resource) {
+      // Admin-only surfaces.
       case "users":
-        return isManager;
-      case "categories":
-      case "departments":
-        // Everyone reads the shared taxonomy; only managers write.
-        return ["create", "edit", "delete"].includes(action ?? "")
-          ? isManager
-          : true;
+      case "clients":
+      case "roles":
+      case "settings":
+        return false;
       default:
-        // Clients / products remain readable by any authenticated backoffice
-        // user for now; tighten per-resource when needed.
+        // Catalog modules are governed by the effective permission map.
+        if (MANAGED_MODULES.includes(resource)) {
+          const backendAction = ACTION_MAP[action ?? ""] ?? action ?? "";
+          return permissionsCache[resource]?.includes(backendAction) ?? false;
+        }
+        // Anything else stays readable by any authenticated backoffice user.
         return true;
     }
   },

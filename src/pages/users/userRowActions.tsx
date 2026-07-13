@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
+import { ManageUserRolesDialog } from "@/components/users/ManageUserRolesDialog";
 import { backendMessage } from "./errors";
 
 const IconButton = ({
@@ -346,6 +347,7 @@ export const UserActionsCell = () => {
   return (
     <div className="flex items-center justify-center gap-1">
       <UserEditButton />
+      <ManageUserRolesDialog />
       <UserPasswordButton />
       <UserDeleteButton />
     </div>
