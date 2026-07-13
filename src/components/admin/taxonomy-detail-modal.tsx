@@ -1,19 +1,22 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
+  useGetOne,
   useRecordContext,
+  useResourceContext,
   useTranslate,
-  type RaRecord,
 } from "ra-core";
-import { Eye, ImageOff } from "lucide-react";
+import { Eye, ImageOff, Pencil } from "lucide-react";
 import { BooleanField } from "@/components/admin/boolean-field";
 import { DateField } from "@/components/admin/date-field";
 import { ReferenceField } from "@/components/admin/reference-field";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -23,12 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-interface TaxonomyDetailModalProps {
-  record?: RaRecord;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { cn } from "@/lib/utils";
 
 function DetailRow({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -54,109 +52,148 @@ function ImagePreview({ label, url }: { label: string; url?: string | null }) {
   );
 }
 
+function DetailSkeleton() {
+  return (
+    <div className="space-y-3 py-2">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="h-6 w-full rounded bg-muted animate-pulse" />
+      ))}
+    </div>
+  );
+}
+
 /**
- * Read-only detail view shared by departments and categories. Auto-adapts:
- * a row with no parentId is a department (shows Featured), otherwise a category
- * (shows its parent department). Reads the record passed from the list row.
+ * URL-routed read-only detail view shared by departments and categories,
+ * mounted at `/[resource]/:id` inside the layout's <Outlet>. The resource
+ * (departments | categories) is read from the surrounding ResourceContext, so
+ * the same component serves both. Auto-adapts by `parentId`: a row with no
+ * parent is a department (shows Featured), otherwise a category (shows its
+ * parent department). Closing (X / Esc / overlay) navigates back to the list.
  */
-export function TaxonomyDetailModal({
-  record,
-  open,
-  onOpenChange,
-}: TaxonomyDetailModalProps) {
+export function TaxonomyDetailModal() {
   const translate = useTranslate();
-  if (!record) return null;
-  const isDepartment = record.parentId == null;
+  const navigate = useNavigate();
+  const resource = useResourceContext();
+  const { id } = useParams<{ id: string }>();
+
+  const onClose = () => navigate(`/${resource}`);
+  const { data: record, isLoading } = useGetOne(
+    resource as string,
+    { id: id as string },
+    { enabled: Boolean(resource && id), onError: onClose },
+  );
+
+  const isDepartment = record?.parentId == null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-full sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-        <RecordContextProvider value={record}>
-          <DialogHeader>
-            <DialogTitle className="text-xl">{record.name}</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              {record.slug}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            {(record?.name as string) ??
+              translate("shared.actions.view", { _: "Details" })}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {(record?.slug as string) ?? ""}
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="flex gap-4">
-            <ImagePreview
-              label={translate("list.fields.imageDesktop", { _: "Desktop" })}
-              url={record.imageDesktopUrl}
-            />
-            <ImagePreview
-              label={translate("list.fields.imageMobile", { _: "Mobile" })}
-              url={record.imageMobileUrl}
-            />
-          </div>
+        {isLoading || !record ? (
+          <DetailSkeleton />
+        ) : (
+          <RecordContextProvider value={record}>
+            <div className="flex gap-4">
+              <ImagePreview
+                label={translate("list.fields.imageDesktop", { _: "Desktop" })}
+                url={record.imageDesktopUrl}
+              />
+              <ImagePreview
+                label={translate("list.fields.imageMobile", { _: "Mobile" })}
+                url={record.imageMobileUrl}
+              />
+            </div>
 
-          <dl className="mt-2">
-            {!isDepartment && (
-              <DetailRow label={translate("resources.departments.name")}>
-                <ReferenceField source="parentId" reference="departments" />
+            <dl className="mt-2">
+              {!isDepartment && (
+                <DetailRow label={translate("resources.departments.name")}>
+                  <ReferenceField source="parentId" reference="departments" />
+                </DetailRow>
+              )}
+              {isDepartment && (
+                <DetailRow
+                  label={translate("list.fields.featured", { _: "Featured" })}
+                >
+                  <BooleanField source="isFeatured" />
+                </DetailRow>
+              )}
+              <DetailRow label={translate("list.fields.description")}>
+                <span className="whitespace-pre-wrap">
+                  {(record.description as string) || "—"}
+                </span>
               </DetailRow>
-            )}
-            {isDepartment && (
-              <DetailRow label={translate("list.fields.featured", { _: "Featured" })}>
-                <BooleanField source="isFeatured" />
+              <DetailRow label={translate("list.fields.sortOrder")}>
+                {record.sortOrder ?? 0}
               </DetailRow>
-            )}
-            <DetailRow label={translate("list.fields.description")}>
-              <span className="whitespace-pre-wrap">
-                {(record.description as string) || "—"}
-              </span>
-            </DetailRow>
-            <DetailRow label={translate("list.fields.sortOrder")}>
-              {record.sortOrder ?? 0}
-            </DetailRow>
-            <DetailRow label={translate("list.fields.isActive")}>
-              <BooleanField source="isActive" />
-            </DetailRow>
-            <DetailRow label={translate("list.fields.createdAt")}>
-              <DateField source="createdAt" showTime />
-            </DetailRow>
-            <DetailRow label={translate("list.fields.updatedAt")}>
-              <DateField source="updatedAt" showTime />
-            </DetailRow>
-          </dl>
-        </RecordContextProvider>
+              <DetailRow label={translate("list.fields.isActive")}>
+                <BooleanField source="isActive" />
+              </DetailRow>
+              <DetailRow label={translate("list.fields.createdAt")}>
+                <DateField source="createdAt" showTime />
+              </DetailRow>
+              <DetailRow label={translate("list.fields.updatedAt")}>
+                <DateField source="updatedAt" showTime />
+              </DetailRow>
+            </dl>
+          </RecordContextProvider>
+        )}
+
+        {record && (
+          <DialogFooter>
+            <Link
+              to={`/${resource}/edit/${record.id}`}
+              className={cn(buttonVariants())}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              {translate("shared.actions.edit", { _: "Edit" })}
+            </Link>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
 }
 
 /**
- * Eye-icon button for a list row that opens {@link TaxonomyDetailModal}.
- * Available to every user (view is a read action).
+ * Eye-icon row action that deep-links to the taxonomy detail route
+ * `/[resource]/:id`. Available to every user (view is a read action).
  */
 export function TaxonomyViewButton() {
   const record = useRecordContext();
+  const resource = useResourceContext();
   const translate = useTranslate();
-  const [open, setOpen] = useState(false);
-  const label = translate("shared.actions.view", { _: "View" });
+  const label = translate("shared.actions.view", { _: "View details" });
+
+  if (!record) return null;
 
   return (
-    <>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={() => setOpen(true)}
-              aria-label={label}
-            >
-              <Eye size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{label}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <TaxonomyDetailModal record={record} open={open} onOpenChange={setOpen} />
-    </>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            to={`/${resource}/${record.id}`}
+            aria-label={label}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "h-8 w-8 text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Eye size={16} />
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{label}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

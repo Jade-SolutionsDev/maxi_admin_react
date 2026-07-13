@@ -16,6 +16,7 @@ import { ClientList } from "./pages/Clients";
 import { ProductsLayout } from "./pages/products/ProductsLayout";
 import ProductCreate from "./pages/products/ProductCreate";
 import ProductEdit from "./pages/products/ProductEdit";
+import { ProductDetailModal } from "./pages/products/ProductDetailModal";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
@@ -29,6 +30,7 @@ import DepartmentEdit from "./pages/departments/DepartmentEdit";
 import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
+import { TaxonomyDetailModal } from "./components/admin/taxonomy-detail-modal";
 import ProfilePage from "./pages/profile/ProfilePage";
 import Loading from "./pages/Loading";
 
@@ -55,6 +57,7 @@ const AdminApp = () => (
       <Route path="/products/*" element={<ProductsLayout />}>
         <Route path="create" element={<ProductCreate />} />
         <Route path="edit/:id" element={<ProductEdit />} />
+        <Route path=":id" element={<ProductDetailModal />} />
       </Route>
       <Route path="/users/*" element={<UsersLayout />}>
         <Route path="create" element={<UserCreate />} />
@@ -64,10 +67,12 @@ const AdminApp = () => (
       <Route path="/departments/*" element={<DepartmentsLayout />}>
         <Route path="create" element={<DepartmentCreate />} />
         <Route path="edit/:id" element={<DepartmentEdit />} />
+        <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
       <Route path="/categories/*" element={<CategoriesLayout />}>
         <Route path="create" element={<CategoryCreate />} />
         <Route path="edit/:id" element={<CategoryEdit />} />
+        <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />

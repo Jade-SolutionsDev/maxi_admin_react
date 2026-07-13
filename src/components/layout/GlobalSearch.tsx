@@ -33,29 +33,31 @@ interface SearchSource {
   getPath: (record: SearchRecord) => string;
 }
 
-// Only entities with real server-side `q` search + an addressable edit route.
-// Clients (modal-only edit) and orders (mock) are intentionally absent.
+// Only entities with real server-side `q` search + an addressable route.
+// Taxonomy/products deep-link to their detail view `/[resource]/:id`; users
+// have no detail view so they open the edit form. Clients (modal-only edit)
+// and orders (mock) are intentionally absent.
 const SEARCH_SOURCES: SearchSource[] = [
   {
     resource: "products",
     groupKey: "resources.products.name_plural",
     icon: Package,
     getLabel: (r) => String(r.name ?? ""),
-    getPath: (r) => `/products/edit/${r.id}`,
+    getPath: (r) => `/products/${r.id}`,
   },
   {
     resource: "categories",
     groupKey: "resources.categories.name_plural",
     icon: Tags,
     getLabel: (r) => String(r.name ?? ""),
-    getPath: (r) => `/categories/edit/${r.id}`,
+    getPath: (r) => `/categories/${r.id}`,
   },
   {
     resource: "departments",
     groupKey: "resources.departments.name_plural",
     icon: Building2,
     getLabel: (r) => String(r.name ?? ""),
-    getPath: (r) => `/departments/edit/${r.id}`,
+    getPath: (r) => `/departments/${r.id}`,
   },
   {
     resource: "users",
@@ -76,7 +78,8 @@ const DEBOUNCE_MS = 250;
 /**
  * Global command palette (⌘K / Ctrl+K). Repurposes the header search box: fans
  * the typed term out to each searchable resource via the dataProvider, groups
- * the hits by entity type, and navigates to the record's edit page on select.
+ * the hits by entity type, and navigates to the record's detail/edit page on
+ * select.
  */
 export function GlobalSearch() {
   const translate = useTranslate();
