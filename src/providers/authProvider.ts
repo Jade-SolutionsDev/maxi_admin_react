@@ -129,9 +129,14 @@ export const authProvider: AuthProvider = {
         return ["create", "edit", "delete"].includes(action ?? "")
           ? isManager
           : true;
+      case "products":
+        // Global catalog: everyone reads; SUPER_ADMIN/ADMIN/KARDIST write.
+        return ["create", "edit", "delete"].includes(action ?? "")
+          ? isManager || identity.role === "KARDIST"
+          : true;
       default:
-        // Clients / products remain readable by any authenticated backoffice
-        // user for now; tighten per-resource when needed.
+        // Clients remain readable by any authenticated backoffice user for now;
+        // tighten per-resource when needed.
         return true;
     }
   },

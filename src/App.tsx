@@ -13,7 +13,9 @@ import {
 import Layout from "./components/layout/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
-import Productos from "./pages/Productos";
+import { ProductsLayout } from "./pages/products/ProductsLayout";
+import ProductCreate from "./pages/products/ProductCreate";
+import ProductEdit from "./pages/products/ProductEdit";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
@@ -50,7 +52,10 @@ const AdminApp = () => (
   >
     <CustomRoutes>
       <Route path="/perfil" element={<ProfilePage />} />
-      <Route path="/productos" element={<Productos />} />
+      <Route path="/products/*" element={<ProductsLayout />}>
+        <Route path="create" element={<ProductCreate />} />
+        <Route path="edit/:id" element={<ProductEdit />} />
+      </Route>
       <Route path="/users/*" element={<UsersLayout />}>
         <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />

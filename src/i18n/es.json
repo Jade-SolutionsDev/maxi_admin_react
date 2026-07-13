@@ -22,6 +22,11 @@
     "categories": {
       "name": "Categoría",
       "name_plural": "Categorías"
+    },
+    "products": {
+      "name": "Producto",
+      "name_plural": "Productos",
+      "select_department_first": "Selecciona un departamento primero"
     }
   },
   "list": {
@@ -49,7 +54,16 @@
       "provider": "Proveedor",
       "imageDesktop": "Imagen (escritorio)",
       "imageMobile": "Imagen (móvil)",
-      "featured": "Destacado"
+      "featured": "Destacado",
+      "image": "Imagen",
+      "basePrice": "Precio base",
+      "finalPrice": "Precio final",
+      "discount": "Descuento",
+      "format": "Formato",
+      "measureUnit": "Unidad de medida",
+      "expiryDate": "Fecha de vencimiento",
+      "minPrice": "Precio mín.",
+      "maxPrice": "Precio máx."
     }
   },
   "users": {
@@ -144,6 +158,10 @@
       "invalid_type": "Formato de imagen no admitido",
       "too_large": "La imagen supera el límite de 2 MB",
       "failed": "No se pudo subir la imagen"
+    },
+    "filters": {
+      "yes": "Sí",
+      "no": "No"
     }
   },
   "app": {

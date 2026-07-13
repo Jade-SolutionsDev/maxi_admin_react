@@ -89,7 +89,7 @@ const navItems: NavItem[] = [
   {
     labelKey: "app.menu.productos",
     icon: <Package size={20} />,
-    path: "/productos",
+    path: "/products",
   },
   {
     labelKey: "app.menu.departamentos",

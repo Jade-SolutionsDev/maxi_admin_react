@@ -22,6 +22,11 @@
     "categories": {
       "name": "Category",
       "name_plural": "Categories"
+    },
+    "products": {
+      "name": "Product",
+      "name_plural": "Products",
+      "select_department_first": "Select a department first"
     }
   },
   "list": {
@@ -49,7 +54,16 @@
       "provider": "Provider",
       "imageDesktop": "Image (desktop)",
       "imageMobile": "Image (mobile)",
-      "featured": "Featured"
+      "featured": "Featured",
+      "image": "Image",
+      "basePrice": "Base price",
+      "finalPrice": "Final price",
+      "discount": "Discount",
+      "format": "Format",
+      "measureUnit": "Unit of measure",
+      "expiryDate": "Expiry date",
+      "minPrice": "Min price",
+      "maxPrice": "Max price"
     }
   },
   "users": {
@@ -144,6 +158,10 @@
       "invalid_type": "Unsupported image format",
       "too_large": "Image exceeds the 2MB limit",
       "failed": "Could not upload the image"
+    },
+    "filters": {
+      "yes": "Yes",
+      "no": "No"
     }
   },
   "app": {
