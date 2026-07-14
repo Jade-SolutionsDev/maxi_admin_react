@@ -27,6 +27,10 @@
       "name": "Producto",
       "name_plural": "Productos",
       "select_department_first": "Selecciona un departamento primero"
+    },
+    "stock-locations": {
+      "name": "Almacén",
+      "name_plural": "Almacenes"
     }
   },
   "list": {
@@ -150,7 +154,8 @@
       "delete_confirm_title": "Eliminar %{name}",
       "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
       "cancel": "Cancelar",
-      "confirm": "Eliminar"
+      "confirm": "Eliminar",
+      "back": "Volver"
     },
     "upload": {
       "choose": "Subir imagen",
@@ -278,6 +283,54 @@
       "missing_fields": "Faltan datos para completar el registro: %{fields}.",
       "incomplete_status": "No se pudo completar el registro (estado: %{status}).",
       "generic": "Error al activar la cuenta. Intenta nuevamente."
+    }
+  },
+  "almacenes": {
+    "tabs": {
+      "general": "Datos generales",
+      "products": "Productos"
+    },
+    "sections": {
+      "info": "Información del almacén",
+      "info_hint": "Nombre y disponibilidad del almacén.",
+      "coverage": "Zona de compra",
+      "coverage_hint": "Seleccione las provincias y municipios donde opera este almacén.",
+      "grocers": "Encargados",
+      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén."
+    },
+    "fields": {
+      "available": "Disponible",
+      "available_hint": "Los almacenes deshabilitados no estarán disponibles para los usuarios."
+    },
+    "coverage": {
+      "municipalities": "Municipios",
+      "whole_province": "Toda la provincia",
+      "n_municipalities": "%{smart_count} municipio |||| %{smart_count} municipios",
+      "pick_hint": "Selecciona los municipios habilitados o marca toda la provincia.",
+      "required": "Selecciona al menos una zona de compra."
+    },
+    "grocers": {
+      "empty": "No hay usuarios GROCER disponibles."
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "actions": {
+      "create": "Crear almacén",
+      "operations": "Operaciones",
+      "save_changes": "Guardar cambios",
+      "delete_title": "Eliminar almacén"
+    },
+    "detail": {
+      "subtitle": "Detalle y configuración del almacén"
+    },
+    "products": {
+      "title": "Productos del almacén",
+      "coming_soon": "La gestión de inventario estará disponible próximamente."
+    },
+    "notify": {
+      "created": "Almacén creado"
     }
   }
 }

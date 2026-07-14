@@ -134,6 +134,11 @@ export const authProvider: AuthProvider = {
         return ["create", "edit", "delete"].includes(action ?? "")
           ? isManager || identity.role === "KARDIST"
           : true;
+      case "stock-locations":
+        // Only managers create/delete + assign grocers; assigned GROCERs edit
+        // (the backend enforces the per-storage assignment).
+        if (action === "create" || action === "delete") return isManager;
+        return true;
       default:
         // Clients remain readable by any authenticated backoffice user for now;
         // tighten per-resource when needed.

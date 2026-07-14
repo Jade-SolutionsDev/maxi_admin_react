@@ -106,7 +106,11 @@ const navItems: NavItem[] = [
     icon: <ClipboardList size={20} />,
     soon: true,
   },
-  { labelKey: "app.menu.almacenes", icon: <Warehouse size={20} />, soon: true },
+  {
+    labelKey: "app.menu.almacenes",
+    icon: <Warehouse size={20} />,
+    path: "/stock-locations",
+  },
   {
     labelKey: "app.menu.usuarios",
     icon: <Users size={20} />,

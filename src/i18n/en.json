@@ -27,6 +27,10 @@
       "name": "Product",
       "name_plural": "Products",
       "select_department_first": "Select a department first"
+    },
+    "stock-locations": {
+      "name": "Warehouse",
+      "name_plural": "Warehouses"
     }
   },
   "list": {
@@ -150,7 +154,8 @@
       "delete_confirm_title": "Delete %{name}",
       "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
       "cancel": "Cancel",
-      "confirm": "Delete"
+      "confirm": "Delete",
+      "back": "Back"
     },
     "upload": {
       "choose": "Upload image",
@@ -278,6 +283,54 @@
       "missing_fields": "Missing data to complete the registration: %{fields}.",
       "incomplete_status": "The registration could not be completed (status: %{status}).",
       "generic": "Error activating the account. Please try again."
+    }
+  },
+  "almacenes": {
+    "tabs": {
+      "general": "General",
+      "products": "Products"
+    },
+    "sections": {
+      "info": "Warehouse information",
+      "info_hint": "Warehouse name and availability.",
+      "coverage": "Coverage area",
+      "coverage_hint": "Select the provinces and municipalities this warehouse serves.",
+      "grocers": "Managers",
+      "grocers_hint": "GROCER users who can manage this warehouse."
+    },
+    "fields": {
+      "available": "Available",
+      "available_hint": "Disabled warehouses won't be available to users."
+    },
+    "coverage": {
+      "municipalities": "Municipalities",
+      "whole_province": "Whole province",
+      "n_municipalities": "%{smart_count} municipality |||| %{smart_count} municipalities",
+      "pick_hint": "Select the enabled municipalities or mark the whole province.",
+      "required": "Select at least one coverage area."
+    },
+    "grocers": {
+      "empty": "No GROCER users available."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "create": "Create warehouse",
+      "operations": "Operations",
+      "save_changes": "Save changes",
+      "delete_title": "Delete warehouse"
+    },
+    "detail": {
+      "subtitle": "Warehouse detail and configuration"
+    },
+    "products": {
+      "title": "Warehouse products",
+      "coming_soon": "Inventory management is coming soon."
+    },
+    "notify": {
+      "created": "Warehouse created"
     }
   }
 }
