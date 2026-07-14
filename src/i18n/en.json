@@ -285,7 +285,7 @@
       "generic": "Error activating the account. Please try again."
     }
   },
-  "almacenes": {
+  "stockLocations": {
     "tabs": {
       "general": "General",
       "products": "Products"

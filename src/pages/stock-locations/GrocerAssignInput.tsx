@@ -34,7 +34,7 @@ export function GrocerAssignInput({ source = "grocerIds" }: { source?: string })
   if (grocers.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-        {translate("almacenes.grocers.empty", {
+        {translate("stockLocations.grocers.empty", {
           _: "No hay usuarios GROCER disponibles.",
         })}
       </p>

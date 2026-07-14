@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AlmacenFormFields } from "./AlmacenFormFields";
+import { StockLocationFormFields } from "./StockLocationFormFields";
 
 // Only the DTO fields the backend accepts.
 const sanitize = (data: Record<string, unknown>) => ({
@@ -30,7 +30,7 @@ const sanitize = (data: Record<string, unknown>) => ({
   ...(data.grocerIds !== undefined ? { grocerIds: data.grocerIds } : {}),
 });
 
-export function AlmacenCreateModal({
+export function StockLocationCreateModal({
   open,
   onClose,
   isManager,
@@ -46,13 +46,13 @@ export function AlmacenCreateModal({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="flex flex-col w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[88vh] p-0 gap-0 overflow-hidden">
+      <DialogContent className="flex flex-col w-full sm:max-w-3xl h-[90vh] sm:h-auto sm:max-h-[88vh] p-0 gap-0 overflow-hidden">
         <CreateBase
           resource="stock-locations"
           transform={sanitize}
           mutationOptions={{
             onSuccess: (data: RaRecord) => {
-              notify("almacenes.notify.created", {
+              notify("stockLocations.notify.created", {
                 type: "success",
                 messageArgs: { _: "Almacén creado" },
               });
@@ -64,7 +64,7 @@ export function AlmacenCreateModal({
         >
           <DialogHeader className="shrink-0 px-6 py-4 border-b">
             <DialogTitle className="text-xl">
-              {translate("almacenes.actions.create", { _: "Crear almacén" })}
+              {translate("stockLocations.actions.create", { _: "Crear almacén" })}
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               {translate("shared.actions.form_subtitle", {
@@ -78,7 +78,7 @@ export function AlmacenCreateModal({
             className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
           >
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <AlmacenFormFields isManager={isManager} />
+              <StockLocationFormFields isManager={isManager} />
             </div>
           </SimpleForm>
         </CreateBase>

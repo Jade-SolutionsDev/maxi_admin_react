@@ -33,7 +33,7 @@ const LIST_PARAMS = {
 const validateCoverage = (value: unknown) =>
   Array.isArray(value) && value.length > 0
     ? undefined
-    : "almacenes.coverage.required";
+    : "stockLocations.coverage.required";
 
 export function CoverageSelector({ source = "coverage" }: { source?: string }) {
   const translate = useTranslate();
@@ -96,7 +96,7 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
         <p className="text-sm text-destructive">
           {translate(
             (fieldState.error.message as string) ??
-              "almacenes.coverage.required",
+              "stockLocations.coverage.required",
             { _: "Selecciona al menos una zona de compra" },
           )}
         </p>
@@ -109,25 +109,26 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
             <div
               key={province.id}
               className={cn(
-                "flex items-center justify-between rounded-lg border px-4 py-3 transition-colors",
+                "flex items-center gap-2 rounded-lg border px-3 py-2.5 transition-colors",
                 covered ? "border-primary/40 bg-primary/5" : "border-border",
               )}
             >
-              <label className="flex items-center gap-3 cursor-pointer">
+              <label className="flex min-w-0 flex-1 items-center gap-2.5 cursor-pointer">
                 <Checkbox
+                  className="shrink-0"
                   checked={covered}
                   onCheckedChange={(v) =>
                     v ? setWholeProvince(pid) : clearProvince(pid)
                   }
                   aria-label={province.name as string}
                 />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">
+                <div className="flex min-w-0 flex-col">
+                  <span className="text-sm font-medium leading-tight text-foreground">
                     {province.name as string}
                   </span>
                   {covered && !whole && (
                     <span className="text-xs text-primary">
-                      {translate("almacenes.coverage.n_municipalities", {
+                      {translate("stockLocations.coverage.n_municipalities", {
                         smart_count: municipalityIds.length,
                         _: "%{smart_count} municipios",
                       })}
@@ -138,12 +139,12 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
               <button
                 type="button"
                 onClick={() => setOpenProvince(province)}
-                className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="flex shrink-0 items-center gap-0.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
               >
-                {translate("almacenes.coverage.municipalities", {
+                {translate("stockLocations.coverage.municipalities", {
                   _: "Municipios",
                 })}
-                <ChevronRight size={14} />
+                <ChevronRight size={13} />
               </button>
             </div>
           );
@@ -197,7 +198,7 @@ function MunicipalityPicker({
       <SheetHeader>
         <SheetTitle>{province.name as string}</SheetTitle>
         <SheetDescription>
-          {translate("almacenes.coverage.pick_hint", {
+          {translate("stockLocations.coverage.pick_hint", {
             _: "Selecciona los municipios habilitados o marca toda la provincia.",
           })}
         </SheetDescription>
@@ -210,7 +211,7 @@ function MunicipalityPicker({
             onCheckedChange={(v) => onToggleWhole(v === true)}
           />
           <span className="text-sm font-medium">
-            {translate("almacenes.coverage.whole_province", {
+            {translate("stockLocations.coverage.whole_province", {
               _: "Toda la provincia",
             })}
           </span>

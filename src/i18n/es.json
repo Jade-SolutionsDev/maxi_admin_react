@@ -285,7 +285,7 @@
       "generic": "Error al activar la cuenta. Intenta nuevamente."
     }
   },
-  "almacenes": {
+  "stockLocations": {
     "tabs": {
       "general": "Datos generales",
       "products": "Productos"

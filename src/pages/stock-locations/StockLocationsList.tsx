@@ -33,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { AlmacenCreateModal } from "./AlmacenCreateModal";
+import { StockLocationCreateModal } from "./StockLocationCreateModal";
 
 const BOOL_CHOICES = [
   { id: "true", name: "shared.filters.yes" },
@@ -160,7 +160,7 @@ const DeleteButton = () => {
             <AlertTriangle className="h-6 w-6 text-destructive" />
           </div>
           <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {translate("almacenes.actions.delete_title", {
+            {translate("stockLocations.actions.delete_title", {
               _: "Eliminar almacén",
             })}
           </AlertDialogTitle>
@@ -212,14 +212,14 @@ const ListActions = ({ onCreate }: { onCreate: () => void }) => {
       {canCreate && (
         <Button type="button" onClick={onCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          {translate("almacenes.actions.create", { _: "Crear almacén" })}
+          {translate("stockLocations.actions.create", { _: "Crear almacén" })}
         </Button>
       )}
     </div>
   );
 };
 
-export default function AlmacenesList() {
+export default function StockLocationsList() {
   const translate = useTranslate();
   const [createOpen, setCreateOpen] = useState(false);
   const { canAccess } = useCanAccess({
@@ -247,13 +247,13 @@ export default function AlmacenesList() {
             <NameCell />
           </DataTable.Col>
           <DataTable.Col
-            label="almacenes.sections.coverage"
+            label="stockLocations.sections.coverage"
             disableSort
             render={CoverageSummary}
           />
           <DataTable.Col
             source="isActive"
-            label="almacenes.fields.available"
+            label="stockLocations.fields.available"
             disableSort
           >
             <StatusToggle />
@@ -295,7 +295,7 @@ function CreateModalHost({
   isManager: boolean;
 }) {
   return (
-    <AlmacenCreateModal
+    <StockLocationCreateModal
       open={createOpen}
       onClose={() => setCreateOpen(false)}
       isManager={isManager}

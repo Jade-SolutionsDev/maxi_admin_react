@@ -17,8 +17,8 @@ import { ProductsLayout } from "./pages/products/ProductsLayout";
 import ProductCreate from "./pages/products/ProductCreate";
 import ProductEdit from "./pages/products/ProductEdit";
 import { ProductDetailModal } from "./pages/products/ProductDetailModal";
-import AlmacenesList from "./pages/almacenes/AlmacenesList";
-import AlmacenDetailPage from "./pages/almacenes/AlmacenDetailPage";
+import StockLocationsList from "./pages/stock-locations/StockLocationsList";
+import StockLocationDetailPage from "./pages/stock-locations/StockLocationDetailPage";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
@@ -76,8 +76,8 @@ const AdminApp = () => (
         <Route path="edit/:id" element={<CategoryEdit />} />
         <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
-      <Route path="/stock-locations" element={<AlmacenesList />} />
-      <Route path="/stock-locations/:id" element={<AlmacenDetailPage />} />
+      <Route path="/stock-locations" element={<StockLocationsList />} />
+      <Route path="/stock-locations/:id" element={<StockLocationDetailPage />} />
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
     {/* users / departments / categories are handled via CustomRoutes above. */}

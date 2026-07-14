@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
-import { AlmacenFormFields } from "./AlmacenFormFields";
+import { StockLocationFormFields } from "./StockLocationFormFields";
 
 const sanitize = (data: Record<string, unknown>) => ({
   name: data.name,
@@ -36,7 +36,7 @@ const sanitize = (data: Record<string, unknown>) => ({
 
 type TabKey = "general" | "productos";
 
-export default function AlmacenDetailPage() {
+export default function StockLocationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: identity } = useGetIdentity();
   const isManager = MANAGER_ROLES.includes(
@@ -72,8 +72,8 @@ function DetailShell({ isManager }: { isManager: boolean }) {
   const active = record.isActive === true;
 
   const tabs: { key: TabKey; label: string; icon: typeof Boxes }[] = [
-    { key: "general", label: "almacenes.tabs.general", icon: SlidersHorizontal },
-    { key: "productos", label: "almacenes.tabs.products", icon: Boxes },
+    { key: "general", label: "stockLocations.tabs.general", icon: SlidersHorizontal },
+    { key: "productos", label: "stockLocations.tabs.products", icon: Boxes },
   ];
 
   return (
@@ -111,13 +111,13 @@ function DetailShell({ isManager }: { isManager: boolean }) {
                   <XCircle size={13} />
                 )}
                 {translate(
-                  active ? "almacenes.status.active" : "almacenes.status.inactive",
+                  active ? "stockLocations.status.active" : "stockLocations.status.inactive",
                   { _: active ? "Activo" : "Inactivo" },
                 )}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {translate("almacenes.detail.subtitle", {
+              {translate("stockLocations.detail.subtitle", {
                 _: "Detalle y configuración del almacén",
               })}
             </p>
@@ -127,7 +127,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
         {/* Operaciones — Phase B */}
         <Button type="button" variant="outline" disabled title={translate("app.menu.soon", { _: "Próximamente" })}>
           <Settings2 className="mr-2 h-4 w-4" />
-          {translate("almacenes.actions.operations", { _: "Operaciones" })}
+          {translate("stockLocations.actions.operations", { _: "Operaciones" })}
         </Button>
       </div>
 
@@ -164,7 +164,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
           toolbar={<SaveToolbar />}
           className="w-full max-w-none p-0 gap-6"
         >
-          <AlmacenFormFields isManager={isManager} />
+          <StockLocationFormFields isManager={isManager} />
         </SimpleForm>
       )}
 
@@ -172,12 +172,12 @@ function DetailShell({ isManager }: { isManager: boolean }) {
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16 text-center">
           <Boxes className="mb-3 h-10 w-10 text-muted-foreground" />
           <p className="font-medium text-foreground">
-            {translate("almacenes.products.title", {
+            {translate("stockLocations.products.title", {
               _: "Productos del almacén",
             })}
           </p>
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            {translate("almacenes.products.coming_soon", {
+            {translate("stockLocations.products.coming_soon", {
               _: "La gestión de inventario estará disponible próximamente.",
             })}
           </p>
@@ -200,7 +200,7 @@ function SaveToolbar() {
         {translate("shared.actions.cancel", { _: "Cancel" })}
       </Button>
       <SaveButton
-        label={translate("almacenes.actions.save_changes", {
+        label={translate("stockLocations.actions.save_changes", {
           _: "Guardar cambios",
         })}
       />
