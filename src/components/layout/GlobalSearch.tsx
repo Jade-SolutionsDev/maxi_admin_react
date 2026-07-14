@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDataProvider, useGetIdentity, useTranslate } from "ra-core";
 import { useQueries } from "@tanstack/react-query";
-import { Building2, Package, Search, Tags, Users } from "lucide-react";
+import { Building2, Package, Search, Tags, Users, Warehouse } from "lucide-react";
 
 import {
   Dialog,
@@ -58,6 +58,14 @@ const SEARCH_SOURCES: SearchSource[] = [
     icon: Building2,
     getLabel: (r) => String(r.name ?? ""),
     getPath: (r) => `/departments/${r.id}`,
+  },
+  {
+    // Backend scopes results by role (grocers see only assigned storages).
+    resource: "stock-locations",
+    groupKey: "resources.stock-locations.name_plural",
+    icon: Warehouse,
+    getLabel: (r) => String(r.name ?? ""),
+    getPath: (r) => `/stock-locations/${r.id}`,
   },
   {
     resource: "users",
