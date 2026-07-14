@@ -26,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { StockLocationFormFields } from "./StockLocationFormFields";
+import { StockLocationProductsTab } from "./StockLocationProductsTab";
+import { CreateOperationWizard } from "./CreateOperationWizard";
 
 const sanitize = (data: Record<string, unknown>) => ({
   name: data.name,
@@ -64,6 +66,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
   const navigate = useNavigate();
   const { record, isLoading } = useEditContext();
   const [tab, setTab] = useState<TabKey>("general");
+  const [opsOpen, setOpsOpen] = useState(false);
 
   if (isLoading || !record) {
     return <div className="h-64 rounded-lg bg-muted animate-pulse" />;
@@ -124,12 +127,18 @@ function DetailShell({ isManager }: { isManager: boolean }) {
           </div>
         </div>
 
-        {/* Operaciones — Phase B */}
-        <Button type="button" variant="outline" disabled title={translate("app.menu.soon", { _: "Próximamente" })}>
+        {/* Operaciones — opens the In/Out/Transfer wizard */}
+        <Button type="button" variant="outline" onClick={() => setOpsOpen(true)}>
           <Settings2 className="mr-2 h-4 w-4" />
           {translate("stockLocations.actions.operations", { _: "Operaciones" })}
         </Button>
       </div>
+
+      <CreateOperationWizard
+        locationId={record.id as string}
+        open={opsOpen}
+        onOpenChange={setOpsOpen}
+      />
 
       {/* Tab strip */}
       <div
@@ -169,19 +178,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
       )}
 
       {tab === "productos" && (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16 text-center">
-          <Boxes className="mb-3 h-10 w-10 text-muted-foreground" />
-          <p className="font-medium text-foreground">
-            {translate("stockLocations.products.title", {
-              _: "Productos del almacén",
-            })}
-          </p>
-          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            {translate("stockLocations.products.coming_soon", {
-              _: "La gestión de inventario estará disponible próximamente.",
-            })}
-          </p>
-        </div>
+        <StockLocationProductsTab locationId={record.id as string} />
       )}
     </>
   );

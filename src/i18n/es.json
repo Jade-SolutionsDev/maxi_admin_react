@@ -155,7 +155,8 @@
       "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
       "cancel": "Cancelar",
       "confirm": "Eliminar",
-      "back": "Volver"
+      "back": "Volver",
+      "continue": "Continuar"
     },
     "upload": {
       "choose": "Subir imagen",
@@ -327,10 +328,39 @@
     },
     "products": {
       "title": "Productos del almacén",
-      "coming_soon": "La gestión de inventario estará disponible próximamente."
+      "coming_soon": "La gestión de inventario estará disponible próximamente.",
+      "subtitle": "Listado de productos y cantidad disponible en este almacén.",
+      "search": "Buscar producto",
+      "product_name": "Nombre del producto",
+      "available": "Cantidad disponible",
+      "empty_title": "Sin productos en existencia",
+      "empty_hint": "Use \"Operaciones\" para registrar una entrada y añadir existencias.",
+      "unknown": "Producto"
     },
     "notify": {
       "created": "Almacén creado"
+    },
+    "operations": {
+      "title": "Crear operación",
+      "subtitle": "Registre una entrada, salida o transferencia de inventario.",
+      "step_type": "Seleccionar operación",
+      "step_items": "Ingresar productos",
+      "step_confirm": "Resumen y confirmar",
+      "in": "Entrada",
+      "in_desc": "Añade existencias a uno o varios productos del almacén.",
+      "out": "Salida",
+      "out_desc": "Disminuye las existencias de uno o varios productos.",
+      "transfer": "Transferencia",
+      "transfer_desc": "Mueve productos hacia otro almacén del sistema.",
+      "product_placeholder": "Escriba el nombre del producto...",
+      "product_search": "Buscar producto...",
+      "destination": "Almacén de destino",
+      "destination_placeholder": "Seleccione un almacén",
+      "quantity": "Cantidad",
+      "note": "Nota (opcional)",
+      "add_product": "Agregar otro producto",
+      "confirm": "Confirmar operación",
+      "success": "Operación registrada"
     }
   }
 }

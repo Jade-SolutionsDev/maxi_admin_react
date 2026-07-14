@@ -155,7 +155,8 @@
       "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete",
-      "back": "Back"
+      "back": "Back",
+      "continue": "Continue"
     },
     "upload": {
       "choose": "Upload image",
@@ -327,10 +328,39 @@
     },
     "products": {
       "title": "Warehouse products",
-      "coming_soon": "Inventory management is coming soon."
+      "coming_soon": "Inventory management is coming soon.",
+      "subtitle": "Products and available quantity in this storage.",
+      "search": "Search product",
+      "product_name": "Product name",
+      "available": "Available quantity",
+      "empty_title": "No stock yet",
+      "empty_hint": "Use \"Operations\" to register a stock-in and add quantities.",
+      "unknown": "Product"
     },
     "notify": {
       "created": "Warehouse created"
+    },
+    "operations": {
+      "title": "Create operation",
+      "subtitle": "Register an inventory in, out or transfer.",
+      "step_type": "Select operation",
+      "step_items": "Enter products",
+      "step_confirm": "Summary & confirm",
+      "in": "Stock in",
+      "in_desc": "Add stock to one or more products.",
+      "out": "Stock out",
+      "out_desc": "Reduce stock of one or more products.",
+      "transfer": "Transfer",
+      "transfer_desc": "Move products to another storage.",
+      "product_placeholder": "Type the product name...",
+      "product_search": "Search product...",
+      "destination": "Destination storage",
+      "destination_placeholder": "Select a storage",
+      "quantity": "Quantity",
+      "note": "Note (optional)",
+      "add_product": "Add another product",
+      "confirm": "Confirm operation",
+      "success": "Operation recorded"
     }
   }
 }

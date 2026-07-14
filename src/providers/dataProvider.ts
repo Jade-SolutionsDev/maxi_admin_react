@@ -11,12 +11,25 @@ export interface InviteUserPayload {
   organizationId?: string;
 }
 
+export type InventoryOperationType = "IN" | "OUT" | "TRANSFER";
+
+export interface CreateInventoryOperationPayload {
+  locationId: string;
+  type: InventoryOperationType;
+  targetLocationId?: string;
+  note?: string;
+  items: { productId: string; quantity: number }[];
+}
+
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
+  createInventoryOperation: (
+    payload: CreateInventoryOperationPayload,
+  ) => Promise<{ data: unknown }>;
 }
 
 async function httpClient(url: string, options: fetchUtils.Options = {}) {
@@ -202,5 +215,13 @@ export const dataProvider: DataProvider = {
       method: 'PATCH',
       body: JSON.stringify({ password }),
     });
+  },
+
+  async createInventoryOperation(payload: CreateInventoryOperationPayload) {
+    const { json } = await httpClient(`${API_URL}/inventory/operations`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return { data: unwrapOne(json) };
   },
 } as ExtendedDataProvider;
