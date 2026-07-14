@@ -368,6 +368,10 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
           )}
         />
 
+        {/* Clerk mounts its Smart CAPTCHA widget here during signUp.create.
+            Without this element it silently falls back to Invisible CAPTCHA. */}
+        <div id="clerk-captcha" className="flex justify-center empty:mt-0 mt-2" />
+
         <Button
           type="submit"
           disabled={flow.isSubmitting}
