@@ -92,6 +92,16 @@ export default function UserFormModal() {
           id={id}
           mutationMode="pessimistic"
           redirect={false}
+          // Submit only the editable fields — the form is seeded with the full
+          // record, and the backend rejects server-managed props (id, timestamps,
+          // derived status, ...) via forbidNonWhitelisted.
+          transform={({ firstName, lastName, phone, role, isActive }) => ({
+            firstName,
+            lastName,
+            phone,
+            role,
+            isActive,
+          })}
           mutationOptions={{
             onSuccess: () => {
               notify("users.actions.update_success", {
