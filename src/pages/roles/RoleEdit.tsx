@@ -15,7 +15,7 @@ const RoleEditForm = () => {
 
   return (
     <SimpleForm
-      className="max-w-4xl"
+      className="max-w-4xl mx-auto"
       toolbar={isSystem ? false : undefined}
     >
       {isSystem && (
@@ -64,7 +64,7 @@ export default function RoleEdit() {
   const translate = useTranslate();
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-2xl font-semibold text-foreground">
+      <h1 className="max-w-4xl mx-auto mb-4 text-2xl font-semibold text-foreground">
         {translate("roles.matrix.title", { _: "Role & permissions" })}
       </h1>
       <EditBase mutationMode="pessimistic" redirect="list">
