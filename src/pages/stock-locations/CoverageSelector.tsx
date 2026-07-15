@@ -123,7 +123,7 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
                   aria-label={province.name as string}
                 />
                 <div className="flex min-w-0 flex-col">
-                  <span className="text-sm font-medium leading-tight text-foreground">
+                  <span className="truncate text-sm font-medium leading-tight text-foreground">
                     {province.name as string}
                   </span>
                   {covered && !whole && (
@@ -139,7 +139,7 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
               <button
                 type="button"
                 onClick={() => setOpenProvince(province)}
-                className="flex shrink-0 items-center gap-0.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="flex shrink-0 items-center gap-0.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 {translate("stockLocations.coverage.municipalities", {
                   _: "Municipios",
@@ -230,7 +230,7 @@ function MunicipalityPicker({
             return (
               <label
                 key={m.id}
-                className="flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer hover:bg-accent"
+                className="flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer hover:bg-muted"
               >
                 <Checkbox
                   checked={checked}

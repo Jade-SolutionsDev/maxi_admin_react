@@ -357,6 +357,8 @@
       "destination": "Almacén de destino",
       "destination_placeholder": "Seleccione un almacén",
       "quantity": "Cantidad",
+      "available_short": "disp: %{smart_count}",
+      "no_stock": "Este almacén no tiene existencias disponibles para retirar o transferir.",
       "note": "Nota (opcional)",
       "add_product": "Agregar otro producto",
       "confirm": "Confirmar operación",

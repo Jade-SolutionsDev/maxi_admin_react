@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   useDataProvider,
   useGetList,
+  useGetMany,
   useNotify,
   useRefresh,
   useTranslate,
@@ -64,6 +65,14 @@ interface ItemRow {
   productId: string;
   productName: string;
   quantity: string;
+  // Present only for Out/Transfer, where products are restricted to current stock.
+  available?: number;
+}
+
+interface StockProduct {
+  id: string;
+  name: string;
+  available: number;
 }
 
 const OP_TYPES: {
@@ -104,28 +113,52 @@ const OP_TYPES: {
   },
 ];
 
-/** Searchable product picker (server-side search via the products resource). */
+/**
+ * Product picker. For an Entrada (no `stock` prop) it searches all products
+ * server-side. For Salida/Transferencia, `stock` restricts the options to what
+ * the location actually holds, and each option shows its available quantity.
+ */
 function ProductCombobox({
   value,
   valueName,
   onSelect,
+  stock,
+  excludeIds,
 }: {
   value: string;
   valueName: string;
-  onSelect: (id: string, name: string) => void;
+  onSelect: (id: string, name: string, available?: number) => void;
+  stock?: StockProduct[];
+  excludeIds?: Set<string>;
 }) {
   const translate = useTranslate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
-  const { data: products, isLoading } = useGetList(
+  const restricted = stock !== undefined;
+
+  const { data: searched, isLoading } = useGetList(
     "products",
     {
       filter: term ? { q: term } : {},
       pagination: { page: 1, perPage: 20 },
       sort: { field: "name", order: "ASC" },
     },
-    { enabled: open },
+    { enabled: open && !restricted },
   );
+
+  const options: StockProduct[] = restricted
+    ? (stock ?? [])
+        .filter((s) => s.id === value || !excludeIds?.has(s.id))
+        .filter((s) =>
+          term ? s.name.toLowerCase().includes(term.toLowerCase()) : true,
+        )
+    : (searched ?? [])
+        .filter((p) => String(p.id) === value || !excludeIds?.has(String(p.id)))
+        .map((p) => ({
+          id: String(p.id),
+          name: String(p.name ?? ""),
+          available: Number.NaN,
+        }));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -147,7 +180,7 @@ function ProductCombobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
+        className="w-(--radix-popover-trigger-width) p-0"
         align="start"
       >
         <Command shouldFilter={false}>
@@ -159,34 +192,46 @@ function ProductCombobox({
             })}
           />
           <CommandList>
-            {isLoading && (
+            {!restricted && isLoading && (
               <p className="py-4 text-center text-sm text-muted-foreground">
                 {translate("search.loading", { _: "Buscando…" })}
               </p>
             )}
-            {!isLoading && (products ?? []).length === 0 && (
+            {(restricted || !isLoading) && options.length === 0 && (
               <p className="py-4 text-center text-sm text-muted-foreground">
                 {translate("search.empty", { _: "Sin resultados" })}
               </p>
             )}
             <CommandGroup>
-              {(products ?? []).map((p) => (
+              {options.map((o) => (
                 <CommandItem
-                  key={p.id}
-                  value={String(p.id)}
+                  key={o.id}
+                  value={o.id}
                   onSelect={() => {
-                    onSelect(String(p.id), String(p.name ?? ""));
+                    onSelect(
+                      o.id,
+                      o.name,
+                      restricted ? o.available : undefined,
+                    );
                     setOpen(false);
                     setTerm("");
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      value === p.id ? "opacity-100" : "opacity-0",
+                      "mr-2 h-4 w-4 shrink-0",
+                      value === o.id ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {String(p.name ?? "")}
+                  <span className="flex-1 truncate">{o.name}</span>
+                  {restricted && (
+                    <span className="ml-2 shrink-0 text-xs text-muted-foreground">
+                      {translate("stockLocations.operations.available_short", {
+                        smart_count: o.available,
+                        _: "disp: %{smart_count}",
+                      })}
+                    </span>
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -228,6 +273,39 @@ export function CreateOperationWizard({
   );
   const destinations = (locations ?? []).filter((l) => l.id !== locationId);
 
+  // For Out/Transfer, products are limited to what this location currently holds.
+  const stockMode = type === "OUT" || type === "TRANSFER";
+  const { data: invRows } = useGetList(
+    "inventory",
+    {
+      filter: { locationId },
+      pagination: { page: 1, perPage: 300 },
+      sort: { field: "id", order: "ASC" },
+    },
+    { enabled: open && stockMode },
+  );
+  const invProductIds = useMemo(
+    () => [...new Set((invRows ?? []).map((r) => String(r.productId)))],
+    [invRows],
+  );
+  const { data: invProducts } = useGetMany(
+    "products",
+    { ids: invProductIds },
+    { enabled: invProductIds.length > 0 },
+  );
+  const stock: StockProduct[] = useMemo(() => {
+    const nameById = new Map(
+      (invProducts ?? []).map((p) => [String(p.id), String(p.name ?? "")]),
+    );
+    return (invRows ?? [])
+      .filter((r) => Number(r.quantity) > 0)
+      .map((r) => ({
+        id: String(r.productId),
+        name: nameById.get(String(r.productId)) ?? "",
+        available: Number(r.quantity),
+      }));
+  }, [invRows, invProducts]);
+
   const reset = () => {
     setStep(1);
     setType(null);
@@ -243,9 +321,20 @@ export function CreateOperationWizard({
     setTimeout(reset, 200);
   };
 
+  const selectType = (t: InventoryOperationType) => {
+    setType(t);
+    setTargetLocationId("");
+    setItems([{ key: 0, productId: "", productName: "", quantity: "" }]);
+  };
+
   const validItems = useMemo(
     () =>
-      items.filter((i) => i.productId && Number(i.quantity) > 0),
+      items.filter(
+        (i) =>
+          i.productId &&
+          Number(i.quantity) > 0 &&
+          (i.available == null || Number(i.quantity) <= i.available),
+      ),
     [items],
   );
 
@@ -377,12 +466,12 @@ export function CreateOperationWizard({
                 <button
                   key={op.type}
                   type="button"
-                  onClick={() => setType(op.type)}
+                  onClick={() => selectType(op.type)}
                   className={cn(
                     "flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors",
                     selected
-                      ? "border-primary ring-1 ring-primary"
-                      : "border-border hover:bg-accent",
+                      ? "border-primary bg-primary/10 ring-1 ring-primary"
+                      : "border-border hover:border-primary/40 hover:bg-muted",
                   )}
                 >
                   <Icon className={cn("h-7 w-7", op.accent)} />
@@ -432,68 +521,111 @@ export function CreateOperationWizard({
               </div>
             )}
 
-            <div className="space-y-2">
-              {items.map((item) => (
-                <div key={item.key} className="flex items-end gap-2">
-                  <div className="flex-1 space-y-1.5">
-                    <label className="text-xs text-muted-foreground">
-                      {translate("resources.products.name", { _: "Producto" })}
-                    </label>
-                    <ProductCombobox
-                      value={item.productId}
-                      valueName={item.productName}
-                      onSelect={(id, name) =>
-                        updateItem(item.key, {
-                          productId: id,
-                          productName: name,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="w-28 space-y-1.5">
-                    <label className="text-xs text-muted-foreground">
-                      {translate("stockLocations.operations.quantity", {
-                        _: "Cantidad",
-                      })}
-                    </label>
-                    <Input
-                      type="number"
-                      min={1}
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateItem(item.key, { quantity: e.target.value })
-                      }
-                      placeholder="0"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:bg-destructive/10"
-                    onClick={() => removeItem(item.key)}
-                    disabled={items.length === 1}
-                    aria-label={translate("shared.actions.delete", {
-                      _: "Delete",
-                    })}
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addItem}
-                className="w-full"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {translate("stockLocations.operations.add_product", {
-                  _: "Agregar otro producto",
+            {stockMode && stock.length === 0 ? (
+              <p className="rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                {translate("stockLocations.operations.no_stock", {
+                  _: "Este almacén no tiene existencias disponibles para retirar o transferir.",
                 })}
-              </Button>
-            </div>
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {items.map((item) => {
+                  const usedIds = new Set(
+                    items
+                      .filter((x) => x.key !== item.key && x.productId)
+                      .map((x) => x.productId),
+                  );
+                  const over =
+                    item.available != null &&
+                    Number(item.quantity) > item.available;
+                  return (
+                    <div key={item.key} className="flex items-start gap-2">
+                      <div className="flex-1 space-y-1.5">
+                        <label className="text-xs text-muted-foreground">
+                          {translate("resources.products.name", {
+                            _: "Producto",
+                          })}
+                        </label>
+                        <ProductCombobox
+                          value={item.productId}
+                          valueName={item.productName}
+                          stock={stockMode ? stock : undefined}
+                          excludeIds={usedIds}
+                          onSelect={(id, name, available) =>
+                            updateItem(item.key, {
+                              productId: id,
+                              productName: name,
+                              available,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="w-28 space-y-1.5">
+                        <label className="text-xs text-muted-foreground">
+                          {translate("stockLocations.operations.quantity", {
+                            _: "Cantidad",
+                          })}
+                        </label>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={item.available}
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateItem(item.key, { quantity: e.target.value })
+                          }
+                          placeholder="0"
+                          className={cn(over && "border-destructive")}
+                        />
+                        {item.available != null && (
+                          <span
+                            className={cn(
+                              "block text-[11px]",
+                              over
+                                ? "text-destructive"
+                                : "text-muted-foreground",
+                            )}
+                          >
+                            {translate(
+                              "stockLocations.operations.available_short",
+                              {
+                                smart_count: item.available,
+                                _: "disp: %{smart_count}",
+                              },
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="mt-6 text-destructive hover:bg-destructive/10"
+                        onClick={() => removeItem(item.key)}
+                        disabled={items.length === 1}
+                        aria-label={translate("shared.actions.delete", {
+                          _: "Delete",
+                        })}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  );
+                })}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addItem}
+                  className="w-full"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {translate("stockLocations.operations.add_product", {
+                    _: "Agregar otro producto",
+                  })}
+                </Button>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium">

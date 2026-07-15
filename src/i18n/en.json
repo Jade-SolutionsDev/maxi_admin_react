@@ -357,6 +357,8 @@
       "destination": "Destination storage",
       "destination_placeholder": "Select a storage",
       "quantity": "Quantity",
+      "available_short": "avail: %{smart_count}",
+      "no_stock": "This storage has no stock available to remove or transfer.",
       "note": "Note (optional)",
       "add_product": "Add another product",
       "confirm": "Confirm operation",

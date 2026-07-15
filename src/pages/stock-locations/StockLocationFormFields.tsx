@@ -1,15 +1,24 @@
 import { required, useTranslate } from "ra-core";
 
 import { BooleanInput, TextInput } from "@/components/admin";
+import { cn } from "@/lib/utils";
 import { CoverageSelector } from "./CoverageSelector";
 import { GrocerAssignInput } from "./GrocerAssignInput";
 
 // Shared fields for the create modal and the detail "Datos generales" tab.
-export function StockLocationFormFields({ isManager }: { isManager: boolean }) {
+// `stacked` (create modal) drops the 2-column split so the coverage grid gets
+// the full width — otherwise the province cards are too narrow and collide.
+export function StockLocationFormFields({
+  isManager,
+  stacked = false,
+}: {
+  isManager: boolean;
+  stacked?: boolean;
+}) {
   const translate = useTranslate();
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className={cn("grid grid-cols-1 gap-6", !stacked && "lg:grid-cols-2")}>
       <div className="space-y-5">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
