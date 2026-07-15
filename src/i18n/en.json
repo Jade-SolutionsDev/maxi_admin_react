@@ -6,6 +6,11 @@
     "loading": "Searching…",
     "empty": "No results"
   },
+  "accessDenied": {
+    "title": "Access denied",
+    "message": "You don't have permission to view this section. If you think this is a mistake, contact an administrator.",
+    "back": "Back to dashboard"
+  },
   "resources": {
     "clients": {
       "name": "Client",

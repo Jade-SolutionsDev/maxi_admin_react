@@ -6,6 +6,11 @@
     "loading": "Buscando…",
     "empty": "Sin resultados"
   },
+  "accessDenied": {
+    "title": "Acceso denegado",
+    "message": "No tienes permiso para ver esta sección. Si crees que es un error, contacta a un administrador.",
+    "back": "Volver al panel"
+  },
   "resources": {
     "clients": {
       "name": "Cliente",

@@ -36,6 +36,8 @@ import { TaxonomyDetailModal } from "./components/admin/taxonomy-detail-modal";
 import ProfilePage from "./pages/profile/ProfilePage";
 import roles from "./pages/roles";
 import Loading from "./pages/Loading";
+import AccessDenied from "./pages/AccessDenied";
+import { RequireAccess } from "./components/auth/RequireAccess";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
@@ -54,31 +56,74 @@ const AdminApp = () => (
     store={store}
     disableTelemetry
     loading={Loading}
+    accessDenied={AccessDenied}
   >
     <CustomRoutes>
       <Route path="/perfil" element={<ProfilePage />} />
-      <Route path="/products/*" element={<ProductsLayout />}>
+      <Route
+        path="/products/*"
+        element={
+          <RequireAccess resource="products">
+            <ProductsLayout />
+          </RequireAccess>
+        }
+      >
         <Route path="create" element={<ProductCreate />} />
         <Route path="edit/:id" element={<ProductEdit />} />
         <Route path=":id" element={<ProductDetailModal />} />
       </Route>
-      <Route path="/users/*" element={<UsersLayout />}>
+      <Route
+        path="/users/*"
+        element={
+          <RequireAccess resource="users">
+            <UsersLayout />
+          </RequireAccess>
+        }
+      >
         <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />
         <Route path="password/:id" element={<ChangePasswordModal />} />
       </Route>
-      <Route path="/departments/*" element={<DepartmentsLayout />}>
+      <Route
+        path="/departments/*"
+        element={
+          <RequireAccess resource="departments">
+            <DepartmentsLayout />
+          </RequireAccess>
+        }
+      >
         <Route path="create" element={<DepartmentCreate />} />
         <Route path="edit/:id" element={<DepartmentEdit />} />
         <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
-      <Route path="/categories/*" element={<CategoriesLayout />}>
+      <Route
+        path="/categories/*"
+        element={
+          <RequireAccess resource="categories">
+            <CategoriesLayout />
+          </RequireAccess>
+        }
+      >
         <Route path="create" element={<CategoryCreate />} />
         <Route path="edit/:id" element={<CategoryEdit />} />
         <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
-      <Route path="/stock-locations" element={<StockLocationsList />} />
-      <Route path="/stock-locations/:id" element={<StockLocationDetailPage />} />
+      <Route
+        path="/stock-locations"
+        element={
+          <RequireAccess resource="stock-locations">
+            <StockLocationsList />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/stock-locations/:id"
+        element={
+          <RequireAccess resource="stock-locations" action="read">
+            <StockLocationDetailPage />
+          </RequireAccess>
+        }
+      />
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission

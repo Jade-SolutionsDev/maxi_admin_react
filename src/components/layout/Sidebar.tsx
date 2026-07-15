@@ -16,7 +16,13 @@ import {
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
 import { cn } from "@/lib/utils";
-import { Translate, useGetIdentity, useLogout, useTranslate } from "ra-core";
+import {
+  Translate,
+  useCanAccess,
+  useGetIdentity,
+  useLogout,
+  useTranslate,
+} from "ra-core";
 import { Button } from "../ui/button";
 import {
   Sidebar,
@@ -31,7 +37,6 @@ import {
   SidebarMenuItem,
   SidebarRail
 } from "../ui/sidebar";
-import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { useTheme } from "../admin";
 
 /** Icon-only mark (the "m" + smile) for the collapsed rail. `currentColor` = "m", brand green = smile. */
@@ -69,8 +74,9 @@ interface NavItem {
   labelKey: string;
   icon: React.ReactNode;
   path?: string;
-  /** When true, only SUPER_ADMIN / ADMIN see this entry. */
-  managerOnly?: boolean;
+  /** Resource this entry maps to; the item is hidden unless the user can list
+   *  it (canAccess). Omit for non-resource entries (dashboard, "coming soon"). */
+  resource?: string;
   /** Not yet built — rendered disabled with a "coming soon" hint. */
   soon?: boolean;
 }
@@ -90,16 +96,19 @@ const navItems: NavItem[] = [
     labelKey: "app.menu.productos",
     icon: <Package size={20} />,
     path: "/products",
+    resource: "products",
   },
   {
     labelKey: "app.menu.departamentos",
     icon: <Building2 size={20} />,
     path: "/departments",
+    resource: "departments",
   },
   {
     labelKey: "app.menu.categorias",
     icon: <Tags size={20} />,
     path: "/categories",
+    resource: "categories",
   },
   {
     labelKey: "app.menu.inventario",
@@ -110,44 +119,82 @@ const navItems: NavItem[] = [
     labelKey: "app.menu.almacenes",
     icon: <Warehouse size={20} />,
     path: "/stock-locations",
+    resource: "stock-locations",
   },
   {
     labelKey: "app.menu.usuarios",
     icon: <Users size={20} />,
     path: "/users",
-    managerOnly: true,
+    resource: "users",
   },
   {
     labelKey: "app.menu.clientes",
     icon: <UserRound size={20} />,
     path: "/clients",
+    resource: "clients",
   },
   { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
   {
     labelKey: "app.menu.configuracion",
     icon: <Settings size={20} />,
     path: "/roles",
-    managerOnly: true,
+    resource: "roles",
   },
 ];
 
-export default function AppSidebar() {
+/** Renders a single sidebar entry. */
+function NavEntry({ item }: { item: NavItem }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const translate = useTranslate();
+  const isActive = !!item.path && location.pathname === item.path;
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        size="lg"
+        isActive={isActive}
+        disabled={item.soon}
+        tooltip={translate(item.labelKey)}
+        onClick={() => item.path && navigate(item.path)}
+        className={cn(
+          "gap-3 rounded-[10px] text-[14px] text-sidebar-foreground",
+          "data-[active=true]:bg-sidebar-primary/10 data-[active=true]:text-sidebar-primary",
+          // Collapsed rail: fill and center the button + icon, drop the label.
+          "group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!",
+          item.soon &&
+            "opacity-45 hover:bg-transparent hover:text-sidebar-foreground",
+        )}
+      >
+        <span className="shrink-0 [&>svg]:size-5">{item.icon}</span>
+        <span className="flex-1 truncate group-data-[collapsible=icon]:hidden">
+          <Translate i18nKey={item.labelKey} />
+        </span>
+      </SidebarMenuButton>
+      {item.soon && (
+        <SidebarMenuBadge className="top-3.5 rounded-full bg-muted px-1.5 text-[10px] text-muted-foreground">
+          <Translate i18nKey="app.menu.soon" />
+        </SidebarMenuBadge>
+      )}
+    </SidebarMenuItem>
+  );
+}
+
+/** Resource-bound entry: hidden unless the user can list the resource. */
+function GatedNavEntry({ item }: { item: NavItem }) {
+  const { canAccess, isPending } = useCanAccess({
+    resource: item.resource!,
+    action: "list",
+  });
+  if (isPending || !canAccess) return null;
+  return <NavEntry item={item} />;
+}
+
+export default function AppSidebar() {
   const logout = useLogout();
   const translate = useTranslate();
   const { data: identity } = useGetIdentity();
   const { theme } = useTheme();
-
-  const isManager = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
-  );
-
-  const visibleItems = navItems.filter(
-    (item) => !item.managerOnly || isManager,
-  );
-
-  const isActive = (path?: string) => !!path && location.pathname === path;
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
@@ -170,35 +217,13 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {visibleItems.map((item) => (
-                <SidebarMenuItem key={item.labelKey}>
-                  <SidebarMenuButton
-                    size="lg"
-                    isActive={isActive(item.path)}
-                    disabled={item.soon}
-                    tooltip={translate(item.labelKey)}
-                    onClick={() => item.path && navigate(item.path)}
-                    className={cn(
-                      "gap-3 rounded-[10px] text-[14px] text-sidebar-foreground",
-                      "data-[active=true]:bg-sidebar-primary/10 data-[active=true]:text-sidebar-primary",
-                      // Collapsed rail: fill and center the button + icon, drop the label.
-                      "group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!",
-                      item.soon &&
-                        "opacity-45 hover:bg-transparent hover:text-sidebar-foreground",
-                    )}
-                  >
-                    <span className="shrink-0 [&>svg]:size-5">{item.icon}</span>
-                    <span className="flex-1 truncate group-data-[collapsible=icon]:hidden">
-                      <Translate i18nKey={item.labelKey} />
-                    </span>
-                  </SidebarMenuButton>
-                  {item.soon && (
-                    <SidebarMenuBadge className="top-3.5 rounded-full bg-muted px-1.5 text-[10px] text-muted-foreground">
-                      <Translate i18nKey="app.menu.soon" />
-                    </SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) =>
+                item.resource ? (
+                  <GatedNavEntry key={item.labelKey} item={item} />
+                ) : (
+                  <NavEntry key={item.labelKey} item={item} />
+                ),
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
