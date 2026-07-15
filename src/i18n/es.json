@@ -26,6 +26,15 @@
     "roles": {
       "name": "Rol",
       "name_plural": "Roles y permisos"
+    },
+    "products": {
+      "name": "Producto",
+      "name_plural": "Productos",
+      "select_department_first": "Selecciona un departamento primero"
+    },
+    "stock-locations": {
+      "name": "Almacén",
+      "name_plural": "Almacenes"
     }
   },
   "list": {
@@ -53,7 +62,16 @@
       "provider": "Proveedor",
       "imageDesktop": "Imagen (escritorio)",
       "imageMobile": "Imagen (móvil)",
-      "featured": "Destacado"
+      "featured": "Destacado",
+      "image": "Imagen",
+      "basePrice": "Precio base",
+      "finalPrice": "Precio final",
+      "discount": "Descuento",
+      "format": "Formato",
+      "measureUnit": "Unidad de medida",
+      "expiryDate": "Fecha de vencimiento",
+      "minPrice": "Precio mín.",
+      "maxPrice": "Precio máx."
     }
   },
   "users": {
@@ -140,7 +158,9 @@
       "delete_confirm_title": "Eliminar %{name}",
       "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
       "cancel": "Cancelar",
-      "confirm": "Eliminar"
+      "confirm": "Eliminar",
+      "back": "Volver",
+      "continue": "Continuar"
     },
     "upload": {
       "choose": "Subir imagen",
@@ -148,6 +168,10 @@
       "invalid_type": "Formato de imagen no admitido",
       "too_large": "La imagen supera el límite de 2 MB",
       "failed": "No se pudo subir la imagen"
+    },
+    "filters": {
+      "yes": "Sí",
+      "no": "No"
     }
   },
   "app": {
@@ -214,7 +238,8 @@
     "modules": {
       "products": "Productos",
       "categories": "Categorías",
-      "departments": "Departamentos"
+      "departments": "Departamentos",
+      "stock-locations": "Almacenes"
     },
     "actions": {
       "list": "Listar",
@@ -307,6 +332,85 @@
       "missing_fields": "Faltan datos para completar el registro: %{fields}.",
       "incomplete_status": "No se pudo completar el registro (estado: %{status}).",
       "generic": "Error al activar la cuenta. Intenta nuevamente."
+    }
+  },
+  "stockLocations": {
+    "tabs": {
+      "general": "Datos generales",
+      "products": "Productos"
+    },
+    "sections": {
+      "info": "Información del almacén",
+      "info_hint": "Nombre y disponibilidad del almacén.",
+      "coverage": "Zona de compra",
+      "coverage_hint": "Seleccione las provincias y municipios donde opera este almacén.",
+      "grocers": "Encargados",
+      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén."
+    },
+    "fields": {
+      "available": "Disponible",
+      "available_hint": "Los almacenes deshabilitados no estarán disponibles para los usuarios."
+    },
+    "coverage": {
+      "municipalities": "Municipios",
+      "whole_province": "Toda la provincia",
+      "n_municipalities": "%{smart_count} municipio |||| %{smart_count} municipios",
+      "pick_hint": "Selecciona los municipios habilitados o marca toda la provincia.",
+      "required": "Selecciona al menos una zona de compra."
+    },
+    "grocers": {
+      "empty": "No hay usuarios GROCER disponibles."
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "actions": {
+      "create": "Crear almacén",
+      "operations": "Operaciones",
+      "save_changes": "Guardar cambios",
+      "delete_title": "Eliminar almacén"
+    },
+    "detail": {
+      "subtitle": "Detalle y configuración del almacén"
+    },
+    "products": {
+      "title": "Productos del almacén",
+      "coming_soon": "La gestión de inventario estará disponible próximamente.",
+      "subtitle": "Listado de productos y cantidad disponible en este almacén.",
+      "search": "Buscar producto",
+      "product_name": "Nombre del producto",
+      "available": "Cantidad disponible",
+      "empty_title": "Sin productos en existencia",
+      "empty_hint": "Use \"Operaciones\" para registrar una entrada y añadir existencias.",
+      "unknown": "Producto"
+    },
+    "notify": {
+      "created": "Almacén creado"
+    },
+    "operations": {
+      "title": "Crear operación",
+      "subtitle": "Registre una entrada, salida o transferencia de inventario.",
+      "step_type": "Seleccionar operación",
+      "step_items": "Ingresar productos",
+      "step_confirm": "Resumen y confirmar",
+      "in": "Entrada",
+      "in_desc": "Añade existencias a uno o varios productos del almacén.",
+      "out": "Salida",
+      "out_desc": "Disminuye las existencias de uno o varios productos.",
+      "transfer": "Transferencia",
+      "transfer_desc": "Mueve productos hacia otro almacén del sistema.",
+      "product_placeholder": "Escriba el nombre del producto...",
+      "product_search": "Buscar producto...",
+      "destination": "Almacén de destino",
+      "destination_placeholder": "Seleccione un almacén",
+      "quantity": "Cantidad",
+      "available_short": "disp: %{smart_count}",
+      "no_stock": "Este almacén no tiene existencias disponibles para retirar o transferir.",
+      "note": "Nota (opcional)",
+      "add_product": "Agregar otro producto",
+      "confirm": "Confirmar operación",
+      "success": "Operación registrada"
     }
   }
 }

@@ -24,7 +24,12 @@ let identityCache: Identity | null = null;
 let permissionsCache: PermissionMap = {};
 
 // Modules governed by managed permissions; other resources gate by role only.
-const MANAGED_MODULES = ["products", "categories", "departments"];
+const MANAGED_MODULES = [
+  "products",
+  "categories",
+  "departments",
+  "stock-locations",
+];
 
 // react-admin actions -> backend permission actions.
 const ACTION_MAP: Record<string, string> = {
@@ -152,7 +157,8 @@ export const authProvider: AuthProvider = {
       case "settings":
         return false;
       default:
-        // Catalog modules are governed by the effective permission map.
+        // Catalog + operational modules are governed by the effective
+        // permission map (products, categories, departments, stock-locations).
         if (MANAGED_MODULES.includes(resource)) {
           const backendAction = ACTION_MAP[action ?? ""] ?? action ?? "";
           return permissionsCache[resource]?.includes(backendAction) ?? false;

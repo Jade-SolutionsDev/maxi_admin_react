@@ -17,6 +17,16 @@ export interface RoleSummary {
   description?: string | null;
 }
 
+export type InventoryOperationType = "IN" | "OUT" | "TRANSFER";
+
+export interface CreateInventoryOperationPayload {
+  locationId: string;
+  type: InventoryOperationType;
+  targetLocationId?: string;
+  note?: string;
+  items: { productId: string; quantity: number }[];
+}
+
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
@@ -25,6 +35,9 @@ export interface ExtendedDataProvider extends DataProvider {
   setUserPassword: (id: string, password: string) => Promise<void>;
   getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
   setUserRoles: (userId: string, roleIds: string[]) => Promise<{ data: unknown }>;
+  createInventoryOperation: (
+    payload: CreateInventoryOperationPayload,
+  ) => Promise<{ data: unknown }>;
 }
 
 // The managed-roles resource lives under the nested /permissions route.
@@ -263,6 +276,14 @@ export const dataProvider: DataProvider = {
       `${API_URL}/permissions/users/${userId}/roles`,
       { method: 'PUT', body: JSON.stringify({ roleIds }) },
     );
+    return { data: unwrapOne(json) };
+  },
+
+  async createInventoryOperation(payload: CreateInventoryOperationPayload) {
+    const { json } = await httpClient(`${API_URL}/inventory/operations`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
     return { data: unwrapOne(json) };
   },
 } as ExtendedDataProvider;

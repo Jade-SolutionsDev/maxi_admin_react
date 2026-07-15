@@ -26,6 +26,15 @@
     "roles": {
       "name": "Role",
       "name_plural": "Roles & permissions"
+    },
+    "products": {
+      "name": "Product",
+      "name_plural": "Products",
+      "select_department_first": "Select a department first"
+    },
+    "stock-locations": {
+      "name": "Warehouse",
+      "name_plural": "Warehouses"
     }
   },
   "list": {
@@ -53,7 +62,16 @@
       "provider": "Provider",
       "imageDesktop": "Image (desktop)",
       "imageMobile": "Image (mobile)",
-      "featured": "Featured"
+      "featured": "Featured",
+      "image": "Image",
+      "basePrice": "Base price",
+      "finalPrice": "Final price",
+      "discount": "Discount",
+      "format": "Format",
+      "measureUnit": "Unit of measure",
+      "expiryDate": "Expiry date",
+      "minPrice": "Min price",
+      "maxPrice": "Max price"
     }
   },
   "users": {
@@ -140,7 +158,9 @@
       "delete_confirm_title": "Delete %{name}",
       "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
       "cancel": "Cancel",
-      "confirm": "Delete"
+      "confirm": "Delete",
+      "back": "Back",
+      "continue": "Continue"
     },
     "upload": {
       "choose": "Upload image",
@@ -148,6 +168,10 @@
       "invalid_type": "Unsupported image format",
       "too_large": "Image exceeds the 2MB limit",
       "failed": "Could not upload the image"
+    },
+    "filters": {
+      "yes": "Yes",
+      "no": "No"
     }
   },
   "app": {
@@ -214,7 +238,8 @@
     "modules": {
       "products": "Products",
       "categories": "Categories",
-      "departments": "Departments"
+      "departments": "Departments",
+      "stock-locations": "Warehouses"
     },
     "actions": {
       "list": "List",
@@ -307,6 +332,85 @@
       "missing_fields": "Missing data to complete the registration: %{fields}.",
       "incomplete_status": "The registration could not be completed (status: %{status}).",
       "generic": "Error activating the account. Please try again."
+    }
+  },
+  "stockLocations": {
+    "tabs": {
+      "general": "General",
+      "products": "Products"
+    },
+    "sections": {
+      "info": "Warehouse information",
+      "info_hint": "Warehouse name and availability.",
+      "coverage": "Coverage area",
+      "coverage_hint": "Select the provinces and municipalities this warehouse serves.",
+      "grocers": "Managers",
+      "grocers_hint": "GROCER users who can manage this warehouse."
+    },
+    "fields": {
+      "available": "Available",
+      "available_hint": "Disabled warehouses won't be available to users."
+    },
+    "coverage": {
+      "municipalities": "Municipalities",
+      "whole_province": "Whole province",
+      "n_municipalities": "%{smart_count} municipality |||| %{smart_count} municipalities",
+      "pick_hint": "Select the enabled municipalities or mark the whole province.",
+      "required": "Select at least one coverage area."
+    },
+    "grocers": {
+      "empty": "No GROCER users available."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "create": "Create warehouse",
+      "operations": "Operations",
+      "save_changes": "Save changes",
+      "delete_title": "Delete warehouse"
+    },
+    "detail": {
+      "subtitle": "Warehouse detail and configuration"
+    },
+    "products": {
+      "title": "Warehouse products",
+      "coming_soon": "Inventory management is coming soon.",
+      "subtitle": "Products and available quantity in this storage.",
+      "search": "Search product",
+      "product_name": "Product name",
+      "available": "Available quantity",
+      "empty_title": "No stock yet",
+      "empty_hint": "Use \"Operations\" to register a stock-in and add quantities.",
+      "unknown": "Product"
+    },
+    "notify": {
+      "created": "Warehouse created"
+    },
+    "operations": {
+      "title": "Create operation",
+      "subtitle": "Register an inventory in, out or transfer.",
+      "step_type": "Select operation",
+      "step_items": "Enter products",
+      "step_confirm": "Summary & confirm",
+      "in": "Stock in",
+      "in_desc": "Add stock to one or more products.",
+      "out": "Stock out",
+      "out_desc": "Reduce stock of one or more products.",
+      "transfer": "Transfer",
+      "transfer_desc": "Move products to another storage.",
+      "product_placeholder": "Type the product name...",
+      "product_search": "Search product...",
+      "destination": "Destination storage",
+      "destination_placeholder": "Select a storage",
+      "quantity": "Quantity",
+      "available_short": "avail: %{smart_count}",
+      "no_stock": "This storage has no stock available to remove or transfer.",
+      "note": "Note (optional)",
+      "add_product": "Add another product",
+      "confirm": "Confirm operation",
+      "success": "Operation recorded"
     }
   }
 }

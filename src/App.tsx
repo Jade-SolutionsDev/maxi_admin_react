@@ -13,7 +13,12 @@ import {
 import Layout from "./components/layout/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ClientList } from "./pages/Clients";
-import Productos from "./pages/Productos";
+import { ProductsLayout } from "./pages/products/ProductsLayout";
+import ProductCreate from "./pages/products/ProductCreate";
+import ProductEdit from "./pages/products/ProductEdit";
+import { ProductDetailModal } from "./pages/products/ProductDetailModal";
+import StockLocationsList from "./pages/stock-locations/StockLocationsList";
+import StockLocationDetailPage from "./pages/stock-locations/StockLocationDetailPage";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
@@ -27,6 +32,7 @@ import DepartmentEdit from "./pages/departments/DepartmentEdit";
 import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
+import { TaxonomyDetailModal } from "./components/admin/taxonomy-detail-modal";
 import ProfilePage from "./pages/profile/ProfilePage";
 import roles from "./pages/roles";
 import Loading from "./pages/Loading";
@@ -51,7 +57,11 @@ const AdminApp = () => (
   >
     <CustomRoutes>
       <Route path="/perfil" element={<ProfilePage />} />
-      <Route path="/productos" element={<Productos />} />
+      <Route path="/products/*" element={<ProductsLayout />}>
+        <Route path="create" element={<ProductCreate />} />
+        <Route path="edit/:id" element={<ProductEdit />} />
+        <Route path=":id" element={<ProductDetailModal />} />
+      </Route>
       <Route path="/users/*" element={<UsersLayout />}>
         <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />
@@ -60,11 +70,15 @@ const AdminApp = () => (
       <Route path="/departments/*" element={<DepartmentsLayout />}>
         <Route path="create" element={<DepartmentCreate />} />
         <Route path="edit/:id" element={<DepartmentEdit />} />
+        <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
       <Route path="/categories/*" element={<CategoriesLayout />}>
         <Route path="create" element={<CategoryCreate />} />
         <Route path="edit/:id" element={<CategoryEdit />} />
+        <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
+      <Route path="/stock-locations" element={<StockLocationsList />} />
+      <Route path="/stock-locations/:id" element={<StockLocationDetailPage />} />
     </CustomRoutes>
     <Resource name="clients" list={ClientList} />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission

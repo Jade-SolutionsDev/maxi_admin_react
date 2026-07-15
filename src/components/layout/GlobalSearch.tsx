@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDataProvider, useGetIdentity, useTranslate } from "ra-core";
 import { useQueries } from "@tanstack/react-query";
-import { Building2, Search, Tags, Users } from "lucide-react";
+import { Building2, Package, Search, Tags, Users, Warehouse } from "lucide-react";
 
 import {
   Dialog,
@@ -33,22 +33,39 @@ interface SearchSource {
   getPath: (record: SearchRecord) => string;
 }
 
-// Only entities with real server-side `q` search + an addressable edit route.
-// Clients (modal-only edit) and products/orders (mock) are intentionally absent.
+// Only entities with real server-side `q` search + an addressable route.
+// Taxonomy/products deep-link to their detail view `/[resource]/:id`; users
+// have no detail view so they open the edit form. Clients (modal-only edit)
+// and orders (mock) are intentionally absent.
 const SEARCH_SOURCES: SearchSource[] = [
+  {
+    resource: "products",
+    groupKey: "resources.products.name_plural",
+    icon: Package,
+    getLabel: (r) => String(r.name ?? ""),
+    getPath: (r) => `/products/${r.id}`,
+  },
   {
     resource: "categories",
     groupKey: "resources.categories.name_plural",
     icon: Tags,
     getLabel: (r) => String(r.name ?? ""),
-    getPath: (r) => `/categories/edit/${r.id}`,
+    getPath: (r) => `/categories/${r.id}`,
   },
   {
     resource: "departments",
     groupKey: "resources.departments.name_plural",
     icon: Building2,
     getLabel: (r) => String(r.name ?? ""),
-    getPath: (r) => `/departments/edit/${r.id}`,
+    getPath: (r) => `/departments/${r.id}`,
+  },
+  {
+    // Backend scopes results by role (grocers see only assigned storages).
+    resource: "stock-locations",
+    groupKey: "resources.stock-locations.name_plural",
+    icon: Warehouse,
+    getLabel: (r) => String(r.name ?? ""),
+    getPath: (r) => `/stock-locations/${r.id}`,
   },
   {
     resource: "users",
@@ -69,7 +86,8 @@ const DEBOUNCE_MS = 250;
 /**
  * Global command palette (⌘K / Ctrl+K). Repurposes the header search box: fans
  * the typed term out to each searchable resource via the dataProvider, groups
- * the hits by entity type, and navigates to the record's edit page on select.
+ * the hits by entity type, and navigates to the record's detail/edit page on
+ * select.
  */
 export function GlobalSearch() {
   const translate = useTranslate();

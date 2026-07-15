@@ -14,7 +14,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 const ACTIONS = ["list", "read", "create", "update", "delete"] as const;
 
 // Preferred row order; any extra modules returned by the API are appended.
-const MODULE_ORDER = ["products", "categories", "departments"];
+const MODULE_ORDER = [
+  "products",
+  "categories",
+  "departments",
+  "stock-locations",
+];
 
 interface PermissionRecord {
   id: string;

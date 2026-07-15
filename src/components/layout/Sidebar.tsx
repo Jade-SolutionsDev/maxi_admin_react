@@ -89,7 +89,7 @@ const navItems: NavItem[] = [
   {
     labelKey: "app.menu.productos",
     icon: <Package size={20} />,
-    path: "/productos",
+    path: "/products",
   },
   {
     labelKey: "app.menu.departamentos",
@@ -106,7 +106,11 @@ const navItems: NavItem[] = [
     icon: <ClipboardList size={20} />,
     soon: true,
   },
-  { labelKey: "app.menu.almacenes", icon: <Warehouse size={20} />, soon: true },
+  {
+    labelKey: "app.menu.almacenes",
+    icon: <Warehouse size={20} />,
+    path: "/stock-locations",
+  },
   {
     labelKey: "app.menu.usuarios",
     icon: <Users size={20} />,
