@@ -5,7 +5,6 @@ import {
   EditBase,
   required,
   useEditContext,
-  useGetOne,
   useSaveContext,
   useTranslate,
 } from "ra-core";
@@ -125,7 +124,7 @@ function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
         className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {mode === "edit" ? <EditLoading /> : <ProductFormFields mode={mode} />}
+          {mode === "edit" ? <EditLoading /> : <ProductFormFields />}
         </div>
       </SimpleForm>
     </>
@@ -136,35 +135,20 @@ function EditLoading() {
   const editContext = useEditContext();
   const isLoading = editContext?.isLoading ?? false;
 
-  return isLoading ? <FormSkeleton /> : <ProductFormFields mode="edit" />;
+  return isLoading ? <FormSkeleton /> : <ProductFormFields />;
 }
 
-function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
+function ProductFormFields() {
   const translate = useTranslate();
   const { setValue } = useFormContext();
   // Department is a client-side filter for the category dropdown only; it is not
-  // submitted (stripped by sanitizeProduct).
+  // submitted (stripped by sanitizeProduct). On edit it arrives pre-filled from
+  // the record — the API derives it from the category's parent department.
   const departmentId = useWatch({ name: "departmentId" });
-  const categoryId = useWatch({ name: "categoryId" });
 
-  // On edit the record has a category but no department. Derive the department
-  // from the category's parent so the category field starts enabled + filtered.
-  const derivingRef = useRef(false);
-  const { data: currentCategory } = useGetOne(
-    "categories",
-    { id: categoryId },
-    { enabled: mode === "edit" && !!categoryId && !departmentId },
-  );
-  useEffect(() => {
-    if (currentCategory?.parentId && !departmentId) {
-      derivingRef.current = true;
-      setValue("departmentId", currentCategory.parentId as string);
-    }
-  }, [currentCategory, departmentId, setValue]);
-
-  // When the user actually changes the department, clear the selected category
-  // (a category from another department must not be submitted). The edit-derive
-  // above is skipped via derivingRef so it doesn't wipe the loaded category.
+  // When the user changes the department, clear the selected category (a category
+  // from another department must not be submitted). The firstRun guard keeps the
+  // record's category on the initial load.
   const prevDept = useRef<string | undefined>(undefined);
   const firstRun = useRef(true);
   useEffect(() => {
@@ -175,10 +159,6 @@ function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
     }
     if (prevDept.current !== departmentId) {
       prevDept.current = departmentId;
-      if (derivingRef.current) {
-        derivingRef.current = false;
-        return;
-      }
       setValue("categoryId", undefined);
     }
   }, [departmentId, setValue]);
