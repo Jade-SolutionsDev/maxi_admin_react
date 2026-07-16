@@ -52,7 +52,7 @@ const sanitizeProduct = (data: Record<string, unknown>) => ({
   sku: (data.sku as string) || undefined,
   name: data.name,
   description: (data.description as string) || undefined,
-  imageUrl: data.imageUrl,
+  imageUrl: (data.imageUrl as string) || undefined,
   format: (data.format as string) || undefined,
   expiryDate: (data.expiryDate as string) || undefined,
   measureUnit: (data.measureUnit as string) || undefined,
@@ -165,10 +165,12 @@ function ProductFormFields() {
 
   return (
     <>
+      {/* TEMPORARY: image is optional until the Render file server is configured
+          — QA cannot upload yet. To restore: add back `validate={required()}`
+          here and `@IsNotEmpty()` on the backend CreateProductDto.imageUrl. */}
       <ImageUploadInput
         source="imageUrl"
         label={translate("list.fields.image")}
-        validate={required()}
       />
       <TextInput
         source="name"
