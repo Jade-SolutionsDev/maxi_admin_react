@@ -67,7 +67,6 @@ export default function UsersList() {
   return (
     <List
       filters={userFilters}
-      filterDefaultValues={{ includeInvitations: true }}
       actions={<UserActions />}
       resource="users"
       title={translate("resources.users.name_plural")}
