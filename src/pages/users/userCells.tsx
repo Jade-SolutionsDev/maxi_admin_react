@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { backendMessage } from "./errors";
 
 const StatusPill = ({ tone, labelKey, fallback }: {
-  tone: "amber" | "slate";
+  tone: "amber" | "slate" | "indigo";
   labelKey: string;
   fallback: string;
 }) => {
@@ -27,6 +27,8 @@ const StatusPill = ({ tone, labelKey, fallback }: {
           "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
         tone === "slate" &&
           "bg-slate-100 text-slate-600 dark:bg-slate-800/60 dark:text-slate-300",
+        tone === "indigo" &&
+          "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
       )}
     >
       {translate(labelKey, { _: fallback })}
@@ -89,6 +91,15 @@ export const StatusCell = () => {
   if (!record) return null;
   if (record.isPending) {
     return <StatusPill tone="amber" labelKey="users.status.pending" fallback="Pending" />;
+  }
+  if (record.isAwaitingApproval) {
+    return (
+      <StatusPill
+        tone="indigo"
+        labelKey="users.status.awaiting_approval"
+        fallback="Awaiting approval"
+      />
+    );
   }
   if (record.isDeleted) {
     return <StatusPill tone="slate" labelKey="users.status.deleted" fallback="Deleted" />;

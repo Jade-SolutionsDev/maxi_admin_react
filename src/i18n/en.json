@@ -84,7 +84,7 @@
       "all": "All",
       "active": "Active",
       "inactive": "Inactive",
-      "pending": "Pending",
+      "pending": "Awaiting approval",
       "status": "Status",
       "show_deleted": "Show deleted"
     },
@@ -117,6 +117,10 @@
       "resend_success": "Invitation resent",
       "revoke": "Revoke invitation",
       "revoke_success": "Invitation revoked",
+      "approve": "Approve",
+      "approve_success": "User approved",
+      "reject": "Reject",
+      "reject_success": "Request rejected",
       "restore": "Restore",
       "restore_success": "User restored",
       "enable": "Enable",
@@ -148,6 +152,7 @@
       "active": "Active",
       "inactive": "Inactive",
       "pending": "Pending",
+      "awaiting_approval": "Awaiting approval",
       "deleted": "Deleted"
     }
   },

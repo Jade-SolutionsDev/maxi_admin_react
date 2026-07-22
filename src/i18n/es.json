@@ -84,7 +84,7 @@
       "all": "Todos",
       "active": "Activos",
       "inactive": "Inactivos",
-      "pending": "Pendientes",
+      "pending": "Por aprobar",
       "status": "Estado",
       "show_deleted": "Mostrar eliminados"
     },
@@ -117,6 +117,10 @@
       "resend_success": "Invitación reenviada",
       "revoke": "Revocar invitación",
       "revoke_success": "Invitación revocada",
+      "approve": "Aprobar",
+      "approve_success": "Usuario aprobado",
+      "reject": "Rechazar",
+      "reject_success": "Solicitud rechazada",
       "restore": "Restaurar",
       "restore_success": "Usuario restaurado",
       "enable": "Activar",
@@ -148,6 +152,7 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "pending": "Pendiente",
+      "awaiting_approval": "Espera aprobación",
       "deleted": "Eliminado"
     }
   },

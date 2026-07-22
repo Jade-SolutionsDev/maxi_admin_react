@@ -8,9 +8,11 @@ import {
   useRefresh,
   useResourceContext,
   useTranslate,
+  useUpdate,
 } from "ra-core";
 import {
   AlertTriangle,
+  CheckCircle2,
   KeyRound,
   MailCheck,
   Pencil,
@@ -132,6 +134,79 @@ const InvitationActionsCell = () => {
             "Invitation revoked",
           )
         }
+      >
+        <XCircle size={16} />
+      </IconButton>
+    </div>
+  );
+};
+
+/** Actions for a registered user awaiting admin approval (`isAwaitingApproval`).
+ *  Approve enables the account (PATCH isActive) — first activation stamps
+ *  approvedAt on the backend; Reject soft-deletes the request. */
+const ApprovalActionsCell = () => {
+  const record = useRecordContext();
+  const resource = useResourceContext();
+  const translate = useTranslate();
+  const notify = useNotify();
+  const refresh = useRefresh();
+  const [update, { isPending: approving }] = useUpdate();
+  const [deleteOne, { isPending: rejecting }] = useDelete();
+  const busy = approving || rejecting;
+
+  if (!record) return null;
+
+  const approve = async () => {
+    try {
+      await update(
+        resource,
+        { id: record.id, data: { isActive: true }, previousData: record },
+        { mutationMode: "pessimistic" },
+      );
+      notify("users.actions.approve_success", {
+        type: "success",
+        messageArgs: { _: "User approved" },
+      });
+      refresh();
+    } catch (error) {
+      notify(backendMessage(error, "Could not approve user"), { type: "error" });
+      refresh();
+    }
+  };
+
+  const reject = async () => {
+    try {
+      await deleteOne(
+        resource,
+        { id: record.id, previousData: record },
+        { mutationMode: "pessimistic" },
+      );
+      notify("users.actions.reject_success", {
+        type: "success",
+        messageArgs: { _: "Request rejected" },
+      });
+      refresh();
+    } catch (error) {
+      notify(backendMessage(error, "Could not reject user"), { type: "error" });
+      refresh();
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-1">
+      <IconButton
+        label={translate("users.actions.approve", { _: "Approve" })}
+        className="text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+        disabled={busy}
+        onClick={approve}
+      >
+        <CheckCircle2 size={16} />
+      </IconButton>
+      <IconButton
+        label={translate("users.actions.reject", { _: "Reject" })}
+        className="text-destructive hover:bg-destructive/10"
+        disabled={busy}
+        onClick={reject}
       >
         <XCircle size={16} />
       </IconButton>
@@ -336,6 +411,9 @@ export const UserActionsCell = () => {
   const record = useRecordContext();
   if (record?.isPending) {
     return <InvitationActionsCell />;
+  }
+  if (record?.isAwaitingApproval) {
+    return <ApprovalActionsCell />;
   }
   if (record?.isDeleted) {
     return (
