@@ -127,7 +127,10 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
   const hasDashboard = useHasDashboard();
 
   return (
-    <>
+    // Fill the viewport (minus topbar + page padding) so the table scrolls
+    // internally and the pagination stays pinned in view. min-w-0 lets the wide
+    // table scroll sideways on its own instead of pushing the whole page.
+    <div className="flex flex-col min-w-0 h-[calc(100svh-7rem)] lg:h-[calc(100svh-8rem)]">
       {!disableBreadcrumb && (
         <Breadcrumb>
           {hasDashboard && (
@@ -156,10 +159,17 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
         </div>
         <FilterForm />
 
-        <div className={cn("my-2", props.className)}>{children}</div>
+        <div
+          className={cn(
+            "my-2 flex flex-1 min-h-0 min-w-0 flex-col",
+            props.className,
+          )}
+        >
+          {children}
+        </div>
         {pagination}
       </FilterContext.Provider>
-    </>
+    </div>
   );
 };
 
