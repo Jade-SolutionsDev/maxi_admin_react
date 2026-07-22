@@ -127,10 +127,13 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
   const hasDashboard = useHasDashboard();
 
   return (
-    // Fill the viewport (minus topbar + page padding) so the table scrolls
-    // internally and the pagination stays pinned in view. min-w-0 lets the wide
-    // table scroll sideways on its own instead of pushing the whole page.
-    <div className="flex flex-col min-w-0 h-[calc(100svh-7rem)] lg:h-[calc(100svh-8rem)]">
+    // Grow with content up to the viewport (minus topbar + page padding): a
+    // short list stays card-sized, a long one caps here and scrolls internally
+    // while the pagination stays pinned in view. flex-auto (not flex-1) keeps
+    // the table at its content height until the cap is hit — flex-1's 0 basis
+    // would collapse it in this auto-height column. min-w-0 lets the wide table
+    // scroll sideways on its own instead of pushing the whole page.
+    <div className="flex flex-col min-w-0 max-h-[calc(100svh-7rem)] lg:max-h-[calc(100svh-8rem)]">
       {!disableBreadcrumb && (
         <Breadcrumb>
           {hasDashboard && (
@@ -161,7 +164,7 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
 
         <div
           className={cn(
-            "my-2 flex flex-1 min-h-0 min-w-0 flex-col",
+            "my-2 flex flex-auto min-h-0 min-w-0 flex-col",
             props.className,
           )}
         >
