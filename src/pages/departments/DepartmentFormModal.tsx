@@ -132,7 +132,7 @@ function DepartmentFormFields() {
         label={translate("list.fields.name")}
         validate={required()}
       />
-      <TextInput source="slug" label={translate("list.fields.slug")} />
+      {/* Slug temporarily hidden — auto-generated from the name on the backend. */}
       <TextInput
         source="description"
         label={translate("list.fields.description")}

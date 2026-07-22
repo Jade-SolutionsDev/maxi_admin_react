@@ -212,6 +212,7 @@ export default function DepartmentsList() {
           "parentId",
           "deletedAt",
           "updatedAt",
+          "slug",
         ]}
       >
         <DataTable.Col

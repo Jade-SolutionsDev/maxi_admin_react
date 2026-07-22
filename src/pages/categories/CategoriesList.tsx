@@ -215,7 +215,7 @@ export default function CategoriesList() {
       perPage={10}
     >
       <DataTable
-        hiddenColumns={["id", "parentId", "deletedAt"]}
+        hiddenColumns={["id", "parentId", "deletedAt", "slug"]}
       >
         <DataTable.Col
           label="resources.departments.name"
