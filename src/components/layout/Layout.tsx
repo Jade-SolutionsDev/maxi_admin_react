@@ -32,7 +32,7 @@ function LayoutContent({ children }: LayoutProps) {
         breadcrumb={pageInfo.breadcrumb}
         onMenuClick={toggleSidebar}
       />
-      <div className="p-6 lg:p-8">{children}</div>
+      <div className="p-6 lg:p-8 lg:pb-7">{children}</div>
     </SidebarInset>
   );
 }
