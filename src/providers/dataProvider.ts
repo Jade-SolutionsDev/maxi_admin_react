@@ -79,14 +79,20 @@ function toQueryString(filter: Record<string, unknown>): string {
  * The API wraps every response as `{ data }`; `fetchJson` returns that as
  * `json`, so the payload lives at `json.data`. List endpoints come in two
  * shapes: paginated (`{ data: { data: [...], meta } }`, e.g. GET /users) and
- * flat (`{ data: [...] }`, e.g. clients/products). Handle both.
+ * flat (`{ data: [...] }`, e.g. clients/products). `serverPaginated` tells
+ * getList whether the backend already applied paging/sorting (use as-is) or
+ * returned the full list (page + sort on the client — see getList).
  */
-function unwrapList(json: unknown): { rows: unknown[]; total: number } {
+function unwrapList(json: unknown): {
+  rows: unknown[];
+  total: number;
+  serverPaginated: boolean;
+} {
   const body = json as { data?: unknown } | unknown[] | null;
   const payload = Array.isArray(body) ? body : (body?.data ?? body);
 
   if (Array.isArray(payload)) {
-    return { rows: payload, total: payload.length };
+    return { rows: payload, total: payload.length, serverPaginated: false };
   }
 
   const paginated = payload as {
@@ -98,11 +104,47 @@ function unwrapList(json: unknown): { rows: unknown[]; total: number } {
     return {
       rows: paginated.data,
       total: paginated.meta.total ?? paginated.data.length,
+      serverPaginated: true,
     };
   }
 
   const rows = (paginated?.data as unknown[] | undefined) ?? [];
-  return { rows, total: rows.length };
+  return { rows, total: rows.length, serverPaginated: false };
+}
+
+/**
+ * Client-side sort for endpoints that return the whole list unsorted (the
+ * backend keeps the catalog small and returns everything). Compares numbers,
+ * booleans, numeric strings and ISO dates sensibly; `id`/no field keeps the
+ * server's own order (react-admin's default sort sentinel is `id`).
+ */
+function sortRecords(
+  rows: unknown[],
+  field: string,
+  order: "ASC" | "DESC",
+): unknown[] {
+  if (!field || field === "id") return rows;
+  const dir = order === "DESC" ? -1 : 1;
+  const get = (r: unknown) => (r as Record<string, unknown>)?.[field];
+  return [...rows].sort((a, b) => {
+    const av = get(a);
+    const bv = get(b);
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1; // nulls last
+    if (bv == null) return -1;
+    if (typeof av === "boolean" || typeof bv === "boolean") {
+      return (Number(av) - Number(bv)) * dir;
+    }
+    const an = typeof av === "number" ? av : Number(av);
+    const bn = typeof bv === "number" ? bv : Number(bv);
+    const numeric =
+      !Number.isNaN(an) &&
+      !Number.isNaN(bn) &&
+      String(av).trim() !== "" &&
+      String(bv).trim() !== "";
+    if (numeric) return (an - bn) * dir;
+    return String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir;
+  });
 }
 
 function unwrapOne(json: unknown): unknown {
@@ -124,8 +166,21 @@ export const dataProvider: DataProvider = {
     });
 
     const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
-    const { rows, total } = unwrapList(json);
-    return { data: rows as never[], total };
+    const { rows, total, serverPaginated } = unwrapList(json);
+
+    // Server already paged/sorted (e.g. users) → use as-is.
+    if (serverPaginated) {
+      return { data: rows as never[], total };
+    }
+
+    // Backend returned the full list → sort + slice on the client so the
+    // pagination controls and column sorting actually work.
+    const sorted = sortRecords(rows, field, order);
+    const start = (page - 1) * perPage;
+    return {
+      data: sorted.slice(start, start + perPage) as never[],
+      total: sorted.length,
+    };
   },
 
   async getOne(resource, params) {

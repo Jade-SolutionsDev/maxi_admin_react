@@ -349,11 +349,7 @@ export default function ProductsList() {
         >
           <ReferenceField source="categoryId" reference="categories" />
         </DataTable.Col>
-        <DataTable.Col
-          source="measureUnit"
-          label="list.fields.measureUnit"
-          disableSort
-        />
+        <DataTable.Col source="measureUnit" label="list.fields.measureUnit" />
         <DataTable.NumberCol
           source="basePrice"
           label="list.fields.basePrice"
@@ -363,7 +359,6 @@ export default function ProductsList() {
         <DataTable.Col
           source="discount"
           label="list.fields.discount"
-          disableSort
           render={DiscountCell}
         />
         <DataTable.NumberCol
@@ -375,7 +370,7 @@ export default function ProductsList() {
         <DataTable.Col source="featured" label="list.fields.featured">
           <BooleanField source="featured" />
         </DataTable.Col>
-        <DataTable.Col source="isActive" label="list.fields.isActive" disableSort>
+        <DataTable.Col source="isActive" label="list.fields.isActive">
           <ProductStatusToggle />
         </DataTable.Col>
         <DataTable.Col
