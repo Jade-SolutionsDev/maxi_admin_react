@@ -307,9 +307,9 @@
       "description": "No invitation ticket was found. Contact the administrator."
     },
     "success": {
-      "title": "Account Created!",
-      "description": "Your account has been activated successfully.",
-      "description_credentials": "You will receive your access credentials by email shortly."
+      "title": "Registration complete!",
+      "description": "Your account needs one more confirmation step before you can sign in.",
+      "description_credentials": "An administrator will review it shortly. You can wait for approval or contact the platform administrators if you need more information."
     },
     "form": {
       "avatar": "Photo",

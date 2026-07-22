@@ -4,7 +4,7 @@ import {
   Building2,
   Camera,
   AlertCircle,
-  CheckCircle2,
+  Clock,
   Upload,
   X,
   Lock,
@@ -97,8 +97,8 @@ export function SuccessScreen({ flow }: { flow: InvitationFlow }) {
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-[400px]">
         <CardContent className="pt-8 text-center">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-primary/10">
-            <CheckCircle2 className="h-8 w-8 text-primary" />
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-amber-100 dark:bg-amber-900/30">
+            <Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
           </div>
           <CardTitle className="text-xl mb-2">
             {translate("invitation.success.title")}

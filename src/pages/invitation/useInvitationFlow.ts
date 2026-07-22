@@ -157,17 +157,11 @@ export function useInvitationFlow() {
         return;
       }
 
-      // Activate the new session, then leave the invite page.
-      await signUp.finalize({
-        navigate: ({ session, decorateUrl }) => {
-          if (session?.currentTask) {
-            // Pending session tasks (e.g. org selection) are out of scope here.
-            return;
-          }
-          navigate(decorateUrl("/"), { replace: true });
-        },
-      });
-
+      // Account created — the backoffice webhook provisions a DISABLED local
+      // user, pending admin approval. Do NOT activate a session: signing the
+      // new user in would immediately bounce off the auth wall (/api/auth/me →
+      // 401 → logout). Show the pending-approval screen instead; the user signs
+      // in normally once an admin approves them.
       setIsSuccess(true);
     } catch (err) {
       setError(

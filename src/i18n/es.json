@@ -307,9 +307,9 @@
       "description": "No se encontró ticket de invitación. Contacta al administrador."
     },
     "success": {
-      "title": "¡Cuenta Creada!",
-      "description": "Tu cuenta ha sido activada exitosamente.",
-      "description_credentials": "Recibirás tus credenciales de acceso por correo electrónico en breve."
+      "title": "¡Registro completado!",
+      "description": "Tu cuenta requiere un paso de confirmación adicional antes de que puedas acceder.",
+      "description_credentials": "Un administrador la revisará pronto. Puedes esperar la aprobación o contactar a los administradores de la plataforma si necesitas más información."
     },
     "form": {
       "avatar": "Foto",
