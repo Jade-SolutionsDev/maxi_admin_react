@@ -175,6 +175,19 @@ export const dataProvider: DataProvider = {
 
     // Backend returned the full list → sort + slice on the client so the
     // pagination controls and column sorting actually work.
+    //
+    // SCALABILITY: this refetches the entire list on every page/sort change. It
+    // is intentional while every catalog here is small. When a resource becomes
+    // high-load / large, move THAT resource to server-side paging so only one
+    // page crosses the wire. Transition recipe:
+    //   1. Backend: have the list endpoint return `{ data, meta:{ total, ... } }`
+    //      via `src/common/dto/pagination.dto.ts` (`GET /users` is the template),
+    //      applying LIMIT/OFFSET + ORDER BY + getManyAndCount for page/limit/
+    //      sortBy/sortOrder — AND add an `id` (comma-list) filter so this
+    //      provider's getMany/getManyReference + <ReferenceField>/dropdowns keep
+    //      resolving records beyond the first page.
+    //   2. Frontend: nothing — unwrapList already detects the `{ data, meta }`
+    //      shape (serverPaginated) and this branch is skipped automatically.
     const sorted = sortRecords(rows, field, order);
     const start = (page - 1) * perPage;
     return {
