@@ -74,6 +74,7 @@
       "discount": "Descuento",
       "format": "Formato",
       "measureUnit": "Unidad de medida",
+      "totalStock": "Existencia total",
       "expiryDate": "Fecha de vencimiento",
       "minPrice": "Precio mín.",
       "maxPrice": "Precio máx."
@@ -342,6 +343,16 @@
       "missing_fields": "Faltan datos para completar el registro: %{fields}.",
       "incomplete_status": "No se pudo completar el registro (estado: %{status}).",
       "generic": "Error al activar la cuenta. Intenta nuevamente."
+    }
+  },
+  "products": {
+    "tabs": {
+      "details": "Detalles",
+      "stock": "Existencias por almacén"
+    },
+    "stock": {
+      "empty_title": "Sin existencias",
+      "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."
     }
   },
   "stockLocations": {
