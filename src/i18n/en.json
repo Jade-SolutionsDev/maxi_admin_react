@@ -74,6 +74,7 @@
       "discount": "Discount",
       "format": "Format",
       "measureUnit": "Unit of measure",
+      "totalStock": "Total stock",
       "expiryDate": "Expiry date",
       "minPrice": "Min price",
       "maxPrice": "Max price"
@@ -342,6 +343,16 @@
       "missing_fields": "Missing data to complete the registration: %{fields}.",
       "incomplete_status": "The registration could not be completed (status: %{status}).",
       "generic": "Error activating the account. Please try again."
+    }
+  },
+  "products": {
+    "tabs": {
+      "details": "Details",
+      "stock": "Stock by storage"
+    },
+    "stock": {
+      "empty_title": "No stock",
+      "empty_hint": "This product has no stock recorded in any storage."
     }
   },
   "stockLocations": {

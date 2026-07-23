@@ -19,6 +19,13 @@ export interface RoleSummary {
 
 export type InventoryOperationType = "IN" | "OUT" | "TRANSFER";
 
+export interface ProductStockLocation {
+  locationId: string;
+  locationName: string;
+  provinces: string[];
+  quantity: number;
+}
+
 export interface CreateInventoryOperationPayload {
   locationId: string;
   type: InventoryOperationType;
@@ -38,6 +45,9 @@ export interface ExtendedDataProvider extends DataProvider {
   createInventoryOperation: (
     payload: CreateInventoryOperationPayload,
   ) => Promise<{ data: unknown }>;
+  getProductStock: (
+    productId: string,
+  ) => Promise<{ data: ProductStockLocation[] }>;
 }
 
 // The managed-roles resource lives under the nested /permissions route.
@@ -353,5 +363,13 @@ export const dataProvider: DataProvider = {
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
+  },
+
+  async getProductStock(productId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/inventory/product/${productId}`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as ProductStockLocation[] };
   },
 } as ExtendedDataProvider;
