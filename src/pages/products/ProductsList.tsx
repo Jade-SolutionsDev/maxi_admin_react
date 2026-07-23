@@ -126,9 +126,9 @@ const ProductThumb = (record: RaRecord) => {
 const ProductNameCell = (record: RaRecord) => (
   <div className="min-w-40">
     <p className="font-medium text-foreground">{record.name as string}</p>
-    {record.sku ? (
+    {/* {record.sku ? (
       <p className="text-xs text-muted-foreground">{record.sku as string}</p>
-    ) : null}
+    ) : null} */}
   </div>
 );
 
