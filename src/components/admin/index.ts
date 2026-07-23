@@ -6,6 +6,7 @@ export * from "./badge-field";
 export * from "./boolean-field";
 export * from "./boolean-input";
 export * from "./columns-button";
+export * from "./confirm-toggle-field";
 export * from "./create-button";
 export * from "./data-table";
 export * from "./date-field";

@@ -171,7 +171,19 @@
       "cancel": "Cancelar",
       "confirm": "Eliminar",
       "back": "Volver",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "confirm_action": "Confirmar",
+      "error": "No se pudo aplicar el cambio",
+      "toggle_active": {
+        "title": "Cambiar estado",
+        "enable": "¿Activar «%{name}»? Volverá a estar disponible.",
+        "disable": "¿Desactivar «%{name}»? Dejará de mostrarse en la tienda."
+      },
+      "toggle_featured": {
+        "title": "Cambiar destacado",
+        "enable": "¿Marcar «%{name}» como destacado?",
+        "disable": "¿Quitar «%{name}» de los destacados?"
+      }
     },
     "upload": {
       "choose": "Subir imagen",
@@ -432,6 +444,16 @@
       "add_product": "Agregar otro producto",
       "confirm": "Confirmar operación",
       "success": "Operación registrada"
+    }
+  },
+  "departments": {
+    "errors": {
+      "delete_conflict": "No se puede eliminar: el departamento tiene categorías asociadas."
+    }
+  },
+  "categories": {
+    "errors": {
+      "delete_conflict": "No se puede eliminar: la categoría tiene productos asociados."
     }
   }
 }

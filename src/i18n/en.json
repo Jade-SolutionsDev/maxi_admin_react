@@ -171,7 +171,19 @@
       "cancel": "Cancel",
       "confirm": "Delete",
       "back": "Back",
-      "continue": "Continue"
+      "continue": "Continue",
+      "confirm_action": "Confirm",
+      "error": "Could not apply the change",
+      "toggle_active": {
+        "title": "Change status",
+        "enable": "Activate “%{name}”? It will be available again.",
+        "disable": "Deactivate “%{name}”? It will stop showing in the storefront."
+      },
+      "toggle_featured": {
+        "title": "Change featured",
+        "enable": "Mark “%{name}” as featured?",
+        "disable": "Remove “%{name}” from featured?"
+      }
     },
     "upload": {
       "choose": "Upload image",
@@ -432,6 +444,16 @@
       "add_product": "Add another product",
       "confirm": "Confirm operation",
       "success": "Operation recorded"
+    }
+  },
+  "departments": {
+    "errors": {
+      "delete_conflict": "Cannot delete: the department still has categories."
+    }
+  },
+  "categories": {
+    "errors": {
+      "delete_conflict": "Cannot delete: the category still has products."
     }
   }
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   useCanAccess,
   useDelete,
+  useNotify,
   useRecordContext,
   useRefresh,
   useResourceContext,
@@ -11,8 +12,8 @@ import { AlertTriangle, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import {
-  BooleanField,
   ColumnsButton,
+  ConfirmToggleField,
   CreateButton,
   DataTable,
   DateField,
@@ -74,6 +75,7 @@ const CategoryDeleteButton = () => {
   const resource = useResourceContext();
   const translate = useTranslate();
   const refresh = useRefresh();
+  const notify = useNotify();
   const [open, setOpen] = useState(false);
 
   const [deleteOne, { isPending }] = useDelete(resource, {
@@ -93,8 +95,17 @@ const CategoryDeleteButton = () => {
           setOpen(false);
           refresh();
         },
-        onError: () => {
+        // The backend rejects deleting a category that still has products
+        // (409). Surface that instead of silently closing the dialog.
+        onError: (error: unknown) => {
           setOpen(false);
+          const status = (error as { status?: number })?.status;
+          notify(
+            status === 409
+              ? "categories.errors.delete_conflict"
+              : "shared.actions.error",
+            { type: "error" },
+          );
         },
       },
     );
@@ -129,6 +140,7 @@ const CategoryDeleteButton = () => {
           </div>
           <AlertDialogTitle className="text-center sm:text-left text-lg">
             {translate("shared.actions.delete_confirm_title", {
+              name: translate("resources.categories.name", { _: "category" }),
               _: "Delete category",
             })}
           </AlertDialogTitle>
@@ -238,7 +250,11 @@ export default function CategoriesList() {
           disableSort
         />
         <DataTable.Col source="isActive" label="list.fields.isActive">
-          <BooleanField source="isActive" />
+          <ConfirmToggleField
+            source="isActive"
+            labelKey="list.fields.isActive"
+            confirmKey="shared.actions.toggle_active"
+          />
         </DataTable.Col>
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
