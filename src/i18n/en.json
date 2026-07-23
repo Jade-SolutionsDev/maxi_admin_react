@@ -362,6 +362,24 @@
       "details": "Details",
       "stock": "Stock by storage"
     },
+    "toggles": {
+      "isActive": {
+        "on_title": "Activate product?",
+        "on_desc": "\"%{name}\" will be available on the platform again.",
+        "on_cta": "Activate",
+        "off_title": "Deactivate product?",
+        "off_desc": "\"%{name}\" will no longer be available on the platform.",
+        "off_cta": "Deactivate"
+      },
+      "featured": {
+        "on_title": "Feature product?",
+        "on_desc": "\"%{name}\" will be shown among the featured products.",
+        "on_cta": "Feature",
+        "off_title": "Remove from featured?",
+        "off_desc": "\"%{name}\" will no longer be shown among the featured products.",
+        "off_cta": "Remove"
+      }
+    },
     "stock": {
       "empty_title": "No stock",
       "empty_hint": "This product has no stock recorded in any storage."
