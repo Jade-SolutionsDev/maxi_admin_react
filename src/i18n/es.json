@@ -158,9 +158,12 @@
     },
     "confirm": {
       "toggle_active": {
-        "title": "Cambiar estado del usuario",
-        "enable": "¿Activar a «%{name}»? Podrá volver a acceder a la plataforma.",
-        "disable": "¿Desactivar a «%{name}»? Perderá el acceso a la plataforma."
+        "on_title": "¿Activar usuario?",
+        "on_desc": "«%{name}» podrá volver a acceder a la plataforma.",
+        "on_cta": "Activar",
+        "off_title": "¿Desactivar usuario?",
+        "off_desc": "«%{name}» perderá el acceso a la plataforma.",
+        "off_cta": "Desactivar"
       },
       "approve": {
         "title": "Aprobar usuario",
@@ -198,14 +201,20 @@
       "confirm_action": "Confirmar",
       "error": "No se pudo aplicar el cambio",
       "toggle_active": {
-        "title": "Cambiar estado",
-        "enable": "¿Activar «%{name}»? Volverá a estar disponible.",
-        "disable": "¿Desactivar «%{name}»? Dejará de mostrarse en la tienda."
+        "on_title": "¿Activar?",
+        "on_desc": "«%{name}» volverá a estar disponible.",
+        "on_cta": "Activar",
+        "off_title": "¿Desactivar?",
+        "off_desc": "«%{name}» dejará de mostrarse en la tienda.",
+        "off_cta": "Desactivar"
       },
       "toggle_featured": {
-        "title": "Cambiar destacado",
-        "enable": "¿Marcar «%{name}» como destacado?",
-        "disable": "¿Quitar «%{name}» de los destacados?"
+        "on_title": "¿Destacar?",
+        "on_desc": "«%{name}» se mostrará entre los destacados.",
+        "on_cta": "Destacar",
+        "off_title": "¿Quitar de destacados?",
+        "off_desc": "«%{name}» dejará de mostrarse entre los destacados.",
+        "off_cta": "Quitar"
       }
     },
     "upload": {

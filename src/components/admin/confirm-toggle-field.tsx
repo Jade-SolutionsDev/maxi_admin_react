@@ -23,11 +23,16 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ConfirmToggleFieldProps {
-  /** Boolean field on the record, e.g. "isActive" / "isFeatured". */
+  /** Boolean field on the record, e.g. "isActive" / "featured". */
   source: string;
   /** i18n key for the switch aria-label. */
   labelKey: string;
-  /** i18n prefix providing `.title`, `.enable` and `.disable`. */
+  /**
+   * i18n prefix providing per-direction copy:
+   * `on_title` / `on_desc` / `on_cta` and the `off_*` variants.
+   * `*_desc` receives the record name as `%{name}`; `*_cta` falls back to the
+   * generic confirm label when a resource doesn't need a specific verb.
+   */
   confirmKey: string;
 }
 
@@ -51,6 +56,9 @@ export const ConfirmToggleField = ({
 
   if (!record) return null;
   const checked = record[source] === true;
+  // Direction being confirmed. Falls back to the direction a click *would*
+  // take, so the copy stays stable while the dialog animates closed.
+  const dir: "on" | "off" = (nextValue ?? !checked) ? "on" : "off";
   // Catalog rows carry `name`; users carry first/last name or an email.
   const displayName =
     (record.name as string) ||
@@ -96,11 +104,12 @@ export const ConfirmToggleField = ({
       <AlertDialogContent className="sm:max-w-md">
         <AlertDialogHeader className="space-y-3">
           <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {translate(`${confirmKey}.title`)}
+            {translate(`${confirmKey}.${dir}_title`, { _: "Confirm change" })}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center sm:text-left">
-            {translate(`${confirmKey}.${nextValue ? "enable" : "disable"}`, {
+            {translate(`${confirmKey}.${dir}_desc`, {
               name: displayName,
+              _: "Are you sure you want to apply this change?",
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -115,7 +124,11 @@ export const ConfirmToggleField = ({
           >
             {isPending
               ? translate("ra.action.loading", { _: "Saving…" })
-              : translate("shared.actions.confirm_action", { _: "Confirm" })}
+              : translate(`${confirmKey}.${dir}_cta`, {
+                  _: translate("shared.actions.confirm_action", {
+                    _: "Confirm",
+                  }),
+                })}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

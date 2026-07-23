@@ -158,9 +158,12 @@
     },
     "confirm": {
       "toggle_active": {
-        "title": "Change user status",
-        "enable": "Activate “%{name}”? They will regain access to the platform.",
-        "disable": "Deactivate “%{name}”? They will lose access to the platform."
+        "on_title": "Activate user?",
+        "on_desc": "“%{name}” will regain access to the platform.",
+        "on_cta": "Activate",
+        "off_title": "Deactivate user?",
+        "off_desc": "“%{name}” will lose access to the platform.",
+        "off_cta": "Deactivate"
       },
       "approve": {
         "title": "Approve user",
@@ -198,14 +201,20 @@
       "confirm_action": "Confirm",
       "error": "Could not apply the change",
       "toggle_active": {
-        "title": "Change status",
-        "enable": "Activate “%{name}”? It will be available again.",
-        "disable": "Deactivate “%{name}”? It will stop showing in the storefront."
+        "on_title": "Activate?",
+        "on_desc": "“%{name}” will be available again.",
+        "on_cta": "Activate",
+        "off_title": "Deactivate?",
+        "off_desc": "“%{name}” will stop showing in the storefront.",
+        "off_cta": "Deactivate"
       },
       "toggle_featured": {
-        "title": "Change featured",
-        "enable": "Mark “%{name}” as featured?",
-        "disable": "Remove “%{name}” from featured?"
+        "on_title": "Feature?",
+        "on_desc": "“%{name}” will show among the featured items.",
+        "on_cta": "Feature",
+        "off_title": "Remove from featured?",
+        "off_desc": "“%{name}” will stop showing among the featured items.",
+        "off_cta": "Remove"
       }
     },
     "upload": {
