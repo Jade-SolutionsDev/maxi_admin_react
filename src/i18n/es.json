@@ -350,6 +350,24 @@
       "details": "Detalles",
       "stock": "Existencias por almacén"
     },
+    "toggles": {
+      "isActive": {
+        "on_title": "¿Activar producto?",
+        "on_desc": "\"%{name}\" volverá a estar disponible en la plataforma.",
+        "on_cta": "Activar",
+        "off_title": "¿Desactivar producto?",
+        "off_desc": "\"%{name}\" dejará de estar disponible en la plataforma.",
+        "off_cta": "Desactivar"
+      },
+      "featured": {
+        "on_title": "¿Destacar producto?",
+        "on_desc": "\"%{name}\" se mostrará entre los productos destacados.",
+        "on_cta": "Destacar",
+        "off_title": "¿Quitar de destacados?",
+        "off_desc": "\"%{name}\" dejará de mostrarse entre los productos destacados.",
+        "off_cta": "Quitar"
+      }
+    },
     "stock": {
       "empty_title": "Sin existencias",
       "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."

@@ -13,7 +13,6 @@ import { AlertTriangle, ImageOff, Pencil, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import {
-  BooleanField,
   ColumnsButton,
   CreateButton,
   DataTable,
@@ -141,8 +140,46 @@ const DiscountCell = (record: RaRecord) => {
   );
 };
 
-/** Inline enable/disable switch that PATCHes `isActive`; read-only without edit access. */
-const ProductStatusToggle = () => {
+// Fallback copy per field + direction, so the confirm dialog reads naturally
+// even before the i18n keys resolve. `source` is both the record key and the
+// PATCH body key (the API takes `featured` / `isActive`).
+type ToggleSource = "isActive" | "featured";
+const TOGGLE_FALLBACKS: Record<
+  ToggleSource,
+  Record<"on" | "off", { title: string; desc: string; cta: string }>
+> = {
+  isActive: {
+    on: {
+      title: "¿Activar producto?",
+      desc: '"%{name}" volverá a estar disponible en la plataforma.',
+      cta: "Activar",
+    },
+    off: {
+      title: "¿Desactivar producto?",
+      desc: '"%{name}" dejará de estar disponible en la plataforma.',
+      cta: "Desactivar",
+    },
+  },
+  featured: {
+    on: {
+      title: "¿Destacar producto?",
+      desc: '"%{name}" se mostrará entre los productos destacados.',
+      cta: "Destacar",
+    },
+    off: {
+      title: "¿Quitar de destacados?",
+      desc: '"%{name}" dejará de mostrarse entre los productos destacados.',
+      cta: "Quitar",
+    },
+  },
+};
+
+/**
+ * Inline switch that PATCHes a boolean field after an explicit confirmation.
+ * The switch only moves once the update lands (no optimistic flip), and is
+ * read-only without edit access.
+ */
+const ProductToggleCell = ({ source }: { source: ToggleSource }) => {
   const record = useRecordContext();
   const resource = useResourceContext();
   const notify = useNotify();
@@ -153,15 +190,23 @@ const ProductStatusToggle = () => {
     action: "edit",
   });
   const [update, { isPending }] = useUpdate();
+  // Non-null while the confirmation dialog is open; holds the requested value.
+  const [pending, setPending] = useState<boolean | null>(null);
 
   if (!record) return null;
-  const checked = record.isActive === true;
+  const checked = record[source] === true;
+  const dir: "on" | "off" = (pending ?? !checked) ? "on" : "off";
+  const copy = TOGGLE_FALLBACKS[source][dir];
+  const name = (record.name as string) || "";
 
-  const handleChange = async (value: boolean) => {
+  const handleConfirm = async () => {
+    const value = pending;
+    setPending(null);
+    if (value === null) return;
     try {
       await update(
         resource,
-        { id: record.id, data: { isActive: value }, previousData: record },
+        { id: record.id, data: { [source]: value }, previousData: record },
         { mutationMode: "pessimistic" },
       );
       refresh();
@@ -175,12 +220,45 @@ const ProductStatusToggle = () => {
   };
 
   return (
-    <Switch
-      checked={checked}
-      onCheckedChange={handleChange}
-      disabled={!canEdit || isPending}
-      aria-label={translate("list.fields.isActive")}
-    />
+    <>
+      <Switch
+        checked={checked}
+        onCheckedChange={(value) => setPending(value)}
+        disabled={!canEdit || isPending}
+        aria-label={translate(`list.fields.${source}`)}
+      />
+
+      <AlertDialog
+        open={pending !== null}
+        onOpenChange={(open) => !open && setPending(null)}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {translate(`products.toggles.${source}.${dir}_title`, {
+                _: copy.title,
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {translate(`products.toggles.${source}.${dir}_desc`, {
+                name,
+                _: copy.desc,
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-end">
+            <AlertDialogCancel disabled={isPending}>
+              {translate("shared.actions.cancel", { _: "Cancelar" })}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} disabled={isPending}>
+              {translate(`products.toggles.${source}.${dir}_cta`, {
+                _: copy.cta,
+              })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
@@ -368,10 +446,10 @@ export default function ProductsList() {
           locales={'en-US'}
         />
         <DataTable.Col source="featured" label="list.fields.featured">
-          <BooleanField source="featured" />
+          <ProductToggleCell source="featured" />
         </DataTable.Col>
         <DataTable.Col source="isActive" label="list.fields.isActive">
-          <ProductStatusToggle />
+          <ProductToggleCell source="isActive" />
         </DataTable.Col>
         <DataTable.Col
           label="list.fields.actions"
