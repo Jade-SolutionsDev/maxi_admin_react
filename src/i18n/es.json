@@ -155,6 +155,29 @@
       "pending": "Pendiente",
       "awaiting_approval": "Espera aprobación",
       "deleted": "Eliminado"
+    },
+    "confirm": {
+      "toggle_active": {
+        "title": "Cambiar estado del usuario",
+        "enable": "¿Activar a «%{name}»? Podrá volver a acceder a la plataforma.",
+        "disable": "¿Desactivar a «%{name}»? Perderá el acceso a la plataforma."
+      },
+      "approve": {
+        "title": "Aprobar usuario",
+        "description": "¿Aprobar a «%{name}»? Podrá iniciar sesión y acceder a la plataforma."
+      },
+      "reject": {
+        "title": "Rechazar solicitud",
+        "description": "¿Rechazar a «%{name}»? No podrá acceder. Podrás restaurarlo luego desde «Mostrar eliminados»."
+      },
+      "resend": {
+        "title": "Reenviar invitación",
+        "description": "¿Enviar de nuevo la invitación a %{email}?"
+      },
+      "revoke": {
+        "title": "Revocar invitación",
+        "description": "¿Revocar la invitación de %{email}? El enlace dejará de ser válido."
+      }
     }
   },
   "shared": {

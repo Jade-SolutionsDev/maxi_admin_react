@@ -1,17 +1,9 @@
-import {
-  useNotify,
-  useRecordContext,
-  useRefresh,
-  useResourceContext,
-  useTranslate,
-  useUpdate,
-} from "ra-core";
+import { useRecordContext, useTranslate } from "ra-core";
 import { User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
+import { ConfirmToggleField } from "@/components/admin/confirm-toggle-field";
 import { cn } from "@/lib/utils";
-import { backendMessage } from "./errors";
 
 const StatusPill = ({ tone, labelKey, fallback }: {
   tone: "amber" | "slate" | "indigo";
@@ -36,46 +28,24 @@ const StatusPill = ({ tone, labelKey, fallback }: {
   );
 };
 
-/** Inline enable/disable switch that PATCHes `isActive` on the user. */
+/**
+ * Enable/disable switch. Confirmation + the PATCH itself live in the shared
+ * ConfirmToggleField (same flow as the catalog lists); the label beside it just
+ * mirrors the current state.
+ */
 const ActiveToggle = () => {
   const record = useRecordContext();
-  const resource = useResourceContext();
-  const notify = useNotify();
-  const refresh = useRefresh();
   const translate = useTranslate();
-  const [update, { isPending }] = useUpdate();
 
   if (!record) return null;
   const checked = record.isActive === true;
 
-  const handleChange = async (value: boolean) => {
-    try {
-      await update(
-        resource,
-        { id: record.id, data: { isActive: value }, previousData: record },
-        { mutationMode: "pessimistic" },
-      );
-      notify(value ? "users.actions.enable_success" : "users.actions.disable_success", {
-        type: "success",
-        messageArgs: { _: value ? "User enabled" : "User disabled" },
-      });
-      refresh();
-    } catch (error) {
-      notify(backendMessage(error, "Could not update user"), { type: "error" });
-      refresh();
-    }
-  };
-
   return (
     <div className="flex items-center gap-2">
-      <Switch
-        checked={checked}
-        onCheckedChange={handleChange}
-        disabled={isPending}
-        aria-label={translate(
-          checked ? "users.actions.disable" : "users.actions.enable",
-          { _: checked ? "Disable" : "Enable" },
-        )}
+      <ConfirmToggleField
+        source="isActive"
+        labelKey={checked ? "users.actions.disable" : "users.actions.enable"}
+        confirmKey="users.confirm.toggle_active"
       />
       <span className="text-xs text-muted-foreground">
         {translate(`users.status.${checked ? "active" : "inactive"}`, {

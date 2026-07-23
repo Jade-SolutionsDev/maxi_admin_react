@@ -51,6 +51,12 @@ export const ConfirmToggleField = ({
 
   if (!record) return null;
   const checked = record[source] === true;
+  // Catalog rows carry `name`; users carry first/last name or an email.
+  const displayName =
+    (record.name as string) ||
+    [record.firstName, record.lastName].filter(Boolean).join(" ") ||
+    (record.email as string) ||
+    "";
 
   const handleConfirm = () => {
     if (nextValue === null) return;
@@ -94,7 +100,7 @@ export const ConfirmToggleField = ({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center sm:text-left">
             {translate(`${confirmKey}.${nextValue ? "enable" : "disable"}`, {
-              name: (record.name as string) ?? "",
+              name: displayName,
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>

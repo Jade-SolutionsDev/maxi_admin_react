@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { RaRecord } from "ra-core";
 import {
   useDataProvider,
   useDelete,
@@ -79,6 +80,90 @@ const IconButton = ({
   </TooltipProvider>
 );
 
+/** Best display name for confirmation copy: full name, else the email. */
+const displayName = (record: RaRecord): string =>
+  [record.firstName, record.lastName].filter(Boolean).join(" ") ||
+  (record.email as string) ||
+  "";
+
+/**
+ * Icon button that asks for confirmation before running its action — the
+ * button-shaped counterpart to ConfirmToggleField. Destructive actions get the
+ * warning glyph and a destructive CTA.
+ */
+const ConfirmIconButton = ({
+  icon,
+  label,
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+  destructive,
+  disabled,
+  className,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  title: string;
+  description: string;
+  confirmLabel: string;
+  onConfirm: () => void | Promise<void>;
+  destructive?: boolean;
+  disabled?: boolean;
+  className?: string;
+}) => {
+  const translate = useTranslate();
+  const [open, setOpen] = useState(false);
+
+  const handleConfirm = async () => {
+    setOpen(false);
+    await onConfirm();
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <IconButton
+        label={label}
+        className={className}
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
+        {icon}
+      </IconButton>
+
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader className="space-y-3">
+          {destructive && (
+            <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+            </div>
+          )}
+          <AlertDialogTitle className="text-center sm:text-left text-lg">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-center sm:text-left">
+            {description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="sm:justify-end">
+          <AlertDialogCancel disabled={disabled}>
+            {translate("shared.actions.cancel", { _: "Cancel" })}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            disabled={disabled}
+            className={cn(
+              destructive && buttonVariants({ variant: "destructive" }),
+            )}
+          >
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
 /** Actions for a pending invitation row (synthetic user, `isPending === true`). */
 const InvitationActionsCell = () => {
   const record = useRecordContext();
@@ -107,36 +192,53 @@ const InvitationActionsCell = () => {
     }
   };
 
+  const email = (record.email as string) ?? "";
+
   return (
     <div className="flex items-center justify-center gap-1">
-      <IconButton
+      <ConfirmIconButton
+        icon={<MailCheck size={16} />}
         label={translate("users.actions.resend", { _: "Resend invitation" })}
         className="text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30"
         disabled={busy}
-        onClick={() =>
+        title={translate("users.confirm.resend.title", {
+          _: "Resend invitation",
+        })}
+        description={translate("users.confirm.resend.description", {
+          email,
+          _: `Send the invitation to ${email} again?`,
+        })}
+        confirmLabel={translate("users.actions.resend", { _: "Resend" })}
+        onConfirm={() =>
           run(
             () => dataProvider.resendInvitation(String(record.id)),
             "users.actions.resend_success",
             "Invitation resent",
           )
         }
-      >
-        <MailCheck size={16} />
-      </IconButton>
-      <IconButton
+      />
+      <ConfirmIconButton
+        icon={<XCircle size={16} />}
         label={translate("users.actions.revoke", { _: "Revoke invitation" })}
         className="text-destructive hover:bg-destructive/10"
+        destructive
         disabled={busy}
-        onClick={() =>
+        title={translate("users.confirm.revoke.title", {
+          _: "Revoke invitation",
+        })}
+        description={translate("users.confirm.revoke.description", {
+          email,
+          _: `Revoke the invitation for ${email}? The link will stop working.`,
+        })}
+        confirmLabel={translate("users.actions.revoke", { _: "Revoke" })}
+        onConfirm={() =>
           run(
             () => dataProvider.revokeInvitation(String(record.id)),
             "users.actions.revoke_success",
             "Invitation revoked",
           )
         }
-      >
-        <XCircle size={16} />
-      </IconButton>
+      />
     </div>
   );
 };
@@ -192,24 +294,37 @@ const ApprovalActionsCell = () => {
     }
   };
 
+  const name = displayName(record);
+
   return (
     <div className="flex items-center justify-center gap-1">
-      <IconButton
+      <ConfirmIconButton
+        icon={<CheckCircle2 size={16} />}
         label={translate("users.actions.approve", { _: "Approve" })}
         className="text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
         disabled={busy}
-        onClick={approve}
-      >
-        <CheckCircle2 size={16} />
-      </IconButton>
-      <IconButton
+        title={translate("users.confirm.approve.title", { _: "Approve user" })}
+        description={translate("users.confirm.approve.description", {
+          name,
+          _: `Approve ${name}? They will be able to sign in.`,
+        })}
+        confirmLabel={translate("users.actions.approve", { _: "Approve" })}
+        onConfirm={approve}
+      />
+      <ConfirmIconButton
+        icon={<XCircle size={16} />}
         label={translate("users.actions.reject", { _: "Reject" })}
         className="text-destructive hover:bg-destructive/10"
+        destructive
         disabled={busy}
-        onClick={reject}
-      >
-        <XCircle size={16} />
-      </IconButton>
+        title={translate("users.confirm.reject.title", { _: "Reject request" })}
+        description={translate("users.confirm.reject.description", {
+          name,
+          _: `Reject ${name}? They will not get access.`,
+        })}
+        confirmLabel={translate("users.actions.reject", { _: "Reject" })}
+        onConfirm={reject}
+      />
     </div>
   );
 };
@@ -322,29 +437,23 @@ const UserDeleteButton = () => {
   const translate = useTranslate();
   const notify = useNotify();
   const refresh = useRefresh();
-  const [open, setOpen] = useState(false);
-
   const [deleteOne, { isPending }] = useDelete();
 
   const isSelf = record?.id === identity?.id;
   // You cannot delete yourself; already-deleted rows show Restore instead.
-  if (isSelf || record?.isDeleted) {
+  if (!record || isSelf || record.isDeleted) {
     return null;
   }
 
-  const firstName = (record?.firstName as string | null) ?? "";
-  const lastName = (record?.lastName as string | null) ?? "";
-  const email = (record?.email as string | null) ?? "";
-  const displayName = `${firstName} ${lastName}`.trim() || email;
+  const name = displayName(record);
 
   const handleConfirm = async () => {
     await deleteOne(
       resource,
-      { id: record?.id, previousData: record },
+      { id: record.id, previousData: record },
       {
         mutationMode: "pessimistic",
         onSuccess: () => {
-          setOpen(false);
           notify("users.actions.delete_success", {
             type: "success",
             messageArgs: { _: "User deleted" },
@@ -352,7 +461,6 @@ const UserDeleteButton = () => {
           refresh();
         },
         onError: (error) => {
-          setOpen(false);
           notify(backendMessage(error, "Could not delete user"), {
             type: "error",
           });
@@ -362,48 +470,22 @@ const UserDeleteButton = () => {
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <IconButton
-        label={translate("users.actions.delete", { _: "Delete" })}
-        className="text-destructive hover:bg-destructive/10"
-        onClick={() => setOpen(true)}
-      >
-        <Trash2 size={16} />
-      </IconButton>
-
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader className="space-y-3">
-          <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
-          </div>
-          <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {translate("users.actions.delete_confirm_title", {
-              _: "Delete user",
-            })}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center sm:text-left">
-            {translate("users.actions.delete_confirm_description", {
-              _: "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
-              name: displayName,
-            })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="sm:justify-end">
-          <AlertDialogCancel disabled={isPending}>
-            {translate("users.actions.cancel", { _: "Cancel" })}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            disabled={isPending}
-            className={cn(buttonVariants({ variant: "destructive" }))}
-          >
-            {isPending
-              ? translate("ra.action.loading", { _: "Working…" })
-              : translate("users.actions.delete", { _: "Delete" })}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmIconButton
+      icon={<Trash2 size={16} />}
+      label={translate("users.actions.delete", { _: "Delete" })}
+      className="text-destructive hover:bg-destructive/10"
+      destructive
+      disabled={isPending}
+      title={translate("users.actions.delete_confirm_title", {
+        _: "Delete user",
+      })}
+      description={translate("users.actions.delete_confirm_description", {
+        name,
+        _: "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
+      })}
+      confirmLabel={translate("users.actions.delete", { _: "Delete" })}
+      onConfirm={handleConfirm}
+    />
   );
 };
 

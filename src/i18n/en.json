@@ -155,6 +155,29 @@
       "pending": "Pending",
       "awaiting_approval": "Awaiting approval",
       "deleted": "Deleted"
+    },
+    "confirm": {
+      "toggle_active": {
+        "title": "Change user status",
+        "enable": "Activate “%{name}”? They will regain access to the platform.",
+        "disable": "Deactivate “%{name}”? They will lose access to the platform."
+      },
+      "approve": {
+        "title": "Approve user",
+        "description": "Approve “%{name}”? They will be able to sign in and use the platform."
+      },
+      "reject": {
+        "title": "Reject request",
+        "description": "Reject “%{name}”? They will not get access. You can restore them later from “Show deleted”."
+      },
+      "resend": {
+        "title": "Resend invitation",
+        "description": "Send the invitation to %{email} again?"
+      },
+      "revoke": {
+        "title": "Revoke invitation",
+        "description": "Revoke the invitation for %{email}? The link will stop working."
+      }
     }
   },
   "shared": {
