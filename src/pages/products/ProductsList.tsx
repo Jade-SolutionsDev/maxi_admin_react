@@ -199,6 +199,10 @@ const ProductDeleteButton = () => {
           </div>
           <AlertDialogTitle className="text-center sm:text-left text-lg">
             {translate("shared.actions.delete_confirm_title", {
+              // The key is "Eliminar %{name}" — pass the resource label, like
+              // the categories/departments lists do (the description below
+              // names the actual record).
+              name: translate("resources.products.name", { _: "product" }),
               _: "Delete product",
             })}
           </AlertDialogTitle>
@@ -284,7 +288,7 @@ export default function ProductsList() {
       title={translate("resources.products.name_plural")}
       perPage={10}
     >
-      <DataTable hiddenColumns={["id"]}>
+      <DataTable hasBulkActions={false} hiddenColumns={["id"]}>
         <DataTable.Col
           label="list.fields.image"
           disableSort
