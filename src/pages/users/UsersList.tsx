@@ -74,6 +74,7 @@ export default function UsersList() {
       sort={{ field: "id", order: "DESC" }}
     >
       <DataTable
+        hasBulkActions={false}
         hiddenColumns={[
           "id",
           "businessName",

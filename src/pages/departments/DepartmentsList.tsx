@@ -221,6 +221,7 @@ export default function DepartmentsList() {
       perPage={10}
     >
       <DataTable
+        hasBulkActions={false}
         hiddenColumns={[
           "id",
           "parentId",

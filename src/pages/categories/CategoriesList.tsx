@@ -227,6 +227,7 @@ export default function CategoriesList() {
       perPage={10}
     >
       <DataTable
+        hasBulkActions={false}
         hiddenColumns={["id", "parentId", "deletedAt", "slug"]}
       >
         <DataTable.Col
