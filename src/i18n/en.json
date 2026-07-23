@@ -77,7 +77,9 @@
       "totalStock": "Total stock",
       "expiryDate": "Expiry date",
       "minPrice": "Min price",
-      "maxPrice": "Max price"
+      "maxPrice": "Max price",
+      "childrenCount": "Categories",
+      "productsCount": "Products"
     }
   },
   "users": {

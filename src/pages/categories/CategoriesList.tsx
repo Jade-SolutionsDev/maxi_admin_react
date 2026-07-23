@@ -244,6 +244,12 @@ export default function CategoriesList() {
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
         <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
+        {/* Server-computed total; not a sortable column. */}
+        <DataTable.Col
+          source="productsCount"
+          label="list.fields.productsCount"
+          disableSort
+        />
         <DataTable.Col
           source="sortOrder"
           label="list.fields.sortOrder"

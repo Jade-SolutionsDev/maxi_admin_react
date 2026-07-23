@@ -236,6 +236,12 @@ export default function DepartmentsList() {
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
         <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
+        {/* Server-computed total; not a sortable column. */}
+        <DataTable.Col
+          source="childrenCount"
+          label="list.fields.childrenCount"
+          disableSort
+        />
         <DataTable.Col
           source="sortOrder"
           label="list.fields.sortOrder"
