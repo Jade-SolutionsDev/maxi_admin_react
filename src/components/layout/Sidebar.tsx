@@ -90,7 +90,8 @@ const navItems: NavItem[] = [
   {
     labelKey: "app.menu.pedidos",
     icon: <ShoppingCart size={20} />,
-    soon: true,
+    path: "/orders",
+    resource: "orders",
   },
   {
     labelKey: "app.menu.productos",

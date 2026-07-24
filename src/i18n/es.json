@@ -40,6 +40,10 @@
     "stock-locations": {
       "name": "Almacén",
       "name_plural": "Almacenes"
+    },
+    "orders": {
+      "name": "Pedido",
+      "name_plural": "Pedidos"
     }
   },
   "list": {
@@ -506,6 +510,53 @@
   "categories": {
     "errors": {
       "delete_conflict": "No se puede eliminar: la categoría tiene productos asociados."
+    }
+  },
+  "orders": {
+    "fields": {
+      "orderNumber": "Número",
+      "client": "Cliente",
+      "paymentStatus": "Pago",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Envío",
+      "quantity": "Cantidad",
+      "unitPrice": "Precio unitario",
+      "lineTotal": "Importe"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmado",
+      "processing": "En preparación",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    },
+    "paymentStatus": {
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "failed": "Fallido",
+      "refunded": "Reembolsado"
+    },
+    "sections": {
+      "items": "Productos",
+      "delivery": "Entrega",
+      "notes": "Notas del cliente"
+    },
+    "actions": {
+      "updated": "Pedido actualizado",
+      "confirm_title": "Confirmar cambio",
+      "confirm_status_description": "¿Cambiar el estado del pedido a \"%{value}\"?",
+      "confirm_payment_description": "¿Marcar el pago como \"%{value}\"?",
+      "set_confirmed": "Confirmar pedido",
+      "set_processing": "Pasar a preparación",
+      "set_shipped": "Marcar enviado",
+      "set_delivered": "Marcar entregado",
+      "set_cancelled": "Cancelar pedido",
+      "mark_pending": "Pago pendiente",
+      "mark_paid": "Marcar pagado",
+      "mark_failed": "Pago fallido",
+      "mark_refunded": "Reembolsar"
     }
   }
 }

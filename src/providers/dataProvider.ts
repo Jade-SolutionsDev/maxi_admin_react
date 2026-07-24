@@ -34,6 +34,16 @@ export interface CreateInventoryOperationPayload {
   items: { productId: string; quantity: number }[];
 }
 
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
+export type OrderPaymentStatus = "pending" | "paid" | "failed" | "refunded";
+
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
@@ -48,6 +58,14 @@ export interface ExtendedDataProvider extends DataProvider {
   getProductStock: (
     productId: string,
   ) => Promise<{ data: ProductStockLocation[] }>;
+  updateOrderStatus: (
+    id: string,
+    status: OrderStatus,
+  ) => Promise<{ data: unknown }>;
+  updateOrderPaymentStatus: (
+    id: string,
+    paymentStatus: OrderPaymentStatus,
+  ) => Promise<{ data: unknown }>;
 }
 
 // The managed-roles resource lives under the nested /permissions route.
@@ -371,5 +389,24 @@ export const dataProvider: DataProvider = {
     );
     const { rows } = unwrapList(json);
     return { data: rows as ProductStockLocation[] };
+  },
+
+  async updateOrderStatus(id: string, status: OrderStatus) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async updateOrderPaymentStatus(
+    id: string,
+    paymentStatus: OrderPaymentStatus,
+  ) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${id}/payment-status`,
+      { method: 'PATCH', body: JSON.stringify({ paymentStatus }) },
+    );
+    return { data: unwrapOne(json) };
   },
 } as ExtendedDataProvider;

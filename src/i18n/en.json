@@ -40,6 +40,10 @@
     "stock-locations": {
       "name": "Warehouse",
       "name_plural": "Warehouses"
+    },
+    "orders": {
+      "name": "Order",
+      "name_plural": "Orders"
     }
   },
   "list": {
@@ -506,6 +510,53 @@
   "categories": {
     "errors": {
       "delete_conflict": "Cannot delete: the category still has products."
+    }
+  },
+  "orders": {
+    "fields": {
+      "orderNumber": "Number",
+      "client": "Customer",
+      "paymentStatus": "Payment",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "lineTotal": "Amount"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "paymentStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "sections": {
+      "items": "Items",
+      "delivery": "Delivery",
+      "notes": "Customer notes"
+    },
+    "actions": {
+      "updated": "Order updated",
+      "confirm_title": "Confirm change",
+      "confirm_status_description": "Change the order status to \"%{value}\"?",
+      "confirm_payment_description": "Mark the payment as \"%{value}\"?",
+      "set_confirmed": "Confirm order",
+      "set_processing": "Start processing",
+      "set_shipped": "Mark shipped",
+      "set_delivered": "Mark delivered",
+      "set_cancelled": "Cancel order",
+      "mark_pending": "Payment pending",
+      "mark_paid": "Mark paid",
+      "mark_failed": "Payment failed",
+      "mark_refunded": "Refund"
     }
   }
 }
