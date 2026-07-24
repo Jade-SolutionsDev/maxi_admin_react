@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
+  useCanAccess,
   useDataProvider,
   useGetIdentity,
   useGetOne,
@@ -19,6 +20,7 @@ import {
   MapPin,
   ShoppingCart,
   StickyNote,
+  UserRound,
 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -67,6 +69,7 @@ interface OrderItemRow {
 interface OrderRecord {
   id: string;
   orderNumber: string | null;
+  clientId: string;
   clientName: string | null;
   clientEmail: string | null;
   status: OrderStatus;
@@ -97,6 +100,12 @@ export default function OrderDetailPage() {
   const isManager = MANAGER_ROLES.includes(
     (identity?.role as Role) ?? "KARDIST",
   );
+  // The customer link only renders when the actor may open /clients
+  // (admin-only resource — GROCER gets plain text).
+  const { canAccess: canViewClient } = useCanAccess({
+    resource: "clients",
+    action: "read",
+  });
 
   const {
     data: order,
@@ -300,8 +309,29 @@ export default function OrderDetailPage() {
         </div>
       </section>
 
-      {/* Delivery + notes */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Customer + delivery + notes */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="rounded-lg border border-border p-4">
+          <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+            <UserRound size={16} />
+            {translate("orders.sections.customer", { _: "Cliente" })}
+          </h2>
+          <p className="text-sm font-medium text-foreground">
+            {order.clientName || "—"}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {order.clientEmail || "—"}
+          </p>
+          {canViewClient && (
+            <Link
+              to={`/clients/${order.clientId}`}
+              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              {translate("orders.actions.view_customer", { _: "Ver cliente" })}
+              <ArrowRight size={14} />
+            </Link>
+          )}
+        </section>
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
             <MapPin size={16} />
@@ -377,7 +407,9 @@ export default function OrderDetailPage() {
               )}
               onClick={() => pending && mutation.mutate(pending)}
             >
-              {translate("shared.actions.confirm", { _: "Confirmar" })}
+              {/* NOT shared.actions.confirm — that key is the delete-dialog
+                  label ("Eliminar"); confirm_action is the generic one. */}
+              {translate("shared.actions.confirm_action", { _: "Confirmar" })}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

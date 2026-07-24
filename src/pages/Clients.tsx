@@ -39,7 +39,11 @@ export const ClientList = () => {
     resource="clients"
     title={translate("resources.clients.name_plural")}
   >
-    <DataTable hasBulkActions={false} hiddenColumns={["id","onboardingCompleted"]}>
+    <DataTable
+      hasBulkActions={false}
+      hiddenColumns={["id","onboardingCompleted"]}
+      rowClick={(id) => `/clients/${id}`}
+    >
       <DataTable.Col source="id">
         <BadgeField source="id" variant="default" truncate />
       </DataTable.Col>

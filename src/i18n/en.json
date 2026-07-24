@@ -541,7 +541,8 @@
     "sections": {
       "items": "Items",
       "delivery": "Delivery",
-      "notes": "Customer notes"
+      "notes": "Customer notes",
+      "customer": "Customer"
     },
     "actions": {
       "updated": "Order updated",
@@ -556,7 +557,22 @@
       "mark_pending": "Payment pending",
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
-      "mark_refunded": "Refund"
+      "mark_refunded": "Refund",
+      "view_customer": "View customer"
+    }
+  },
+  "clients": {
+    "tabs": {
+      "general": "General",
+      "orders": "Orders"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "orders": {
+      "empty_title": "No orders",
+      "empty_hint": "This customer has not placed any orders yet."
     }
   }
 }

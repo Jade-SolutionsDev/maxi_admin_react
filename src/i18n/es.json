@@ -541,7 +541,8 @@
     "sections": {
       "items": "Productos",
       "delivery": "Entrega",
-      "notes": "Notas del cliente"
+      "notes": "Notas del cliente",
+      "customer": "Cliente"
     },
     "actions": {
       "updated": "Pedido actualizado",
@@ -556,7 +557,22 @@
       "mark_pending": "Pago pendiente",
       "mark_paid": "Marcar pagado",
       "mark_failed": "Pago fallido",
-      "mark_refunded": "Reembolsar"
+      "mark_refunded": "Reembolsar",
+      "view_customer": "Ver cliente"
+    }
+  },
+  "clients": {
+    "tabs": {
+      "general": "Datos generales",
+      "orders": "Pedidos"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "orders": {
+      "empty_title": "Sin pedidos",
+      "empty_hint": "Este cliente aún no ha realizado pedidos."
     }
   }
 }
