@@ -19,6 +19,9 @@ import ProductEdit from "./pages/products/ProductEdit";
 import { ProductDetailModal } from "./pages/products/ProductDetailModal";
 import StockLocationsList from "./pages/stock-locations/StockLocationsList";
 import StockLocationDetailPage from "./pages/stock-locations/StockLocationDetailPage";
+import OrdersList from "./pages/orders/OrdersList";
+import OrderDetailPage from "./pages/orders/OrderDetailPage";
+import ClientDetailPage from "./pages/clients/ClientDetailPage";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
@@ -108,6 +111,30 @@ const AdminApp = () => (
         <Route path="edit/:id" element={<CategoryEdit />} />
         <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
+      <Route
+        path="/clients/:id"
+        element={
+          <RequireAccess resource="clients" action="read">
+            <ClientDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <RequireAccess resource="orders">
+            <OrdersList />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/orders/:id"
+        element={
+          <RequireAccess resource="orders" action="read">
+            <OrderDetailPage />
+          </RequireAccess>
+        }
+      />
       <Route
         path="/stock-locations"
         element={
