@@ -276,7 +276,7 @@ export function CreateOperationWizard({
   // For Out/Transfer, products are limited to what this location currently holds.
   const stockMode = type === "OUT" || type === "TRANSFER";
   const { data: invRows } = useGetList(
-    "inventory",
+    "storage-inventory",
     {
       filter: { locationId },
       pagination: { page: 1, perPage: 300 },

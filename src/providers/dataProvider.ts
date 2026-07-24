@@ -24,6 +24,26 @@ export interface ProductStockLocation {
   locationName: string;
   provinces: string[];
   quantity: number;
+  reservedQuantity: number;
+  isActive: boolean;
+  available: number;
+}
+
+export interface InventoryHistoryEvent {
+  kind: "operation" | "reservation";
+  type: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  locationId: string;
+  locationName: string | null;
+  targetLocationId: string | null;
+  targetLocationName: string | null;
+  note: string | null;
+  actorId: string | null;
+  actorName: string | null;
+  orderId: string | null;
+  createdAt: string;
 }
 
 export interface CreateInventoryOperationPayload {
@@ -58,6 +78,10 @@ export interface ExtendedDataProvider extends DataProvider {
   getProductStock: (
     productId: string,
   ) => Promise<{ data: ProductStockLocation[] }>;
+  getInventoryHistory: (params: {
+    productId?: string;
+    locationId?: string;
+  }) => Promise<{ data: InventoryHistoryEvent[] }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -68,9 +92,13 @@ export interface ExtendedDataProvider extends DataProvider {
   ) => Promise<{ data: unknown }>;
 }
 
-// The managed-roles resource lives under the nested /permissions route.
+// Resources whose REST path differs from the react-admin resource name.
 const RESOURCE_PATHS: Record<string, string> = {
   roles: 'permissions/roles',
+  // The Inventory page lists stock aggregated by product across all storages.
+  inventory: 'inventory/aggregate',
+  // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
+  'storage-inventory': 'inventory',
 };
 
 function resourcePath(resource: string): string {
@@ -389,6 +417,18 @@ export const dataProvider: DataProvider = {
     );
     const { rows } = unwrapList(json);
     return { data: rows as ProductStockLocation[] };
+  },
+
+  async getInventoryHistory(params: {
+    productId?: string;
+    locationId?: string;
+  }) {
+    const path = params.productId
+      ? `inventory/product/${params.productId}/history`
+      : `inventory/location/${params.locationId}/history`;
+    const { json } = await httpClient(`${API_URL}/${path}`);
+    const { rows } = unwrapList(json);
+    return { data: rows as InventoryHistoryEvent[] };
   },
 
   async updateOrderStatus(id: string, status: OrderStatus) {

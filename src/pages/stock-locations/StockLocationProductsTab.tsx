@@ -20,7 +20,7 @@ export function StockLocationProductsTab({
   const translate = useTranslate();
   const [q, setQ] = useState("");
 
-  const { data: inventory, isLoading } = useGetList("inventory", {
+  const { data: inventory, isLoading } = useGetList("storage-inventory", {
     filter: { locationId },
     pagination: { page: 1, perPage: 200 },
     sort: { field: "id", order: "ASC" },
