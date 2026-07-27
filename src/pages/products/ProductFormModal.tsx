@@ -12,14 +12,13 @@ import { useFormContext, useFormState, useWatch } from "react-hook-form";
 import { Loader2, Save } from "lucide-react";
 
 import {
-  AutocompleteInput,
   BooleanInput,
   ImageUploadInput,
   NumberInput,
   ReferenceInput,
   SelectInput,
   SimpleForm,
-  TextInput,
+  TextInput
 } from "@/components/admin";
 import {
   Dialog,

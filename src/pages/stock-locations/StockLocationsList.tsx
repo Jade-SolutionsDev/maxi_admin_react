@@ -210,7 +210,7 @@ const ListActions = ({ onCreate }: { onCreate: () => void }) => {
     <div className="flex items-center gap-2">
       <RefreshButton />
       {canCreate && (
-        <Button type="button" onClick={onCreate}>
+        <Button size={'lg'} type="button" onClick={onCreate}>
           <Plus className="mr-2 h-4 w-4" />
           {translate("stockLocations.actions.create", { _: "Crear almacén" })}
         </Button>

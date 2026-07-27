@@ -12,6 +12,7 @@ import {
   ReferenceField,
   ReferenceInput,
   RefreshButton,
+  SearchInput,
   SelectInput,
 } from "@/components/admin";
 import { buttonVariants } from "@/components/ui/button";
@@ -24,22 +25,23 @@ import {
 import { cn } from "@/lib/utils";
 
 const inventoryFilters = [
-  <ReferenceInput
-    source="departmentId"
-    reference="departments"
-    label="resources.departments.name"
-    alwaysOn
-  >
-    <SelectInput optionText="name" label="resources.departments.name" />
-  </ReferenceInput>,
-  <ReferenceInput
-    source="categoryId"
-    reference="categories"
-    label="resources.categories.name"
-    alwaysOn
-  >
-    <SelectInput optionText="name" label="resources.categories.name" />
-  </ReferenceInput>,
+  <SearchInput source="q" alwaysOn />,
+    <ReferenceInput
+      source="departmentId"
+      reference="departments"
+      label="resources.departments.name"
+      alwaysOn
+    >
+      <SelectInput className="min-w-64" optionText="name" label="resources.departments.name" />
+    </ReferenceInput>,
+    <ReferenceInput
+      source="categoryId"
+      reference="categories"
+      label="resources.categories.name"
+      alwaysOn
+    >
+      <SelectInput className="min-w-64" optionText="name" label="resources.categories.name" />
+    </ReferenceInput>,
   <ReferenceInput
     source="atLocationId"
     reference="stock-locations"

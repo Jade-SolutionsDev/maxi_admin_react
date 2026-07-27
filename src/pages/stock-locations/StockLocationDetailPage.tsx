@@ -49,7 +49,7 @@ export default function StockLocationDetailPage() {
 
   return (
     <ResourceContextProvider value="stock-locations">
-      <div className="mx-auto w-full max-w-5xl px-4 py-6">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6">
         <EditBase
           id={id}
           mutationMode="pessimistic"
