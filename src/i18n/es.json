@@ -209,6 +209,7 @@
       "edit_title": "Editar %{name}",
       "save": "Guardar",
       "form_subtitle": "Completa los datos a continuación.",
+      "delete_success": "Elemento eliminado",
       "delete_confirm_title": "Eliminar %{name}",
       "delete_confirm_description": "¿Estás seguro de que quieres eliminar a %{name}? Esta acción no se puede deshacer.",
       "cancel": "Cancelar",
@@ -472,11 +473,19 @@
       "coverage": "Zona de compra",
       "coverage_hint": "Seleccione las provincias y municipios donde opera este almacén.",
       "grocers": "Encargados",
-      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén."
+      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén.",
+      "pickupAddresses": "Direcciones de recogida",
+      "pickupAddresses_hint": "Puntos donde los clientes pueden recoger sus pedidos."
     },
     "fields": {
       "available": "Disponible",
       "available_hint": "Los almacenes deshabilitados no estarán disponibles para los usuarios."
+    },
+    "pickupAddresses": {
+      "empty": "No hay direcciones de recogida.",
+      "label": "Etiqueta (opcional)",
+      "address": "Dirección",
+      "add": "Agregar dirección"
     },
     "coverage": {
       "municipalities": "Municipios",

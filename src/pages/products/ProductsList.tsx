@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   useCanAccess,
   useDelete,
+  useNotify,
   useRecordContext,
   useRefresh,
   useResourceContext,
@@ -144,6 +145,7 @@ const ProductDeleteButton = () => {
   const resource = useResourceContext();
   const translate = useTranslate();
   const refresh = useRefresh();
+  const notify = useNotify();
   const [open, setOpen] = useState(false);
 
   const [deleteOne, { isPending }] = useDelete(resource, {
@@ -162,9 +164,18 @@ const ProductDeleteButton = () => {
         onSuccess: () => {
           setOpen(false);
           refresh();
+          notify("shared.actions.delete_success", { type: "info" });
         },
-        onError: () => {
+        // Surface the backend's message (e.g. the 409 "still has stock" guard)
+        // instead of silently swallowing the failure.
+        onError: (error: unknown) => {
           setOpen(false);
+          const backendMessage = (
+            error as { body?: { error?: { message?: string } } }
+          )?.body?.error?.message;
+          notify(backendMessage ?? translate("shared.actions.error"), {
+            type: "error",
+          });
         },
       },
     );

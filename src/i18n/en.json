@@ -209,6 +209,7 @@
       "edit_title": "Edit %{name}",
       "save": "Save",
       "form_subtitle": "Fill in the details below.",
+      "delete_success": "Item deleted",
       "delete_confirm_title": "Delete %{name}",
       "delete_confirm_description": "Are you sure you want to delete %{name}? This action cannot be undone.",
       "cancel": "Cancel",
@@ -472,11 +473,19 @@
       "coverage": "Coverage area",
       "coverage_hint": "Select the provinces and municipalities this warehouse serves.",
       "grocers": "Managers",
-      "grocers_hint": "GROCER users who can manage this warehouse."
+      "grocers_hint": "GROCER users who can manage this warehouse.",
+      "pickupAddresses": "Pickup addresses",
+      "pickupAddresses_hint": "Places where customers can pick up their orders."
     },
     "fields": {
       "available": "Available",
       "available_hint": "Disabled warehouses won't be available to users."
+    },
+    "pickupAddresses": {
+      "empty": "No pickup addresses.",
+      "label": "Label (optional)",
+      "address": "Address",
+      "add": "Add address"
     },
     "coverage": {
       "municipalities": "Municipalities",

@@ -10,6 +10,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type CoverageType = "province" | "municipality";
@@ -123,9 +128,14 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
                   aria-label={province.name as string}
                 />
                 <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-sm font-medium leading-tight text-foreground">
-                    {province.name as string}
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="truncate text-sm font-medium leading-tight text-foreground">
+                        {province.name as string}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>{province.name as string}</TooltipContent>
+                  </Tooltip>
                   {covered && !whole && (
                     <span className="text-xs text-primary">
                       {translate("stockLocations.coverage.n_municipalities", {

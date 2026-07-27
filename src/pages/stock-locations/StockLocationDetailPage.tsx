@@ -27,16 +27,10 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { StockLocationFormFields } from "./StockLocationFormFields";
+import { sanitizeStockLocation as sanitize } from "./sanitizeStockLocation";
 import { StockLocationProductsTab } from "./StockLocationProductsTab";
 import { CreateOperationWizard } from "./CreateOperationWizard";
 import { OperationHistoryTab } from "../inventory/OperationHistoryTab";
-
-const sanitize = (data: Record<string, unknown>) => ({
-  name: data.name,
-  isActive: data.isActive,
-  coverage: data.coverage,
-  ...(data.grocerIds !== undefined ? { grocerIds: data.grocerIds } : {}),
-});
 
 type TabKey = "general" | "productos" | "historial";
 

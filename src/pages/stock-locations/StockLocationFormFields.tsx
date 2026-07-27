@@ -4,6 +4,7 @@ import { BooleanInput, TextInput } from "@/components/admin";
 import { cn } from "@/lib/utils";
 import { CoverageSelector } from "./CoverageSelector";
 import { GrocerAssignInput } from "./GrocerAssignInput";
+import { PickupAddressesInput } from "./PickupAddressesInput";
 
 // Shared fields for the create modal and the detail "Datos generales" tab.
 // `stacked` (create modal) drops the 2-column split so the coverage grid gets
@@ -62,6 +63,22 @@ export function StockLocationFormFields({
             <GrocerAssignInput />
           </div>
         )}
+
+        <div className="space-y-2 pt-2">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              {translate("stockLocations.sections.pickupAddresses", {
+                _: "Direcciones de recogida",
+              })}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {translate("stockLocations.sections.pickupAddresses_hint", {
+                _: "Puntos donde los clientes pueden recoger sus pedidos.",
+              })}
+            </p>
+          </div>
+          <PickupAddressesInput />
+        </div>
       </div>
 
       <div className="space-y-3">

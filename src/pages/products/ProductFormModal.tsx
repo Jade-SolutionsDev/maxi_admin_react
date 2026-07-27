@@ -150,20 +150,15 @@ function ProductFormFields() {
   const departmentId = useWatch({ name: "departmentId" });
 
   // When the user changes the department, clear the selected category (a category
-  // from another department must not be submitted). The firstRun guard keeps the
-  // record's category on the initial load.
+  // from another department must not be submitted). Only a change FROM a real
+  // department counts: the initial `undefined → value` transition is the edit
+  // record loading in asynchronously, and must keep the record's category.
   const prevDept = useRef<string | undefined>(undefined);
-  const firstRun = useRef(true);
   useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false;
-      prevDept.current = departmentId;
-      return;
-    }
-    if (prevDept.current !== departmentId) {
-      prevDept.current = departmentId;
+    if (prevDept.current !== undefined && prevDept.current !== departmentId) {
       setValue("categoryId", undefined);
     }
+    prevDept.current = departmentId;
   }, [departmentId, setValue]);
 
   return (

@@ -21,14 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { StockLocationFormFields } from "./StockLocationFormFields";
-
-// Only the DTO fields the backend accepts.
-const sanitize = (data: Record<string, unknown>) => ({
-  name: data.name,
-  isActive: data.isActive,
-  coverage: data.coverage,
-  ...(data.grocerIds !== undefined ? { grocerIds: data.grocerIds } : {}),
-});
+import { sanitizeStockLocation as sanitize } from "./sanitizeStockLocation";
 
 export function StockLocationCreateModal({
   open,
