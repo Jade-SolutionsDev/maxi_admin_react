@@ -54,7 +54,7 @@ function AnimatedNumber({ value, duration = 800 }: { value: string; duration?: n
 }
 
 export default function KpiCard({ value, subtitle, trend, trendUp, icon: Icon, iconBg, iconColor }: KpiCardProps) {
-  const { theme: mode } = useTheme();
+  const { resolvedTheme: mode } = useTheme();
 
   return (
     <div

@@ -23,6 +23,7 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<Theme>(
     () => (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? defaultTheme,
   );
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
   const setTheme = (t: Theme) => {
     localStorage.setItem(STORAGE_KEY, t);
     setThemeState(t);
@@ -30,24 +31,32 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
 
-    root.classList.remove("light", "dark");
+    // Resolve "system" to a concrete light/dark and mirror it onto <html> so
+    // both class-based CSS and JS consumers (charts, logo) agree. Without this,
+    // components reading the raw theme string saw "system" and fell back to the
+    // light palette on a dark shell.
+    const apply = () => {
+      const effective =
+        theme === "system" ? (mql.matches ? "dark" : "light") : theme;
+      root.classList.remove("light", "dark");
+      root.classList.add(effective);
+      setResolvedTheme(effective);
+    };
 
+    apply();
+
+    // Follow live OS light/dark switches while on "system".
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
+      mql.addEventListener("change", apply);
+      return () => mql.removeEventListener("change", apply);
     }
-
-    root.classList.add(theme);
   }, [theme]);
 
   const value = {
     theme,
+    resolvedTheme,
     setTheme,
   };
 

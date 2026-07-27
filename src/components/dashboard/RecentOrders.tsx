@@ -11,7 +11,7 @@ const statusStyles: Record<string, { bg: string; text: string }> = {
 };
 
 export default function RecentOrders() {
-  const { theme:mode } = useTheme();
+  const { resolvedTheme:mode } = useTheme();
   const navigate = useNavigate();
 
   return (

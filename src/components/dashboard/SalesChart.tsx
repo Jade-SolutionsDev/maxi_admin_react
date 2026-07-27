@@ -14,7 +14,7 @@ import { useTheme } from '../admin';
 const timeFilters = ['7D', '30D', '3M', '1A'];
 
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
-  const { theme:mode } = useTheme();
+  const { resolvedTheme:mode } = useTheme();
   if (active && payload && payload.length) {
     return (
       <div
@@ -36,7 +36,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export default function SalesChart() {
-  const { theme:mode } = useTheme();
+  const { resolvedTheme:mode } = useTheme();
   const [activeFilter, setActiveFilter] = useState('1A');
 
   const textColor = mode === 'dark' ? '#64748B' : '#94A3B8';

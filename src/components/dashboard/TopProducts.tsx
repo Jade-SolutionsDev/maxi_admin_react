@@ -3,7 +3,7 @@ import { Package } from 'lucide-react';
 import { useTheme } from '../admin';
 
 export default function TopProducts() {
-  const { theme:mode } = useTheme();
+  const { resolvedTheme:mode } = useTheme();
 
   return (
     <div

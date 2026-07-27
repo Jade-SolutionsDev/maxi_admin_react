@@ -196,21 +196,21 @@ export default function AppSidebar() {
   const logout = useLogout();
   const translate = useTranslate();
   const { data: identity } = useGetIdentity();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
       {/* Logo */}
       <SidebarHeader className="h-16 flex-row items-center justify-between border-b border-sidebar-border px-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
         <img
-          src={theme === "dark" ? LogoDark : Logo}
+          src={resolvedTheme === "dark" ? LogoDark : Logo}
           alt="MaxiHabana"
           className="h-8 w-auto max-w-full group-data-[collapsible=icon]:hidden"
         />
         <LogoMark
           className="hidden h-7 w-auto group-data-[collapsible=icon]:block"
-          letterColor={theme === "dark" ? "#FFFFFF" : "currentColor"}
-          smileColor={theme === "dark" ? "#FFFFFF" : "#49B08A"}
+          letterColor={resolvedTheme === "dark" ? "#FFFFFF" : "currentColor"}
+          smileColor={resolvedTheme === "dark" ? "#FFFFFF" : "#49B08A"}
         />
       </SidebarHeader>
 
