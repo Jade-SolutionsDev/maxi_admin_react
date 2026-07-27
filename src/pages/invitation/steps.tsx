@@ -1,14 +1,12 @@
 import {
   User,
-  Phone,
-  Building2,
-  Camera,
+  Phone, Camera,
   AlertCircle,
   Clock,
   Upload,
   X,
   Lock,
-  LogOut,
+  LogOut
 } from "lucide-react";
 
 // shadcn/ui components
@@ -295,7 +293,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
         />
 
         {/* Business Name */}
-        <FormField
+        {/* <FormField
           control={form.control}
           name="businessName"
           render={({ field }) => (
@@ -314,7 +312,7 @@ export function SignUpForm({ flow }: { flow: InvitationFlow }) {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         {/* Password */}
         <FormField

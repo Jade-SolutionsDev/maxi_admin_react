@@ -47,7 +47,7 @@ const UserActions = () => {
     <div className="flex items-center gap-2">
       <RefreshButton />
       <ColumnsButton />
-      <FilterButton variant="outline" size="lg" />
+      {/* <FilterButton variant="outline" size="lg" /> */}
       {canManage && (
         <Link
           to="/users/create"
