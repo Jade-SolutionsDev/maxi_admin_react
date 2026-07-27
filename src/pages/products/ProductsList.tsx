@@ -66,7 +66,7 @@ const productFilters = [
     label="resources.departments.name"
     alwaysOn
   >
-    <SelectInput optionText="name" label="resources.departments.name" />
+    <SelectInput className="min-w-64" optionText="name" label="resources.departments.name" />
   </ReferenceInput>,
   <ReferenceInput
     source="categoryId"
@@ -74,7 +74,7 @@ const productFilters = [
     label="resources.categories.name"
     alwaysOn
   >
-    <SelectInput optionText="name" label="resources.categories.name" />
+    <SelectInput className="min-w-64" optionText="name" label="resources.categories.name" />
   </ReferenceInput>,
   <NumberInput source="minPrice" label="list.fields.minPrice" min={0} />,
   <NumberInput source="maxPrice" label="list.fields.maxPrice" min={0} />,

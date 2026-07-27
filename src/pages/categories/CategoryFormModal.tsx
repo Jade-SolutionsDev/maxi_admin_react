@@ -139,7 +139,7 @@ function CategoryFormFields() {
         reference="departments"
         label={translate("resources.departments.name")}
       >
-        <AutocompleteInput validate={required()} />
+        <AutocompleteInput label={translate("resources.departments.name")} validate={required()} />
       </ReferenceInput>
       <TextInput
         source="name"

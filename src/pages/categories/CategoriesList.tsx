@@ -23,7 +23,7 @@ import {
   RefreshButton,
   ReferenceInput,
   SearchInput,
-  TaxonomyViewButton,
+  TaxonomyViewButton, SelectInput
 } from "@/components/admin";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -52,7 +52,13 @@ const categoryFilters = [
     reference="departments"
     label="resources.departments.name"
     alwaysOn
-  />,
+  >
+    <SelectInput
+      className="min-w-64"
+      optionText="name"
+      label="resources.departments.name"
+    />
+  </ReferenceInput>,
 ];
 
 const CategoryActions = () => {
@@ -244,7 +250,11 @@ export default function CategoriesList() {
           cellClassName="min-w-[180px]"
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
-        <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
+        <DataTable.Col
+          className="max-w-sm truncate"
+          source="description"
+          label="list.fields.description"
+        />
         {/* Server-computed total; not a sortable column. */}
         <DataTable.Col
           source="productsCount"

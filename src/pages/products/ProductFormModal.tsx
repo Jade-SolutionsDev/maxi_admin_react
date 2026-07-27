@@ -80,7 +80,11 @@ export default function ProductFormModal({ mode }: ProductFormModalProps) {
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
         {isEdit ? (
-          <EditBase id={id} mutationMode="pessimistic" transform={sanitizeProduct}>
+          <EditBase
+            id={id}
+            mutationMode="pessimistic"
+            transform={sanitizeProduct}
+          >
             <ModalFormShell title={title} onClose={onClose} mode={mode} />
           </EditBase>
         ) : (
@@ -185,18 +189,24 @@ function ProductFormFields() {
       <ReferenceInput
         source="departmentId"
         reference="departments"
-        label={translate("resources.departments.name")}
+        label="resources.departments.name"
+        alwaysOn
       >
-        <AutocompleteInput validate={required()} />
+        <SelectInput
+          validate={required()}
+          className="min-w-64"
+          optionText="name"
+          label="resources.departments.name"
+        />
       </ReferenceInput>
       <ReferenceInput
         source="categoryId"
         reference="categories"
-        label={translate("resources.categories.name")}
         filter={departmentId ? { departmentId } : {}}
       >
         <SelectInput
           optionText="name"
+          label={translate("resources.categories.name")}
           validate={required()}
           disabled={!departmentId}
           helperText={
