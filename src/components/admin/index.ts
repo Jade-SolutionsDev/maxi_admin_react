@@ -9,6 +9,7 @@ export * from "./columns-button";
 export * from "./confirm-toggle-field";
 export * from "./create-button";
 export * from "./data-table";
+export * from "./data-table-skeleton";
 export * from "./date-field";
 export * from "./filter-form";
 export * from "./image-upload-input";

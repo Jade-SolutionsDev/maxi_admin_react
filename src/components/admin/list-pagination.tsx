@@ -55,7 +55,7 @@ export const ListPagination = ({
     setPage,
   } = useListPaginationContext();
 
-  const pageStart = (page - 1) * perPage + 1;
+  const pageStart = total ? (page - 1) * perPage + 1 : 0;
   const pageEnd = hasNextPage ? page * perPage : total;
 
   const boundaryCount = 1;
@@ -133,18 +133,20 @@ export const ListPagination = ({
         </Select>
       </div>
       <div className="text-sm text-muted-foreground">
-        <Translate
-          i18nKey="ra.navigation.page_range_info"
-          options={{
-            offsetBegin: pageStart,
-            offsetEnd: pageEnd,
-            total: total === -1 ? pageEnd : total,
-          }}
-        >
-          {total != null
-            ? `${pageStart}-${pageEnd} of ${total === -1 ? pageEnd : total}`
-            : null}
-        </Translate>
+        {/* Only render once the total is known — otherwise Polyglot leaves the
+            unresolved %{offsetEnd}/%{total} placeholders on screen. */}
+        {total ? (
+          <Translate
+            i18nKey="ra.navigation.page_range_info"
+            options={{
+              offsetBegin: pageStart,
+              offsetEnd: pageEnd,
+              total: total === -1 ? pageEnd : total,
+            }}
+          >
+            {`${pageStart}-${pageEnd} of ${total === -1 ? pageEnd : total}`}
+          </Translate>
+        ) : null}
       </div>
       <Pagination className="-w-full -mx-auto">
         <PaginationContent>

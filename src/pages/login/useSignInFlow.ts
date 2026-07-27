@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignIn, useUser } from '@clerk/react';
+import { useTranslate } from 'ra-core';
 import { getErrorMessage } from './clerkErrors';
 
 export type Step = 'credentials' | 'verify' | 'forgot' | 'reset';
@@ -15,6 +16,13 @@ export function useSignInFlow() {
   const { isSignedIn } = useUser();
   const { signIn } = useSignIn();
   const navigate = useNavigate();
+  const translate = useTranslate();
+  // Localized error from a Clerk failure, with a translated fallback key.
+  const errMsg = (
+    err: unknown,
+    fallbackKey: string,
+    fallbackArgs?: Record<string, unknown>,
+  ) => getErrorMessage(err, translate, fallbackKey, fallbackArgs);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -74,7 +82,7 @@ export function useSignInFlow() {
 
       if (passwordError) {
         // See https://clerk.com/docs/guides/development/custom-flows/error-handling
-        setError(getErrorMessage(passwordError, 'Correo o contraseña incorrectos.'));
+        setError(errMsg(passwordError, 'login.errors.invalid_credentials'));
         return;
       }
 
@@ -95,9 +103,7 @@ export function useSignInFlow() {
           signIn.supportedSecondFactors.find((f) => f.strategy === 'phone_code');
 
         if (!factor) {
-          setError(
-            'Tu cuenta requiere un método de verificación no disponible en este formulario.',
-          );
+          setError(translate('login.errors.mfa_unavailable'));
           return;
         }
 
@@ -107,7 +113,7 @@ export function useSignInFlow() {
             : await signIn.mfa.sendPhoneCode();
 
         if (sendError) {
-          setError(getErrorMessage(sendError, 'No se pudo enviar el código de verificación.'));
+          setError(errMsg(sendError, 'login.errors.code_send_failed'));
           return;
         }
 
@@ -118,9 +124,11 @@ export function useSignInFlow() {
         return;
       }
 
-      setError(`No se pudo iniciar sesión (estado: ${signIn.status}).`);
+      setError(
+        translate('login.errors.signin_status', { status: signIn.status }),
+      );
     } catch (err) {
-      setError(getErrorMessage(err, 'Ocurrió un error al iniciar sesión.'));
+      setError(errMsg(err, 'login.errors.signin_generic'));
     }
   });
 
@@ -132,17 +140,19 @@ export function useSignInFlow() {
           : await signIn.mfa.verifyEmailCode({ code });
 
       if (verifyError) {
-        setError(getErrorMessage(verifyError, 'Código inválido o expirado.'));
+        setError(errMsg(verifyError, 'login.errors.code_invalid'));
         return;
       }
 
       if (signIn.status === 'complete') {
         await finalizeSignIn();
       } else {
-        setError(`No se pudo verificar (estado: ${signIn.status}).`);
+        setError(
+          translate('login.errors.verify_status', { status: signIn.status }),
+        );
       }
     } catch (err) {
-      setError(getErrorMessage(err, 'Ocurrió un error al verificar el código.'));
+      setError(errMsg(err, 'login.errors.verify_generic'));
     }
   });
 
@@ -153,7 +163,7 @@ export function useSignInFlow() {
         ? await signIn.mfa.sendPhoneCode()
         : await signIn.mfa.sendEmailCode();
     if (sendError) {
-      setError(getErrorMessage(sendError, 'No se pudo reenviar el código.'));
+      setError(errMsg(sendError, 'login.errors.code_resend_failed'));
     }
   };
 
@@ -176,15 +186,13 @@ export function useSignInFlow() {
     try {
       const { error: createError } = await signIn.create({ identifier: email });
       if (createError) {
-        setError(
-          getErrorMessage(createError, 'No encontramos una cuenta con ese correo.'),
-        );
+        setError(errMsg(createError, 'login.errors.account_not_found'));
         return;
       }
 
       const { error: sendError } = await signIn.resetPasswordEmailCode.sendCode();
       if (sendError) {
-        setError(getErrorMessage(sendError, 'No se pudo enviar el código.'));
+        setError(errMsg(sendError, 'login.errors.code_send_failed'));
         return;
       }
 
@@ -193,7 +201,7 @@ export function useSignInFlow() {
       setConfirmPassword('');
       setStep('reset');
     } catch (err) {
-      setError(getErrorMessage(err, 'Ocurrió un error al enviar el código.'));
+      setError(errMsg(err, 'login.errors.send_generic'));
     }
   });
 
@@ -203,7 +211,7 @@ export function useSignInFlow() {
     setError('');
 
     if (newPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setError(translate('login.errors.password_mismatch'));
       return;
     }
 
@@ -213,7 +221,7 @@ export function useSignInFlow() {
         code,
       });
       if (verifyError) {
-        setError(getErrorMessage(verifyError, 'Código inválido o expirado.'));
+        setError(errMsg(verifyError, 'login.errors.code_invalid'));
         return;
       }
 
@@ -222,7 +230,7 @@ export function useSignInFlow() {
         signOutOfOtherSessions: true,
       });
       if (pwError) {
-        setError(getErrorMessage(pwError, 'No se pudo actualizar la contraseña.'));
+        setError(errMsg(pwError, 'login.errors.password_update_failed'));
         return;
       }
 
@@ -238,13 +246,15 @@ export function useSignInFlow() {
         setConfirmPassword('');
         setStep('credentials');
         signIn.reset();
-        setError('Contraseña actualizada. Inicia sesión con tu nueva contraseña.');
+        setError(translate('login.errors.password_updated_signin'));
         return;
       }
 
-      setError(`No se pudo completar el restablecimiento (estado: ${signIn.status}).`);
+      setError(
+        translate('login.errors.reset_status', { status: signIn.status }),
+      );
     } catch (err) {
-      setError(getErrorMessage(err, 'Ocurrió un error al restablecer la contraseña.'));
+      setError(errMsg(err, 'login.errors.reset_generic'));
     } finally {
       setIsLoading(false);
     }
@@ -254,7 +264,7 @@ export function useSignInFlow() {
     setError('');
     const { error: sendError } = await signIn.resetPasswordEmailCode.sendCode();
     if (sendError) {
-      setError(getErrorMessage(sendError, 'No se pudo reenviar el código.'));
+      setError(errMsg(sendError, 'login.errors.code_resend_failed'));
     }
   };
 

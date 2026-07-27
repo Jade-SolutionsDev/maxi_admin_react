@@ -31,6 +31,7 @@ import {
 import { ArrowDownAZ, ArrowUpZA } from "lucide-react";
 import get from "lodash/get";
 import { cn } from "@/lib/utils";
+import { DataTableSkeleton } from "./data-table-skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
@@ -108,7 +109,7 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
   return (
     <DataTableBase<RecordType>
       hasBulkActions={hasBulkActions}
-      loading={null}
+      loading={<DataTableSkeleton />}
       empty={<DataTableEmpty />}
       {...rest}
     >

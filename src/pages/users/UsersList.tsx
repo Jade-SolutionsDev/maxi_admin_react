@@ -6,7 +6,6 @@ import {
   ColumnsButton,
   DataTable,
   DateField,
-  FilterButton,
   List,
   RefreshButton,
   SearchInput,

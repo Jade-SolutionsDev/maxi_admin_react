@@ -11,6 +11,29 @@
     "message": "No tienes permiso para ver esta sección. Si crees que es un error, contacta a un administrador.",
     "back": "Volver al panel"
   },
+  "login": {
+    "errors": {
+      "network": "No pudimos conectar con el servidor. Revisa tu conexión a internet e inténtalo de nuevo.",
+      "already_signed_in": "Ya has iniciado sesión.",
+      "invalid_credentials": "Correo o contraseña incorrectos.",
+      "account_not_found": "No encontramos una cuenta con ese correo.",
+      "code_invalid": "Código inválido o expirado.",
+      "too_many_requests": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
+      "mfa_unavailable": "Tu cuenta requiere un método de verificación no disponible en este formulario.",
+      "code_send_failed": "No se pudo enviar el código de verificación.",
+      "code_resend_failed": "No se pudo reenviar el código.",
+      "signin_status": "No se pudo iniciar sesión (estado: %{status}).",
+      "signin_generic": "Ocurrió un error al iniciar sesión.",
+      "verify_status": "No se pudo verificar (estado: %{status}).",
+      "verify_generic": "Ocurrió un error al verificar el código.",
+      "send_generic": "Ocurrió un error al enviar el código.",
+      "password_mismatch": "Las contraseñas no coinciden.",
+      "password_update_failed": "No se pudo actualizar la contraseña.",
+      "password_updated_signin": "Contraseña actualizada. Inicia sesión con tu nueva contraseña.",
+      "reset_status": "No se pudo completar el restablecimiento (estado: %{status}).",
+      "reset_generic": "Ocurrió un error al restablecer la contraseña."
+    }
+  },
   "resources": {
     "clients": {
       "name": "Cliente",

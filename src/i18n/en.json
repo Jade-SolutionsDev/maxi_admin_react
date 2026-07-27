@@ -11,6 +11,29 @@
     "message": "You don't have permission to view this section. If you think this is a mistake, contact an administrator.",
     "back": "Back to dashboard"
   },
+  "login": {
+    "errors": {
+      "network": "We couldn't reach the server. Check your internet connection and try again.",
+      "already_signed_in": "You're already signed in.",
+      "invalid_credentials": "Incorrect email or password.",
+      "account_not_found": "We couldn't find an account with that email.",
+      "code_invalid": "Invalid or expired code.",
+      "too_many_requests": "Too many attempts. Please wait a moment and try again.",
+      "mfa_unavailable": "Your account requires a verification method not available in this form.",
+      "code_send_failed": "Could not send the verification code.",
+      "code_resend_failed": "Could not resend the code.",
+      "signin_status": "Could not sign in (status: %{status}).",
+      "signin_generic": "An error occurred while signing in.",
+      "verify_status": "Could not verify (status: %{status}).",
+      "verify_generic": "An error occurred while verifying the code.",
+      "send_generic": "An error occurred while sending the code.",
+      "password_mismatch": "Passwords do not match.",
+      "password_update_failed": "Could not update the password.",
+      "password_updated_signin": "Password updated. Sign in with your new password.",
+      "reset_status": "Could not complete the reset (status: %{status}).",
+      "reset_generic": "An error occurred while resetting the password."
+    }
+  },
   "resources": {
     "clients": {
       "name": "Client",

@@ -144,6 +144,7 @@ function UserEditFields({
   onChangeRoles: (ids: string[]) => void;
 }) {
   const translate = useTranslate();
+  const record = useRecordContext();
 
   return (
     <>
@@ -165,10 +166,14 @@ function UserEditFields({
         choices={roleChoices}
         validate={required()}
       />
-      <BooleanInput
-        source="isActive"
-        label={translate("list.fields.isActive")}
-      />
+      {/* An awaiting-approval user is activated via Approve/Reject in the detail
+          modal, not this switch — showing it here only confuses admins. */}
+      {!record?.isAwaitingApproval && (
+        <BooleanInput
+          source="isActive"
+          label={translate("list.fields.isActive")}
+        />
+      )}
       <UserRolesField roleIds={roleIds} onChange={onChangeRoles} />
     </>
   );
