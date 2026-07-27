@@ -41,7 +41,11 @@ const ActiveToggle = () => {
   const checked = record.isActive === true;
 
   return (
-    <div className="flex items-center gap-2">
+    // Stop the switch/dialog clicks from also opening the row's detail modal.
+    <div
+      className="flex items-center gap-2"
+      onClick={(e) => e.stopPropagation()}
+    >
       <ConfirmToggleField
         source="isActive"
         labelKey={checked ? "users.actions.disable" : "users.actions.enable"}

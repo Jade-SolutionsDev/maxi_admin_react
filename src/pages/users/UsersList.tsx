@@ -75,6 +75,12 @@ export default function UsersList() {
     >
       <DataTable
         hasBulkActions={false}
+        // Open the detail modal on row click. Pending invitations are synthetic
+        // and soft-deleted users aren't returned by GET /users/:id, so neither
+        // is clickable.
+        rowClick={(_id, _resource, record) =>
+          record.isPending || record.isDeleted ? false : `/users/${record.id}`
+        }
         hiddenColumns={[
           "id",
           "businessName",

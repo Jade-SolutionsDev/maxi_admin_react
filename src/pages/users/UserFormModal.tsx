@@ -1,8 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   EditBase,
   required,
+  useDataProvider,
   useEditContext,
+  useGetList,
   useNotify,
   useRecordContext,
   useSaveContext,
@@ -24,8 +27,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import type { ExtendedDataProvider, RoleSummary } from "@/providers/dataProvider";
+import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
 import { backendMessage } from "./errors";
 
@@ -45,7 +52,97 @@ function EmailField() {
   );
 }
 
-function UserEditFields() {
+/**
+ * Managed-role assignment, moved here from the old row dialog. Selection is
+ * lifted to UserFormModal so it saves together with the profile fields.
+ * `roleIds === null` means the current assignment is still loading.
+ */
+function UserRolesField({
+  roleIds,
+  onChange,
+}: {
+  roleIds: string[] | null;
+  onChange: (ids: string[]) => void;
+}) {
+  const translate = useTranslate();
+  const record = useRecordContext();
+  const { data: roles, isPending } = useGetList<RoleSummary>("roles", {
+    pagination: { page: 1, perPage: 1000 },
+    sort: { field: "name", order: "ASC" },
+  });
+
+  const targetIsAdmin = MANAGER_ROLES.includes(record?.role as Role);
+
+  const toggle = (id: string) => {
+    if (roleIds === null) return;
+    onChange(
+      roleIds.includes(id)
+        ? roleIds.filter((x) => x !== id)
+        : [...roleIds, id],
+    );
+  };
+
+  return (
+    <div className="space-y-2">
+      <span className="text-sm font-medium text-foreground">
+        {translate("resources.roles.name_plural", { _: "Roles & permissions" })}
+      </span>
+
+      {targetIsAdmin && (
+        <Alert>
+          <AlertDescription>
+            {translate("roles.assign_dialog.admin_notice", {
+              _: "Admin users have full access regardless of assigned roles.",
+            })}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {isPending || roleIds === null ? (
+        <p className="text-sm text-muted-foreground">
+          {translate("ra.page.loading", { _: "Loading…" })}
+        </p>
+      ) : (roles ?? []).length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          {translate("roles.assign_dialog.empty", { _: "No roles yet." })}
+        </p>
+      ) : (
+        <ul className="space-y-1 rounded-md border border-border p-1">
+          {(roles ?? []).map((role) => {
+            const id = String(role.id);
+            return (
+              <li key={id}>
+                <label className="flex items-start gap-3 rounded-md p-2 hover:bg-muted/50 cursor-pointer">
+                  <Checkbox
+                    checked={roleIds.includes(id)}
+                    onCheckedChange={() => toggle(id)}
+                    className="mt-0.5"
+                  />
+                  <span className="flex flex-col">
+                    <span className="text-sm font-medium">{role.name}</span>
+                    {role.description && (
+                      <span className="text-xs text-muted-foreground">
+                        {role.description}
+                      </span>
+                    )}
+                  </span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function UserEditFields({
+  roleIds,
+  onChangeRoles,
+}: {
+  roleIds: string[] | null;
+  onChangeRoles: (ids: string[]) => void;
+}) {
   const translate = useTranslate();
 
   return (
@@ -72,6 +169,7 @@ function UserEditFields() {
         source="isActive"
         label={translate("list.fields.isActive")}
       />
+      <UserRolesField roleIds={roleIds} onChange={onChangeRoles} />
     </>
   );
 }
@@ -81,6 +179,30 @@ export default function UserFormModal() {
   const notify = useNotify();
   const { id } = useParams<{ id: string }>();
   const translate = useTranslate();
+  const dataProvider = useDataProvider<ExtendedDataProvider>();
+
+  // Selected managed roles, lifted here so they save with the profile fields.
+  // null until the current assignment loads (and stays null on load failure, so
+  // a failed fetch never wipes the user's roles on save).
+  const [roleIds, setRoleIds] = useState<string[] | null>(null);
+  const roleIdsRef = useRef<string[] | null>(null);
+  roleIdsRef.current = roleIds;
+
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    dataProvider
+      .getUserRoles(id)
+      .then(({ data }) => {
+        if (active) setRoleIds(data.map((r) => String(r.id)));
+      })
+      .catch(() => {
+        // Leave null → save won't touch roles we couldn't read.
+      });
+    return () => {
+      active = false;
+    };
+  }, [id, dataProvider]);
 
   const title = translate("users.actions.edit_title", { _: "Edit user" });
   const onClose = () => navigate("/users");
@@ -103,7 +225,19 @@ export default function UserFormModal() {
             isActive,
           })}
           mutationOptions={{
-            onSuccess: () => {
+            // Profile saved → persist role assignment, then close. Roles ride a
+            // separate endpoint (setUserRoles), so they save after the PATCH.
+            onSuccess: async () => {
+              try {
+                if (id && roleIdsRef.current) {
+                  await dataProvider.setUserRoles(id, roleIdsRef.current);
+                }
+              } catch (error) {
+                notify(backendMessage(error, "Failed to update roles"), {
+                  type: "error",
+                });
+                return;
+              }
               notify("users.actions.update_success", {
                 type: "success",
                 messageArgs: { _: "User updated" },
@@ -117,7 +251,12 @@ export default function UserFormModal() {
             },
           }}
         >
-          <ModalFormShell title={title} onClose={onClose} />
+          <ModalFormShell
+            title={title}
+            onClose={onClose}
+            roleIds={roleIds}
+            onChangeRoles={setRoleIds}
+          />
         </EditBase>
       </DialogContent>
     </Dialog>
@@ -127,9 +266,16 @@ export default function UserFormModal() {
 interface ModalFormShellProps {
   title: string;
   onClose: () => void;
+  roleIds: string[] | null;
+  onChangeRoles: (ids: string[]) => void;
 }
 
-function ModalFormShell({ title, onClose }: ModalFormShellProps) {
+function ModalFormShell({
+  title,
+  onClose,
+  roleIds,
+  onChangeRoles,
+}: ModalFormShellProps) {
   const translate = useTranslate();
   const editContext = useEditContext();
   const isLoading = editContext?.isLoading ?? false;
@@ -152,7 +298,11 @@ function ModalFormShell({ title, onClose }: ModalFormShellProps) {
         className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {isLoading ? <FormSkeleton /> : <UserEditFields />}
+          {isLoading ? (
+            <FormSkeleton />
+          ) : (
+            <UserEditFields roleIds={roleIds} onChangeRoles={onChangeRoles} />
+          )}
         </div>
       </SimpleForm>
     </>
@@ -192,7 +342,7 @@ function SaveButton({ label }: { label: string }) {
   const disabled = isSubmitting || isValidating;
 
   const handleClick = async () => {
-    // Close/notify are handled by EditBase mutationOptions (success/error).
+    // Close/notify (+ role save) are handled by EditBase mutationOptions.
     await form.handleSubmit(async (values) => {
       await saveContext?.save?.(values);
     })();
