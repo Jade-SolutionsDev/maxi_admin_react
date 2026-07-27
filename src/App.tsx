@@ -30,6 +30,7 @@ import Invitation from "./pages/invitation/InvitationPage";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
 import UserCreate from "./pages/users/UserCreate";
+import UserDetailModal from "./pages/users/UserDetailModal";
 import ChangePasswordModal from "./pages/users/ChangePasswordModal";
 import { DepartmentsLayout } from "./pages/departments/DepartmentsLayout";
 import DepartmentCreate from "./pages/departments/DepartmentCreate";
@@ -88,6 +89,7 @@ const AdminApp = () => (
         <Route path="create" element={<UserCreate />} />
         <Route path="edit/:id" element={<UserEdit />} />
         <Route path="password/:id" element={<ChangePasswordModal />} />
+        <Route path=":id" element={<UserDetailModal />} />
       </Route>
       <Route
         path="/departments/*"

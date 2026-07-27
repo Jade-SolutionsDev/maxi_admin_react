@@ -148,6 +148,7 @@
       "delete_success": "User deleted",
       "delete_confirm_title": "Delete user",
       "delete_confirm_description": "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
+      "delete_confirm_description_no_restore": "Are you sure you want to delete %{name}?",
       "update_success": "User updated",
       "change_password": "Change password",
       "cancel": "Cancel"

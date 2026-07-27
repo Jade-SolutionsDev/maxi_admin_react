@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   KeyRound,
   MailCheck,
-  Pencil,
   RotateCcw,
   Trash2,
   XCircle,
@@ -42,7 +41,6 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
-import { ManageUserRolesDialog } from "@/components/users/ManageUserRolesDialog";
 import { backendMessage } from "./errors";
 
 const IconButton = ({
@@ -329,33 +327,6 @@ const ApprovalActionsCell = () => {
   );
 };
 
-const UserEditButton = () => {
-  const record = useRecordContext();
-  const translate = useTranslate();
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={`/users/edit/${record?.id}`}
-            className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
-              "text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
-            )}
-            aria-label={translate("users.actions.edit", { _: "Edit" })}
-          >
-            <Pencil size={16} />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{translate("users.actions.edit", { _: "Edit" })}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
 const UserPasswordButton = () => {
   const record = useRecordContext();
   const { data: identity } = useGetIdentity();
@@ -446,6 +417,8 @@ const UserDeleteButton = () => {
   }
 
   const name = displayName(record);
+  // Only SUPER_ADMIN can restore, so only they see the "can be restored" hint.
+  const canRestore = identity?.role === "SUPER_ADMIN";
 
   const handleConfirm = async () => {
     await deleteOne(
@@ -479,10 +452,17 @@ const UserDeleteButton = () => {
       title={translate("users.actions.delete_confirm_title", {
         _: "Delete user",
       })}
-      description={translate("users.actions.delete_confirm_description", {
-        name,
-        _: "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”.",
-      })}
+      description={translate(
+        canRestore
+          ? "users.actions.delete_confirm_description"
+          : "users.actions.delete_confirm_description_no_restore",
+        {
+          name,
+          _: canRestore
+            ? "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”."
+            : "Are you sure you want to delete %{name}?",
+        },
+      )}
       confirmLabel={translate("users.actions.delete", { _: "Delete" })}
       onConfirm={handleConfirm}
     />
@@ -491,25 +471,32 @@ const UserDeleteButton = () => {
 
 export const UserActionsCell = () => {
   const record = useRecordContext();
+
+  let content: React.ReactNode;
   if (record?.isPending) {
-    return <InvitationActionsCell />;
-  }
-  if (record?.isAwaitingApproval) {
-    return <ApprovalActionsCell />;
-  }
-  if (record?.isDeleted) {
-    return (
-      <div className="flex items-center justify-center gap-1">
-        <UserRestoreButton />
-      </div>
+    content = <InvitationActionsCell />;
+  } else if (record?.isAwaitingApproval) {
+    content = <ApprovalActionsCell />;
+  } else if (record?.isDeleted) {
+    content = <UserRestoreButton />;
+  } else {
+    // Edit + role editing moved to the detail/edit modal; the row keeps the
+    // quick password + delete actions.
+    content = (
+      <>
+        <UserPasswordButton />
+        <UserDeleteButton />
+      </>
     );
   }
+
+  // The row itself opens the detail modal — keep action clicks from bubbling.
   return (
-    <div className="flex items-center justify-center gap-1">
-      <UserEditButton />
-      <ManageUserRolesDialog />
-      <UserPasswordButton />
-      <UserDeleteButton />
+    <div
+      className="flex items-center justify-center gap-1"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {content}
     </div>
   );
 };
