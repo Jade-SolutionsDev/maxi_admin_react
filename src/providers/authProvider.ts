@@ -156,6 +156,10 @@ export const authProvider: AuthProvider = {
       case "roles":
       case "settings":
         return false;
+      // Cross-storage inventory overview: managers (handled above) + kardist.
+      // Grocers use the per-storage Almacenes tab instead.
+      case "inventory":
+        return identity.role === "KARDIST";
       default:
         // Catalog + operational modules are governed by the effective
         // permission map (products, categories, departments, stock-locations).

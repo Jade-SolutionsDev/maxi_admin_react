@@ -44,6 +44,10 @@
     "orders": {
       "name": "Order",
       "name_plural": "Orders"
+    },
+    "inventory": {
+      "name": "Inventory",
+      "name_plural": "Inventory"
     }
   },
   "list": {
@@ -83,7 +87,13 @@
       "minPrice": "Min price",
       "maxPrice": "Max price",
       "childrenCount": "Categories",
-      "productsCount": "Products"
+      "productsCount": "Products",
+      "minStock": "Min stock",
+      "maxStock": "Max stock",
+      "real": "Real",
+      "reserved": "Reserved",
+      "available": "Available",
+      "storages": "Storages"
     }
   },
   "users": {
@@ -424,10 +434,37 @@
       "empty_hint": "This product has no stock recorded in any storage."
     }
   },
+  "inventory": {
+    "tabs": {
+      "storages": "Stock by storage",
+      "history": "Movement history"
+    },
+    "actions": {
+      "view_breakdown": "Stock by storage",
+      "view_product": "View product"
+    },
+    "detail": {
+      "empty_title": "No stock"
+    },
+    "history": {
+      "empty_title": "No movements",
+      "empty_hint": "No stock changes have been recorded yet.",
+      "order": "Order",
+      "type": {
+        "IN": "Stock in",
+        "OUT": "Stock out",
+        "TRANSFER": "Transfer",
+        "reserved": "Reserved",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled"
+      }
+    }
+  },
   "stockLocations": {
     "tabs": {
       "general": "General",
-      "products": "Products"
+      "products": "Products",
+      "history": "History"
     },
     "sections": {
       "info": "Warehouse information",

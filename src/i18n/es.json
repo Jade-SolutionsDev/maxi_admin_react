@@ -44,6 +44,10 @@
     "orders": {
       "name": "Pedido",
       "name_plural": "Pedidos"
+    },
+    "inventory": {
+      "name": "Inventario",
+      "name_plural": "Inventario"
     }
   },
   "list": {
@@ -83,7 +87,13 @@
       "minPrice": "Precio mín.",
       "maxPrice": "Precio máx.",
       "childrenCount": "Categorías",
-      "productsCount": "Productos"
+      "productsCount": "Productos",
+      "minStock": "Existencia mín.",
+      "maxStock": "Existencia máx.",
+      "real": "Real",
+      "reserved": "Reservado",
+      "available": "Disponible",
+      "storages": "Almacenes"
     }
   },
   "users": {
@@ -424,10 +434,37 @@
       "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."
     }
   },
+  "inventory": {
+    "tabs": {
+      "storages": "Existencias por almacén",
+      "history": "Historial de movimientos"
+    },
+    "actions": {
+      "view_breakdown": "Existencias por almacén",
+      "view_product": "Ver producto"
+    },
+    "detail": {
+      "empty_title": "Sin existencias"
+    },
+    "history": {
+      "empty_title": "Sin movimientos",
+      "empty_hint": "Aún no se registran cambios de existencia.",
+      "order": "Pedido",
+      "type": {
+        "IN": "Entrada",
+        "OUT": "Salida",
+        "TRANSFER": "Transferencia",
+        "reserved": "Reserva",
+        "confirmed": "Confirmado",
+        "cancelled": "Cancelado"
+      }
+    }
+  },
   "stockLocations": {
     "tabs": {
       "general": "Datos generales",
-      "products": "Productos"
+      "products": "Productos",
+      "history": "Historial"
     },
     "sections": {
       "info": "Información del almacén",

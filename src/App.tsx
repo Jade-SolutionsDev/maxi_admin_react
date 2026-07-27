@@ -19,6 +19,8 @@ import ProductEdit from "./pages/products/ProductEdit";
 import { ProductDetailModal } from "./pages/products/ProductDetailModal";
 import StockLocationsList from "./pages/stock-locations/StockLocationsList";
 import StockLocationDetailPage from "./pages/stock-locations/StockLocationDetailPage";
+import InventoryList from "./pages/inventory/InventoryList";
+import InventoryDetailPage from "./pages/inventory/InventoryDetailPage";
 import OrdersList from "./pages/orders/OrdersList";
 import OrderDetailPage from "./pages/orders/OrderDetailPage";
 import ClientDetailPage from "./pages/clients/ClientDetailPage";
@@ -150,6 +152,22 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="stock-locations" action="read">
             <StockLocationDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/inventory"
+        element={
+          <RequireAccess resource="inventory">
+            <InventoryList />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/inventory/:productId"
+        element={
+          <RequireAccess resource="inventory" action="read">
+            <InventoryDetailPage />
           </RequireAccess>
         }
       />

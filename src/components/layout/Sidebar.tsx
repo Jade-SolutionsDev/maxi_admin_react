@@ -114,7 +114,8 @@ const navItems: NavItem[] = [
   {
     labelKey: "app.menu.inventario",
     icon: <ClipboardList size={20} />,
-    soon: true,
+    path: "/inventory",
+    resource: "inventory",
   },
   {
     labelKey: "app.menu.almacenes",

@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Boxes,
   CheckCircle2,
+  ClipboardList,
   Loader2,
   Save,
   Settings2,
@@ -28,6 +29,7 @@ import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { StockLocationFormFields } from "./StockLocationFormFields";
 import { StockLocationProductsTab } from "./StockLocationProductsTab";
 import { CreateOperationWizard } from "./CreateOperationWizard";
+import { OperationHistoryTab } from "../inventory/OperationHistoryTab";
 
 const sanitize = (data: Record<string, unknown>) => ({
   name: data.name,
@@ -36,7 +38,7 @@ const sanitize = (data: Record<string, unknown>) => ({
   ...(data.grocerIds !== undefined ? { grocerIds: data.grocerIds } : {}),
 });
 
-type TabKey = "general" | "productos";
+type TabKey = "general" | "productos" | "historial";
 
 export default function StockLocationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -77,6 +79,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
   const tabs: { key: TabKey; label: string; icon: typeof Boxes }[] = [
     { key: "general", label: "stockLocations.tabs.general", icon: SlidersHorizontal },
     { key: "productos", label: "stockLocations.tabs.products", icon: Boxes },
+    { key: "historial", label: "stockLocations.tabs.history", icon: ClipboardList },
   ];
 
   return (
@@ -179,6 +182,13 @@ function DetailShell({ isManager }: { isManager: boolean }) {
 
       {tab === "productos" && (
         <StockLocationProductsTab locationId={record.id as string} />
+      )}
+
+      {tab === "historial" && (
+        <OperationHistoryTab
+          locationId={record.id as string}
+          enabled={tab === "historial"}
+        />
       )}
     </>
   );
