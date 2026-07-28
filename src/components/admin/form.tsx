@@ -87,7 +87,12 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      // Colour the ra-core required marker (<span aria-hidden> *</span>) red so
+      // it matches the manual `*`s in the custom modal forms.
+      className={cn(
+        "data-[error=true]:text-destructive [&_span[aria-hidden=true]]:text-destructive",
+        className,
+      )}
       htmlFor={formItemId}
       {...props}
     />
