@@ -95,6 +95,7 @@ export default function StockLocationsList() {
         <DataTable
           rowClick={(id) => `/stock-locations/${id}`}
           bulkActionButtons={false}
+          rowClassName={() => "[&>td]:py-4"}
         >
           <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
             <RowNumberField />
