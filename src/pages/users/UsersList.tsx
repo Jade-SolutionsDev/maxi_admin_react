@@ -21,8 +21,6 @@ import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
 import { RoleBadge } from "./RoleBadge";
 import { StatusCell, UserAvatar, UserNameCell } from "./userCells";
-// Commented out alongside the actions column below (kept for future use).
-// import { UserActionsCell } from "./userRowActions";
 
 const userFilters = [
   <SearchInput source="q" alwaysOn />,
@@ -50,10 +48,7 @@ const UserActions = () => {
       <ColumnsButton />
       {/* <FilterButton variant="outline" size="lg" /> */}
       {canManage && (
-        <Link
-          to="/users/create"
-          className={cn(buttonVariants({ size: "lg" }))}
-        >
+        <Link to="/users/create" className={cn(buttonVariants({ size: "lg" }))}>
           <UserPlus className="mr-2 h-4 w-4" />
           {translate("users.actions.add", { _: "Invite user" })}
         </Link>
