@@ -121,13 +121,13 @@ export default function UsersList() {
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
         </DataTable.Col>
-        <DataTable.Col
+        {/* <DataTable.Col
           label="list.fields.actions"
           disableSort
           cellClassName="text-center w-28"
         >
           <UserActionsCell />
-        </DataTable.Col>
+        </DataTable.Col> */}
       </DataTable>
     </List>
   );
