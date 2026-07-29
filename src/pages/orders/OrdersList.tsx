@@ -10,6 +10,7 @@ import {
   DateField,
   List,
   RefreshButton,
+  RowNumberField,
   SearchInput,
   SelectInput,
 } from "@/components/admin";
@@ -99,6 +100,9 @@ export default function OrdersList() {
         empty={false}
       >
         <DataTable rowClick={(id) => `/orders/${id}`} bulkActionButtons={false}>
+          <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+            <RowNumberField />
+          </DataTable.Col>
           <DataTable.Col source="orderNumber" label="orders.fields.orderNumber">
             <NumberCell />
           </DataTable.Col>

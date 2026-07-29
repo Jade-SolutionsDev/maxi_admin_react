@@ -3,14 +3,21 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
   useDataProvider,
+  useDelete,
   useGetOne,
-  useRecordContext,
+  useNotify,
+  useRefresh,
   useTranslate,
 } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, ImageOff, Package, PackageSearch, Pencil, Warehouse } from "lucide-react";
+import { ImageOff, Package, PackageSearch, Pencil, Trash2, Warehouse } from "lucide-react";
 
-import { BooleanField, DateField, ReferenceField } from "@/components/admin";
+import {
+  ConfirmActionButton,
+  ConfirmToggleField,
+  DateField,
+  ReferenceField,
+} from "@/components/admin";
 import { buttonVariants } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
 import {
@@ -21,12 +28,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 // Prices are shown in USD to match the products list.
@@ -132,12 +133,39 @@ export function ProductDetailModal() {
   const { id } = useParams<{ id: string }>();
   const [tab, setTab] = useState<TabKey>("details");
 
+  const notify = useNotify();
+  const refresh = useRefresh();
+  const [deleteOne, { isPending: removing }] = useDelete();
+
   const onClose = () => navigate("/products");
   const { data: record, isLoading } = useGetOne(
     "products",
     { id: id as string },
     { enabled: Boolean(id), onError: onClose },
   );
+
+  const remove = () =>
+    deleteOne(
+      "products",
+      { id: record!.id, previousData: record },
+      {
+        mutationMode: "pessimistic",
+        onSuccess: () => {
+          notify("shared.actions.delete_success", { type: "info" });
+          refresh();
+          navigate("/products");
+        },
+        // Surface the backend's message (e.g. the 409 "still has stock" guard).
+        onError: (error: unknown) => {
+          const backendMessage = (
+            error as { body?: { error?: { message?: string } } }
+          )?.body?.error?.message;
+          notify(backendMessage ?? translate("shared.actions.error"), {
+            type: "error",
+          });
+        },
+      },
+    );
 
   const imageUrl = record?.imageUrl as string | null | undefined;
   const measureUnit = (record?.measureUnit as string) || "";
@@ -244,10 +272,18 @@ export function ProductDetailModal() {
                     </span>
                   </DetailRow>
                   <DetailRow label={translate("list.fields.featured")}>
-                    <BooleanField source="featured" />
+                    <ConfirmToggleField
+                      source="featured"
+                      labelKey="list.fields.featured"
+                      confirmKey="products.toggles.featured"
+                    />
                   </DetailRow>
                   <DetailRow label={translate("list.fields.isActive")}>
-                    <BooleanField source="isActive" />
+                    <ConfirmToggleField
+                      source="isActive"
+                      labelKey="list.fields.isActive"
+                      confirmKey="products.toggles.isActive"
+                    />
                   </DetailRow>
                   <DetailRow label={translate("list.fields.sortOrder")}>
                     {(record.sortOrder as number) ?? 0}
@@ -272,7 +308,23 @@ export function ProductDetailModal() {
         )}
 
         {record && (
-          <DialogFooter>
+          <DialogFooter className="sm:justify-end gap-2">
+            <ConfirmActionButton
+              label={translate("shared.actions.delete", { _: "Delete" })}
+              icon={<Trash2 className="mr-2 h-4 w-4" />}
+              destructive
+              disabled={removing}
+              title={translate("shared.actions.delete_confirm_title", {
+                name: translate("resources.products.name", { _: "product" }),
+                _: "Delete product",
+              })}
+              description={translate("shared.actions.delete_confirm_description", {
+                name: (record.name as string) || "",
+                _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+              })}
+              confirmLabel={translate("shared.actions.delete", { _: "Delete" })}
+              onConfirm={remove}
+            />
             <Link
               to={`/products/edit/${record.id}`}
               className={cn(buttonVariants())}
@@ -284,39 +336,5 @@ export function ProductDetailModal() {
         )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-/**
- * Eye-icon row action that deep-links to the product detail route
- * `/products/:id`. Read action → all users.
- */
-export function ProductViewButton() {
-  const record = useRecordContext();
-  const translate = useTranslate();
-  const label = translate("shared.actions.view", { _: "View details" });
-
-  if (!record) return null;
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={`/products/${record.id}`}
-            aria-label={label}
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon" }),
-              "h-8 w-8 text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Eye size={16} />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{label}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   );
 }

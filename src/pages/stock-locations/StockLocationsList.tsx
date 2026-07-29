@@ -2,37 +2,21 @@ import { useState } from "react";
 import {
   ResourceContextProvider,
   useCanAccess,
-  useDelete,
-  useNotify,
   useRecordContext,
-  useRefresh,
-  useResourceContext,
   useTranslate,
-  useUpdate,
   type RaRecord,
 } from "ra-core";
-import { AlertTriangle, Plus, Trash2, Warehouse } from "lucide-react";
+import { Plus, Warehouse } from "lucide-react";
 
 import {
   DataTable,
   List,
   RefreshButton,
+  RowNumberField,
   SearchInput,
   SelectInput,
 } from "@/components/admin";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { StockLocationCreateModal } from "./StockLocationCreateModal";
 
 const BOOL_CHOICES = [
@@ -68,137 +52,6 @@ const CoverageSummary = (record: RaRecord) => {
   );
 };
 
-/** Inline availability switch; the backend enforces assignment for grocers. */
-const StatusToggle = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const notify = useNotify();
-  const refresh = useRefresh();
-  const translate = useTranslate();
-  const [update, { isPending }] = useUpdate();
-  const { canAccess: canEdit } = useCanAccess({
-    resource: "stock-locations",
-    action: "edit",
-  });
-
-  if (!record) return null;
-  const checked = record.isActive === true;
-
-  const handleChange = async (value: boolean) => {
-    try {
-      await update(
-        resource,
-        { id: record.id, data: { isActive: value }, previousData: record },
-        { mutationMode: "pessimistic" },
-      );
-      refresh();
-    } catch {
-      notify("shared.actions.error", {
-        type: "error",
-        messageArgs: { _: "Could not update" },
-      });
-      refresh();
-    }
-  };
-
-  return (
-    <span onClick={(e) => e.stopPropagation()} className="inline-flex">
-      <Switch
-        checked={checked}
-        onCheckedChange={handleChange}
-        disabled={!canEdit || isPending}
-        aria-label={translate("list.fields.isActive")}
-      />
-    </span>
-  );
-};
-
-const DeleteButton = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const translate = useTranslate();
-  const refresh = useRefresh();
-  const [open, setOpen] = useState(false);
-  const [deleteOne, { isPending }] = useDelete();
-
-  const handleConfirm = async () => {
-    await deleteOne(
-      resource,
-      { id: record?.id, previousData: record },
-      {
-        mutationMode: "pessimistic",
-        onSuccess: () => {
-          setOpen(false);
-          refresh();
-        },
-        onError: () => setOpen(false),
-      },
-    );
-  };
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-destructive hover:bg-destructive/10"
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen(true);
-        }}
-        aria-label={translate("shared.actions.delete", { _: "Delete" })}
-      >
-        <Trash2 size={16} />
-      </Button>
-      <AlertDialogContent
-        className="sm:max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <AlertDialogHeader className="space-y-3">
-          <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
-          </div>
-          <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {translate("stockLocations.actions.delete_title", {
-              _: "Eliminar almacén",
-            })}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center sm:text-left">
-            {translate("shared.actions.delete_confirm_description", {
-              _: "Are you sure you want to delete %{name}? This action cannot be undone.",
-              name: (record?.name as string) || "",
-            })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="sm:justify-end">
-          <AlertDialogCancel disabled={isPending}>
-            {translate("shared.actions.cancel", { _: "Cancel" })}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            disabled={isPending}
-            className={cn(buttonVariants({ variant: "destructive" }))}
-          >
-            {translate("shared.actions.confirm", { _: "Delete" })}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-};
-
-const ActionsCell = () => {
-  const { canAccess: canDelete } = useCanAccess({
-    resource: "stock-locations",
-    action: "delete",
-  });
-  return (
-    <div className="flex items-center justify-end">
-      {canDelete && <DeleteButton />}
-    </div>
-  );
-};
 
 const ListActions = ({ onCreate }: { onCreate: () => void }) => {
   const translate = useTranslate();
@@ -243,6 +96,9 @@ export default function StockLocationsList() {
           rowClick={(id) => `/stock-locations/${id}`}
           bulkActionButtons={false}
         >
+          <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+            <RowNumberField />
+          </DataTable.Col>
           <DataTable.Col source="name" label="list.fields.name">
             <NameCell />
           </DataTable.Col>
@@ -251,16 +107,6 @@ export default function StockLocationsList() {
             disableSort
             render={CoverageSummary}
           />
-          <DataTable.Col
-            source="isActive"
-            label="stockLocations.fields.available"
-            disableSort
-          >
-            <StatusToggle />
-          </DataTable.Col>
-          <DataTable.Col label="list.fields.actions" disableSort>
-            <ActionsCell />
-          </DataTable.Col>
         </DataTable>
       </List>
 

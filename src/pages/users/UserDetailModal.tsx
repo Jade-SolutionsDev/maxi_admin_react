@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
@@ -10,21 +10,11 @@ import {
   useTranslate,
   useUpdate,
 } from "ra-core";
-import { DateField } from "@/components/admin";
-import { AlertTriangle, CheckCircle2, Pencil, Trash2, User, XCircle } from "lucide-react";
+import { ConfirmActionButton, DateField } from "@/components/admin";
+import { CheckCircle2, KeyRound, Pencil, Trash2, User, XCircle } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -54,79 +44,6 @@ function DetailSkeleton() {
         <div key={i} className="h-6 w-full rounded bg-muted animate-pulse" />
       ))}
     </div>
-  );
-}
-
-/** Footer button that confirms in an AlertDialog before running its action. */
-function ConfirmActionButton({
-  label,
-  icon,
-  title,
-  description,
-  confirmLabel,
-  onConfirm,
-  destructive,
-  disabled,
-}: {
-  label: string;
-  icon: ReactNode;
-  title: string;
-  description: string;
-  confirmLabel: string;
-  onConfirm: () => void | Promise<void>;
-  destructive?: boolean;
-  disabled?: boolean;
-}) {
-  const translate = useTranslate();
-  const [open, setOpen] = useState(false);
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <Button
-        type="button"
-        variant="outline"
-        disabled={disabled}
-        onClick={() => setOpen(true)}
-        className={cn(
-          destructive &&
-            "text-destructive hover:text-destructive hover:bg-destructive/10",
-        )}
-      >
-        {icon}
-        {label}
-      </Button>
-
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader className="space-y-3">
-          {destructive && (
-            <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
-            </div>
-          )}
-          <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {title}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center sm:text-left">
-            {description}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="sm:justify-end">
-          <AlertDialogCancel disabled={disabled}>
-            {translate("shared.actions.cancel", { _: "Cancel" })}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={async () => {
-              setOpen(false);
-              await onConfirm();
-            }}
-            disabled={disabled}
-            className={cn(destructive && buttonVariants({ variant: "destructive" }))}
-          >
-            {confirmLabel}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   );
 }
 
@@ -299,33 +216,44 @@ export default function UserDetailModal() {
               </>
             ) : (
               !isSelf && (
-                <ConfirmActionButton
-                  label={translate("users.actions.delete", { _: "Delete" })}
-                  icon={<Trash2 className="mr-2 h-4 w-4" />}
-                  destructive
-                  disabled={busy}
-                  title={translate("users.actions.delete_confirm_title", {
-                    _: "Delete user",
-                  })}
-                  description={translate(
-                    canRestore
-                      ? "users.actions.delete_confirm_description"
-                      : "users.actions.delete_confirm_description_no_restore",
-                    {
-                      name,
-                      _: canRestore
-                        ? "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”."
-                        : "Are you sure you want to delete %{name}?",
-                    },
-                  )}
-                  confirmLabel={translate("users.actions.delete", {
-                    _: "Delete",
-                  })}
-                  onConfirm={softDelete(
-                    "users.actions.delete_success",
-                    "User deleted",
-                  )}
-                />
+                <>
+                  <ConfirmActionButton
+                    label={translate("users.actions.delete", { _: "Delete" })}
+                    icon={<Trash2 className="mr-2 h-4 w-4" />}
+                    destructive
+                    disabled={busy}
+                    title={translate("users.actions.delete_confirm_title", {
+                      _: "Delete user",
+                    })}
+                    description={translate(
+                      canRestore
+                        ? "users.actions.delete_confirm_description"
+                        : "users.actions.delete_confirm_description_no_restore",
+                      {
+                        name,
+                        _: canRestore
+                          ? "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”."
+                          : "Are you sure you want to delete %{name}?",
+                      },
+                    )}
+                    confirmLabel={translate("users.actions.delete", {
+                      _: "Delete",
+                    })}
+                    onConfirm={softDelete(
+                      "users.actions.delete_success",
+                      "User deleted",
+                    )}
+                  />
+                  <Link
+                    to={`/users/password/${record.id}`}
+                    className={cn(buttonVariants({ variant: "outline" }))}
+                  >
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    {translate("users.actions.change_password", {
+                      _: "Change password",
+                    })}
+                  </Link>
+                </>
               )
             )}
             <Link

@@ -2,13 +2,16 @@ import { type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
+  useDelete,
   useGetOne,
-  useRecordContext,
+  useNotify,
+  useRefresh,
   useResourceContext,
   useTranslate,
 } from "ra-core";
-import { Eye, ImageOff, Pencil } from "lucide-react";
-import { BooleanField } from "@/components/admin/boolean-field";
+import { ImageOff, Pencil, Trash2 } from "lucide-react";
+import { ConfirmActionButton } from "@/components/admin/confirm-action-button";
+import { ConfirmToggleField } from "@/components/admin/confirm-toggle-field";
 import { DateField } from "@/components/admin/date-field";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,12 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 function DetailRow({ label, children }: { label: string; children: ReactNode }) {
@@ -76,6 +73,10 @@ export function TaxonomyDetailModal() {
   const resource = useResourceContext();
   const { id } = useParams<{ id: string }>();
 
+  const notify = useNotify();
+  const refresh = useRefresh();
+  const [deleteOne, { isPending: removing }] = useDelete();
+
   const onClose = () => navigate(`/${resource}`);
   const { data: record, isLoading } = useGetOne(
     resource as string,
@@ -84,6 +85,29 @@ export function TaxonomyDetailModal() {
   );
 
   const isDepartment = record?.parentId == null;
+
+  const remove = () =>
+    deleteOne(
+      resource as string,
+      { id: record!.id, previousData: record },
+      {
+        mutationMode: "pessimistic",
+        onSuccess: () => {
+          notify("shared.actions.delete_success", { type: "info" });
+          refresh();
+          navigate(`/${resource}`);
+        },
+        // Surface the backend guard (department has categories / category has products).
+        onError: (error: unknown) => {
+          const backendMessage = (
+            error as { body?: { error?: { message?: string } } }
+          )?.body?.error?.message;
+          notify(backendMessage ?? translate("shared.actions.error"), {
+            type: "error",
+          });
+        },
+      },
+    );
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -123,7 +147,11 @@ export function TaxonomyDetailModal() {
                 <DetailRow
                   label={translate("list.fields.featured", { _: "Featured" })}
                 >
-                  <BooleanField source="isFeatured" />
+                  <ConfirmToggleField
+                    source="isFeatured"
+                    labelKey="list.fields.featured"
+                    confirmKey="shared.actions.toggle_featured"
+                  />
                 </DetailRow>
               )}
               <DetailRow label={translate("list.fields.description")}>
@@ -135,7 +163,11 @@ export function TaxonomyDetailModal() {
                 {record.sortOrder ?? 0}
               </DetailRow>
               <DetailRow label={translate("list.fields.isActive")}>
-                <BooleanField source="isActive" />
+                <ConfirmToggleField
+                  source="isActive"
+                  labelKey="list.fields.isActive"
+                  confirmKey="shared.actions.toggle_active"
+                />
               </DetailRow>
               <DetailRow label={translate("list.fields.createdAt")}>
                 <DateField source="createdAt" showTime />
@@ -148,7 +180,27 @@ export function TaxonomyDetailModal() {
         )}
 
         {record && (
-          <DialogFooter>
+          <DialogFooter className="sm:justify-end gap-2">
+            <ConfirmActionButton
+              label={translate("shared.actions.delete", { _: "Delete" })}
+              icon={<Trash2 className="mr-2 h-4 w-4" />}
+              destructive
+              disabled={removing}
+              title={translate("shared.actions.delete_confirm_title", {
+                name: translate(
+                  isDepartment
+                    ? "resources.departments.name"
+                    : "resources.categories.name",
+                ),
+                _: "Delete",
+              })}
+              description={translate("shared.actions.delete_confirm_description", {
+                name: (record.name as string) || "",
+                _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+              })}
+              confirmLabel={translate("shared.actions.delete", { _: "Delete" })}
+              onConfirm={remove}
+            />
             <Link
               to={`/${resource}/edit/${record.id}`}
               className={cn(buttonVariants())}
@@ -160,40 +212,5 @@ export function TaxonomyDetailModal() {
         )}
       </DialogContent>
     </Dialog>
-  );
-}
-
-/**
- * Eye-icon row action that deep-links to the taxonomy detail route
- * `/[resource]/:id`. Available to every user (view is a read action).
- */
-export function TaxonomyViewButton() {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const translate = useTranslate();
-  const label = translate("shared.actions.view", { _: "View details" });
-
-  if (!record) return null;
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={`/${resource}/${record.id}`}
-            aria-label={label}
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon" }),
-              "h-8 w-8 text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Eye size={16} />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{label}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   );
 }

@@ -1,26 +1,18 @@
 import { useState } from "react";
-import type { RaRecord } from "ra-core";
 import {
   useDataProvider,
-  useDelete,
   useGetIdentity,
   useNotify,
   useRecordContext,
   useRefresh,
-  useResourceContext,
   useTranslate,
-  useUpdate,
 } from "ra-core";
 import {
   AlertTriangle,
-  CheckCircle2,
-  KeyRound,
   MailCheck,
   RotateCcw,
-  Trash2,
   XCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -78,11 +70,6 @@ const IconButton = ({
   </TooltipProvider>
 );
 
-/** Best display name for confirmation copy: full name, else the email. */
-const displayName = (record: RaRecord): string =>
-  [record.firstName, record.lastName].filter(Boolean).join(" ") ||
-  (record.email as string) ||
-  "";
 
 /**
  * Icon button that asks for confirmation before running its action — the
@@ -241,125 +228,6 @@ const InvitationActionsCell = () => {
   );
 };
 
-/** Actions for a registered user awaiting admin approval (`isAwaitingApproval`).
- *  Approve enables the account (PATCH isActive) — first activation stamps
- *  approvedAt on the backend; Reject soft-deletes the request. */
-const ApprovalActionsCell = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const translate = useTranslate();
-  const notify = useNotify();
-  const refresh = useRefresh();
-  const [update, { isPending: approving }] = useUpdate();
-  const [deleteOne, { isPending: rejecting }] = useDelete();
-  const busy = approving || rejecting;
-
-  if (!record) return null;
-
-  const approve = async () => {
-    try {
-      await update(
-        resource,
-        { id: record.id, data: { isActive: true }, previousData: record },
-        { mutationMode: "pessimistic" },
-      );
-      notify("users.actions.approve_success", {
-        type: "success",
-        messageArgs: { _: "User approved" },
-      });
-      refresh();
-    } catch (error) {
-      notify(backendMessage(error, "Could not approve user"), { type: "error" });
-      refresh();
-    }
-  };
-
-  const reject = async () => {
-    try {
-      await deleteOne(
-        resource,
-        { id: record.id, previousData: record },
-        { mutationMode: "pessimistic" },
-      );
-      notify("users.actions.reject_success", {
-        type: "success",
-        messageArgs: { _: "Request rejected" },
-      });
-      refresh();
-    } catch (error) {
-      notify(backendMessage(error, "Could not reject user"), { type: "error" });
-      refresh();
-    }
-  };
-
-  const name = displayName(record);
-
-  return (
-    <div className="flex items-center justify-center gap-1">
-      <ConfirmIconButton
-        icon={<CheckCircle2 size={16} />}
-        label={translate("users.actions.approve", { _: "Approve" })}
-        className="text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
-        disabled={busy}
-        title={translate("users.confirm.approve.title", { _: "Approve user" })}
-        description={translate("users.confirm.approve.description", {
-          name,
-          _: `Approve ${name}? They will be able to sign in.`,
-        })}
-        confirmLabel={translate("users.actions.approve", { _: "Approve" })}
-        onConfirm={approve}
-      />
-      <ConfirmIconButton
-        icon={<XCircle size={16} />}
-        label={translate("users.actions.reject", { _: "Reject" })}
-        className="text-destructive hover:bg-destructive/10"
-        destructive
-        disabled={busy}
-        title={translate("users.confirm.reject.title", { _: "Reject request" })}
-        description={translate("users.confirm.reject.description", {
-          name,
-          _: `Reject ${name}? They will not get access.`,
-        })}
-        confirmLabel={translate("users.actions.reject", { _: "Reject" })}
-        onConfirm={reject}
-      />
-    </div>
-  );
-};
-
-const UserPasswordButton = () => {
-  const record = useRecordContext();
-  const { data: identity } = useGetIdentity();
-  const translate = useTranslate();
-
-  // Own password is changed from the profile, not here (backend enforces too).
-  if (!record || record.id === identity?.id) return null;
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={`/users/password/${record.id}`}
-            className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
-              "text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30",
-            )}
-            aria-label={translate("users.actions.change_password", {
-              _: "Change password",
-            })}
-          >
-            <KeyRound size={16} />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{translate("users.actions.change_password", { _: "Change password" })}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
 const UserRestoreButton = () => {
   const record = useRecordContext();
   const dataProvider = useDataProvider() as ExtendedDataProvider;
@@ -401,94 +269,21 @@ const UserRestoreButton = () => {
   );
 };
 
-const UserDeleteButton = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const { data: identity } = useGetIdentity();
-  const translate = useTranslate();
-  const notify = useNotify();
-  const refresh = useRefresh();
-  const [deleteOne, { isPending }] = useDelete();
-
-  const isSelf = record?.id === identity?.id;
-  // You cannot delete yourself; already-deleted rows show Restore instead.
-  if (!record || isSelf || record.isDeleted) {
-    return null;
-  }
-
-  const name = displayName(record);
-  // Only SUPER_ADMIN can restore, so only they see the "can be restored" hint.
-  const canRestore = identity?.role === "SUPER_ADMIN";
-
-  const handleConfirm = async () => {
-    await deleteOne(
-      resource,
-      { id: record.id, previousData: record },
-      {
-        mutationMode: "pessimistic",
-        onSuccess: () => {
-          notify("users.actions.delete_success", {
-            type: "success",
-            messageArgs: { _: "User deleted" },
-          });
-          refresh();
-        },
-        onError: (error) => {
-          notify(backendMessage(error, "Could not delete user"), {
-            type: "error",
-          });
-        },
-      },
-    );
-  };
-
-  return (
-    <ConfirmIconButton
-      icon={<Trash2 size={16} />}
-      label={translate("users.actions.delete", { _: "Delete" })}
-      className="text-destructive hover:bg-destructive/10"
-      destructive
-      disabled={isPending}
-      title={translate("users.actions.delete_confirm_title", {
-        _: "Delete user",
-      })}
-      description={translate(
-        canRestore
-          ? "users.actions.delete_confirm_description"
-          : "users.actions.delete_confirm_description_no_restore",
-        {
-          name,
-          _: canRestore
-            ? "Are you sure you want to delete %{name}? You can restore them later from “Show deleted”."
-            : "Are you sure you want to delete %{name}?",
-        },
-      )}
-      confirmLabel={translate("users.actions.delete", { _: "Delete" })}
-      onConfirm={handleConfirm}
-    />
-  );
-};
-
 export const UserActionsCell = () => {
   const record = useRecordContext();
 
-  let content: React.ReactNode;
+  // Normal and awaiting-approval rows open the detail modal, which now hosts
+  // their actions (edit / change-password / delete / approve / reject). Only
+  // the non-navigable synthetic rows keep inline actions: a pending invitation
+  // is not a user, and a soft-deleted user isn't returned by GET /users/:id.
+  let content: React.ReactNode = null;
   if (record?.isPending) {
     content = <InvitationActionsCell />;
-  } else if (record?.isAwaitingApproval) {
-    content = <ApprovalActionsCell />;
   } else if (record?.isDeleted) {
     content = <UserRestoreButton />;
-  } else {
-    // Edit + role editing moved to the detail/edit modal; the row keeps the
-    // quick password + delete actions.
-    content = (
-      <>
-        <UserPasswordButton />
-        <UserDeleteButton />
-      </>
-    );
   }
+
+  if (!content) return null;
 
   // The row itself opens the detail modal — keep action clicks from bubbling.
   return (
