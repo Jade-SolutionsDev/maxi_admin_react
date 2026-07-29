@@ -8,6 +8,7 @@ import {
   DateField,
   List,
   RefreshButton,
+  RowNumberField,
   SearchInput,
   SelectInput,
 } from "@/components/admin";
@@ -92,6 +93,9 @@ export default function UsersList() {
           "isPending",
         ]}
       >
+        <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+          <RowNumberField />
+        </DataTable.Col>
         <DataTable.Col
           source="avatarUrl"
           disableSort

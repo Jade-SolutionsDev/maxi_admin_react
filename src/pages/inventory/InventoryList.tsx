@@ -1,7 +1,7 @@
 import { useTranslate } from "ra-core";
 import type { RaRecord } from "ra-core";
 import { Link } from "react-router-dom";
-import { Eye, ImageOff, Package } from "lucide-react";
+import { ImageOff } from "lucide-react";
 
 import {
   ColumnsButton,
@@ -12,16 +12,10 @@ import {
   ReferenceField,
   ReferenceInput,
   RefreshButton,
+  RowNumberField,
   SearchInput,
   SelectInput,
 } from "@/components/admin";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const inventoryFilters = [
@@ -104,53 +98,8 @@ const AvailableCell = (record: RaRecord) => {
   );
 };
 
-const RowActions = () => {
-  const translate = useTranslate();
-  return (record: RaRecord) => (
-    <div className="flex items-center justify-center gap-1">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              to={`/inventory/${record.id}`}
-              aria-label={translate("shared.actions.view", { _: "View" })}
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "icon" }),
-                "h-8 w-8 text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Eye size={16} />
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{translate("inventory.actions.view_breakdown", { _: "Existencias por almacén" })}</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              to={`/products/${record.id}`}
-              aria-label={translate("inventory.actions.view_product", { _: "Product" })}
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "icon" }),
-                "h-8 w-8 text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Package size={16} />
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{translate("inventory.actions.view_product", { _: "Ver producto" })}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  );
-};
-
 export default function InventoryList() {
   const translate = useTranslate();
-  const rowActions = RowActions();
 
   return (
     <List
@@ -160,7 +109,14 @@ export default function InventoryList() {
       title={translate("resources.inventory.name_plural", { _: "Inventario" })}
       perPage={10}
     >
-      <DataTable hasBulkActions={false} hiddenColumns={["id"]}>
+      <DataTable
+        hasBulkActions={false}
+        hiddenColumns={["id"]}
+        rowClick={(id) => `/inventory/${id}`}
+      >
+        <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+          <RowNumberField />
+        </DataTable.Col>
         <DataTable.Col
           label="list.fields.image"
           disableSort
@@ -190,12 +146,6 @@ export default function InventoryList() {
           render={AvailableCell}
         />
         <DataTable.NumberCol source="storageCount" label="list.fields.storages" />
-        <DataTable.Col
-          label="list.fields.actions"
-          disableSort
-          cellClassName="text-center w-24"
-          render={rowActions}
-        />
       </DataTable>
     </List>
   );

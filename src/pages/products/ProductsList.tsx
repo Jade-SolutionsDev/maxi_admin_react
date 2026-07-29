@@ -1,19 +1,8 @@
-import { useState } from "react";
-import {
-  useCanAccess,
-  useDelete,
-  useNotify,
-  useRecordContext,
-  useRefresh,
-  useResourceContext,
-  useTranslate,
-} from "ra-core";
-import { AlertTriangle, ImageOff, Pencil, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useCanAccess, useTranslate, type RaRecord } from "ra-core";
+import { ImageOff } from "lucide-react";
 
 import {
   ColumnsButton,
-  ConfirmToggleField,
   CreateButton,
   DataTable,
   FilterButton,
@@ -22,30 +11,10 @@ import {
   ReferenceField,
   ReferenceInput,
   RefreshButton,
+  RowNumberField,
   SearchInput,
   SelectInput,
 } from "@/components/admin";
-
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import type { RaRecord } from "ra-core";
-import { ProductViewButton } from "./ProductDetailModal";
 
 // Prices are shown always in USD (doesn't matter the app is for Cuba).
 const CURRENCY: Intl.NumberFormatOptions = {
@@ -140,154 +109,6 @@ const DiscountCell = (record: RaRecord) => {
 };
 
 
-const ProductDeleteButton = () => {
-  const record = useRecordContext();
-  const resource = useResourceContext();
-  const translate = useTranslate();
-  const refresh = useRefresh();
-  const notify = useNotify();
-  const [open, setOpen] = useState(false);
-
-  const [deleteOne, { isPending }] = useDelete(resource, {
-    id: record?.id,
-    previousData: record,
-  });
-
-  const displayName = (record?.name as string) || "";
-
-  const handleConfirm = async () => {
-    await deleteOne(
-      resource,
-      { id: record?.id, previousData: record },
-      {
-        mutationMode: "pessimistic",
-        onSuccess: () => {
-          setOpen(false);
-          refresh();
-          notify("shared.actions.delete_success", { type: "info" });
-        },
-        // Surface the backend's message (e.g. the 409 "still has stock" guard)
-        // instead of silently swallowing the failure.
-        onError: (error: unknown) => {
-          setOpen(false);
-          const backendMessage = (
-            error as { body?: { error?: { message?: string } } }
-          )?.body?.error?.message;
-          notify(backendMessage ?? translate("shared.actions.error"), {
-            type: "error",
-          });
-        },
-      },
-    );
-  };
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive hover:bg-destructive/10"
-              onClick={() => setOpen(true)}
-              aria-label={translate("shared.actions.delete", { _: "Delete" })}
-            >
-              <Trash2 size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{translate("shared.actions.delete", { _: "Delete" })}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader className="space-y-3">
-          <div className="mx-auto sm:mx-0 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
-          </div>
-          <AlertDialogTitle className="text-center sm:text-left text-lg">
-            {translate("shared.actions.delete_confirm_title", {
-              // The key is "Eliminar %{name}" — pass the resource label, like
-              // the categories/departments lists do (the description below
-              // names the actual record).
-              name: translate("resources.products.name", { _: "product" }),
-              _: "Delete product",
-            })}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center sm:text-left">
-            {translate("shared.actions.delete_confirm_description", {
-              _: "Are you sure you want to delete %{name}? This action cannot be undone.",
-              name: displayName,
-            })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="sm:justify-end">
-          <AlertDialogCancel disabled={isPending}>
-            {translate("shared.actions.cancel", { _: "Cancel" })}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            disabled={isPending}
-            className={cn(buttonVariants({ variant: "destructive" }))}
-          >
-            {isPending
-              ? translate("ra.action.loading", { _: "Deleting…" })
-              : translate("shared.actions.confirm", { _: "Delete" })}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-};
-
-const ProductEditButton = () => {
-  const record = useRecordContext();
-  const translate = useTranslate();
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={`/products/edit/${record?.id}`}
-            className={cn(
-              "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-colors",
-              "text-teal-700 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30",
-            )}
-            aria-label={translate("shared.actions.edit", { _: "Edit" })}
-          >
-            <Pencil size={16} />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{translate("shared.actions.edit", { _: "Edit" })}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
-const ProductActionsCell = () => {
-  const { canAccess: canEdit } = useCanAccess({
-    resource: "products",
-    action: "edit",
-  });
-  return (
-    <div className="flex items-center justify-center gap-1">
-      <ProductViewButton />
-      {canEdit && (
-        <>
-          <ProductEditButton />
-          <ProductDeleteButton />
-        </>
-      )}
-    </div>
-  );
-};
-
 export default function ProductsList() {
   const translate = useTranslate();
 
@@ -299,7 +120,14 @@ export default function ProductsList() {
       title={translate("resources.products.name_plural")}
       perPage={10}
     >
-      <DataTable hasBulkActions={false} hiddenColumns={["id"]}>
+      <DataTable
+        hasBulkActions={false}
+        hiddenColumns={["id"]}
+        rowClick={(id) => `/products/${id}`}
+      >
+        <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+          <RowNumberField />
+        </DataTable.Col>
         <DataTable.Col
           label="list.fields.image"
           disableSort
@@ -337,27 +165,6 @@ export default function ProductsList() {
           options={CURRENCY}
           locales={'en-US'}
         />
-        <DataTable.Col source="featured" label="list.fields.featured">
-          <ConfirmToggleField
-            source="featured"
-            labelKey="list.fields.featured"
-            confirmKey="products.toggles.featured"
-          />
-        </DataTable.Col>
-        <DataTable.Col source="isActive" label="list.fields.isActive">
-          <ConfirmToggleField
-            source="isActive"
-            labelKey="list.fields.isActive"
-            confirmKey="products.toggles.isActive"
-          />
-        </DataTable.Col>
-        <DataTable.Col
-          label="list.fields.actions"
-          disableSort
-          cellClassName="text-center w-28"
-        >
-          <ProductActionsCell />
-        </DataTable.Col>
       </DataTable>
     </List>
   );

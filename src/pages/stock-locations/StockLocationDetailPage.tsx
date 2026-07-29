@@ -3,8 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   EditBase,
   ResourceContextProvider,
+  useDelete,
   useEditContext,
   useGetIdentity,
+  useNotify,
+  useRefresh,
   useSaveContext,
   useTranslate,
 } from "ra-core";
@@ -18,10 +21,11 @@ import {
   Save,
   Settings2,
   SlidersHorizontal,
+  Trash2,
   XCircle,
 } from "lucide-react";
 
-import { SimpleForm } from "@/components/admin";
+import { ConfirmActionButton, SimpleForm } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -60,15 +64,40 @@ export default function StockLocationDetailPage() {
 function DetailShell({ isManager }: { isManager: boolean }) {
   const translate = useTranslate();
   const navigate = useNavigate();
+  const notify = useNotify();
+  const refresh = useRefresh();
   const { record, isLoading } = useEditContext();
   const [tab, setTab] = useState<TabKey>("general");
   const [opsOpen, setOpsOpen] = useState(false);
+  const [deleteOne, { isPending: removing }] = useDelete();
 
   if (isLoading || !record) {
     return <div className="h-64 rounded-lg bg-muted animate-pulse" />;
   }
 
   const active = record.isActive === true;
+
+  const remove = () =>
+    deleteOne(
+      "stock-locations",
+      { id: record.id, previousData: record },
+      {
+        mutationMode: "pessimistic",
+        onSuccess: () => {
+          notify("shared.actions.delete_success", { type: "info" });
+          refresh();
+          navigate("/stock-locations");
+        },
+        onError: (error: unknown) => {
+          const backendMessage = (
+            error as { body?: { error?: { message?: string } } }
+          )?.body?.error?.message;
+          notify(backendMessage ?? translate("shared.actions.error"), {
+            type: "error",
+          });
+        },
+      },
+    );
 
   const tabs: { key: TabKey; label: string; icon: typeof Boxes }[] = [
     { key: "general", label: "stockLocations.tabs.general", icon: SlidersHorizontal },
@@ -124,11 +153,33 @@ function DetailShell({ isManager }: { isManager: boolean }) {
           </div>
         </div>
 
-        {/* Operaciones — opens the In/Out/Transfer wizard */}
-        <Button type="button" variant="outline" onClick={() => setOpsOpen(true)}>
-          <Settings2 className="mr-2 h-4 w-4" />
-          {translate("stockLocations.actions.operations", { _: "Operaciones" })}
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Operaciones — opens the In/Out/Transfer wizard */}
+          <Button type="button" variant="outline" onClick={() => setOpsOpen(true)}>
+            <Settings2 className="mr-2 h-4 w-4" />
+            {translate("stockLocations.actions.operations", { _: "Operaciones" })}
+          </Button>
+          {isManager && (
+            <ConfirmActionButton
+              label={translate("shared.actions.delete", { _: "Delete" })}
+              icon={<Trash2 className="mr-2 h-4 w-4" />}
+              destructive
+              disabled={removing}
+              title={translate("shared.actions.delete_confirm_title", {
+                name: translate("resources.stock-locations.name", {
+                  _: "warehouse",
+                }),
+                _: "Delete",
+              })}
+              description={translate("shared.actions.delete_confirm_description", {
+                name: (record.name as string) || "",
+                _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+              })}
+              confirmLabel={translate("shared.actions.delete", { _: "Delete" })}
+              onConfirm={remove}
+            />
+          )}
+        </div>
       </div>
 
       <CreateOperationWizard

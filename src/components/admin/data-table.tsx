@@ -263,11 +263,28 @@ const DataTableRow = ({
     });
   }, [record, resource, rowClick, navigate, getPathForRecord]);
 
+  // Rows are the primary way to open a record's detail, so they must be
+  // keyboard-operable (they replaced focusable action buttons). Enter/Space
+  // activate the same navigation as a click.
+  const clickable = rowClick !== false;
+
   return (
     <TableRow
       key={record.id}
       onClick={handleClick}
-      className={cn(rowClick !== false && "cursor-pointer", className)}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={
+        clickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                void handleClick();
+              }
+            }
+          : undefined
+      }
+      className={cn(clickable && "cursor-pointer", className)}
     >
       {hasBulkActions ? (
         <TableCell className="flex w-8" onClick={handleToggle}>

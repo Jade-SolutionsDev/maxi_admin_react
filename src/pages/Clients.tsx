@@ -12,6 +12,7 @@ import {
 import { DataTable } from "@/components/admin/data-table";
 import { List } from "@/components/admin/list";
 import { ReferenceField } from "@/components/admin/reference-field";
+import { RowNumberField } from "@/components/admin/row-number-field";
 import { useTranslate } from "ra-core";
 
 const clientFilters = [<SearchInput source="q" alwaysOn />, <SelectInput label="list.fields.isActive" source="isActive" choices={[
@@ -44,6 +45,9 @@ export const ClientList = () => {
       hiddenColumns={["id","onboardingCompleted"]}
       rowClick={(id) => `/clients/${id}`}
     >
+      <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
+        <RowNumberField />
+      </DataTable.Col>
       <DataTable.Col source="id">
         <BadgeField source="id" variant="default" truncate />
       </DataTable.Col>
