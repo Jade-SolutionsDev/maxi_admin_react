@@ -279,3 +279,33 @@
 svg, path, circle, rect {
   transition: none !important;
 }
+
+/* Neutralize the browser's yellow/white autofill background on inputs.
+   background-color can't be overridden on :-webkit-autofill, so paint over it
+   with an inset box-shadow. Uses input tokens, so it adapts to light/dark. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: hsl(var(--foreground));
+  -webkit-box-shadow: 0 0 0 1000px hsl(var(--input)) inset;
+  caret-color: hsl(var(--foreground));
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Login pill inputs are bespoke (not shadcn) and always dark — match autofill
+   to the pill background: #1E293B (light) / #1A2535 (dark), see login/fields.tsx. */
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #e2e8f0;
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
+  caret-color: #e2e8f0;
+}
+.dark .login-input:-webkit-autofill,
+.dark .login-input:-webkit-autofill:hover,
+.dark .login-input:-webkit-autofill:focus,
+.dark .login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1a2535 inset;
+}

@@ -11,7 +11,7 @@ import type { ComponentType, ReactNode } from 'react';
 const PILL_CLASS =
   'flex items-center dark:bg-[#1A2535] bg-[#1E293B] border-transparent rounded-xl px-4 h-11 border transition-colors duration-150 focus-within:border-[#10B981]';
 const INPUT_CLASS =
-  'bg-transparent border-none outline-none text-[14px] ml-3 w-full placeholder:text-[#94A3B8] text-[#E2E8F0]';
+  'login-input bg-transparent border-none outline-none text-[14px] ml-3 w-full placeholder:text-[#94A3B8] text-[#E2E8F0]';
 const LABEL_CLASS =
   'block text-[13px] font-medium mb-1.5 dark:text-[#94A3B8] text-[#64748B]';
 
