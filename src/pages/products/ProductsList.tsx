@@ -37,7 +37,11 @@ const productFilters = [
     label="resources.departments.name"
     alwaysOn
   >
-    <SelectInput className="min-w-64" optionText="name" label="resources.departments.name" />
+    <SelectInput
+      className="min-w-64"
+      optionText="name"
+      label="resources.departments.name"
+    />
   </ReferenceInput>,
   <ReferenceInput
     source="categoryId"
@@ -45,7 +49,11 @@ const productFilters = [
     label="resources.categories.name"
     alwaysOn
   >
-    <SelectInput className="min-w-64" optionText="name" label="resources.categories.name" />
+    <SelectInput
+      className="min-w-64"
+      optionText="name"
+      label="resources.categories.name"
+    />
   </ReferenceInput>,
   <NumberInput source="minPrice" label="list.fields.minPrice" min={0} />,
   <NumberInput source="maxPrice" label="list.fields.maxPrice" min={0} />,
@@ -109,7 +117,6 @@ const DiscountCell = (record: RaRecord) => {
   );
 };
 
-
 export default function ProductsList() {
   const translate = useTranslate();
 
@@ -153,7 +160,7 @@ export default function ProductsList() {
           source="basePrice"
           label="list.fields.basePrice"
           options={CURRENCY}
-          locales={'en-US'}
+          locales={"en-US"}
         />
         <DataTable.Col
           source="discount"
@@ -164,13 +171,21 @@ export default function ProductsList() {
           source="finalPrice"
           label="list.fields.finalPrice"
           options={CURRENCY}
-          locales={'en-US'}
+          locales={"en-US"}
         />
-        <DataTable.Col source="featured" label="list.fields.featured" disableSort>
+        <DataTable.Col
+          source="featured"
+          label="list.fields.featured"
+          disableSort
+        >
           <BooleanField source="featured" />
         </DataTable.Col>
         <DataTable.Col source="isActive" label="list.fields.status" disableSort>
-          <BooleanField source="isActive" />
+          <BooleanField
+            valueLabelFalse="users.status.inactive"
+            valueLabelTrue="users.status.active"
+            source="isActive"
+          />
         </DataTable.Col>
       </DataTable>
     </List>

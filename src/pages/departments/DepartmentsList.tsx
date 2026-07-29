@@ -13,9 +13,7 @@ import {
   SearchInput,
 } from "@/components/admin";
 
-const departmentFilters = [
-  <SearchInput source="q" alwaysOn />,
-];
+const departmentFilters = [<SearchInput source="q" alwaysOn />];
 
 const DepartmentActions = () => {
   const { canAccess: canCreate } = useCanAccess({
@@ -46,13 +44,7 @@ export default function DepartmentsList() {
         hasBulkActions={false}
         rowClick={(id) => `/departments/${id}`}
         rowClassName={() => "[&>td]:py-4"}
-        hiddenColumns={[
-          "id",
-          "parentId",
-          "deletedAt",
-          "updatedAt",
-          "slug",
-        ]}
+        hiddenColumns={["id", "parentId", "deletedAt", "updatedAt", "slug"]}
       >
         <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
           <RowNumberField />
@@ -63,7 +55,11 @@ export default function DepartmentsList() {
           cellClassName="min-w-[180px]"
         />
         <DataTable.Col source="slug" label="list.fields.slug" />
-        <DataTable.Col className="max-w-sm truncate" source="description" label="list.fields.description" />
+        <DataTable.Col
+          className="max-w-sm truncate"
+          source="description"
+          label="list.fields.description"
+        />
         {/* Server-computed total; not a sortable column. */}
         <DataTable.Col
           source="childrenCount"
@@ -75,11 +71,19 @@ export default function DepartmentsList() {
           label="list.fields.sortOrder"
           disableSort
         />
-        <DataTable.Col source="isFeatured" label="list.fields.featured" disableSort>
+        <DataTable.Col
+          source="isFeatured"
+          label="list.fields.featured"
+          disableSort
+        >
           <BooleanField source="isFeatured" />
         </DataTable.Col>
         <DataTable.Col source="isActive" label="list.fields.status" disableSort>
-          <BooleanField source="isActive" />
+          <BooleanField
+            valueLabelFalse="users.status.inactive"
+            valueLabelTrue="users.status.active"
+            source="isActive"
+          />
         </DataTable.Col>
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />

@@ -5,7 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BooleanField } from "@/components/admin/boolean-field";
 import { cn } from "@/lib/utils";
 
-const StatusPill = ({ tone, labelKey, fallback }: {
+const StatusPill = ({
+  tone,
+  labelKey,
+  fallback,
+}: {
   tone: "amber" | "slate" | "indigo";
   labelKey: string;
   fallback: string;
@@ -32,7 +36,13 @@ export const StatusCell = () => {
   const record = useRecordContext();
   if (!record) return null;
   if (record.isPending) {
-    return <StatusPill tone="amber" labelKey="users.status.pending" fallback="Pending" />;
+    return (
+      <StatusPill
+        tone="amber"
+        labelKey="users.status.pending"
+        fallback="Pending"
+      />
+    );
   }
   if (record.isAwaitingApproval) {
     return (
@@ -44,10 +54,22 @@ export const StatusCell = () => {
     );
   }
   if (record.isDeleted) {
-    return <StatusPill tone="slate" labelKey="users.status.deleted" fallback="Deleted" />;
+    return (
+      <StatusPill
+        tone="slate"
+        labelKey="users.status.deleted"
+        fallback="Deleted"
+      />
+    );
   }
   // Read-only boolean; toggling active/inactive now happens in the edit form.
-  return <BooleanField source="isActive" />;
+  return (
+    <BooleanField
+      valueLabelFalse="users.status.inactive"
+      valueLabelTrue="users.status.active"
+      source="isActive"
+    />
+  );
 };
 
 export const UserAvatar = () => {

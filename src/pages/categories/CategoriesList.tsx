@@ -98,7 +98,11 @@ export default function CategoriesList() {
           disableSort
         />
         <DataTable.Col source="isActive" label="list.fields.status" disableSort>
-          <BooleanField source="isActive" />
+          <BooleanField
+            valueLabelFalse="users.status.inactive"
+            valueLabelTrue="users.status.active"
+            source="isActive"
+          />
         </DataTable.Col>
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />

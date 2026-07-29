@@ -53,7 +53,6 @@ const CoverageSummary = (record: RaRecord) => {
   );
 };
 
-
 const ListActions = ({ onCreate }: { onCreate: () => void }) => {
   const translate = useTranslate();
   const { canAccess: canCreate } = useCanAccess({
@@ -64,7 +63,7 @@ const ListActions = ({ onCreate }: { onCreate: () => void }) => {
     <div className="flex items-center gap-2">
       <RefreshButton />
       {canCreate && (
-        <Button size={'lg'} type="button" onClick={onCreate}>
+        <Button size={"lg"} type="button" onClick={onCreate}>
           <Plus className="mr-2 h-4 w-4" />
           {translate("stockLocations.actions.create", { _: "Crear almacén" })}
         </Button>
@@ -108,8 +107,16 @@ export default function StockLocationsList() {
             disableSort
             render={CoverageSummary}
           />
-          <DataTable.Col source="isActive" label="list.fields.status" disableSort>
-            <BooleanField source="isActive" />
+          <DataTable.Col
+            source="isActive"
+            label="list.fields.status"
+            disableSort
+          >
+            <BooleanField
+              valueLabelFalse="users.status.inactive"
+              valueLabelTrue="users.status.active"
+              source="isActive"
+            />
           </DataTable.Col>
         </DataTable>
       </List>
