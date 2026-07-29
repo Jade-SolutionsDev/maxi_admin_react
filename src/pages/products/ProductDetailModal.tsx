@@ -14,7 +14,6 @@ import { ImageOff, Package, PackageSearch, Pencil, Trash2, Warehouse } from "luc
 
 import {
   ConfirmActionButton,
-  ConfirmToggleField,
   DateField,
   ReferenceField,
 } from "@/components/admin";
@@ -272,18 +271,14 @@ export function ProductDetailModal() {
                     </span>
                   </DetailRow>
                   <DetailRow label={translate("list.fields.featured")}>
-                    <ConfirmToggleField
-                      source="featured"
-                      labelKey="list.fields.featured"
-                      confirmKey="products.toggles.featured"
-                    />
+                    {record.featured
+                      ? translate("shared.filters.yes", { _: "Yes" })
+                      : translate("shared.filters.no", { _: "No" })}
                   </DetailRow>
-                  <DetailRow label={translate("list.fields.isActive")}>
-                    <ConfirmToggleField
-                      source="isActive"
-                      labelKey="list.fields.isActive"
-                      confirmKey="products.toggles.isActive"
-                    />
+                  <DetailRow label={translate("list.fields.status")}>
+                    {record.isActive
+                      ? translate("shared.status.active", { _: "Active" })
+                      : translate("shared.status.inactive", { _: "Inactive" })}
                   </DetailRow>
                   <DetailRow label={translate("list.fields.sortOrder")}>
                     {(record.sortOrder as number) ?? 0}

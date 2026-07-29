@@ -9,6 +9,7 @@ import {
 import { Plus, Warehouse } from "lucide-react";
 
 import {
+  BooleanField,
   DataTable,
   List,
   RefreshButton,
@@ -107,6 +108,9 @@ export default function StockLocationsList() {
             disableSort
             render={CoverageSummary}
           />
+          <DataTable.Col source="isActive" label="list.fields.status" disableSort>
+            <BooleanField source="isActive" />
+          </DataTable.Col>
         </DataTable>
       </List>
 

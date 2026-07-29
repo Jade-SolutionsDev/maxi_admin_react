@@ -2,7 +2,7 @@ import { useRecordContext, useTranslate } from "ra-core";
 import { User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ConfirmToggleField } from "@/components/admin/confirm-toggle-field";
+import { BooleanField } from "@/components/admin/boolean-field";
 import { cn } from "@/lib/utils";
 
 const StatusPill = ({ tone, labelKey, fallback }: {
@@ -28,38 +28,6 @@ const StatusPill = ({ tone, labelKey, fallback }: {
   );
 };
 
-/**
- * Enable/disable switch. Confirmation + the PATCH itself live in the shared
- * ConfirmToggleField (same flow as the catalog lists); the label beside it just
- * mirrors the current state.
- */
-const ActiveToggle = () => {
-  const record = useRecordContext();
-  const translate = useTranslate();
-
-  if (!record) return null;
-  const checked = record.isActive === true;
-
-  return (
-    // Stop the switch/dialog clicks from also opening the row's detail modal.
-    <div
-      className="flex items-center gap-2"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <ConfirmToggleField
-        source="isActive"
-        labelKey={checked ? "users.actions.disable" : "users.actions.enable"}
-        confirmKey="users.confirm.toggle_active"
-      />
-      <span className="text-xs text-muted-foreground">
-        {translate(`users.status.${checked ? "active" : "inactive"}`, {
-          _: checked ? "Active" : "Inactive",
-        })}
-      </span>
-    </div>
-  );
-};
-
 export const StatusCell = () => {
   const record = useRecordContext();
   if (!record) return null;
@@ -78,7 +46,8 @@ export const StatusCell = () => {
   if (record.isDeleted) {
     return <StatusPill tone="slate" labelKey="users.status.deleted" fallback="Deleted" />;
   }
-  return <ActiveToggle />;
+  // Read-only boolean; toggling active/inactive now happens in the edit form.
+  return <BooleanField source="isActive" />;
 };
 
 export const UserAvatar = () => {

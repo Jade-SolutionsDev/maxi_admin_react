@@ -2,6 +2,7 @@ import { useCanAccess, useTranslate, type RaRecord } from "ra-core";
 import { ImageOff } from "lucide-react";
 
 import {
+  BooleanField,
   ColumnsButton,
   CreateButton,
   DataTable,
@@ -165,6 +166,12 @@ export default function ProductsList() {
           options={CURRENCY}
           locales={'en-US'}
         />
+        <DataTable.Col source="featured" label="list.fields.featured" disableSort>
+          <BooleanField source="featured" />
+        </DataTable.Col>
+        <DataTable.Col source="isActive" label="list.fields.status" disableSort>
+          <BooleanField source="isActive" />
+        </DataTable.Col>
       </DataTable>
     </List>
   );

@@ -11,7 +11,6 @@ import {
 } from "ra-core";
 import { ImageOff, Pencil, Trash2 } from "lucide-react";
 import { ConfirmActionButton } from "@/components/admin/confirm-action-button";
-import { ConfirmToggleField } from "@/components/admin/confirm-toggle-field";
 import { DateField } from "@/components/admin/date-field";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { buttonVariants } from "@/components/ui/button";
@@ -147,11 +146,9 @@ export function TaxonomyDetailModal() {
                 <DetailRow
                   label={translate("list.fields.featured", { _: "Featured" })}
                 >
-                  <ConfirmToggleField
-                    source="isFeatured"
-                    labelKey="list.fields.featured"
-                    confirmKey="shared.actions.toggle_featured"
-                  />
+                  {record.isFeatured
+                    ? translate("shared.filters.yes", { _: "Yes" })
+                    : translate("shared.filters.no", { _: "No" })}
                 </DetailRow>
               )}
               <DetailRow label={translate("list.fields.description")}>
@@ -162,12 +159,10 @@ export function TaxonomyDetailModal() {
               <DetailRow label={translate("list.fields.sortOrder")}>
                 {record.sortOrder ?? 0}
               </DetailRow>
-              <DetailRow label={translate("list.fields.isActive")}>
-                <ConfirmToggleField
-                  source="isActive"
-                  labelKey="list.fields.isActive"
-                  confirmKey="shared.actions.toggle_active"
-                />
+              <DetailRow label={translate("list.fields.status")}>
+                {record.isActive
+                  ? translate("shared.status.active", { _: "Active" })
+                  : translate("shared.status.inactive", { _: "Inactive" })}
               </DetailRow>
               <DetailRow label={translate("list.fields.createdAt")}>
                 <DateField source="createdAt" showTime />

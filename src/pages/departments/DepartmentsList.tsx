@@ -1,6 +1,7 @@
 import { useCanAccess, useTranslate } from "ra-core";
 
 import {
+  BooleanField,
   ColumnsButton,
   CreateButton,
   DataTable,
@@ -44,6 +45,7 @@ export default function DepartmentsList() {
       <DataTable
         hasBulkActions={false}
         rowClick={(id) => `/departments/${id}`}
+        rowClassName={() => "[&>td]:py-4"}
         hiddenColumns={[
           "id",
           "parentId",
@@ -73,6 +75,12 @@ export default function DepartmentsList() {
           label="list.fields.sortOrder"
           disableSort
         />
+        <DataTable.Col source="isFeatured" label="list.fields.featured" disableSort>
+          <BooleanField source="isFeatured" />
+        </DataTable.Col>
+        <DataTable.Col source="isActive" label="list.fields.status" disableSort>
+          <BooleanField source="isActive" />
+        </DataTable.Col>
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
         </DataTable.Col>
