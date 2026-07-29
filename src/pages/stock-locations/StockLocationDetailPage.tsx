@@ -8,17 +8,13 @@ import {
   useGetIdentity,
   useNotify,
   useRefresh,
-  useSaveContext,
   useTranslate,
 } from "ra-core";
-import { useFormContext, useFormState } from "react-hook-form";
 import {
   ArrowLeft,
   Boxes,
   CheckCircle2,
   ClipboardList,
-  Loader2,
-  Save,
   Settings2,
   SlidersHorizontal,
   Trash2,
@@ -26,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { ConfirmActionButton, SimpleForm } from "@/components/admin";
+import { SaveButton } from "@/components/admin/form";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -251,40 +248,9 @@ function SaveToolbar() {
       >
         {translate("shared.actions.cancel", { _: "Cancel" })}
       </Button>
-      <SaveButton
-        label={translate("stockLocations.actions.save_changes", {
-          _: "Guardar cambios",
-        })}
-      />
+      {/* Shared SaveButton: same submit path, and it also surfaces backend
+          field errors that the old local copy dropped. */}
+      <SaveButton type="button" label="stockLocations.actions.save_changes" />
     </div>
-  );
-}
-
-function SaveButton({ label }: { label: string }) {
-  const form = useFormContext();
-  const saveContext = useSaveContext();
-  const { isSubmitting, isValidating } = useFormState();
-  const disabled = isSubmitting || isValidating;
-
-  const handleClick = async () => {
-    await form.handleSubmit(async (values) => {
-      await saveContext?.save?.(values);
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      disabled={disabled}
-      onClick={handleClick}
-      className={cn(disabled && "opacity-50 cursor-not-allowed")}
-    >
-      {isSubmitting ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Save className="mr-2 h-4 w-4" />
-      )}
-      {label}
-    </Button>
   );
 }

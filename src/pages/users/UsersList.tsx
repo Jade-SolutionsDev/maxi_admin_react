@@ -21,7 +21,8 @@ import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
 import { RoleBadge } from "./RoleBadge";
 import { StatusCell, UserAvatar, UserNameCell } from "./userCells";
-import { UserActionsCell } from "./userRowActions";
+// Commented out alongside the actions column below (kept for future use).
+// import { UserActionsCell } from "./userRowActions";
 
 const userFilters = [
   <SearchInput source="q" alwaysOn />,

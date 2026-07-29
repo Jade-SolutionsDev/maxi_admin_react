@@ -221,6 +221,23 @@
         "title": "Revocar invitación",
         "description": "¿Revocar la invitación de %{email}? El enlace dejará de ser válido."
       }
+    },
+    "form": {
+      "edit_subtitle": "Actualiza el rol, el estado y los datos del usuario.",
+      "note": "Los cambios de rol y estado afectan de inmediato el acceso del usuario.",
+      "sections": {
+        "personal": "Datos personales",
+        "personal_hint": "Nombre y datos de contacto del usuario.",
+        "access": "Acceso y permisos",
+        "access_hint": "Rol, roles gestionados y estado de la cuenta."
+      },
+      "hints": {
+        "firstName": "Nombre del usuario.",
+        "lastName": "Apellidos del usuario.",
+        "phone": "Teléfono de contacto (opcional).",
+        "role": "Determina los permisos base del usuario.",
+        "isActive": "Un usuario inactivo no podrá iniciar sesión."
+      }
     }
   },
   "shared": {
@@ -256,14 +273,22 @@
         "off_title": "¿Quitar de destacados?",
         "off_desc": "«%{name}» dejará de mostrarse entre los destacados.",
         "off_cta": "Quitar"
-      }
+      },
+      "save_changes": "Guardar cambios"
     },
     "upload": {
       "choose": "Subir imagen",
       "remove": "Quitar",
       "invalid_type": "Formato de imagen no admitido",
-      "too_large": "La imagen supera el límite de 2 MB",
-      "failed": "No se pudo subir la imagen"
+      "too_large": "La imagen supera el límite de %{max}",
+      "failed": "No se pudo subir la imagen",
+      "dropzone_title": "Arrastra una imagen aquí",
+      "dropzone_cta": "o haz clic para seleccionar",
+      "dropzone_hint": "Recomendado: %{size} px (máx. %{max})",
+      "dropzone_hint_no_size": "Máx. %{max}",
+      "formats": "Formato: %{formats}",
+      "replace": "Subir nueva imagen",
+      "remove_image": "Quitar imagen"
     },
     "filters": {
       "yes": "Sí",
@@ -272,6 +297,12 @@
     "status": {
       "active": "Activo",
       "inactive": "Inactivo"
+    },
+    "form": {
+      "note_title": "Campos obligatorios",
+      "note_title_edit": "Importante",
+      "required_note": "Los campos marcados con * son requeridos.",
+      "edit_note": "Los cambios se reflejarán en la plataforma una vez que guardes la información."
     }
   },
   "app": {
@@ -460,6 +491,29 @@
     "stock": {
       "empty_title": "Sin existencias",
       "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."
+    },
+    "form": {
+      "create_subtitle": "Completa la información para crear un nuevo producto.",
+      "edit_subtitle": "Actualiza la información del producto.",
+      "note": "Los campos marcados con * son requeridos para crear el producto.",
+      "images_title": "Imagen",
+      "images_hint": "Imagen que representará el producto en la tienda.",
+      "sections": {
+        "general": "Información general",
+        "general_hint": "Nombre, clasificación y descripción del producto.",
+        "pricing": "Precio y presentación",
+        "pricing_hint": "Precio base, descuento y formato de venta.",
+        "visibility": "Visibilidad",
+        "visibility_hint": "Cómo y dónde se muestra el producto."
+      },
+      "hints": {
+        "name": "Nombre visible del producto.",
+        "departmentId": "Departamento al que pertenece el producto.",
+        "categoryId": "Categoría dentro del departamento seleccionado.",
+        "basePrice": "Precio antes de aplicar el descuento.",
+        "discount": "Porcentaje de descuento sobre el precio base.",
+        "sortOrder": "Determina el orden en que se mostrará el producto."
+      }
     }
   },
   "inventory": {
@@ -574,16 +628,59 @@
       "add_product": "Agregar otro producto",
       "confirm": "Confirmar operación",
       "success": "Operación registrada"
+    },
+    "form": {
+      "create_subtitle": "Completa la información para crear un nuevo almacén.",
+      "note": "Los campos marcados con * son requeridos para crear el almacén."
     }
   },
   "departments": {
     "errors": {
       "delete_conflict": "No se puede eliminar: el departamento tiene categorías asociadas."
+    },
+    "form": {
+      "create_subtitle": "Completa la información para crear un nuevo departamento.",
+      "edit_subtitle": "Actualiza la información del departamento.",
+      "note": "Los campos marcados con * son requeridos para crear el departamento.",
+      "images_title": "Imágenes",
+      "images_hint": "Agrega imágenes para representar el departamento en diferentes dispositivos.",
+      "images_hint_edit": "Actualiza las imágenes que representarán el departamento en diferentes dispositivos.",
+      "hints": {
+        "name": "Nombre visible del departamento.",
+        "description": "Esta descripción será útil para identificar el departamento.",
+        "sortOrder": "Determina el orden en que se mostrará el departamento.",
+        "isActive": "El departamento estará visible y disponible para los usuarios.",
+        "isFeatured": "Los departamentos destacados se muestran primero en la tienda."
+      },
+      "placeholders": {
+        "name": "Ingresa el nombre del departamento...",
+        "description": "Escribe una descripción breve del departamento (opcional)..."
+      }
     }
   },
   "categories": {
     "errors": {
       "delete_conflict": "No se puede eliminar: la categoría tiene productos asociados."
+    },
+    "form": {
+      "create_subtitle": "Completa la información para crear una nueva categoría.",
+      "edit_subtitle": "Actualiza la información de la categoría.",
+      "note": "Los campos marcados con * son requeridos para crear la categoría.",
+      "images_title": "Imágenes",
+      "images_hint": "Agrega imágenes para representar la categoría en diferentes dispositivos.",
+      "images_hint_edit": "Actualiza las imágenes que representarán la categoría en diferentes dispositivos.",
+      "hints": {
+        "departmentId": "Selecciona el departamento al que pertenece esta categoría.",
+        "name": "Nombre visible de la categoría.",
+        "description": "Esta descripción será útil para identificar la categoría.",
+        "sortOrder": "Determina el orden en que se mostrará la categoría.",
+        "isActive": "La categoría estará visible y disponible para los usuarios."
+      },
+      "placeholders": {
+        "departmentId": "Buscar departamento...",
+        "name": "Ingresa el nombre de la categoría...",
+        "description": "Escribe una descripción breve de la categoría (opcional)..."
+      }
     }
   },
   "orders": {

@@ -13,10 +13,11 @@ import {
   useSupportCreateSuggestion,
   useTranslate,
 } from "ra-core";
-import type { ComponentProps, ReactElement } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useCallback, useEffect, useId } from "react";
 
 import { FormError, FormField, FormLabel } from "@/components/admin/form";
+import { FormInputIcon } from "@/components/admin/form-input-icon";
 import { InputHelperText } from "@/components/admin/input-helper-text";
 import {
   Select,
@@ -93,6 +94,8 @@ export const SelectInput = (props: SelectInputProps) => {
     create,
     createLabel,
     onCreate,
+    // Must be destructured: `...rest` is spread onto FormField (a <div>).
+    icon,
 
     ...rest
   } = props;
@@ -262,6 +265,7 @@ export const SelectInput = (props: SelectInputProps) => {
           </FormLabel>
         )}
         <div className="relative">
+          {icon && <FormInputIcon>{icon}</FormInputIcon>}
           <Select
             //FIXME https://github.com/radix-ui/primitives/issues/3135
             // Setting a key based on the value fixes an issue where onValueChange
@@ -272,7 +276,10 @@ export const SelectInput = (props: SelectInputProps) => {
             onValueChange={handleChangeWithCreateSupport}
           >
             <SelectTrigger
-              className={cn("w-full transition-all hover:bg-accent")}
+              className={cn(
+                "w-full transition-all hover:bg-accent",
+                icon && "pl-12",
+              )}
               disabled={field.disabled}
               aria-labelledby={labelId}
             >
@@ -312,6 +319,9 @@ export const SelectInput = (props: SelectInputProps) => {
           </Select>
         </div>
         <InputHelperText helperText={helperText} />
+        {/* Was missing: without this, validation errors never rendered for a
+            SelectInput (only the isPending skeleton branch had it). */}
+        <FormError />
       </FormField>
       {createElement}
     </>
@@ -326,4 +336,6 @@ export type SelectInputProps = ChoicesProps &
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     emptyValue?: any;
     onChange?: (value: string) => void;
+    /** Leading tinted icon tile inside the trigger. */
+    icon?: ReactNode;
   } & Omit<ComponentProps<typeof FormField>, "id" | "name" | "children">;

@@ -1,37 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  EditBase,
   required,
   useDataProvider,
-  useEditContext,
   useGetList,
   useNotify,
   useRecordContext,
-  useSaveContext,
   useTranslate,
 } from "ra-core";
-import { useFormContext, useFormState } from "react-hook-form";
-import { Loader2, Save } from "lucide-react";
+import { Phone, Shield, User, UserCog } from "lucide-react";
 
 import {
   BooleanInput,
+  FormSection,
+  ResourceFormModal,
   SelectInput,
-  SimpleForm,
   TextInput,
 } from "@/components/admin";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import type { ExtendedDataProvider, RoleSummary } from "@/providers/dataProvider";
+import type {
+  ExtendedDataProvider,
+  RoleSummary,
+} from "@/providers/dataProvider";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
 import { backendMessage } from "./errors";
@@ -76,9 +67,7 @@ function UserRolesField({
   const toggle = (id: string) => {
     if (roleIds === null) return;
     onChange(
-      roleIds.includes(id)
-        ? roleIds.filter((x) => x !== id)
-        : [...roleIds, id],
+      roleIds.includes(id) ? roleIds.filter((x) => x !== id) : [...roleIds, id],
     );
   };
 
@@ -148,33 +137,65 @@ function UserEditFields({
 
   return (
     <>
-      <TextInput
-        source="firstName"
-        label={translate("list.fields.firstName")}
-        validate={required()}
-      />
-      <TextInput
-        source="lastName"
-        label={translate("list.fields.lastName")}
-        validate={required()}
-      />
-      <EmailField />
-      <TextInput source="phone" label={translate("list.fields.phone")} />
-      <SelectInput
-        source="role"
-        label={translate("list.fields.role")}
-        choices={roleChoices}
-        validate={required()}
-      />
-      {/* An awaiting-approval user is activated via Approve/Reject in the detail
-          modal, not this switch — showing it here only confuses admins. */}
-      {!record?.isAwaitingApproval && (
-        <BooleanInput
-          source="isActive"
-          label={translate("list.fields.isActive")}
-        />
-      )}
-      <UserRolesField roleIds={roleIds} onChange={onChangeRoles} />
+      <FormSection
+        icon={<User />}
+        title={translate("users.form.sections.personal", { _: "" })}
+        subtitle={translate("users.form.sections.personal_hint", { _: "" })}
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextInput
+            source="firstName"
+            label={translate("list.fields.firstName")}
+            validate={required()}
+            icon={<User />}
+            helperText="users.form.hints.firstName"
+          />
+          <TextInput
+            source="lastName"
+            label={translate("list.fields.lastName")}
+            validate={required()}
+            icon={<User />}
+            helperText="users.form.hints.lastName"
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <EmailField />
+          <TextInput
+            source="phone"
+            label={translate("list.fields.phone")}
+            icon={<Phone />}
+            helperText="users.form.hints.phone"
+          />
+        </div>
+      </FormSection>
+
+      <FormSection
+        icon={<Shield />}
+        title={translate("users.form.sections.access", { _: "" })}
+        subtitle={translate("users.form.sections.access_hint", { _: "" })}
+        className="border-t pt-5"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SelectInput
+            source="role"
+            label={translate("list.fields.role")}
+            choices={roleChoices}
+            validate={required()}
+            icon={<Shield />}
+            helperText="users.form.hints.role"
+          />
+          {/* An awaiting-approval user is activated via Approve/Reject in the
+              detail modal, not this switch — showing it here only confuses. */}
+          {!record?.isAwaitingApproval && (
+            <BooleanInput
+              source="isActive"
+              label={translate("list.fields.status")}
+              helperText="users.form.hints.isActive"
+            />
+          )}
+        </div>
+        <UserRolesField roleIds={roleIds} onChange={onChangeRoles} />
+      </FormSection>
     </>
   );
 }
@@ -209,163 +230,59 @@ export default function UserFormModal() {
     };
   }, [id, dataProvider]);
 
-  const title = translate("users.actions.edit_title", { _: "Edit user" });
-  const onClose = () => navigate("/users");
-
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
-        <EditBase
-          id={id}
-          mutationMode="pessimistic"
-          redirect={false}
-          // Submit only the editable fields — the form is seeded with the full
-          // record, and the backend rejects server-managed props (id, timestamps,
-          // derived status, ...) via forbidNonWhitelisted.
-          transform={({ firstName, lastName, phone, role, isActive }) => ({
-            firstName,
-            lastName,
-            phone,
-            role,
-            isActive,
-          })}
-          mutationOptions={{
-            // Profile saved → persist role assignment, then close. Roles ride a
-            // separate endpoint (setUserRoles), so they save after the PATCH.
-            onSuccess: async () => {
-              try {
-                if (id && roleIdsRef.current) {
-                  await dataProvider.setUserRoles(id, roleIdsRef.current);
-                }
-              } catch (error) {
-                notify(backendMessage(error, "Failed to update roles"), {
-                  type: "error",
-                });
-                return;
-              }
-              notify("users.actions.update_success", {
-                type: "success",
-                messageArgs: { _: "User updated" },
-              });
-              navigate("/users");
-            },
-            onError: (error) => {
-              notify(backendMessage(error, "ra.notification.http_error"), {
-                type: "error",
-              });
-            },
-          }}
-        >
-          <ModalFormShell
-            title={title}
-            onClose={onClose}
-            roleIds={roleIds}
-            onChangeRoles={setRoleIds}
-          />
-        </EditBase>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-interface ModalFormShellProps {
-  title: string;
-  onClose: () => void;
-  roleIds: string[] | null;
-  onChangeRoles: (ids: string[]) => void;
-}
-
-function ModalFormShell({
-  title,
-  onClose,
-  roleIds,
-  onChangeRoles,
-}: ModalFormShellProps) {
-  const translate = useTranslate();
-  const editContext = useEditContext();
-  const isLoading = editContext?.isLoading ?? false;
-
-  return (
-    <>
-      <DialogHeader className="shrink-0 px-6 py-4 border-b">
-        <div className="space-y-1">
-          <DialogTitle className="text-xl">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {translate("users.actions.form_subtitle", {
-              _: "Update the user's role, status and details.",
-            })}
-          </DialogDescription>
-        </div>
-      </DialogHeader>
-
-      <SimpleForm
-        toolbar={<ModalFormToolbar onClose={onClose} />}
-        className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
-      >
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {isLoading ? (
-            <FormSkeleton />
-          ) : (
-            <UserEditFields roleIds={roleIds} onChangeRoles={onChangeRoles} />
-          )}
-        </div>
-      </SimpleForm>
-    </>
-  );
-}
-
-function FormSkeleton() {
-  return (
-    <div className="space-y-5">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-4 w-24 rounded bg-muted animate-pulse" />
-          <div className="h-10 w-full rounded bg-muted animate-pulse" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ModalFormToolbar({ onClose }: { onClose: () => void }) {
-  const translate = useTranslate();
-
-  return (
-    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t">
-      <Button type="button" variant="outline" onClick={onClose}>
-        {translate("users.actions.cancel", { _: "Cancel" })}
-      </Button>
-      <SaveButton label={translate("users.actions.save", { _: "Save" })} />
-    </div>
-  );
-}
-
-function SaveButton({ label }: { label: string }) {
-  const form = useFormContext();
-  const saveContext = useSaveContext();
-  const { isSubmitting, isValidating } = useFormState();
-  const disabled = isSubmitting || isValidating;
-
-  const handleClick = async () => {
-    // Close/notify (+ role save) are handled by EditBase mutationOptions.
-    await form.handleSubmit(async (values) => {
-      await saveContext?.save?.(values);
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      disabled={disabled}
-      onClick={handleClick}
-      className={cn(disabled && "opacity-50 cursor-not-allowed")}
+    <ResourceFormModal
+      mode="edit"
+      id={id}
+      onClose={() => navigate("/users")}
+      icon={<UserCog className="h-5 w-5" />}
+      title={translate("users.actions.edit_title", { _: "Edit user" })}
+      subtitle={translate("users.form.edit_subtitle", {
+        _: "Update the user's role, status and details.",
+      })}
+      callout={{
+        title: translate("shared.form.note_title_edit"),
+        description: translate("users.form.note"),
+      }}
+      redirect={false}
+      // Submit only the editable fields — the form is seeded with the full
+      // record, and the backend rejects server-managed props (id, timestamps,
+      // derived status, ...) via forbidNonWhitelisted.
+      transform={({ firstName, lastName, phone, role, isActive }) => ({
+        firstName,
+        lastName,
+        phone,
+        role,
+        isActive,
+      })}
+      mutationOptions={{
+        // Profile saved → persist role assignment, then close. Roles ride a
+        // separate endpoint (setUserRoles), so they save after the PATCH.
+        onSuccess: async () => {
+          try {
+            if (id && roleIdsRef.current) {
+              await dataProvider.setUserRoles(id, roleIdsRef.current);
+            }
+          } catch (error) {
+            notify(backendMessage(error, "Failed to update roles"), {
+              type: "error",
+            });
+            return;
+          }
+          notify("users.actions.update_success", {
+            type: "success",
+            messageArgs: { _: "User updated" },
+          });
+          navigate("/users");
+        },
+        onError: (error) => {
+          notify(backendMessage(error, "ra.notification.http_error"), {
+            type: "error",
+          });
+        },
+      }}
     >
-      {isSubmitting ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Save className="mr-2 h-4 w-4" />
-      )}
-      {label}
-    </Button>
+      <UserEditFields roleIds={roleIds} onChangeRoles={setRoleIds} />
+    </ResourceFormModal>
   );
 }

@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import type { InputProps } from "ra-core";
 import { FieldTitle, useInput, useResourceContext } from "ra-core";
 import { FormControl, FormField, FormLabel } from "@/components/admin/form";
+import { FormInputIcon } from "@/components/admin/form-input-icon";
 import { Input } from "@/components/ui/input";
 import { FormError } from "@/components/admin/form";
 import { InputHelperText } from "@/components/admin/input-helper-text";
+import { cn } from "@/lib/utils";
 
 /**
  * Input component for numeric values (integers and floats) with parsing and formatting support.
@@ -40,6 +42,7 @@ export const NumberInput = (props: NumberInputProps) => {
     parse = convertStringToNumber,
     onFocus,
     helperText,
+    icon,
     ...rest
   } = props;
   const resource = useResourceContext({ resource: resourceProp });
@@ -89,17 +92,22 @@ export const NumberInput = (props: NumberInputProps) => {
           />
         </FormLabel>
       )}
-      <FormControl>
-        <Input
-          {...rest}
-          {...field}
-          type="number"
-          value={value}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-      </FormControl>
+      {/* `relative` stays outside FormControl (Radix Slot) — see form-input-icon. */}
+      <div className="relative">
+        {icon && <FormInputIcon>{icon}</FormInputIcon>}
+        <FormControl>
+          <Input
+            {...rest}
+            {...field}
+            type="number"
+            value={value}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={cn(icon && "pl-12")}
+          />
+        </FormControl>
+      </div>
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>
@@ -114,6 +122,8 @@ export interface NumberInputProps
       "defaultValue" | "onBlur" | "onChange" | "type"
     > {
   parse?: (value: string) => number;
+  /** Leading tinted icon tile inside the control. */
+  icon?: React.ReactNode;
 }
 
 const convertStringToNumber = (value?: string | null) => {

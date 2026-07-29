@@ -1,223 +1,249 @@
-# MaxiHabana Backoffice — Design System & Build Plan
+# MaxiHabana Backoffice — Design System
 
-This document is the reference for the MaxiHabana admin backoffice. It covers the visual system, component patterns, auth model, and the implementation plan for the first slice: **authentication + user management**.
+Visual and UX system of record for `maxi_admin_react`. **Scope:** how screens look
+and behave. For stack, commands, architecture and domain rules see the root
+`AGENTS.md`, `CLAUDE.md` and `MaxiHabana_KnowledgeBase.md`; for shadcn/registry
+rules see `maxi_admin_react/AGENTS.md`.
 
-## Brand Foundation
+> This document describes what is **actually in the code**. If you change a
+> pattern here, update this file in the same commit.
 
-The brand mark (`public/maxi-habana-logo.png`) is a dark wordmark with a single teal accent on the `i` dot and underline curve. The UI uses that dark/ink base with teal as the primary action color.
+---
 
-### Color Tokens
+## 1. Design tokens
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `--ink` | `#101012` | Logo ink, sidebar background, primary text |
-| `--charcoal` | `#1E1E24` | Elevated surfaces (cards, sidebar hover) |
-| `--teal` | `#2DD4BF` | Primary accent, buttons, active nav, focus rings |
-| `--teal-dark` | `#14B8A6` | Button hover, emphasis |
-| `--teal-light` | `#5EEAD4` | Highlights, glows, badges |
-| `--surface` | `#F8FAFC` | Main content background |
-| `--panel` | `#FFFFFF` | Cards, dialogs, form panels |
-| `--border` | `#E2E8F0` | Dividers, input borders |
-| `--muted` | `#64748B` | Secondary text, placeholders |
-| `--danger` | `#EF4444` | Delete, errors |
-| `--success` | `#22C55E` | Save confirmations |
+Tokens live in `src/index.css` as raw HSL triplets on `:root` / `.dark`, exposed
+to Tailwind v4 through the `@theme inline` block. **Always use the token
+utilities (`bg-primary`, `text-muted-foreground`, `border-border`) — never
+hardcode hex.** `bg-primary` *is* the brand emerald.
 
-Dark mode is out of scope for the first slice; the default is a **light content area + dark sidebar** layout.
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `--primary` | `160 84% 39%` (emerald) | `158 64% 46%` | Brand, primary buttons, active nav, icon tiles |
+| `--accent` | `174 72% 31%` (teal) | — | Secondary accent |
+| `--background` | `38 60% 98%` (cream) | dark slate | App canvas |
+| `--card` | `0 0% 100%` | dark slate | Cards, tables, modals |
+| `--muted` / `--muted-foreground` | `210 40% 96%` / `215 16% 47%` | | Subdued surfaces, helper text |
+| `--border` / `--input` | `214 32% 91%` | `220 15% 22%` | Hairlines, control borders |
+| `--destructive` | `0 84% 60%` | `0 72% 51%` | Delete, errors, the required `*` |
+| `--ring` | same as primary | | Focus rings |
 
-### Typography
+Radius: `--radius: 0.625rem` (10px) → `rounded-md` = 8px (**controls**),
+`rounded-lg` = 10px (**cards/sections**), `rounded-xl` = 14px (image cards).
+Shadows: `shadow-card`, `shadow-card-hover`, `shadow-dropdown`, `shadow-sidebar`.
 
-Loaded from Google Fonts in `index.html`:
+**Dark mode is fully supported** and class-based (`.dark` on `<html>`).
+`ThemeProvider` resolves `"system"` to a concrete light/dark and exposes
+`resolvedTheme` — any component that picks colors **in JS** (charts, logo swaps)
+must read `resolvedTheme`, never the raw `theme` (which can be the literal
+string `"system"`).
 
-- **Display / Headings:** `Bricolage Grotesque` — distinctive, slightly quirky grotesque for page titles.
-- **Body / UI:** `Plus Jakarta Sans` — clean, readable for tables and forms.
-- **Mono:** `JetBrains Mono` — for IDs, emails, code snippets.
+Typography: **Geist Variable** (`@fontsource-variable/geist`). Don't introduce
+another family.
 
-```css
-:root {
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
+Decorative "blobs" are `rounded-full bg-primary opacity-10` — there is no
+`blur-*` anywhere; the softness is opacity alone.
+
+---
+
+## 2. Layout shell
+
+`Layout` → `SidebarProvider` + `Sidebar` + `SidebarInset` (`TopBar` + page).
+
+- Sidebar `16rem`, collapsed `4.5rem`, mobile sheet `18rem`.
+- Page padding `p-6 lg:p-8`. `SidebarInset` carries `min-w-0` so a wide table
+  scrolls itself instead of pushing the whole page sideways.
+- `TopBar`: page title + breadcrumb, ⌘K global search, notifications, locale,
+  theme toggle, user menu.
+
+---
+
+## 3. Component map
+
+| Location | What | Rule |
+|---|---|---|
+| `src/components/ui/*` | shadcn primitives (27 files) | **Don't overwrite** without an explicit ask — registry output |
+| `src/components/admin/*` | shadcn-admin-kit components + ours | Extend here |
+| `src/pages/**` | screens | PascalCase files |
+
+Filenames: **kebab-case** under `components/`, **PascalCase** for pages.
+Search the shadcn registry before hand-rolling a new primitive.
+
+---
+
+## 4. Forms — the authority for new forms
+
+**A new resource form is `ResourceFormModal` + one fields component. Nothing
+else.** Do not re-create a Dialog, a header, a toolbar, a Save button or a
+loading skeleton — that duplication was removed on purpose (it had reached six
+copies of `SaveButton`).
+
+### 4.1 Modal anatomy
+
+```tsx
+<ResourceFormModal
+  mode={mode} id={id} onClose={() => navigate("/categories")}
+  icon={<Tags className="h-5 w-5" />}
+  title={translate(isEdit ? "shared.actions.edit_title" : "shared.actions.create_title", { name })}
+  subtitle={translate(isEdit ? "categories.form.edit_subtitle" : "categories.form.create_subtitle")}
+  callout={{ title: …, description: … }}
+  transform={sanitizeCategory}
+>
+  <CategoryFormFields mode={mode} />
+</ResourceFormModal>
 ```
 
-### Spacing & Radius
+The shell owns, and deliberately does **not** expose as props:
 
-- Base unit: `4px`
-- Card radius: `12px`
-- Button radius: `8px`
-- Input radius: `8px`
-- Max content width: `1280px`
-- Sidebar width: `260px`
+- Width `sm:max-w-3xl`, and the `p-0 gap-0` that cancels `DialogContent`'s
+  built-in padding/grid.
+- The **scroll chain** — `DialogContent(flex flex-col h-[85vh] sm:h-auto
+  sm:max-h-[85vh])` → `SimpleForm(flex-1 min-h-0 … max-w-none)` → body
+  `flex-1 overflow-y-auto`. Every class there is load-bearing; `max-w-none`
+  specifically cancels `SimpleForm`'s default `max-w-lg`.
+- Header: tinted `h-11 w-11 rounded-2xl bg-primary/10 text-primary` icon tile,
+  title, subtitle, two clipped decorative blobs.
+- `mutationMode="pessimistic"`, the Cancel button, and the submit label
+  (`shared.actions.save` on create, `shared.actions.save_changes` on edit).
+- The edit-loading skeleton.
 
-## Layout
+Pass-throughs to ra-core: `transform`, `redirect`, `defaultValues`,
+`mutationOptions`, `resource`, plus `open` for a state-driven (non-routed) modal.
 
-### Shell
+### 4.2 Field anatomy
 
-```
-┌─────────────────────────────────────────────┐
-│  Sidebar  │  Top Bar                        │
-│  (fixed)  │  (sticky)                       │
-│           ├─────────────────────────────────┤
-│           │                                 │
-│  Logo     │  Content                        │
-│           │                                 │
-│  Nav      │  Page Title + Actions           │
-│           │                                 │
-│  User     │  Cards / Tables / Forms         │
-│  Profile  │                                 │
-└─────────────────────────────────────────────┘
-```
+Label (+ red `*` when required) → control with a tinted leading icon tile →
+muted helper text.
 
-- **Sidebar:** dark (`--ink`), shows logo at top, vertical nav links, user card at bottom with Clerk `<UserButton />`.
-- **Top Bar:** breadcrumb / page title on the left; global actions (e.g. “New User”) on the right.
-- **Content:** `padding: 32px`, max-width container, white cards on `--surface` background.
-
-### Navigation
-
-| Route | Label | Icon |
-|-------|-------|------|
-| `/` | Dashboard | `LayoutDashboard` |
-| `/users` | Users | `Users` |
-
-## Auth Model
-
-The app uses **Clerk** for authentication and authorization.
-
-### Roles
-
-Only **admin** users can access the backoffice. Clerk’s `publicMetadata` stores the role:
-
-```ts
-user.publicMetadata = { role: 'admin' };
+```tsx
+<TextInput
+  source="name"
+  label={translate("list.fields.name")}
+  validate={required()}
+  icon={<Tag />}                          // tinted tile
+  placeholder={translate("categories.form.placeholders.name")}
+  helperText="categories.form.hints.name" // i18n key; renders muted underneath
+/>
 ```
 
-The `AuthProvider` checks the signed-in user’s role. If the role is not `admin`, show an unauthorized screen with a sign-out button.
+- **`icon` is supported on `TextInput`, `NumberInput`, `SelectInput`,
+  `AutocompleteInput`.** `BooleanInput` is a Switch + label — documented
+  exception, no icon.
+- The tile (`FormInputIcon`) is an **absolute overlay** inset by the control's
+  1px border (`inset-y-px left-px w-9 rounded-l-md bg-primary/10`), paired with
+  `pl-12` on the control. It is `pointer-events-none` so clicks reach the
+  control. This preserves the control's own border, radius, focus ring and
+  `aria-invalid` styling.
+- ⚠️ **The `relative` wrapper must stay OUTSIDE `FormControl`.** `FormControl` is
+  a Radix `Slot`: it merges `id` / `aria-describedby` / `aria-invalid` onto its
+  immediate child. Wrap the input inside it and the wrapper silently steals
+  them — label-click focus and invalid styling break with no error thrown.
+- The required `*` is automatic: ra-core's `<FieldTitle isRequired>` emits
+  `<span aria-hidden> *</span>` and `FormLabel` colors it destructive. Just keep
+  passing `isRequired` from `useInput()`. **Never hand-write an asterisk in an
+  admin input.**
+- `helperText` takes an **i18n key** (auto-translated) and renders as
+  `FormDescription`, already wired to `aria-describedby`.
 
-### Flow
+### 4.3 Grids and sections
 
-1. Wrap the router with `<ClerkProvider>`.
-2. Use `<SignedIn>` / `<SignedOut>` to gate access.
-3. Inside `<SignedIn>`, `AuthProvider` validates the admin role and exposes `isAdmin`, `isLoading`, `token`.
-4. Protected routes redirect to `/login` when signed out.
-5. The login page shows the Clerk `<SignIn />` component with email/password and a redirect to `/users` after sign-in.
-6. API calls attach the Clerk JWT via `Authorization: Bearer <token>`.
+- Short fields pair up in `grid gap-4 sm:grid-cols-2`. **Opt in per fields
+  component** — the shell never imposes a grid (the stock-location coverage
+  selector needs full width and passes `stacked`).
+- Group related fields with `FormSection` (`icon`, `title`, `subtitle`). Separate
+  sections with `className="border-t pt-5"`.
 
-### API Integration
+### 4.4 Images
 
-- Backend expects `Authorization: Bearer <clerk-jwt>` on protected routes.
-- Use `useAuth().getToken()` to retrieve the JWT.
-- API base URL from `VITE_API_URL`.
+`ImageUploadInput` renders a dashed **click-or-drop** zone when empty, and a
+preview + "Subir nueva imagen" + destructive "Quitar imagen" when set. Pass
+`recommendedSize="1200 x 800"`; accepted formats and the size cap come from
+`src/lib/uploads.ts` (`ACCEPTED_IMAGE_LABEL`, `MAX_IMAGE_SIZE_LABEL`) so the
+limit is written **once**. The cap is **2 MB**, mirroring the backend — if you
+need more, change the constant *and* the API, never just the copy.
 
-## Components
+Multi-image forms wrap each input in `rounded-xl border border-border p-4`
+inside a `FormSection`, with a device icon in the label.
 
-### Shared Primitives
+### 4.5 Create vs edit
 
-| Component | Location | Notes |
-|-----------|----------|-------|
-| `Button` | `src/components/ui/Button.tsx` | Variants: `primary`, `secondary`, `danger`, `ghost`. Sizes: `sm`, `md`, `lg`. |
-| `Input` | `src/components/ui/Input.tsx` | Label + error message support. |
-| `Select` | `src/components/ui/Select.tsx` | Native select styled to match inputs. |
-| `Card` | `src/components/ui/Card.tsx` | White panel with shadow and padding slots. |
-| `Modal` | `src/components/ui/Modal.tsx` | Headless-style overlay with confirm/cancel actions. |
-| `Table` | `src/components/ui/Table.tsx` | `<table>` wrapper with hover rows and sticky header. |
-| `Badge` | `src/components/ui/Badge.tsx` | For status: `active`, `inactive`, `admin`, etc. |
-| `EmptyState` | `src/components/ui/EmptyState.tsx` | Illustration + message for empty lists. |
-| `Spinner` | `src/components/ui/Spinner.tsx` | Teal spinner for loading states. |
+Create shows only what the user must decide; **ordering and status
+(`sortOrder`, `isActive`, `featured`) are edit-only**. Because those inputs then
+don't register on create, the `sanitize*` transform must default them
+(`data.sortOrder ?? 0`, `data.isActive ?? true`) rather than sending `undefined`
+and trusting an unverified backend default.
 
-### Layout Components
+---
 
-| Component | Location | Notes |
-|-----------|----------|-------|
-| `Sidebar` | `src/components/layout/Sidebar.tsx` | Fixed dark sidebar with nav and user button. |
-| `TopBar` | `src/components/layout/TopBar.tsx` | Sticky bar with page title and primary action. |
-| `AppShell` | `src/components/layout/AppShell.tsx` | Sidebar + main area wrapper. |
+## 5. Lists / tables
 
-### Auth Components
+- **Rows are clickable** and open the record's detail (`rowClick` on
+  `DataTable`, returning `false` for non-navigable synthetic rows). Rows are
+  keyboard-operable (`role="button"`, `tabIndex`, Enter/Space).
+- **No action buttons in rows.** Record actions live in the detail view. See
+  `docs/ux-clickable-rows-and-row-actions.md` for the rationale, the trade-offs
+  and the documented exceptions.
+- First column is `#` (`RowNumberField`) — continuous across pages.
+- Booleans render as read-only `BooleanField`; editing happens in the form.
+- The card grows with content up to the viewport, then the **table body** scrolls
+  with a sticky header while pagination stays pinned (`max-h-[calc(...)]` +
+  `flex-auto` — `flex-1` would collapse a short table to nothing).
+- Headers are uppercase — including sortable ones, which need `uppercase` on the
+  sort `<button>` because it doesn't inherit the `<th>`'s `text-transform`.
 
-| Component | Location | Notes |
-|-----------|----------|-------|
-| `AuthProvider` | `src/auth/AuthProvider.tsx` | Validates admin role, exposes auth context. |
-| `ProtectedRoute` | `src/auth/ProtectedRoute.tsx` | Redirects signed-out users to `/login`. |
-| `Unauthorized` | `src/auth/Unauthorized.tsx` | Shown when a user is signed in but not an admin. |
+---
 
-## Pages
+## 6. Detail views
 
-| Page | Route | Purpose |
-|------|-------|---------|
-| `LoginPage` | `/login` | Clerk `<SignIn />` for admins. |
-| `DashboardPage` | `/` | Placeholder with stats cards. |
-| `UsersListPage` | `/users` | Searchable, paginated user table. |
-| `UserCreatePage` | `/users/new` | Form to create a user. |
-| `UserEditPage` | `/users/:id/edit` | Form to update a user. |
+Routed at `/[resource]/:id` inside the list's `<Outlet>`, so the list stays
+mounted behind. Modal for compact records (users, products, taxonomy), full page
+for dense ones (orders, clients, stock-locations, inventory) — a known
+inconsistency, tracked as debt.
 
-### Users Table Columns
+Actions sit in a footer (`DialogFooter`) or a page action bar, using
+`ConfirmActionButton` for anything destructive.
 
-- Name (first + last)
-- Email
-- Type (admin / provider / customer)
-- Status (active / inactive)
-- Created
-- Actions (edit / delete)
+---
 
-### User Form Fields
+## 7. i18n
 
-- First name
-- Last name
-- Email
-- Phone (optional)
-- User type (select)
-- Status (select)
-- Password (only on create; optional on edit)
-
-## State & Data
-
-- Use **React Router** for routing.
-- Use **Clerk React** for auth state.
-- Use **TanStack Query** for server state (users list, mutations).
-- Keep form state local with `useState`.
-
-## Dependencies
-
-Add the following (no new ones needed beyond these for the first slice):
+`es` is the **default** locale; `es.json` and `en.json` must stay in **lockstep**
+(identical key sets). Verify before committing:
 
 ```bash
-pnpm add @clerk/clerk-react react-router-dom @tanstack/react-query lucide-react
+python3 -c "
+import json
+def k(d,p=''):
+  for a,b in d.items():
+    yield from (k(b,p+a+'.') if isinstance(b,dict) else iter([p+a]))
+a,b=[set(k(json.load(open(f'src/i18n/{x}.json')))) for x in ('es','en')]
+print(sorted(a^b) or 'in lockstep')"
 ```
 
-Google Fonts link to add to `index.html`:
+Conventions:
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-```
+- `resources.<r>.name` / `name_plural` — entity names only.
+- `list.fields.<field>` — column and label text, shared across resources.
+- `shared.*` — resource-agnostic UI (`shared.actions.*`, `shared.upload.*`,
+  `shared.form.*`, `shared.status.*`).
+- `<resource>.form.{create_subtitle,edit_subtitle,note,images_title,images_hint,sections.*,hints.<field>,placeholders.<field>}`
+  — form copy.
+- Interpolate values (`%{max}`, `%{name}`) instead of baking numbers or names
+  into translations.
 
-## Environment Variables
+---
 
-```bash
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-VITE_API_URL=http://localhost:3000
-```
+## 8. Checklist for a new screen
 
-## Build Order (First Slice)
-
-1. Install dependencies and add fonts.
-2. Replace Vite starter code with `index.css` tokens and a clean `main.tsx`.
-3. Set up Clerk provider and router.
-4. Build `AuthProvider`, `ProtectedRoute`, and `Unauthorized`.
-5. Build layout primitives (`Sidebar`, `TopBar`, `AppShell`).
-6. Build UI primitives (`Button`, `Input`, `Select`, `Card`, `Table`, `Badge`, `Modal`, `Spinner`).
-7. Implement `LoginPage`.
-8. Implement `UsersListPage` with delete confirmation.
-9. Implement `UserCreatePage` and `UserEditPage`.
-10. Wire API client with Clerk token.
-11. Add `.env.example` and update `README.md`.
-
-## Notes for Future Sessions
-
-- Keep components in `src/components/ui/` and `src/components/layout/`.
-- Keep pages in `src/pages/`.
-- Keep API calls in `src/api/`.
-- Keep auth logic in `src/auth/`.
-- Do not add dark mode until the first slice is complete and stable.
-- Avoid adding a UI component library; build the small set above from scratch using the tokens in this file.
+1. Reuse an existing `components/admin` component; search the shadcn registry
+   before writing a primitive. Don't overwrite `components/ui/*`.
+2. Form? → `ResourceFormModal` + a fields component, with icons, `helperText`,
+   `sm:grid-cols-2` and `FormSection`. Never rebuild the shell.
+3. List? → `List` + `DataTable` with `rowClick`, a `#` column, no row actions.
+4. Colors from tokens; check **light and dark**.
+5. Every string in `es.json` **and** `en.json`; run the lockstep check.
+6. Destructive action → `ConfirmActionButton`.
+7. Keyboard: labels focus their control; custom clickables are focusable and
+   Enter/Space-activatable.
+8. `yarn build && yarn lint` — there is **no frontend test runner**, so verify by
+   driving the UI.

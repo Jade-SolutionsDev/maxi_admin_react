@@ -17,6 +17,7 @@ import {
   FormField,
   FormLabel,
 } from "@/components/admin/form";
+import { FormInputIcon } from "@/components/admin/form-input-icon";
 import {
   Popover,
   PopoverContent,
@@ -87,11 +88,14 @@ export const AutocompleteInput = (
       inputText?:
         | React.ReactNode
         | ((option: any | undefined) => React.ReactNode);
+      /** Leading tinted icon tile inside the trigger. */
+      icon?: React.ReactNode;
     } & Pick<PopoverProps, "modal">,
 ) => {
   const {
     filterToQuery = DefaultFilterToQuery,
     inputText,
+    icon,
     create,
     createValue,
     createLabel,
@@ -217,16 +221,22 @@ export const AutocompleteInput = (
             />
           </FormLabel>
         )}
-        <FormControl>
-          <Popover open={open} onOpenChange={handleOpenChange} modal={modal}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                aria-labelledby={uniqueId}
-                className="w-full justify-between h-auto py-1.75 font-normal"
-              >
+        {/* `relative` outside FormControl (Radix Slot) — see form-input-icon. */}
+        <div className="relative">
+          {icon && <FormInputIcon>{icon}</FormInputIcon>}
+          <FormControl>
+            <Popover open={open} onOpenChange={handleOpenChange} modal={modal}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  aria-labelledby={uniqueId}
+                  className={cn(
+                    "w-full justify-between h-auto py-1.75 font-normal",
+                    icon && "pl-12",
+                  )}
+                >
                 {selectedChoice ? (
                   getInputText(selectedChoice)
                 ) : (
@@ -300,8 +310,9 @@ export const AutocompleteInput = (
                 </CommandList>
               </Command>
             </PopoverContent>
-          </Popover>
-        </FormControl>
+            </Popover>
+          </FormControl>
+        </div>
         <InputHelperText helperText={props.helperText} />
         <FormError />
       </FormField>

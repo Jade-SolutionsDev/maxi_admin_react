@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { InputProps } from "ra-core";
 import { useInput, useResourceContext, FieldTitle } from "ra-core";
 import {
@@ -6,13 +7,17 @@ import {
   FormField,
   FormLabel,
 } from "@/components/admin/form";
+import { FormInputIcon } from "@/components/admin/form-input-icon";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { InputHelperText } from "@/components/admin/input-helper-text";
+import { cn } from "@/lib/utils";
 
 export type TextInputProps = InputProps & {
   multiline?: boolean;
   inputClassName?: string;
+  /** Leading tinted icon tile inside the control. */
+  icon?: ReactNode;
 } & React.ComponentProps<"textarea"> &
   React.ComponentProps<"input">;
 
@@ -46,6 +51,7 @@ export const TextInput = (props: TextInputProps) => {
     className,
     inputClassName,
     helperText,
+    icon,
     validate: _validateProp,
     format: _formatProp,
     ...rest
@@ -64,13 +70,32 @@ export const TextInput = (props: TextInputProps) => {
           />
         </FormLabel>
       )}
-      <FormControl>
-        {multiline ? (
-          <Textarea {...rest} {...field} className={inputClassName} />
-        ) : (
-          <Input {...rest} {...field} className={inputClassName} />
+      {/* `relative` must stay OUTSIDE FormControl: it is a Radix Slot, so it
+          merges id/aria-invalid onto its immediate child — a wrapper here would
+          steal them from the input and break label-focus + invalid styling. */}
+      <div className="relative">
+        {icon && (
+          // Align to the first line of a growing textarea instead of centring.
+          <FormInputIcon className={multiline ? "inset-y-px items-start pt-2.5" : undefined}>
+            {icon}
+          </FormInputIcon>
         )}
-      </FormControl>
+        <FormControl>
+          {multiline ? (
+            <Textarea
+              {...rest}
+              {...field}
+              className={cn(icon && "pl-12", inputClassName)}
+            />
+          ) : (
+            <Input
+              {...rest}
+              {...field}
+              className={cn(icon && "pl-12", inputClassName)}
+            />
+          )}
+        </FormControl>
+      </div>
       <InputHelperText helperText={helperText} />
       <FormError />
     </FormField>

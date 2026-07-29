@@ -1,225 +1,177 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { required, useTranslate } from "ra-core";
 import {
-  CreateBase,
-  EditBase,
-  required,
-  useEditContext,
-  useSaveContext,
-  useTranslate,
-} from "ra-core";
-import { useFormContext, useFormState } from "react-hook-form";
-import { Loader2, Save } from "lucide-react";
+  AlignLeft,
+  ArrowUpDown,
+  Boxes,
+  Building2,
+  Image as ImageIcon,
+  Monitor,
+  Smartphone,
+} from "lucide-react";
 
 import {
   BooleanInput,
+  FormSection,
   ImageUploadInput,
   NumberInput,
-  SimpleForm,
+  ResourceFormModal,
   TextInput,
 } from "@/components/admin";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface DepartmentFormModalProps {
   mode: "create" | "edit";
 }
 
 // Strip server-managed fields (id, parentId, timestamps) the backend rejects.
+// sortOrder/isActive only render in edit mode, so fall back to their defaults
+// on create rather than sending `undefined`.
 const sanitizeDepartment = (data: Record<string, unknown>) => ({
   name: data.name,
   slug: data.slug,
   description: data.description,
   imageDesktopUrl: data.imageDesktopUrl,
   imageMobileUrl: data.imageMobileUrl,
-  isFeatured: data.isFeatured,
-  sortOrder: data.sortOrder,
-  isActive: data.isActive,
+  isFeatured: data.isFeatured ?? false,
+  sortOrder: data.sortOrder ?? 0,
+  isActive: data.isActive ?? true,
 });
 
-export default function DepartmentFormModal({ mode }: DepartmentFormModalProps) {
+export default function DepartmentFormModal({
+  mode,
+}: DepartmentFormModalProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const translate = useTranslate();
 
   const isEdit = mode === "edit";
-  const title = translate(
-    isEdit ? "shared.actions.edit_title" : "shared.actions.create_title",
-    { name: translate("resources.departments.name", { _: "Department" }) },
-  );
-
-  const onClose = () => navigate("/departments");
+  const name = translate("resources.departments.name", { _: "Department" });
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
-        {isEdit ? (
-          <EditBase
-            id={id}
-            mutationMode="pessimistic"
-            transform={sanitizeDepartment}
-          >
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </EditBase>
-        ) : (
-          <CreateBase
-            redirect="list"
-            mutationMode="pessimistic"
-            transform={sanitizeDepartment}
-          >
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </CreateBase>
-        )}
-      </DialogContent>
-    </Dialog>
+    <ResourceFormModal
+      mode={mode}
+      id={id}
+      onClose={() => navigate("/departments")}
+      icon={<Boxes className="h-5 w-5" />}
+      title={translate(
+        isEdit ? "shared.actions.edit_title" : "shared.actions.create_title",
+        { name },
+      )}
+      subtitle={translate(
+        isEdit
+          ? "departments.form.edit_subtitle"
+          : "departments.form.create_subtitle",
+        { _: "" },
+      )}
+      callout={{
+        title: translate(
+          isEdit ? "shared.form.note_title_edit" : "shared.form.note_title",
+        ),
+        description: translate(
+          isEdit ? "shared.form.edit_note" : "departments.form.note",
+        ),
+      }}
+      transform={sanitizeDepartment}
+    >
+      <DepartmentFormFields mode={mode} />
+    </ResourceFormModal>
   );
 }
 
-interface ModalFormShellProps {
-  title: string;
-  onClose: () => void;
-  mode: "create" | "edit";
-}
-
-function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
+function DepartmentFormFields({ mode }: { mode: "create" | "edit" }) {
   const translate = useTranslate();
+  const isEdit = mode === "edit";
 
   return (
     <>
-      <DialogHeader className="shrink-0 px-6 py-4 border-b">
-        <div className="space-y-1">
-          <DialogTitle className="text-xl">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {translate("shared.actions.form_subtitle", {
-              _: "Fill in the details below.",
-            })}
-          </DialogDescription>
-        </div>
-      </DialogHeader>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextInput
+          source="name"
+          label={translate("list.fields.name")}
+          validate={required()}
+          icon={<Building2 />}
+          placeholder={translate("departments.form.placeholders.name", {
+            _: "",
+          })}
+          helperText="departments.form.hints.name"
+        />
+        {/* Slug temporarily hidden — auto-generated from the name on the backend. */}
+        <BooleanInput
+          source="isFeatured"
+          label={translate("list.fields.featured")}
+          defaultValue={false}
+          helperText="departments.form.hints.isFeatured"
+        />
+      </div>
 
-      <SimpleForm
-        toolbar={<ModalFormToolbar onClose={onClose} />}
-        className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
-      >
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {mode === "edit" ? <EditLoading /> : <DepartmentFormFields />}
-        </div>
-      </SimpleForm>
-    </>
-  );
-}
-
-function EditLoading() {
-  const editContext = useEditContext();
-  const isLoading = editContext?.isLoading ?? false;
-
-  return isLoading ? <FormSkeleton /> : <DepartmentFormFields />;
-}
-
-function DepartmentFormFields() {
-  const translate = useTranslate();
-
-  return (
-    <>
-      <TextInput
-        source="name"
-        label={translate("list.fields.name")}
-        validate={required()}
-      />
-      {/* Slug temporarily hidden — auto-generated from the name on the backend. */}
       <TextInput
         source="description"
         label={translate("list.fields.description")}
         multiline
+        icon={<AlignLeft />}
+        placeholder={translate("departments.form.placeholders.description", {
+          _: "",
+        })}
+        helperText="departments.form.hints.description"
       />
-      <ImageUploadInput
-        source="imageDesktopUrl"
-        label={translate("list.fields.imageDesktop")}
-      />
-      <ImageUploadInput
-        source="imageMobileUrl"
-        label={translate("list.fields.imageMobile")}
-      />
-      <BooleanInput
-        source="isFeatured"
-        label={translate("list.fields.featured")}
-        defaultValue={false}
-      />
-      <NumberInput
-        source="sortOrder"
-        label={translate("list.fields.sortOrder")}
-        defaultValue={0}
-      />
-      <BooleanInput
-        source="isActive"
-        label={translate("list.fields.isActive")}
-        defaultValue={true}
-      />
-    </>
-  );
-}
 
-function FormSkeleton() {
-  return (
-    <div className="space-y-5">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-4 w-24 rounded bg-muted animate-pulse" />
-          <div className="h-10 w-full rounded bg-muted animate-pulse" />
+      <FormSection
+        icon={<ImageIcon />}
+        title={translate("departments.form.images_title", { _: "Imágenes" })}
+        subtitle={translate(
+          isEdit
+            ? "departments.form.images_hint_edit"
+            : "departments.form.images_hint",
+          { _: "" },
+        )}
+        className="border-t pt-5"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-border p-4">
+            <ImageUploadInput
+              source="imageDesktopUrl"
+              label={
+                <span className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4 text-primary" />
+                  {translate("list.fields.imageDesktop")}
+                </span>
+              }
+              recommendedSize="1200 x 800"
+            />
+          </div>
+          <div className="rounded-xl border border-border p-4">
+            <ImageUploadInput
+              source="imageMobileUrl"
+              label={
+                <span className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4 text-primary" />
+                  {translate("list.fields.imageMobile")}
+                </span>
+              }
+              recommendedSize="600 x 1000"
+            />
+          </div>
         </div>
-      ))}
-    </div>
-  );
-}
+      </FormSection>
 
-function ModalFormToolbar({ onClose }: { onClose: () => void }) {
-  const translate = useTranslate();
-
-  return (
-    <div
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t",
+      {/* Order + status are edit-only, matching the create form's shorter shape. */}
+      {isEdit && (
+        <div className="grid gap-4 border-t pt-5 sm:grid-cols-2">
+          <NumberInput
+            source="sortOrder"
+            label={translate("list.fields.sortOrder")}
+            defaultValue={0}
+            icon={<ArrowUpDown />}
+            helperText="departments.form.hints.sortOrder"
+          />
+          <BooleanInput
+            source="isActive"
+            label={translate("list.fields.status")}
+            defaultValue={true}
+            helperText="departments.form.hints.isActive"
+          />
+        </div>
       )}
-    >
-      <Button type="button" variant="outline" onClick={onClose}>
-        {translate("shared.actions.cancel", { _: "Cancel" })}
-      </Button>
-      <SaveButton label={translate("shared.actions.save", { _: "Save" })} />
-    </div>
-  );
-}
-
-function SaveButton({ label }: { label: string }) {
-  const form = useFormContext();
-  const saveContext = useSaveContext();
-  const { isSubmitting, isValidating } = useFormState();
-  const disabled = isSubmitting || isValidating;
-
-  const handleClick = async () => {
-    await form.handleSubmit(async (values) => {
-      await saveContext?.save?.(values);
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      disabled={disabled}
-      onClick={handleClick}
-      className={cn(disabled && "opacity-50 cursor-not-allowed")}
-    >
-      {isSubmitting ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Save className="mr-2 h-4 w-4" />
-      )}
-      {label}
-    </Button>
+    </>
   );
 }

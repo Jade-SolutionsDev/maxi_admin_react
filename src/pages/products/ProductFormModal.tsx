@@ -1,34 +1,32 @@
 import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { required, useTranslate } from "ra-core";
+import { useFormContext, useWatch } from "react-hook-form";
 import {
-  CreateBase,
-  EditBase,
-  required,
-  useEditContext,
-  useSaveContext,
-  useTranslate,
-} from "ra-core";
-import { useFormContext, useFormState, useWatch } from "react-hook-form";
-import { Loader2, Save } from "lucide-react";
+  AlignLeft,
+  ArrowUpDown,
+  Box,
+  Building2,
+  CalendarDays,
+  DollarSign,
+  Eye,
+  Image as ImageIcon,
+  Package,
+  Percent,
+  Ruler,
+  Tag,
+} from "lucide-react";
 
 import {
   BooleanInput,
+  FormSection,
   ImageUploadInput,
   NumberInput,
   ReferenceInput,
+  ResourceFormModal,
   SelectInput,
-  SimpleForm,
-  TextInput
+  TextInput,
 } from "@/components/admin";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface ProductFormModalProps {
   mode: "create" | "edit";
@@ -68,82 +66,41 @@ export default function ProductFormModal({ mode }: ProductFormModalProps) {
   const translate = useTranslate();
 
   const isEdit = mode === "edit";
-  const title = translate(
-    isEdit ? "shared.actions.edit_title" : "shared.actions.create_title",
-    { name: translate("resources.products.name", { _: "Product" }) },
-  );
-
-  const onClose = () => navigate("/products");
+  const name = translate("resources.products.name", { _: "Product" });
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex flex-col w-full sm:max-w-xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
-        {isEdit ? (
-          <EditBase
-            id={id}
-            mutationMode="pessimistic"
-            transform={sanitizeProduct}
-          >
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </EditBase>
-        ) : (
-          <CreateBase
-            redirect="list"
-            mutationMode="pessimistic"
-            transform={sanitizeProduct}
-          >
-            <ModalFormShell title={title} onClose={onClose} mode={mode} />
-          </CreateBase>
-        )}
-      </DialogContent>
-    </Dialog>
+    <ResourceFormModal
+      mode={mode}
+      id={id}
+      onClose={() => navigate("/products")}
+      icon={<Package className="h-5 w-5" />}
+      title={translate(
+        isEdit ? "shared.actions.edit_title" : "shared.actions.create_title",
+        { name },
+      )}
+      subtitle={translate(
+        isEdit ? "products.form.edit_subtitle" : "products.form.create_subtitle",
+        { _: "" },
+      )}
+      callout={{
+        title: translate(
+          isEdit ? "shared.form.note_title_edit" : "shared.form.note_title",
+        ),
+        description: translate(
+          isEdit ? "shared.form.edit_note" : "products.form.note",
+        ),
+      }}
+      transform={sanitizeProduct}
+    >
+      <ProductFormFields mode={mode} />
+    </ResourceFormModal>
   );
 }
 
-interface ModalFormShellProps {
-  title: string;
-  onClose: () => void;
-  mode: "create" | "edit";
-}
-
-function ModalFormShell({ title, onClose, mode }: ModalFormShellProps) {
-  const translate = useTranslate();
-
-  return (
-    <>
-      <DialogHeader className="shrink-0 px-6 py-4 border-b">
-        <div className="space-y-1">
-          <DialogTitle className="text-xl">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {translate("shared.actions.form_subtitle", {
-              _: "Fill in the details below.",
-            })}
-          </DialogDescription>
-        </div>
-      </DialogHeader>
-
-      <SimpleForm
-        toolbar={<ModalFormToolbar onClose={onClose} />}
-        className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
-      >
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {mode === "edit" ? <EditLoading /> : <ProductFormFields />}
-        </div>
-      </SimpleForm>
-    </>
-  );
-}
-
-function EditLoading() {
-  const editContext = useEditContext();
-  const isLoading = editContext?.isLoading ?? false;
-
-  return isLoading ? <FormSkeleton /> : <ProductFormFields />;
-}
-
-function ProductFormFields() {
+function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
   const translate = useTranslate();
   const { setValue } = useFormContext();
+  const isEdit = mode === "edit";
   // Department is a client-side filter for the category dropdown only; it is not
   // submitted (stripped by sanitizeProduct). On edit it arrives pre-filled from
   // the record — the API derives it from the category's parent department.
@@ -163,156 +120,162 @@ function ProductFormFields() {
 
   return (
     <>
-      {/* TEMPORARY: image is optional until the Render file server is configured
-          — QA cannot upload yet. To restore: add back `validate={required()}`
-          here and `@IsNotEmpty()` on the backend CreateProductDto.imageUrl. */}
-      <ImageUploadInput
-        source="imageUrl"
-        label={translate("list.fields.image")}
-      />
-      <TextInput
-        source="name"
-        label={translate("list.fields.name")}
-        validate={required()}
-      />
-      <TextInput
-        source="description"
-        label={translate("list.fields.description")}
-        multiline
-      />
-      <ReferenceInput
-        source="departmentId"
-        reference="departments"
-        label="resources.departments.name"
-        alwaysOn
+      <FormSection
+        icon={<Package />}
+        title={translate("products.form.sections.general", { _: "" })}
+        subtitle={translate("products.form.sections.general_hint", { _: "" })}
       >
-        <SelectInput
-          validate={required()}
-          className="min-w-64"
-          optionText="name"
-          label="resources.departments.name"
-        />
-      </ReferenceInput>
-      <ReferenceInput
-        source="categoryId"
-        reference="categories"
-        filter={departmentId ? { departmentId } : {}}
-      >
-        <SelectInput
-          optionText="name"
-          label={translate("resources.categories.name")}
-          validate={required()}
-          disabled={!departmentId}
-          helperText={
-            !departmentId
-              ? translate("resources.products.select_department_first", {
-                  _: "Selecciona un departamento primero",
-                })
-              : undefined
-          }
-        />
-      </ReferenceInput>
-      <TextInput source="format" label={translate("list.fields.format")} />
-      <SelectInput
-        source="measureUnit"
-        label={translate("list.fields.measureUnit")}
-        choices={MEASURE_UNITS}
-        defaultValue="unidad"
-        translateChoice={false}
-      />
-      <TextInput
-        source="expiryDate"
-        type="date"
-        label={translate("list.fields.expiryDate")}
-      />
-      <NumberInput
-        source="basePrice"
-        label={translate("list.fields.basePrice")}
-        step={0.01}
-        min={0}
-        validate={required()}
-      />
-      <NumberInput
-        source="discount"
-        label={translate("list.fields.discount")}
-        min={0}
-        max={100}
-        defaultValue={0}
-      />
-      <NumberInput
-        source="sortOrder"
-        label={translate("list.fields.sortOrder")}
-        defaultValue={0}
-      />
-      <BooleanInput
-        source="featured"
-        label={translate("list.fields.featured")}
-        defaultValue={false}
-      />
-      <BooleanInput
-        source="isActive"
-        label={translate("list.fields.isActive")}
-        defaultValue={true}
-      />
-    </>
-  );
-}
-
-function FormSkeleton() {
-  return (
-    <div className="space-y-5">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-4 w-24 rounded bg-muted animate-pulse" />
-          <div className="h-10 w-full rounded bg-muted animate-pulse" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ReferenceInput
+            source="departmentId"
+            reference="departments"
+            label="resources.departments.name"
+            alwaysOn
+          >
+            <SelectInput
+              validate={required()}
+              optionText="name"
+              label="resources.departments.name"
+              icon={<Building2 />}
+              helperText="products.form.hints.departmentId"
+            />
+          </ReferenceInput>
+          <ReferenceInput
+            source="categoryId"
+            reference="categories"
+            filter={departmentId ? { departmentId } : {}}
+          >
+            <SelectInput
+              optionText="name"
+              label={translate("resources.categories.name")}
+              validate={required()}
+              disabled={!departmentId}
+              icon={<Tag />}
+              helperText={
+                !departmentId
+                  ? translate("resources.products.select_department_first", {
+                      _: "Selecciona un departamento primero",
+                    })
+                  : "products.form.hints.categoryId"
+              }
+            />
+          </ReferenceInput>
         </div>
-      ))}
-    </div>
-  );
-}
+        <TextInput
+          source="name"
+          label={translate("list.fields.name")}
+          validate={required()}
+          icon={<Package />}
+          helperText="products.form.hints.name"
+        />
+        <TextInput
+          source="description"
+          label={translate("list.fields.description")}
+          multiline
+          icon={<AlignLeft />}
+        />
+      </FormSection>
 
-function ModalFormToolbar({ onClose }: { onClose: () => void }) {
-  const translate = useTranslate();
+      <FormSection
+        icon={<DollarSign />}
+        title={translate("products.form.sections.pricing", { _: "" })}
+        subtitle={translate("products.form.sections.pricing_hint", { _: "" })}
+        className="border-t pt-5"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <NumberInput
+            source="basePrice"
+            label={translate("list.fields.basePrice")}
+            step={0.01}
+            min={0}
+            validate={required()}
+            icon={<DollarSign />}
+            helperText="products.form.hints.basePrice"
+          />
+          <NumberInput
+            source="discount"
+            label={translate("list.fields.discount")}
+            min={0}
+            max={100}
+            defaultValue={0}
+            icon={<Percent />}
+            helperText="products.form.hints.discount"
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SelectInput
+            source="measureUnit"
+            label={translate("list.fields.measureUnit")}
+            choices={MEASURE_UNITS}
+            defaultValue="unidad"
+            translateChoice={false}
+            icon={<Ruler />}
+          />
+          <TextInput
+            source="format"
+            label={translate("list.fields.format")}
+            icon={<Box />}
+          />
+        </div>
+        <TextInput
+          source="expiryDate"
+          type="date"
+          label={translate("list.fields.expiryDate")}
+          icon={<CalendarDays />}
+        />
+      </FormSection>
 
-  return (
-    <div
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-6 pt-4 pb-4 border-t",
+      <FormSection
+        icon={<ImageIcon />}
+        title={translate("products.form.images_title", { _: "Imagen" })}
+        subtitle={translate("products.form.images_hint", { _: "" })}
+        className="border-t pt-5"
+      >
+        {/* TEMPORARY: image is optional until the Render file server is configured
+            — QA cannot upload yet. To restore: add back `validate={required()}`
+            here and `@IsNotEmpty()` on the backend CreateProductDto.imageUrl. */}
+        <div className="rounded-xl border border-border p-4 sm:max-w-sm">
+          <ImageUploadInput
+            source="imageUrl"
+            label={translate("list.fields.image")}
+            recommendedSize="800 x 800"
+          />
+        </div>
+      </FormSection>
+
+      {/* Order + visibility are edit-only; create uses the sanitizer's defaults. */}
+      {isEdit && (
+        <FormSection
+          icon={<Eye />}
+          title={translate("products.form.sections.visibility", { _: "" })}
+          subtitle={translate("products.form.sections.visibility_hint", {
+            _: "",
+          })}
+          className="border-t pt-5"
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberInput
+              source="sortOrder"
+              label={translate("list.fields.sortOrder")}
+              defaultValue={0}
+              icon={<ArrowUpDown />}
+              helperText="products.form.hints.sortOrder"
+            />
+            <div className="flex flex-col gap-4">
+              <BooleanInput
+                source="featured"
+                label={translate("list.fields.featured")}
+                defaultValue={false}
+              />
+              <BooleanInput
+                source="isActive"
+                label={translate("list.fields.status")}
+                defaultValue={true}
+              />
+            </div>
+          </div>
+        </FormSection>
       )}
-    >
-      <Button type="button" variant="outline" onClick={onClose}>
-        {translate("shared.actions.cancel", { _: "Cancel" })}
-      </Button>
-      <SaveButton label={translate("shared.actions.save", { _: "Save" })} />
-    </div>
-  );
-}
-
-function SaveButton({ label }: { label: string }) {
-  const form = useFormContext();
-  const saveContext = useSaveContext();
-  const { isSubmitting, isValidating } = useFormState();
-  const disabled = isSubmitting || isValidating;
-
-  const handleClick = async () => {
-    await form.handleSubmit(async (values) => {
-      await saveContext?.save?.(values);
-    })();
-  };
-
-  return (
-    <Button
-      type="button"
-      disabled={disabled}
-      onClick={handleClick}
-      className={cn(disabled && "opacity-50 cursor-not-allowed")}
-    >
-      {isSubmitting ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Save className="mr-2 h-4 w-4" />
-      )}
-      {label}
-    </Button>
+    </>
   );
 }

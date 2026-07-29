@@ -221,6 +221,23 @@
         "title": "Revoke invitation",
         "description": "Revoke the invitation for %{email}? The link will stop working."
       }
+    },
+    "form": {
+      "edit_subtitle": "Update the user's role, status and details.",
+      "note": "Role and status changes affect the user's access immediately.",
+      "sections": {
+        "personal": "Personal details",
+        "personal_hint": "Name and contact details of the user.",
+        "access": "Access and permissions",
+        "access_hint": "Role, managed roles and account status."
+      },
+      "hints": {
+        "firstName": "User's first name.",
+        "lastName": "User's last name.",
+        "phone": "Contact phone (optional).",
+        "role": "Determines the user's base permissions.",
+        "isActive": "An inactive user cannot sign in."
+      }
     }
   },
   "shared": {
@@ -256,14 +273,22 @@
         "off_title": "Remove from featured?",
         "off_desc": "“%{name}” will stop showing among the featured items.",
         "off_cta": "Remove"
-      }
+      },
+      "save_changes": "Save changes"
     },
     "upload": {
       "choose": "Upload image",
       "remove": "Remove",
       "invalid_type": "Unsupported image format",
-      "too_large": "Image exceeds the 2MB limit",
-      "failed": "Could not upload the image"
+      "too_large": "The image exceeds the %{max} limit",
+      "failed": "Could not upload the image",
+      "dropzone_title": "Drag an image here",
+      "dropzone_cta": "or click to select",
+      "dropzone_hint": "Recommended: %{size} px (max. %{max})",
+      "dropzone_hint_no_size": "Max. %{max}",
+      "formats": "Format: %{formats}",
+      "replace": "Upload new image",
+      "remove_image": "Remove image"
     },
     "filters": {
       "yes": "Yes",
@@ -272,6 +297,12 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "form": {
+      "note_title": "Required fields",
+      "note_title_edit": "Important",
+      "required_note": "Fields marked with * are required.",
+      "edit_note": "Changes are reflected on the platform once you save."
     }
   },
   "app": {
@@ -460,6 +491,29 @@
     "stock": {
       "empty_title": "No stock",
       "empty_hint": "This product has no stock recorded in any storage."
+    },
+    "form": {
+      "create_subtitle": "Fill in the information to create a new product.",
+      "edit_subtitle": "Update the product information.",
+      "note": "Fields marked with * are required to create the product.",
+      "images_title": "Image",
+      "images_hint": "Image that represents the product in the storefront.",
+      "sections": {
+        "general": "General information",
+        "general_hint": "Name, classification and description of the product.",
+        "pricing": "Price and presentation",
+        "pricing_hint": "Base price, discount and sales format.",
+        "visibility": "Visibility",
+        "visibility_hint": "How and where the product is shown."
+      },
+      "hints": {
+        "name": "Public name of the product.",
+        "departmentId": "Department the product belongs to.",
+        "categoryId": "Category within the selected department.",
+        "basePrice": "Price before applying the discount.",
+        "discount": "Discount percentage over the base price.",
+        "sortOrder": "Sets the order in which the product is shown."
+      }
     }
   },
   "inventory": {
@@ -574,16 +628,59 @@
       "add_product": "Add another product",
       "confirm": "Confirm operation",
       "success": "Operation recorded"
+    },
+    "form": {
+      "create_subtitle": "Fill in the information to create a new warehouse.",
+      "note": "Fields marked with * are required to create the warehouse."
     }
   },
   "departments": {
     "errors": {
       "delete_conflict": "Cannot delete: the department still has categories."
+    },
+    "form": {
+      "create_subtitle": "Fill in the information to create a new department.",
+      "edit_subtitle": "Update the department information.",
+      "note": "Fields marked with * are required to create the department.",
+      "images_title": "Images",
+      "images_hint": "Add images to represent the department on different devices.",
+      "images_hint_edit": "Update the images that represent the department on different devices.",
+      "hints": {
+        "name": "Public name of the department.",
+        "description": "This description helps identify the department.",
+        "sortOrder": "Sets the order in which the department is shown.",
+        "isActive": "The department will be visible and available to users.",
+        "isFeatured": "Featured departments are shown first in the storefront."
+      },
+      "placeholders": {
+        "name": "Enter the department name...",
+        "description": "Write a short description of the department (optional)..."
+      }
     }
   },
   "categories": {
     "errors": {
       "delete_conflict": "Cannot delete: the category still has products."
+    },
+    "form": {
+      "create_subtitle": "Fill in the information to create a new category.",
+      "edit_subtitle": "Update the category information.",
+      "note": "Fields marked with * are required to create the category.",
+      "images_title": "Images",
+      "images_hint": "Add images to represent the category on different devices.",
+      "images_hint_edit": "Update the images that represent the category on different devices.",
+      "hints": {
+        "departmentId": "Select the department this category belongs to.",
+        "name": "Public name of the category.",
+        "description": "This description helps identify the category.",
+        "sortOrder": "Sets the order in which the category is shown.",
+        "isActive": "The category will be visible and available to users."
+      },
+      "placeholders": {
+        "departmentId": "Search department...",
+        "name": "Enter the category name...",
+        "description": "Write a short description of the category (optional)..."
+      }
     }
   },
   "orders": {
