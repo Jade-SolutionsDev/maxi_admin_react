@@ -141,9 +141,6 @@ function FormModalBody({
   | "onClose"
   | "children"
 >) {
-  const editContext = useEditContext();
-  const isEditLoading = mode === "edit" && (editContext?.isLoading ?? false);
-
   return (
     <>
       <DialogHeader className="relative shrink-0 overflow-hidden border-b px-6 py-5 text-left">
@@ -176,11 +173,21 @@ function FormModalBody({
         className="flex-1 min-h-0 flex flex-col w-full max-w-none px-0 py-0 gap-0"
       >
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
-          {isEditLoading ? <FormSkeleton /> : children}
+          {/* useEditContext() THROWS outside an Edit tree, so the loading gate
+              has to be its own component rendered only in the edit branch —
+              calling the hook here would break every create form. */}
+          {mode === "edit" ? <EditLoadingGate>{children}</EditLoadingGate> : children}
         </div>
       </SimpleForm>
     </>
   );
+}
+
+/** Swaps the fields for a skeleton while the edited record loads. Only ever
+ *  rendered inside <EditBase>, since useEditContext() throws without it. */
+function EditLoadingGate({ children }: { children: ReactNode }) {
+  const { isLoading } = useEditContext();
+  return isLoading ? <FormSkeleton /> : <>{children}</>;
 }
 
 function FormModalFooter({
