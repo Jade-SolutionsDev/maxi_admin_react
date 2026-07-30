@@ -45,7 +45,12 @@ export function CoverageSelector({ source = "coverage" }: { source?: string }) {
   const { field, fieldState } = useInput({ source, validate: validateCoverage });
   const value: CoverageItem[] = Array.isArray(field.value) ? field.value : [];
 
-  const { data: provinces = [], isPending } = useGetList("provinces", LIST_PARAMS);
+  // `all: true` bypasses the API's active-coverage filter — an admin assigning
+  // coverage must see every province, including currently-uncovered ones.
+  const { data: provinces = [], isPending } = useGetList("provinces", {
+    ...LIST_PARAMS,
+    filter: { all: true },
+  });
   const [openProvince, setOpenProvince] = useState<RaRecord | null>(null);
 
   const provinceState = (provinceId: string) => {
@@ -200,7 +205,8 @@ function MunicipalityPicker({
   const translate = useTranslate();
   const { data: municipalities = [], isPending } = useGetList("municipalities", {
     ...LIST_PARAMS,
-    filter: { provinceId: province.id },
+    // `all: true` — assign coverage to any municipality, not just covered ones.
+    filter: { provinceId: province.id, all: true },
   });
 
   return (
