@@ -22,6 +22,7 @@ export * from "./number-input";
 export * from "./reference-field";
 export * from "./reference-input";
 export * from "./refresh-button";
+export * from "./resource-detail-modal";
 export * from "./resource-form-modal";
 export * from "./search-input";
 export * from "./select-input";

@@ -1,4 +1,3 @@
-import { type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
@@ -10,48 +9,43 @@ import {
   useTranslate,
   useUpdate,
 } from "ra-core";
-import { ConfirmActionButton, DateField } from "@/components/admin";
-import { CheckCircle2, KeyRound, Pencil, Trash2, User, XCircle } from "lucide-react";
+import {
+  ConfirmActionButton,
+  DateField,
+  DetailField,
+  FormSection,
+  ResourceDetailModal,
+} from "@/components/admin";
+import {
+  CalendarDays,
+  CheckCircle2,
+  CircleDot,
+  KeyRound,
+  Mail,
+  Pencil,
+  Phone,
+  Shield,
+  Trash2,
+  User,
+  UserCog,
+  XCircle,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { RoleBadge } from "./RoleBadge";
 import { backendMessage } from "./errors";
 
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="grid grid-cols-3 gap-3 py-2 border-b border-border/50 last:border-0">
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="col-span-2 text-sm wrap-break-word">{children}</dd>
-    </div>
-  );
-}
-
-function DetailSkeleton() {
-  return (
-    <div className="space-y-3 py-2">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-6 w-full rounded bg-muted animate-pulse" />
-      ))}
-    </div>
-  );
-}
-
 /**
  * URL-routed read-only detail view for a user, mounted at `/users/:id` inside
  * the users layout's <Outlet>. Closing navigates back to the list. The footer
  * carries the actions (managers only): Approve/Reject for a user awaiting
- * approval, otherwise Edit + Delete.
+ * approval, otherwise Edit + Change password + Delete.
+ *
+ * Sections and field geometry mirror UserFormModal so opening Edit from here
+ * doesn't reflow the dialog.
  */
 export default function UserDetailModal() {
   const translate = useTranslate();
@@ -129,52 +123,15 @@ export default function UserDetailModal() {
     );
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-lg max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
-            {name || translate("shared.actions.view", { _: "Details" })}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {fullName ? email : ""}
-          </DialogDescription>
-        </DialogHeader>
-
-        {isLoading || !record ? (
-          <DetailSkeleton />
-        ) : (
-          <RecordContextProvider value={record}>
-            <div className="mt-1 flex justify-center">
-              <Avatar className="h-20 w-20 border border-border/50">
-                <AvatarImage src={avatarUrl} alt={initials || "Avatar"} />
-                <AvatarFallback className="bg-muted text-muted-foreground text-lg font-medium">
-                  {initials || <User size={24} />}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <dl className="mt-2">
-              <DetailRow label={translate("list.fields.email")}>
-                {email || "—"}
-              </DetailRow>
-              <DetailRow label={translate("list.fields.phone")}>
-                {(record.phone as string) || "—"}
-              </DetailRow>
-              <DetailRow label={translate("list.fields.role")}>
-                <RoleBadge />
-              </DetailRow>
-              <DetailRow label={translate("list.fields.status")}>
-                {translate(`users.status.${statusKey}`, { _: statusKey })}
-              </DetailRow>
-              <DetailRow label={translate("list.fields.createdAt")}>
-                <DateField source="createdAt" showTime />
-              </DetailRow>
-            </dl>
-          </RecordContextProvider>
-        )}
-
-        {record && canManage && (
-          <DialogFooter className="sm:justify-end gap-2">
+    <ResourceDetailModal
+      onClose={onClose}
+      isLoading={isLoading || !record}
+      icon={<UserCog className="h-5 w-5" />}
+      title={name || translate("shared.actions.view", { _: "Details" })}
+      subtitle={fullName ? email : ""}
+      footer={
+        record && canManage ? (
+          <>
             {record.isAwaitingApproval ? (
               <>
                 <ConfirmActionButton
@@ -267,9 +224,92 @@ export default function UserDetailModal() {
               <Pencil className="mr-2 h-4 w-4" />
               {translate("shared.actions.edit", { _: "Edit" })}
             </Link>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
+          </>
+        ) : undefined
+      }
+    >
+      {record && (
+        <RecordContextProvider value={record}>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border border-border/50">
+              <AvatarImage src={avatarUrl} alt={initials || "Avatar"} />
+              <AvatarFallback className="bg-muted text-muted-foreground text-lg font-medium">
+                {initials || <User size={24} />}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate text-base font-semibold text-foreground">
+                {name}
+              </p>
+              <p className="truncate text-sm text-muted-foreground">{email}</p>
+            </div>
+          </div>
+
+          <FormSection
+            icon={<User />}
+            title={translate("users.form.sections.personal", { _: "" })}
+            subtitle={translate("users.form.sections.personal_hint", { _: "" })}
+            className="border-t pt-5"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DetailField
+                label={translate("list.fields.firstName")}
+                icon={<User />}
+              >
+                {firstName}
+              </DetailField>
+              <DetailField
+                label={translate("list.fields.lastName")}
+                icon={<User />}
+              >
+                {lastName}
+              </DetailField>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DetailField
+                label={translate("list.fields.email")}
+                icon={<Mail />}
+              >
+                {email}
+              </DetailField>
+              <DetailField
+                label={translate("list.fields.phone")}
+                icon={<Phone />}
+              >
+                {(record.phone as string) || ""}
+              </DetailField>
+            </div>
+          </FormSection>
+
+          <FormSection
+            icon={<Shield />}
+            title={translate("users.form.sections.access", { _: "" })}
+            subtitle={translate("users.form.sections.access_hint", { _: "" })}
+            className="border-t pt-5"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DetailField
+                label={translate("list.fields.role")}
+                icon={<Shield />}
+              >
+                <RoleBadge />
+              </DetailField>
+              <DetailField
+                label={translate("list.fields.status")}
+                icon={<CircleDot />}
+              >
+                {translate(`users.status.${statusKey}`, { _: statusKey })}
+              </DetailField>
+            </div>
+            <DetailField
+              label={translate("list.fields.createdAt")}
+              icon={<CalendarDays />}
+            >
+              <DateField source="createdAt" showTime />
+            </DetailField>
+          </FormSection>
+        </RecordContextProvider>
+      )}
+    </ResourceDetailModal>
   );
 }

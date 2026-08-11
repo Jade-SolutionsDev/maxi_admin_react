@@ -1,4 +1,3 @@
-import { type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
@@ -9,54 +8,33 @@ import {
   useResourceContext,
   useTranslate,
 } from "ra-core";
-import { ImageOff, Pencil, Trash2 } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowUpDown,
+  Boxes,
+  Building2,
+  CircleDot,
+  Image as ImageIcon,
+  ImageOff,
+  Monitor,
+  Pencil,
+  Smartphone,
+  Sparkles,
+  Tags,
+  Trash2,
+} from "lucide-react";
 import { ConfirmActionButton } from "@/components/admin/confirm-action-button";
 import { DateField } from "@/components/admin/date-field";
+import { FormSection } from "@/components/admin/form-section";
 import { ReferenceField } from "@/components/admin/reference-field";
-import { buttonVariants } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DetailField,
+  DetailImageCard,
+  DetailTextBlock,
+  ResourceDetailModal,
+} from "@/components/admin/resource-detail-modal";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="grid grid-cols-3 gap-3 py-2 border-b border-border/50 last:border-0">
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="col-span-2 text-sm wrap-break-word">{children}</dd>
-    </div>
-  );
-}
-
-function ImagePreview({ label, url }: { label: string; url?: string | null }) {
-  return (
-    <div className="flex-1 space-y-1">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="flex h-28 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-        {url ? (
-          <img src={url} alt={label} className="h-full w-full object-cover" />
-        ) : (
-          <ImageOff className="h-6 w-6 text-muted-foreground" />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function DetailSkeleton() {
-  return (
-    <div className="space-y-3 py-2">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-6 w-full rounded bg-muted animate-pulse" />
-      ))}
-    </div>
-  );
-}
 
 /**
  * URL-routed read-only detail view shared by departments and categories,
@@ -65,6 +43,9 @@ function DetailSkeleton() {
  * the same component serves both. Auto-adapts by `parentId`: a row with no
  * parent is a department (shows Featured), otherwise a category (shows its
  * parent department). Closing (X / Esc / overlay) navigates back to the list.
+ *
+ * Layout mirrors the taxonomy form (same sections, icons and field geometry) so
+ * opening Edit from here doesn't reflow the dialog.
  */
 export function TaxonomyDetailModal() {
   const translate = useTranslate();
@@ -109,73 +90,20 @@ export function TaxonomyDetailModal() {
     );
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
-            {(record?.name as string) ??
-              translate("shared.actions.view", { _: "Details" })}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {(record?.slug as string) ?? ""}
-          </DialogDescription>
-        </DialogHeader>
-
-        {isLoading || !record ? (
-          <DetailSkeleton />
-        ) : (
-          <RecordContextProvider value={record}>
-            <div className="flex gap-4">
-              <ImagePreview
-                label={translate("list.fields.imageDesktop", { _: "Desktop" })}
-                url={record.imageDesktopUrl}
-              />
-              <ImagePreview
-                label={translate("list.fields.imageMobile", { _: "Mobile" })}
-                url={record.imageMobileUrl}
-              />
-            </div>
-
-            <dl className="mt-2">
-              {!isDepartment && (
-                <DetailRow label={translate("resources.departments.name")}>
-                  <ReferenceField source="parentId" reference="departments" />
-                </DetailRow>
-              )}
-              {isDepartment && (
-                <DetailRow
-                  label={translate("list.fields.featured", { _: "Featured" })}
-                >
-                  {record.isFeatured
-                    ? translate("shared.filters.yes", { _: "Yes" })
-                    : translate("shared.filters.no", { _: "No" })}
-                </DetailRow>
-              )}
-              <DetailRow label={translate("list.fields.description")}>
-                <span className="whitespace-pre-wrap">
-                  {(record.description as string) || "—"}
-                </span>
-              </DetailRow>
-              <DetailRow label={translate("list.fields.sortOrder")}>
-                {record.sortOrder ?? 0}
-              </DetailRow>
-              <DetailRow label={translate("list.fields.status")}>
-                {record.isActive
-                  ? translate("shared.status.active", { _: "Active" })
-                  : translate("shared.status.inactive", { _: "Inactive" })}
-              </DetailRow>
-              <DetailRow label={translate("list.fields.createdAt")}>
-                <DateField source="createdAt" showTime />
-              </DetailRow>
-              <DetailRow label={translate("list.fields.updatedAt")}>
-                <DateField source="updatedAt" showTime />
-              </DetailRow>
-            </dl>
-          </RecordContextProvider>
-        )}
-
-        {record && (
-          <DialogFooter className="sm:justify-end gap-2">
+    <ResourceDetailModal
+      onClose={onClose}
+      isLoading={isLoading || !record}
+      icon={
+        isDepartment ? <Boxes className="h-5 w-5" /> : <Tags className="h-5 w-5" />
+      }
+      title={
+        (record?.name as string) ??
+        translate("shared.actions.view", { _: "Details" })
+      }
+      subtitle={(record?.slug as string) ?? ""}
+      footer={
+        record ? (
+          <>
             <ConfirmActionButton
               label={translate("shared.actions.delete", { _: "Delete" })}
               icon={<Trash2 className="mr-2 h-4 w-4" />}
@@ -189,10 +117,13 @@ export function TaxonomyDetailModal() {
                 ),
                 _: "Delete",
               })}
-              description={translate("shared.actions.delete_confirm_description", {
-                name: (record.name as string) || "",
-                _: "Are you sure you want to delete %{name}? This action cannot be undone.",
-              })}
+              description={translate(
+                "shared.actions.delete_confirm_description",
+                {
+                  name: (record.name as string) || "",
+                  _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+                },
+              )}
               confirmLabel={translate("shared.actions.delete", { _: "Delete" })}
               onConfirm={remove}
             />
@@ -203,9 +134,99 @@ export function TaxonomyDetailModal() {
               <Pencil className="mr-2 h-4 w-4" />
               {translate("shared.actions.edit", { _: "Edit" })}
             </Link>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
+          </>
+        ) : undefined
+      }
+    >
+      {record && (
+        <RecordContextProvider value={record}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {isDepartment ? (
+              <DetailField
+                label={translate("list.fields.featured", { _: "Featured" })}
+                icon={<Sparkles />}
+              >
+                {record.isFeatured
+                  ? translate("shared.filters.yes", { _: "Yes" })
+                  : translate("shared.filters.no", { _: "No" })}
+              </DetailField>
+            ) : (
+              <DetailField
+                label={translate("resources.departments.name")}
+                icon={<Building2 />}
+              >
+                <ReferenceField source="parentId" reference="departments" />
+              </DetailField>
+            )}
+            <DetailField
+              label={translate("list.fields.status")}
+              icon={<CircleDot />}
+            >
+              {record.isActive
+                ? translate("shared.status.active", { _: "Active" })
+                : translate("shared.status.inactive", { _: "Inactive" })}
+            </DetailField>
+          </div>
+
+          <DetailTextBlock
+            label={translate("list.fields.description")}
+            icon={<AlignLeft />}
+          >
+            {(record.description as string) || ""}
+          </DetailTextBlock>
+
+          <FormSection
+            icon={<ImageIcon />}
+            title={translate(
+              isDepartment
+                ? "departments.form.images_title"
+                : "categories.form.images_title",
+              { _: "Imágenes" },
+            )}
+            className="border-t pt-5"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DetailImageCard
+                label={
+                  <>
+                    <Monitor className="h-4 w-4 text-primary" />
+                    {translate("list.fields.imageDesktop", { _: "Desktop" })}
+                  </>
+                }
+                url={record.imageDesktopUrl as string | null}
+                emptyIcon={<ImageOff />}
+              />
+              <DetailImageCard
+                label={
+                  <>
+                    <Smartphone className="h-4 w-4 text-primary" />
+                    {translate("list.fields.imageMobile", { _: "Mobile" })}
+                  </>
+                }
+                url={record.imageMobileUrl as string | null}
+                emptyIcon={<ImageOff />}
+              />
+            </div>
+          </FormSection>
+
+          <div className="grid gap-4 border-t pt-5 sm:grid-cols-2">
+            <DetailField
+              label={translate("list.fields.sortOrder")}
+              icon={<ArrowUpDown />}
+            >
+              {record.sortOrder ?? 0}
+            </DetailField>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DetailField label={translate("list.fields.createdAt")}>
+                <DateField source="createdAt" showTime />
+              </DetailField>
+              <DetailField label={translate("list.fields.updatedAt")}>
+                <DateField source="updatedAt" showTime />
+              </DetailField>
+            </div>
+          </div>
+        </RecordContextProvider>
+      )}
+    </ResourceDetailModal>
   );
 }

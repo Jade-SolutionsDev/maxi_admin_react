@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   RecordContextProvider,
@@ -10,23 +10,40 @@ import {
   useTranslate,
 } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
-import { ImageOff, Package, PackageSearch, Pencil, Trash2, Warehouse } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowUpDown,
+  Box,
+  CalendarDays,
+  CircleDot,
+  DollarSign,
+  Eye,
+  Image as ImageIcon,
+  ImageOff,
+  Layers,
+  Package,
+  PackageSearch,
+  Pencil,
+  Percent,
+  Ruler,
+  Sparkles,
+  Tag,
+  Trash2,
+  Warehouse,
+} from "lucide-react";
 
 import {
   ConfirmActionButton,
   DateField,
+  DetailField,
+  DetailImageCard,
+  DetailTextBlock,
+  FormSection,
   ReferenceField,
+  ResourceDetailModal,
 } from "@/components/admin";
 import { buttonVariants } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 // Prices are shown in USD to match the products list.
@@ -36,29 +53,6 @@ const money = (value: unknown) =>
     currency: "USD",
   }).format(Number(value ?? 0));
 
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="grid grid-cols-3 gap-3 py-2 border-b border-border/50 last:border-0">
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
-      <dd className="col-span-2 text-sm wrap-break-word">{children}</dd>
-    </div>
-  );
-}
-
-function DetailSkeleton() {
-  return (
-    <div className="space-y-3 py-2">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="h-6 w-full rounded bg-muted animate-pulse" />
-      ))}
-    </div>
-  );
-}
-
-/**
- * URL-routed read-only detail view for a product, mounted at `/products/:id`
- * inside the products layout's <Outlet>. Closing navigates back to the list.
- */
 type TabKey = "details" | "stock";
 
 /** Per-storage stock breakdown for a product (fetched lazily). */
@@ -126,6 +120,13 @@ function StockByStorageTab({
   );
 }
 
+/**
+ * URL-routed read-only detail view for a product, mounted at `/products/:id`
+ * inside the products layout's <Outlet>. Closing navigates back to the list.
+ *
+ * The "Detalles" tab mirrors ProductFormModal's sections, icons and field
+ * geometry so opening Edit from here doesn't reflow the dialog.
+ */
 export function ProductDetailModal() {
   const translate = useTranslate();
   const navigate = useNavigate();
@@ -169,141 +170,39 @@ export function ProductDetailModal() {
   const imageUrl = record?.imageUrl as string | null | undefined;
   const measureUnit = (record?.measureUnit as string) || "";
 
-  const tabs: { key: TabKey; label: string; fallback: string; icon: typeof Package }[] = [
-    { key: "details", label: "products.tabs.details", fallback: "Detalles", icon: Package },
-    { key: "stock", label: "products.tabs.stock", fallback: "Existencias por almacén", icon: Warehouse },
+  const tabs: {
+    key: TabKey;
+    label: string;
+    fallback: string;
+    icon: typeof Package;
+  }[] = [
+    {
+      key: "details",
+      label: "products.tabs.details",
+      fallback: "Detalles",
+      icon: Package,
+    },
+    {
+      key: "stock",
+      label: "products.tabs.stock",
+      fallback: "Existencias por almacén",
+      icon: Warehouse,
+    },
   ];
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">
-            {(record?.name as string) ??
-              translate("shared.actions.view", { _: "Details" })}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {(record?.sku as string) ?? ""}
-          </DialogDescription>
-        </DialogHeader>
-
-        {isLoading || !record ? (
-          <DetailSkeleton />
-        ) : (
+    <ResourceDetailModal
+      onClose={onClose}
+      isLoading={isLoading || !record}
+      icon={<Package className="h-5 w-5" />}
+      title={
+        (record?.name as string) ??
+        translate("shared.actions.view", { _: "Details" })
+      }
+      subtitle={(record?.sku as string) ?? ""}
+      footer={
+        record ? (
           <>
-            {/* Tab strip */}
-            <div role="tablist" className="flex gap-1 border-b border-border">
-              {tabs.map(({ key, label, fallback, icon: Icon }) => {
-                const isActive = tab === key;
-                return (
-                  <button
-                    key={key}
-                    role="tab"
-                    type="button"
-                    aria-selected={isActive}
-                    onClick={() => setTab(key)}
-                    className={cn(
-                      "-mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
-                      isActive
-                        ? "border-primary text-foreground"
-                        : "border-transparent text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {translate(label, { _: fallback })}
-                  </button>
-                );
-              })}
-            </div>
-
-            {tab === "details" && (
-              <RecordContextProvider value={record}>
-                <div className="mt-2 flex justify-center">
-                  <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={record.name as string}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <ImageOff className="h-8 w-8 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-
-                <dl className="mt-2">
-                  <DetailRow label={translate("resources.categories.name")}>
-                    <ReferenceField source="categoryId" reference="categories" />
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.description")}>
-                    <span className="whitespace-pre-wrap">
-                      {(record.description as string) || "—"}
-                    </span>
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.format")}>
-                    {(record.format as string) || "—"}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.measureUnit")}>
-                    {measureUnit || "—"}
-                  </DetailRow>
-                  <DetailRow
-                    label={translate("list.fields.totalStock", {
-                      _: "Existencia total",
-                    })}
-                  >
-                    <span className="font-medium">
-                      {(record.amount as number) ?? 0} {measureUnit}
-                    </span>
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.expiryDate")}>
-                    {record.expiryDate ? <DateField source="expiryDate" /> : "—"}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.basePrice")}>
-                    {money(record.basePrice)}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.discount")}>
-                    {Number(record.discount ?? 0)}%
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.finalPrice")}>
-                    <span className="font-medium text-primary">
-                      {money(record.finalPrice)}
-                    </span>
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.featured")}>
-                    {record.featured
-                      ? translate("shared.filters.yes", { _: "Yes" })
-                      : translate("shared.filters.no", { _: "No" })}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.status")}>
-                    {record.isActive
-                      ? translate("shared.status.active", { _: "Active" })
-                      : translate("shared.status.inactive", { _: "Inactive" })}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.sortOrder")}>
-                    {(record.sortOrder as number) ?? 0}
-                  </DetailRow>
-                  <DetailRow label={translate("list.fields.createdAt")}>
-                    <DateField source="createdAt" showTime />
-                  </DetailRow>
-                </dl>
-              </RecordContextProvider>
-            )}
-
-            {tab === "stock" && (
-              <div className="mt-3">
-                <StockByStorageTab
-                  productId={record.id as string}
-                  measureUnit={measureUnit}
-                  enabled={tab === "stock"}
-                />
-              </div>
-            )}
-          </>
-        )}
-
-        {record && (
-          <DialogFooter className="sm:justify-end gap-2">
             <ConfirmActionButton
               label={translate("shared.actions.delete", { _: "Delete" })}
               icon={<Trash2 className="mr-2 h-4 w-4" />}
@@ -313,10 +212,13 @@ export function ProductDetailModal() {
                 name: translate("resources.products.name", { _: "product" }),
                 _: "Delete product",
               })}
-              description={translate("shared.actions.delete_confirm_description", {
-                name: (record.name as string) || "",
-                _: "Are you sure you want to delete %{name}? This action cannot be undone.",
-              })}
+              description={translate(
+                "shared.actions.delete_confirm_description",
+                {
+                  name: (record.name as string) || "",
+                  _: "Are you sure you want to delete %{name}? This action cannot be undone.",
+                },
+              )}
               confirmLabel={translate("shared.actions.delete", { _: "Delete" })}
               onConfirm={remove}
             />
@@ -327,9 +229,179 @@ export function ProductDetailModal() {
               <Pencil className="mr-2 h-4 w-4" />
               {translate("shared.actions.edit", { _: "Edit" })}
             </Link>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
+          </>
+        ) : undefined
+      }
+    >
+      {record && (
+        <>
+          {/* Tab strip */}
+          <div role="tablist" className="flex gap-1 border-b border-border">
+            {tabs.map(({ key, label, fallback, icon: Icon }) => {
+              const isActive = tab === key;
+              return (
+                <button
+                  key={key}
+                  role="tab"
+                  type="button"
+                  aria-selected={isActive}
+                  onClick={() => setTab(key)}
+                  className={cn(
+                    "-mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {translate(label, { _: fallback })}
+                </button>
+              );
+            })}
+          </div>
+
+          {tab === "details" && (
+            <RecordContextProvider value={record}>
+              <FormSection
+                icon={<Package />}
+                title={translate("products.form.sections.general", { _: "" })}
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <DetailField
+                    label={translate("resources.categories.name")}
+                    icon={<Tag />}
+                  >
+                    <ReferenceField source="categoryId" reference="categories" />
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.totalStock", {
+                      _: "Existencia total",
+                    })}
+                    icon={<Layers />}
+                  >
+                    <span className="font-medium">
+                      {(record.amount as number) ?? 0} {measureUnit}
+                    </span>
+                  </DetailField>
+                </div>
+                <DetailTextBlock
+                  label={translate("list.fields.description")}
+                  icon={<AlignLeft />}
+                >
+                  {(record.description as string) || ""}
+                </DetailTextBlock>
+              </FormSection>
+
+              <FormSection
+                icon={<DollarSign />}
+                title={translate("products.form.sections.pricing", { _: "" })}
+                className="border-t pt-5"
+              >
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <DetailField
+                    label={translate("list.fields.basePrice")}
+                    icon={<DollarSign />}
+                  >
+                    {money(record.basePrice)}
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.discount")}
+                    icon={<Percent />}
+                  >
+                    {Number(record.discount ?? 0)}%
+                  </DetailField>
+                  <DetailField label={translate("list.fields.finalPrice")}>
+                    <span className="font-medium text-primary">
+                      {money(record.finalPrice)}
+                    </span>
+                  </DetailField>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <DetailField
+                    label={translate("list.fields.measureUnit")}
+                    icon={<Ruler />}
+                  >
+                    {measureUnit}
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.format")}
+                    icon={<Box />}
+                  >
+                    {(record.format as string) || ""}
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.expiryDate")}
+                    icon={<CalendarDays />}
+                  >
+                    {record.expiryDate ? <DateField source="expiryDate" /> : ""}
+                  </DetailField>
+                </div>
+              </FormSection>
+
+              <FormSection
+                icon={<ImageIcon />}
+                title={translate("products.form.images_title", { _: "Imagen" })}
+                className="border-t pt-5"
+              >
+                <div className="sm:max-w-sm">
+                  <DetailImageCard
+                    label={translate("list.fields.image")}
+                    url={imageUrl}
+                    emptyIcon={<ImageOff />}
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection
+                icon={<Eye />}
+                title={translate("products.form.sections.visibility", { _: "" })}
+                className="border-t pt-5"
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <DetailField
+                    label={translate("list.fields.featured")}
+                    icon={<Sparkles />}
+                  >
+                    {record.featured
+                      ? translate("shared.filters.yes", { _: "Yes" })
+                      : translate("shared.filters.no", { _: "No" })}
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.status")}
+                    icon={<CircleDot />}
+                  >
+                    {record.isActive
+                      ? translate("shared.status.active", { _: "Active" })
+                      : translate("shared.status.inactive", { _: "Inactive" })}
+                  </DetailField>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <DetailField
+                    label={translate("list.fields.sortOrder")}
+                    icon={<ArrowUpDown />}
+                  >
+                    {(record.sortOrder as number) ?? 0}
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.createdAt")}
+                    icon={<CalendarDays />}
+                  >
+                    <DateField source="createdAt" showTime />
+                  </DetailField>
+                </div>
+              </FormSection>
+            </RecordContextProvider>
+          )}
+
+          {tab === "stock" && (
+            <StockByStorageTab
+              productId={record.id as string}
+              measureUnit={measureUnit}
+              enabled={tab === "stock"}
+            />
+          )}
+        </>
+      )}
+    </ResourceDetailModal>
   );
 }
