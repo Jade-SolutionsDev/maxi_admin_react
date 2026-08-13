@@ -51,6 +51,42 @@ export const PAYMENT_CLASSES: Record<OrderPaymentStatus, string> = {
   refunded: "bg-muted text-muted-foreground",
 };
 
+export type ProviderChargeStatus =
+  | "PENDING"
+  | "REQUIRES_ACTION"
+  | "PROCESSING"
+  | "SUCCEEDED"
+  | "FAILED"
+  | "EXPIRED"
+  | "CANCELLED";
+
+// Mi Billetera MerchantCharge statuses — a different vocabulary than the
+// order's own paymentStatus (which stays lowercase).
+export const PROVIDER_STATUS_CLASSES: Record<ProviderChargeStatus, string> = {
+  PENDING: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  REQUIRES_ACTION: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  PROCESSING: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
+  SUCCEEDED: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  FAILED: "bg-destructive/15 text-destructive",
+  EXPIRED: "bg-muted text-muted-foreground",
+  CANCELLED: "bg-muted text-muted-foreground",
+};
+
+export interface OrderPayment {
+  provider: string;
+  reference: string;
+  status: ProviderChargeStatus;
+  depositAddress: string | null;
+  amount: string | null;
+  token: string | null;
+  blockchain: string | null;
+  expiresAt: string | null;
+  feeAmount: string | null;
+  settlementAmount: string | null;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
 export const money = (value: unknown) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",

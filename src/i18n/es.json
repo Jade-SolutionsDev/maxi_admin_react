@@ -713,7 +713,8 @@
       "items": "Productos",
       "delivery": "Entrega",
       "notes": "Notas del cliente",
-      "customer": "Cliente"
+      "customer": "Cliente",
+      "payment": "Pago (pasarela)"
     },
     "actions": {
       "updated": "Pedido actualizado",
@@ -730,6 +731,29 @@
       "mark_failed": "Pago fallido",
       "mark_refunded": "Reembolsar",
       "view_customer": "Ver cliente"
+    },
+    "payment": {
+      "provider": "Proveedor",
+      "status": "Estado",
+      "reference": "Referencia",
+      "address": "Dirección de depósito",
+      "amount": "Monto",
+      "fee": "Comisión",
+      "settlement": "Liquidación",
+      "createdAt": "Creado",
+      "expiresAt": "Expira",
+      "copy_reference": "Copiar referencia",
+      "copy_address": "Copiar dirección",
+      "copy_failed": "No se pudo copiar"
+    },
+    "providerStatus": {
+      "PENDING": "Pendiente",
+      "REQUIRES_ACTION": "Esperando pago",
+      "PROCESSING": "Procesando",
+      "SUCCEEDED": "Liquidado",
+      "FAILED": "Fallido",
+      "EXPIRED": "Expirado",
+      "CANCELLED": "Cancelado"
     }
   },
   "clients": {

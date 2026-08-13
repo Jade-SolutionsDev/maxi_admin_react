@@ -713,7 +713,8 @@
       "items": "Items",
       "delivery": "Delivery",
       "notes": "Customer notes",
-      "customer": "Customer"
+      "customer": "Customer",
+      "payment": "Payment (gateway)"
     },
     "actions": {
       "updated": "Order updated",
@@ -730,6 +731,29 @@
       "mark_failed": "Payment failed",
       "mark_refunded": "Refund",
       "view_customer": "View customer"
+    },
+    "payment": {
+      "provider": "Provider",
+      "status": "Status",
+      "reference": "Reference",
+      "address": "Deposit address",
+      "amount": "Amount",
+      "fee": "Fee",
+      "settlement": "Settlement",
+      "createdAt": "Created",
+      "expiresAt": "Expires",
+      "copy_reference": "Copy reference",
+      "copy_address": "Copy address",
+      "copy_failed": "Could not copy"
+    },
+    "providerStatus": {
+      "PENDING": "Pending",
+      "REQUIRES_ACTION": "Awaiting payment",
+      "PROCESSING": "Processing",
+      "SUCCEEDED": "Settled",
+      "FAILED": "Failed",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
     }
   },
   "clients": {
