@@ -71,6 +71,26 @@
     "inventory": {
       "name": "Inventory",
       "name_plural": "Inventory"
+    },
+    "cms-pages": {
+      "name": "Page",
+      "name_plural": "Pages"
+    },
+    "cms-banners": {
+      "name": "Banner",
+      "name_plural": "Banners"
+    },
+    "cms-services": {
+      "name": "Service",
+      "name_plural": "Services"
+    },
+    "cms-staff": {
+      "name": "Staff member",
+      "name_plural": "Staff"
+    },
+    "cms-settings": {
+      "name": "Site settings",
+      "name_plural": "Site settings"
     }
   },
   "list": {
@@ -116,7 +136,12 @@
       "real": "Real",
       "reserved": "Reserved",
       "available": "Available",
-      "storages": "Storages"
+      "storages": "Storages",
+      "title": "Title",
+      "content": "Content",
+      "icon": "Icon",
+      "photo": "Photo",
+      "alt": "Alt text"
     }
   },
   "users": {
@@ -318,7 +343,12 @@
       "clientes": "Clients",
       "reportes": "Reports",
       "configuracion": "Settings",
-      "soon": "Coming soon"
+      "soon": "Coming soon",
+      "cmsPages": "Pages",
+      "cmsBanners": "Banners",
+      "cmsServices": "Services",
+      "cmsStaff": "Staff",
+      "cmsSettings": "Website"
     },
     "user": {
       "profile": "Profile"
@@ -744,6 +774,119 @@
     "orders": {
       "empty_title": "No orders",
       "empty_hint": "This customer has not placed any orders yet."
+    }
+  },
+  "cms-pages": {
+    "form": {
+      "create_subtitle": "Create an informational storefront page.",
+      "edit_subtitle": "Edit the page content.",
+      "note": "Published at /paginas/[slug]; the slug is derived from the title.",
+      "placeholders": {
+        "title": "Privacy policy",
+        "content": "Write the content in Markdown…"
+      },
+      "hints": {
+        "title": "Visible page title and slug source.",
+        "content": "Markdown: ## headings, - lists, **bold**, [links](https://…).",
+        "sortOrder": "Order in page listings (lowest first).",
+        "isActive": "Inactive: no longer served by the storefront (404)."
+      }
+    }
+  },
+  "cms-banners": {
+    "form": {
+      "create_subtitle": "Add a slide to the storefront hero carousel.",
+      "edit_subtitle": "Edit the carousel slide.",
+      "note": "Upload the three variants; dimensions are detected automatically.",
+      "images_title": "Images",
+      "images_hint": "One variant per device. Keep the recommended aspect ratios to avoid cropping.",
+      "variants": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile"
+      },
+      "dimensions": "Detected dimensions: %{width} x %{height} px",
+      "dimensions_pending": "Upload an image to detect its dimensions.",
+      "placeholders": {
+        "alt": "Weekly promotions"
+      },
+      "hints": {
+        "alt": "Accessible description of the banner (screen readers and SEO).",
+        "sortOrder": "Slide order in the carousel (lowest first).",
+        "isActive": "Inactive: the slide is not shown on the storefront."
+      }
+    }
+  },
+  "cms-services": {
+    "form": {
+      "create_subtitle": "Add a card to the \"Our services\" block.",
+      "edit_subtitle": "Edit the service card.",
+      "note": "The icon must exist on the storefront; unknown names fall back to a generic icon.",
+      "placeholders": {
+        "title": "100% secure payment",
+        "description": "Your payment is safe with us"
+      },
+      "hints": {
+        "title": "Short card title.",
+        "icon": "Icon name (catalog kept in sync with the storefront).",
+        "description": "One line explaining the service.",
+        "isFeatured": "Featured: highlighted background on the storefront.",
+        "sortOrder": "Card order (lowest first).",
+        "isActive": "Inactive: not shown on the storefront."
+      }
+    }
+  },
+  "cms-staff": {
+    "form": {
+      "create_subtitle": "Add a person to the About us page.",
+      "edit_subtitle": "Edit the staff card.",
+      "note": "Active cards show on About us, ordered by priority.",
+      "photo_title": "Photo",
+      "photo_hint": "Square, face centered.",
+      "placeholders": {
+        "name": "Maria Perez",
+        "role": "Customer support"
+      },
+      "hints": {
+        "name": "Name shown on the card.",
+        "role": "Role shown under the name.",
+        "sortOrder": "Card order (lowest first).",
+        "isActive": "Inactive: not shown on the storefront."
+      }
+    }
+  },
+  "cms-settings": {
+    "subtitle": "Footer copy, contact info, payment methods and services block.",
+    "saved": "Settings saved",
+    "sections": {
+      "footer": "Footer",
+      "footer_hint": "Brand copy, copyright and legal links.",
+      "contact": "Contact",
+      "payments": "Payment methods",
+      "payments_hint": "Only enabled methods are shown (storefront bundles the logos).",
+      "services": "Services block",
+      "services_hint": "Heading of the home \"Our services\" block."
+    },
+    "fields": {
+      "blurb": "Brand copy",
+      "copyright": "Copyright",
+      "legalLinks": "Legal links",
+      "linkLabel": "Label",
+      "linkSlug": "Page slug",
+      "email": "Email",
+      "phone": "Phone",
+      "heading": "Heading",
+      "subheading": "Subheading"
+    },
+    "hints": {
+      "blurb": "Paragraph under the footer logo.",
+      "copyright": "Bottom line of the footer.",
+      "legalLinks": "Each link points at an active page slug (Content → Pages).",
+      "email": "Contact email shown in the footer and Contact page.",
+      "phone": "Phone shown in the header, footer and Contact page."
+    },
+    "actions": {
+      "add_link": "Add link"
     }
   }
 }

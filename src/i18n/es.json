@@ -71,6 +71,26 @@
     "inventory": {
       "name": "Inventario",
       "name_plural": "Inventario"
+    },
+    "cms-pages": {
+      "name": "Página",
+      "name_plural": "Páginas"
+    },
+    "cms-banners": {
+      "name": "Banner",
+      "name_plural": "Banners"
+    },
+    "cms-services": {
+      "name": "Servicio",
+      "name_plural": "Servicios"
+    },
+    "cms-staff": {
+      "name": "Miembro del equipo",
+      "name_plural": "Equipo"
+    },
+    "cms-settings": {
+      "name": "Ajustes del sitio",
+      "name_plural": "Ajustes del sitio"
     }
   },
   "list": {
@@ -116,7 +136,12 @@
       "real": "Real",
       "reserved": "Reservado",
       "available": "Disponible",
-      "storages": "Almacenes"
+      "storages": "Almacenes",
+      "title": "Título",
+      "content": "Contenido",
+      "icon": "Ícono",
+      "photo": "Foto",
+      "alt": "Texto alternativo"
     }
   },
   "users": {
@@ -318,7 +343,12 @@
       "clientes": "Clientes",
       "reportes": "Reportes",
       "configuracion": "Configuración",
-      "soon": "Próximamente"
+      "soon": "Próximamente",
+      "cmsPages": "Páginas",
+      "cmsBanners": "Banners",
+      "cmsServices": "Servicios",
+      "cmsStaff": "Equipo",
+      "cmsSettings": "Sitio web"
     },
     "user": {
       "profile": "Perfil"
@@ -744,6 +774,119 @@
     "orders": {
       "empty_title": "Sin pedidos",
       "empty_hint": "Este cliente aún no ha realizado pedidos."
+    }
+  },
+  "cms-pages": {
+    "form": {
+      "create_subtitle": "Crea una página informativa para la tienda.",
+      "edit_subtitle": "Edita el contenido de la página.",
+      "note": "La página se publica en /paginas/[slug]; el slug se genera desde el título.",
+      "placeholders": {
+        "title": "Política de privacidad",
+        "content": "Escribe el contenido en Markdown…"
+      },
+      "hints": {
+        "title": "Título visible de la página y origen del slug.",
+        "content": "Markdown: ## títulos, listas con -, **negrita**, [enlaces](https://…).",
+        "sortOrder": "Orden en listados de páginas (menor primero).",
+        "isActive": "Inactiva: deja de mostrarse en la tienda (404)."
+      }
+    }
+  },
+  "cms-banners": {
+    "form": {
+      "create_subtitle": "Añade un slide al carrusel principal de la tienda.",
+      "edit_subtitle": "Edita el slide del carrusel.",
+      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente.",
+      "images_title": "Imágenes",
+      "images_hint": "Una variante por dispositivo. Respeta las proporciones recomendadas para evitar recortes.",
+      "variants": {
+        "desktop": "Escritorio",
+        "tablet": "Tableta",
+        "mobile": "Móvil"
+      },
+      "dimensions": "Dimensiones detectadas: %{width} x %{height} px",
+      "dimensions_pending": "Sube una imagen para detectar sus dimensiones.",
+      "placeholders": {
+        "alt": "Promociones de la semana"
+      },
+      "hints": {
+        "alt": "Descripción accesible del banner (lectores de pantalla y SEO).",
+        "sortOrder": "Orden del slide en el carrusel (menor primero).",
+        "isActive": "Inactivo: el slide no se muestra en la tienda."
+      }
+    }
+  },
+  "cms-services": {
+    "form": {
+      "create_subtitle": "Añade una tarjeta al bloque \"Nuestros servicios\".",
+      "edit_subtitle": "Edita la tarjeta de servicio.",
+      "note": "El ícono debe existir en la tienda; nombres desconocidos usan un ícono genérico.",
+      "placeholders": {
+        "title": "Pago 100% seguro",
+        "description": "Tu pago está seguro con nosotros"
+      },
+      "hints": {
+        "title": "Título corto de la tarjeta.",
+        "icon": "Nombre del ícono (catálogo sincronizado con la tienda).",
+        "description": "Una línea que explica el servicio.",
+        "isFeatured": "Destacada: fondo resaltado en la tienda.",
+        "sortOrder": "Orden de la tarjeta (menor primero).",
+        "isActive": "Inactiva: no se muestra en la tienda."
+      }
+    }
+  },
+  "cms-staff": {
+    "form": {
+      "create_subtitle": "Añade una persona a la página Sobre nosotros.",
+      "edit_subtitle": "Edita la tarjeta del equipo.",
+      "note": "Las tarjetas activas se muestran en Sobre nosotros, ordenadas por prioridad.",
+      "photo_title": "Foto",
+      "photo_hint": "Cuadrada, rostro centrado.",
+      "placeholders": {
+        "name": "María Pérez",
+        "role": "Atención al cliente"
+      },
+      "hints": {
+        "name": "Nombre visible en la tarjeta.",
+        "role": "Cargo o rol mostrado bajo el nombre.",
+        "sortOrder": "Orden de la tarjeta (menor primero).",
+        "isActive": "Inactiva: no se muestra en la tienda."
+      }
+    }
+  },
+  "cms-settings": {
+    "subtitle": "Textos del pie de página, contacto, métodos de pago y bloque de servicios.",
+    "saved": "Ajustes guardados",
+    "sections": {
+      "footer": "Pie de página",
+      "footer_hint": "Texto de marca, copyright y enlaces legales.",
+      "contact": "Contacto",
+      "payments": "Métodos de pago",
+      "payments_hint": "Solo se muestran los métodos activados (logos fijos de la tienda).",
+      "services": "Bloque de servicios",
+      "services_hint": "Encabezado del bloque \"Nuestros servicios\" de la portada."
+    },
+    "fields": {
+      "blurb": "Texto de marca",
+      "copyright": "Copyright",
+      "legalLinks": "Enlaces legales",
+      "linkLabel": "Etiqueta",
+      "linkSlug": "Slug de página",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "heading": "Encabezado",
+      "subheading": "Subtítulo"
+    },
+    "hints": {
+      "blurb": "Párrafo bajo el logo del pie de página.",
+      "copyright": "Línea inferior del pie de página.",
+      "legalLinks": "Cada enlace apunta al slug de una página activa (Contenido → Páginas).",
+      "email": "Correo de contacto mostrado en el pie y en Contacto.",
+      "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
+    },
+    "actions": {
+      "add_link": "Añadir enlace"
     }
   }
 }

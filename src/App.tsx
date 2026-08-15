@@ -36,6 +36,23 @@ import { DepartmentsLayout } from "./pages/departments/DepartmentsLayout";
 import DepartmentCreate from "./pages/departments/DepartmentCreate";
 import DepartmentEdit from "./pages/departments/DepartmentEdit";
 import { CategoriesLayout } from "./pages/categories/CategoriesLayout";
+import { CmsBannersLayout } from "./pages/cms-banners/CmsBannersLayout";
+import CmsBannerCreate from "./pages/cms-banners/CmsBannerCreate";
+import CmsBannerEdit from "./pages/cms-banners/CmsBannerEdit";
+import { CmsBannerDetailModal } from "./pages/cms-banners/CmsBannerDetailModal";
+import { CmsPagesLayout } from "./pages/cms-pages/CmsPagesLayout";
+import CmsPageCreate from "./pages/cms-pages/CmsPageCreate";
+import CmsPageEdit from "./pages/cms-pages/CmsPageEdit";
+import { CmsPageDetailModal } from "./pages/cms-pages/CmsPageDetailModal";
+import { CmsServicesLayout } from "./pages/cms-services/CmsServicesLayout";
+import CmsServiceCreate from "./pages/cms-services/CmsServiceCreate";
+import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
+import { CmsServiceDetailModal } from "./pages/cms-services/CmsServiceDetailModal";
+import { CmsSettingsPage } from "./pages/cms-settings/CmsSettingsPage";
+import { CmsStaffLayout } from "./pages/cms-staff/CmsStaffLayout";
+import CmsStaffCreate from "./pages/cms-staff/CmsStaffCreate";
+import CmsStaffEdit from "./pages/cms-staff/CmsStaffEdit";
+import { CmsStaffDetailModal } from "./pages/cms-staff/CmsStaffDetailModal";
 import CategoryCreate from "./pages/categories/CategoryCreate";
 import CategoryEdit from "./pages/categories/CategoryEdit";
 import { TaxonomyDetailModal } from "./components/admin/taxonomy-detail-modal";
@@ -115,6 +132,62 @@ const AdminApp = () => (
         <Route path="edit/:id" element={<CategoryEdit />} />
         <Route path=":id" element={<TaxonomyDetailModal />} />
       </Route>
+      <Route
+        path="/cms-pages/*"
+        element={
+          <RequireAccess resource="cms-pages">
+            <CmsPagesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsPageCreate />} />
+        <Route path="edit/:id" element={<CmsPageEdit />} />
+        <Route path=":id" element={<CmsPageDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-banners/*"
+        element={
+          <RequireAccess resource="cms-banners">
+            <CmsBannersLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsBannerCreate />} />
+        <Route path="edit/:id" element={<CmsBannerEdit />} />
+        <Route path=":id" element={<CmsBannerDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-services/*"
+        element={
+          <RequireAccess resource="cms-services">
+            <CmsServicesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsServiceCreate />} />
+        <Route path="edit/:id" element={<CmsServiceEdit />} />
+        <Route path=":id" element={<CmsServiceDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-staff/*"
+        element={
+          <RequireAccess resource="cms-staff">
+            <CmsStaffLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsStaffCreate />} />
+        <Route path="edit/:id" element={<CmsStaffEdit />} />
+        <Route path=":id" element={<CmsStaffDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-settings"
+        element={
+          <RequireAccess resource="cms-settings">
+            <CmsSettingsPage />
+          </RequireAccess>
+        }
+      />
       <Route
         path="/clients/:id"
         element={

@@ -90,6 +90,22 @@ export interface ExtendedDataProvider extends DataProvider {
     id: string,
     paymentStatus: OrderPaymentStatus,
   ) => Promise<{ data: unknown }>;
+  getSiteSettings: () => Promise<{ data: SiteSettingsData }>;
+  updateSiteSettings: (
+    data: SiteSettingsData,
+  ) => Promise<{ data: SiteSettingsData }>;
+}
+
+/** Mirror of the API's SiteSettingsData (cms/settings singleton document). */
+export interface SiteSettingsData {
+  footer: {
+    blurb: string;
+    copyright: string;
+    legalLinks: { label: string; slug: string }[];
+  };
+  contact: { email: string; phone: string };
+  payments: { visa: boolean; mastercard: boolean; mibilletera: boolean };
+  services: { heading: string; subheading: string };
 }
 
 // Resources whose REST path differs from the react-admin resource name.
@@ -99,6 +115,10 @@ const RESOURCE_PATHS: Record<string, string> = {
   inventory: 'inventory/aggregate',
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
   'storage-inventory': 'inventory',
+  'cms-pages': 'cms/pages',
+  'cms-banners': 'cms/banners',
+  'cms-services': 'cms/services',
+  'cms-staff': 'cms/staff',
 };
 
 function resourcePath(resource: string): string {
@@ -347,6 +367,23 @@ export const dataProvider: DataProvider = {
       ),
     );
     return { data: params.ids };
+  },
+
+  async getSiteSettings() {
+    const { json } = await httpClient(`${API_URL}/cms/settings`, {
+      method: 'GET',
+    });
+    const payload = unwrapOne(json) as { data: SiteSettingsData };
+    return { data: payload.data };
+  },
+
+  async updateSiteSettings(data: SiteSettingsData) {
+    const { json } = await httpClient(`${API_URL}/cms/settings`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    const payload = unwrapOne(json) as { data: SiteSettingsData };
+    return { data: payload.data };
   },
 
   async inviteUser(payload: InviteUserPayload) {

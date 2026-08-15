@@ -247,3 +247,35 @@ Conventions:
    Enter/Space-activatable.
 8. `yarn build && yarn lint` — there is **no frontend test runner**, so verify by
    driving the UI.
+
+---
+
+## 9. CMS resources (Contenido)
+
+The CMS group (`cms-pages`, `cms-banners`, `cms-services`, `cms-staff`,
+`cms-settings`) manages the storefront's editorial content. It follows the
+standard CustomRoutes + `ResourceFormModal` + detail-modal shape (§4-§6), with
+three deliberate additions:
+
+- **Settings singleton page** (`src/pages/cms-settings/CmsSettingsPage.tsx`):
+  the only one-record resource in the app. No list/create/delete — a custom
+  route loads the whole document via the dataProvider custom verbs
+  `getSiteSettings()` / `updateSiteSettings()` (GET/PATCH `cms/settings`) and
+  PATCHes it back complete (last write wins). Built on ra-core `Form` +
+  `FormSection`s and a plain submit `Button` (no SaveContext). Copy this page,
+  not a resource modal, if another singleton ever appears.
+- **Banner dimension capture** (`src/pages/cms-banners/CmsBannerFormModal.tsx`):
+  the storefront builds `next/image` srcsets from each variant's intrinsic
+  `width`/`height`, so `BannerVariantField` watches the uploaded URL and reads
+  `naturalWidth`/`naturalHeight` off an `Image()` into hidden form fields.
+  Editors never type dimensions; the API rejects missing/zero dims.
+- **Icon allowlist sync** (`src/pages/cms-services/service-icons.ts`): service
+  icons are lucide names, offered via `SelectInput`. The list MUST mirror the
+  storefront's `src/feature/home/constants/service-icons.ts` map — the
+  storefront falls back to a generic icon for unknown names, so a name added
+  here without the storefront counterpart renders as the fallback.
+
+CMS uploads pass `uploadPrefix="cms"` to `ImageUploadInput` so images land in
+the `cms/` storage folder (backend allowlists `taxonomy` | `cms`). All five
+resources are admin-only in `authProvider.canAccess` — they sit in the same
+case group as `users`/`clients`, NOT in `MANAGED_MODULES`.

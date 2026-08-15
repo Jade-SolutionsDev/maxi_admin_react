@@ -23,6 +23,7 @@ import {
   MAX_IMAGE_SIZE_LABEL,
   uploadImage,
 } from "@/lib/uploads";
+import type { UploadPrefix } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 
 export type ImageUploadInputProps = InputProps & {
@@ -32,6 +33,8 @@ export type ImageUploadInputProps = InputProps & {
    * hint next to the size cap. Omit to show only the cap.
    */
   recommendedSize?: string;
+  /** Storage folder for the upload; omit for the historical default. */
+  uploadPrefix?: UploadPrefix;
 };
 
 /**
@@ -45,7 +48,8 @@ export type ImageUploadInputProps = InputProps & {
  */
 export const ImageUploadInput = (props: ImageUploadInputProps) => {
   const resource = useResourceContext(props);
-  const { label, source, className, helperText, recommendedSize } = props;
+  const { label, source, className, helperText, recommendedSize, uploadPrefix } =
+    props;
   const { id, field, isRequired } = useInput(props);
   const notify = useNotify();
   const translate = useTranslate();
@@ -70,7 +74,7 @@ export const ImageUploadInput = (props: ImageUploadInputProps) => {
     }
     setUploading(true);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, uploadPrefix);
       field.onChange(url);
     } catch {
       notify("shared.upload.failed", { type: "error" });

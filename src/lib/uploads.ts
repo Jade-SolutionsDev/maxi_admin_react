@@ -22,16 +22,24 @@ export const ACCEPTED_IMAGE_LABEL = ACCEPTED_IMAGE_TYPES.map((type) =>
   .replace("WEBP", "WebP")
   .replace("AVIF", "AVIF");
 
+/** Storage folders the backend accepts (see uploads.controller allowlist). */
+export type UploadPrefix = "taxonomy" | "cms";
+
 /**
  * Upload an image to the backend (multipart) and return its stored public URL.
  * The backend stores it in S3-compatible storage; the record only keeps the URL.
+ * `prefix` picks the storage folder; omitted keeps the historical default.
  */
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(
+  file: File,
+  prefix?: UploadPrefix,
+): Promise<string> {
   const token = await getApiToken();
   const body = new FormData();
   body.append("file", file);
 
-  const response = await fetch(`${API_URL}/uploads/image`, {
+  const query = prefix ? `?prefix=${prefix}` : "";
+  const response = await fetch(`${API_URL}/uploads/image${query}`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body,

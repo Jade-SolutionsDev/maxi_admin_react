@@ -151,10 +151,17 @@ export const authProvider: AuthProvider = {
 
     switch (resource) {
       // Admin-only surfaces.
+      // Admin-only surfaces; CMS content is an admin task too (managers
+      // already returned true above).
       case "users":
       case "clients":
       case "roles":
       case "settings":
+      case "cms-pages":
+      case "cms-banners":
+      case "cms-services":
+      case "cms-staff":
+      case "cms-settings":
         return false;
       // Cross-storage inventory overview: managers (handled above) + kardist.
       // Grocers use the per-storage Almacenes tab instead.
