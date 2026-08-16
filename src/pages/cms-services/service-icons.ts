@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheck,
   Clock,
+  HandHeart,
   Headset,
   HeartHandshake,
   Leaf,
@@ -32,3 +33,7 @@ export const SERVICE_ICON_COMPONENTS: Record<string, LucideIcon> = {
 };
 
 export const SERVICE_ICON_NAMES = Object.keys(SERVICE_ICON_COMPONENTS);
+
+/** Same fallback the storefront uses for names outside the allowlist. */
+export const resolveServiceIcon = (name: string): LucideIcon =>
+  SERVICE_ICON_COMPONENTS[name] ?? HandHeart;

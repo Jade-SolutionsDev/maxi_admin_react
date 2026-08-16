@@ -26,6 +26,7 @@ import {
 } from "@/components/admin/resource-detail-modal";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ServiceIconField } from "./ServiceIconField";
 
 export function CmsServiceDetailModal() {
   const translate = useTranslate();
@@ -114,7 +115,7 @@ export function CmsServiceDetailModal() {
               label={translate("list.fields.icon")}
               icon={<Shapes />}
             >
-              {(record.icon as string) || ""}
+              <ServiceIconField />
             </DetailField>
             <DetailField
               label={translate("list.fields.featured")}
