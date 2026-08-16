@@ -1,4 +1,5 @@
 import { useCanAccess, useTranslate } from "ra-core";
+import { ServiceIconField } from "./ServiceIconField";
 
 import {
   BooleanField,
@@ -49,7 +50,9 @@ export default function CmsServicesList() {
           source="title"
           cellClassName="min-w-[200px]"
         />
-        <DataTable.Col source="icon" label="list.fields.icon" disableSort />
+        <DataTable.Col source="icon" label="list.fields.icon" disableSort>
+          <ServiceIconField />
+        </DataTable.Col>
         <DataTable.Col
           className="max-w-sm truncate"
           source="description"
