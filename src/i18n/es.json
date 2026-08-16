@@ -141,7 +141,8 @@
       "content": "Contenido",
       "icon": "Ícono",
       "photo": "Foto",
-      "alt": "Texto alternativo"
+      "alt": "Texto alternativo",
+      "resume": "Reseña"
     }
   },
   "users": {
@@ -348,7 +349,8 @@
       "cmsBanners": "Banners",
       "cmsServices": "Servicios",
       "cmsStaff": "Equipo",
-      "cmsSettings": "Sitio web"
+      "cmsSettings": "Sitio web",
+      "cms": "CMS"
     },
     "user": {
       "profile": "Perfil"
@@ -791,6 +793,11 @@
         "sortOrder": "Orden en listados de páginas (menor primero).",
         "isActive": "Inactiva: deja de mostrarse en la tienda (404)."
       }
+    },
+    "mandatory": {
+      "title": "Faltan páginas obligatorias",
+      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Creálas para no dejar enlaces rotos:",
+      "create_label": "Crear la página %{title}"
     }
   },
   "cms-banners": {
@@ -845,13 +852,15 @@
       "photo_hint": "Cuadrada, rostro centrado.",
       "placeholders": {
         "name": "María Pérez",
-        "role": "Atención al cliente"
+        "role": "Atención al cliente",
+        "resume": "Lleva 5 años acompañando a nuestros clientes…"
       },
       "hints": {
         "name": "Nombre visible en la tarjeta.",
         "role": "Cargo o rol mostrado bajo el nombre.",
         "sortOrder": "Orden de la tarjeta (menor primero).",
-        "isActive": "Inactiva: no se muestra en la tienda."
+        "isActive": "Inactiva: no se muestra en la tienda.",
+        "resume": "Reseña breve opcional; se muestra junto a la foto en Sobre nosotros."
       }
     }
   },
@@ -881,7 +890,7 @@
     "hints": {
       "blurb": "Párrafo bajo el logo del pie de página.",
       "copyright": "Línea inferior del pie de página.",
-      "legalLinks": "Cada enlace apunta al slug de una página activa (Contenido → Páginas).",
+      "legalLinks": "Elegí una página activa (Contenido → Páginas); el enlace usa su slug.",
       "email": "Correo de contacto mostrado en el pie y en Contacto.",
       "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
     },

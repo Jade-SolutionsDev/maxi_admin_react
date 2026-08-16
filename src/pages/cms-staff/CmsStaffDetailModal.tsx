@@ -8,6 +8,7 @@ import {
   useTranslate,
 } from "ra-core";
 import {
+  AlignLeft,
   ArrowUpDown,
   BriefcaseBusiness,
   Camera,
@@ -23,6 +24,7 @@ import { FormSection } from "@/components/admin/form-section";
 import {
   DetailField,
   DetailImageCard,
+  DetailTextBlock,
   ResourceDetailModal,
 } from "@/components/admin/resource-detail-modal";
 import { buttonVariants } from "@/components/ui/button";
@@ -127,6 +129,15 @@ export function CmsStaffDetailModal() {
                 : translate("shared.status.inactive", { _: "Inactive" })}
             </DetailField>
           </div>
+
+          {record.resume ? (
+            <DetailTextBlock
+              label={translate("list.fields.resume")}
+              icon={<AlignLeft />}
+            >
+              {record.resume as string}
+            </DetailTextBlock>
+          ) : null}
 
           <FormSection
             icon={<Camera />}

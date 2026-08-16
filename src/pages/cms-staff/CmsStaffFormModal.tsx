@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { required, useTranslate } from "ra-core";
 import {
+  AlignLeft,
   ArrowUpDown,
   BriefcaseBusiness,
   Camera,
@@ -25,6 +26,7 @@ const sanitizeCmsStaff = (data: Record<string, unknown>) => ({
   name: data.name,
   role: data.role,
   photoUrl: data.photoUrl,
+  resume: data.resume,
   sortOrder: data.sortOrder ?? 0,
   isActive: data.isActive ?? true,
 });
@@ -96,6 +98,17 @@ function CmsStaffFormFields({ mode }: { mode: "create" | "edit" }) {
           helperText="cms-staff.form.hints.role"
         />
       </div>
+
+      <TextInput
+        source="resume"
+        label={translate("list.fields.resume")}
+        multiline
+        icon={<AlignLeft />}
+        placeholder={translate("cms-staff.form.placeholders.resume", {
+          _: "",
+        })}
+        helperText="cms-staff.form.hints.resume"
+      />
 
       <FormSection
         icon={<Camera />}

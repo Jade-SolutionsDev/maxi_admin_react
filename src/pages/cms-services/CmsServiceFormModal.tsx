@@ -1,21 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { required, useTranslate } from "ra-core";
-import {
-  AlignLeft,
-  ArrowUpDown,
-  HandHeart,
-  Heading,
-  Shapes,
-} from "lucide-react";
+import { AlignLeft, ArrowUpDown, HandHeart, Heading } from "lucide-react";
 
 import {
   BooleanInput,
   NumberInput,
   ResourceFormModal,
-  SelectInput,
   TextInput,
 } from "@/components/admin";
-import { SERVICE_ICON_CHOICES } from "./service-icons";
+import { IconPickerInput } from "./IconPickerInput";
 
 interface CmsServiceFormModalProps {
   mode: "create" | "edit";
@@ -77,26 +70,23 @@ function CmsServiceFormFields({ mode }: { mode: "create" | "edit" }) {
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <TextInput
-          source="title"
-          label={translate("list.fields.title")}
-          validate={required()}
-          icon={<Heading />}
-          placeholder={translate("cms-services.form.placeholders.title", {
-            _: "",
-          })}
-          helperText="cms-services.form.hints.title"
-        />
-        <SelectInput
-          source="icon"
-          label={translate("list.fields.icon")}
-          validate={required()}
-          icon={<Shapes />}
-          choices={SERVICE_ICON_CHOICES}
-          helperText="cms-services.form.hints.icon"
-        />
-      </div>
+      <TextInput
+        source="title"
+        label={translate("list.fields.title")}
+        validate={required()}
+        icon={<Heading />}
+        placeholder={translate("cms-services.form.placeholders.title", {
+          _: "",
+        })}
+        helperText="cms-services.form.hints.title"
+      />
+
+      <IconPickerInput
+        source="icon"
+        label={translate("list.fields.icon")}
+        validate={required()}
+        helperText="cms-services.form.hints.icon"
+      />
 
       <TextInput
         source="description"

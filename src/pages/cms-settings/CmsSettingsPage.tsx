@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Form, required, useDataProvider, useNotify, useTranslate } from "ra-core";
+import {
+  Form,
+  required,
+  useDataProvider,
+  useGetList,
+  useNotify,
+  useTranslate,
+} from "ra-core";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import {
   AlignLeft,
@@ -16,7 +23,13 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { BooleanInput, FormSection, TextInput } from "@/components/admin";
+import {
+  BooleanInput,
+  FormSection,
+  SelectInput,
+  TextInput,
+} from "@/components/admin";
+import { CmsTabsNav } from "../cms-shared/CmsTabsNav";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
@@ -73,7 +86,9 @@ export function CmsSettingsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6">
+    <>
+      <CmsTabsNav />
+      <div className="mx-auto w-full max-w-3xl px-4 py-6">
       <div className="mb-6 flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Settings2 className="h-5 w-5" />
@@ -206,11 +221,16 @@ export function CmsSettingsPage() {
           </div>
         </Form>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
-/** Label + CmsPage slug pairs feeding the footer's legal links. */
+/**
+ * Label + page pairs feeding the footer's legal links. The slug is never
+ * typed by hand: pages own their slugs (auto-generated from the title), so
+ * the link target is picked from the ACTIVE pages list.
+ */
 function LegalLinksInput() {
   const translate = useTranslate();
   const { control } = useFormContext();
@@ -218,6 +238,13 @@ function LegalLinksInput() {
     control,
     name: "footer.legalLinks",
   });
+  const { data: pages } = useGetList("cms-pages", {
+    pagination: { page: 1, perPage: 100 },
+    sort: { field: "title", order: "ASC" },
+  });
+  const pageChoices = (pages ?? [])
+    .filter((page) => page.isActive)
+    .map((page) => ({ id: page.slug as string, name: page.title as string }));
 
   return (
     <div className="flex flex-col gap-3">
@@ -233,11 +260,12 @@ function LegalLinksInput() {
               validate={required()}
               helperText={false}
             />
-            <TextInput
+            <SelectInput
               source={`footer.legalLinks.${index}.slug`}
               label={translate("cms-settings.fields.linkSlug")}
               validate={required()}
               icon={<Link2 />}
+              choices={pageChoices}
               helperText={false}
             />
           </div>

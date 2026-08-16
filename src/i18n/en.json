@@ -141,7 +141,8 @@
       "content": "Content",
       "icon": "Icon",
       "photo": "Photo",
-      "alt": "Alt text"
+      "alt": "Alt text",
+      "resume": "Bio"
     }
   },
   "users": {
@@ -348,7 +349,8 @@
       "cmsBanners": "Banners",
       "cmsServices": "Services",
       "cmsStaff": "Staff",
-      "cmsSettings": "Website"
+      "cmsSettings": "Website",
+      "cms": "CMS"
     },
     "user": {
       "profile": "Profile"
@@ -791,6 +793,11 @@
         "sortOrder": "Order in page listings (lowest first).",
         "isActive": "Inactive: no longer served by the storefront (404)."
       }
+    },
+    "mandatory": {
+      "title": "Mandatory pages missing",
+      "description": "The storefront links these pages by slug (footer and About us). Create them to avoid broken links:",
+      "create_label": "Create the %{title} page"
     }
   },
   "cms-banners": {
@@ -845,13 +852,15 @@
       "photo_hint": "Square, face centered.",
       "placeholders": {
         "name": "Maria Perez",
-        "role": "Customer support"
+        "role": "Customer support",
+        "resume": "Has supported our customers for 5 years…"
       },
       "hints": {
         "name": "Name shown on the card.",
         "role": "Role shown under the name.",
         "sortOrder": "Card order (lowest first).",
-        "isActive": "Inactive: not shown on the storefront."
+        "isActive": "Inactive: not shown on the storefront.",
+        "resume": "Optional short bio; shown next to the photo on About us."
       }
     }
   },
@@ -881,7 +890,7 @@
     "hints": {
       "blurb": "Paragraph under the footer logo.",
       "copyright": "Bottom line of the footer.",
-      "legalLinks": "Each link points at an active page slug (Content → Pages).",
+      "legalLinks": "Pick an active page (Content → Pages); the link uses its slug.",
       "email": "Contact email shown in the footer and Contact page.",
       "phone": "Phone shown in the header, footer and Contact page."
     },

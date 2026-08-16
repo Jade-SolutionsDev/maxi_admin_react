@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { required, useTranslate } from "ra-core";
 import { AlignLeft, ArrowUpDown, FileText, Heading } from "lucide-react";
 
@@ -14,10 +14,13 @@ interface CmsPageFormModalProps {
 }
 
 // The slug is server-generated from the title (taxonomy precedent) and the
-// record carries server-managed fields the DTO whitelist rejects.
+// record carries server-managed fields the DTO whitelist rejects. The one
+// exception: the mandatory-pages alert prefills an explicit slug so a
+// recreated page lands on the canonical slug the storefront references.
 const sanitizeCmsPage = (data: Record<string, unknown>) => ({
   title: data.title,
   content: data.content,
+  ...(data.slug ? { slug: data.slug } : {}),
   sortOrder: data.sortOrder ?? 0,
   isActive: data.isActive ?? true,
 });
@@ -25,7 +28,11 @@ const sanitizeCmsPage = (data: Record<string, unknown>) => ({
 export default function CmsPageFormModal({ mode }: CmsPageFormModalProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const translate = useTranslate();
+
+  const prefilledTitle = searchParams.get("title") ?? undefined;
+  const prefilledSlug = searchParams.get("slug") ?? undefined;
 
   const isEdit = mode === "edit";
   const name = translate("resources.cms-pages.name", { _: "Page" });
@@ -53,6 +60,9 @@ export default function CmsPageFormModal({ mode }: CmsPageFormModalProps) {
         ),
       }}
       transform={sanitizeCmsPage}
+      defaultValues={
+        isEdit ? undefined : { title: prefilledTitle, slug: prefilledSlug }
+      }
     >
       <CmsPageFormFields mode={mode} />
     </ResourceFormModal>

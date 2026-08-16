@@ -279,3 +279,14 @@ CMS uploads pass `uploadPrefix="cms"` to `ImageUploadInput` so images land in
 the `cms/` storage folder (backend allowlists `taxonomy` | `cms`). All five
 resources are admin-only in `authProvider.canAccess` — they sit in the same
 case group as `users`/`clients`, NOT in `MANAGED_MODULES`.
+
+The CMS group renders as ONE sidebar entry with a routed tab strip
+(`src/pages/cms-shared/CmsTabsNav.tsx`, sidebar `activePrefix: "/cms-"`).
+Service icons use `IconPickerInput` (visual radio grid over the allowlist, not
+a name dropdown). Legal links in the settings page pick their target from the
+ACTIVE pages list (`SelectInput` fed by `useGetList("cms-pages")`) — slugs are
+never typed by hand. `MandatoryPagesAlert` (cms-pages) warns when a
+storefront-referenced slug (sobre-nosotros, terminos-y-condiciones,
+politica-de-privacidad, politica-de-reembolso) has no active page and links to
+the create form with title+slug prefilled; the API frees a page's slug on
+soft-delete so recreation lands on the canonical slug.

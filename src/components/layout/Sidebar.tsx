@@ -12,11 +12,7 @@ import {
   BarChart3,
   Settings, LogOut,
   User,
-  FileText,
-  GalleryHorizontalEnd,
-  HandHeart,
-  Settings2,
-  UsersRound,
+  PanelsTopLeft,
 } from "lucide-react";
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
@@ -79,6 +75,8 @@ interface NavItem {
   labelKey: string;
   icon: React.ReactNode;
   path?: string;
+  /** Also mark active when the pathname starts with this (tabbed sections). */
+  activePrefix?: string;
   /** Resource this entry maps to; the item is hidden unless the user can list
    *  it (canAccess). Omit for non-resource entries (dashboard, "coming soon"). */
   resource?: string;
@@ -141,34 +139,11 @@ const navItems: NavItem[] = [
     resource: "clients",
   },
   {
-    labelKey: "app.menu.cmsPages",
-    icon: <FileText size={20} />,
+    labelKey: "app.menu.cms",
+    icon: <PanelsTopLeft size={20} />,
     path: "/cms-pages",
+    activePrefix: "/cms-",
     resource: "cms-pages",
-  },
-  {
-    labelKey: "app.menu.cmsBanners",
-    icon: <GalleryHorizontalEnd size={20} />,
-    path: "/cms-banners",
-    resource: "cms-banners",
-  },
-  {
-    labelKey: "app.menu.cmsServices",
-    icon: <HandHeart size={20} />,
-    path: "/cms-services",
-    resource: "cms-services",
-  },
-  {
-    labelKey: "app.menu.cmsStaff",
-    icon: <UsersRound size={20} />,
-    path: "/cms-staff",
-    resource: "cms-staff",
-  },
-  {
-    labelKey: "app.menu.cmsSettings",
-    icon: <Settings2 size={20} />,
-    path: "/cms-settings",
-    resource: "cms-settings",
   },
   { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
   {
@@ -184,7 +159,9 @@ function NavEntry({ item }: { item: NavItem }) {
   const location = useLocation();
   const navigate = useNavigate();
   const translate = useTranslate();
-  const isActive = !!item.path && location.pathname === item.path;
+  const isActive =
+    (!!item.path && location.pathname === item.path) ||
+    (!!item.activePrefix && location.pathname.startsWith(item.activePrefix));
 
   return (
     <SidebarMenuItem>
