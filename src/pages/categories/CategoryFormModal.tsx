@@ -153,6 +153,7 @@ function CategoryFormFields({ mode }: { mode: "create" | "edit" }) {
                 </span>
               }
               recommendedSize="1200 x 800"
+              validate={required()}
             />
           </div>
           <div className="rounded-xl border border-border p-4">
@@ -165,6 +166,7 @@ function CategoryFormFields({ mode }: { mode: "create" | "edit" }) {
                 </span>
               }
               recommendedSize="600 x 1000"
+              validate={required()}
             />
           </div>
         </div>

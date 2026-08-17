@@ -231,14 +231,12 @@ function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
         subtitle={translate("products.form.images_hint", { _: "" })}
         className="border-t pt-5"
       >
-        {/* TEMPORARY: image is optional until the Render file server is configured
-            — QA cannot upload yet. To restore: add back `validate={required()}`
-            here and `@IsNotEmpty()` on the backend CreateProductDto.imageUrl. */}
         <div className="rounded-xl border border-border p-4 sm:max-w-sm">
           <ImageUploadInput
             source="imageUrl"
             label={translate("list.fields.image")}
             recommendedSize="800 x 800"
+            validate={required()}
           />
         </div>
       </FormSection>
