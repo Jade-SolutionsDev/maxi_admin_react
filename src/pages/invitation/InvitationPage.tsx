@@ -29,7 +29,9 @@ export default function InvitationPage() {
   // new session. Instead of redirecting to "/" (which is behind requireAuth and
   // would 401 on /api/auth/me for a non-backoffice session), gate them in place
   // and let them sign out to continue — keeping the ticket in the URL.
-  if (flow.isAuthLoaded && flow.isSignedIn) {
+  // Suppressed while submitting: onSubmit briefly activates the session to mint
+  // a mirror token, and we must not flash this gate during that window.
+  if (flow.isAuthLoaded && flow.isSignedIn && !flow.isSubmitting) {
     return <SignedInGate flow={flow} />;
   }
 

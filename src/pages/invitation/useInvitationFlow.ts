@@ -58,7 +58,7 @@ function getErrorMessage(err: unknown, fallback: string): string {
  * steps.tsx are purely presentational.
  */
 export function useInvitationFlow() {
-  const { isLoaded: isAuthLoaded, isSignedIn, signOut } = useAuth();
+  const { isLoaded: isAuthLoaded, isSignedIn, signOut, getToken } = useAuth();
   const { signUp } = useSignUp();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -163,27 +163,48 @@ export function useInvitationFlow() {
       // Mirror the same email + password into a (disabled) storefront customer
       // so the admin can also shop once approved. This is the only moment the
       // password is in hand; it goes straight to the backend → storefront Clerk
-      // and is never stored. Best-effort — never block the pending screen.
+      // and is never stored.
+      //
+      // The mirror endpoint requires proof the caller IS the invitee: a fresh
+      // backoffice session token whose email matches. So we briefly activate the
+      // just-created session to mint a token, send the mirror call, then sign
+      // out again — the account must stay pending admin approval. Signing in for
+      // real would bounce off the auth wall (/api/auth/me → 401), but that never
+      // happens here: the whole sequence is awaited before any re-render, and
+      // the SignedInGate is suppressed while submitting.
       const email = signUp.emailAddress ?? prefilledEmail;
-      if (email) {
-        void fetch(`${API_URL}/users/storefront-mirror`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            password: data.password,
-            firstName: data.firstName || undefined,
-            lastName: data.lastName || undefined,
-            phone: data.phone || undefined,
-          }),
-        }).catch(() => {});
+      if (email && signUp.createdSessionId) {
+        try {
+          // Activate the new session in place (no-op navigate) just long enough
+          // to mint a token; we sign out again below.
+          await signUp.finalize({ navigate: () => {} });
+          const token = await getToken();
+          if (token) {
+            await fetch(`${API_URL}/users/storefront-mirror`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                email,
+                password: data.password,
+                firstName: data.firstName || undefined,
+                lastName: data.lastName || undefined,
+                phone: data.phone || undefined,
+              }),
+            });
+          }
+        } catch {
+          // Best-effort — a failed mirror must never block the pending screen.
+        } finally {
+          await signOut();
+        }
       }
 
       // Account created — the backoffice webhook provisions a DISABLED local
-      // user, pending admin approval. Do NOT activate a session: signing the
-      // new user in would immediately bounce off the auth wall (/api/auth/me →
-      // 401 → logout). Show the pending-approval screen instead; the user signs
-      // in normally once an admin approves them.
+      // user, pending admin approval. Show the pending-approval screen; the user
+      // signs in normally once an admin approves them.
       setIsSuccess(true);
     } catch (err) {
       setError(
