@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+
 // Form validation schema. Built per-locale so zod messages come from the
 // translation catalogs (es is the default locale).
 const makeFormSchema = (translate: (key: string) => string) =>
@@ -73,6 +75,7 @@ export function useInvitationFlow() {
   const ticket = searchParams.get("__clerk_ticket");
   const prefilledFirstName = searchParams.get("firstName") ?? "";
   const prefilledLastName = searchParams.get("lastName") ?? "";
+  const prefilledEmail = searchParams.get("email") ?? "";
 
   // Initialize form
   const form = useForm<FormData>({
@@ -155,6 +158,25 @@ export function useInvitationFlow() {
               }),
         );
         return;
+      }
+
+      // Mirror the same email + password into a (disabled) storefront customer
+      // so the admin can also shop once approved. This is the only moment the
+      // password is in hand; it goes straight to the backend → storefront Clerk
+      // and is never stored. Best-effort — never block the pending screen.
+      const email = signUp.emailAddress ?? prefilledEmail;
+      if (email) {
+        void fetch(`${API_URL}/users/storefront-mirror`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            password: data.password,
+            firstName: data.firstName || undefined,
+            lastName: data.lastName || undefined,
+            phone: data.phone || undefined,
+          }),
+        }).catch(() => {});
       }
 
       // Account created — the backoffice webhook provisions a DISABLED local
