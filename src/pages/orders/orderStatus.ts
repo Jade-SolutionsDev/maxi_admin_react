@@ -60,8 +60,8 @@ export type ProviderChargeStatus =
   | "EXPIRED"
   | "CANCELLED";
 
-// Mi Billetera MerchantCharge statuses — a different vocabulary than the
-// order's own paymentStatus (which stays lowercase).
+// Gateway charge statuses — a different vocabulary than the order's own
+// paymentStatus (which stays lowercase). Shared by every payment platform.
 export const PROVIDER_STATUS_CLASSES: Record<ProviderChargeStatus, string> = {
   PENDING: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
   REQUIRES_ACTION: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
@@ -72,14 +72,20 @@ export const PROVIDER_STATUS_CLASSES: Record<ProviderChargeStatus, string> = {
   CANCELLED: "bg-muted text-muted-foreground",
 };
 
+/** How the customer completes the payment; the card renders per kind. */
+export type PaymentKind = "redirect" | "instructions" | "manual";
+
 export interface OrderPayment {
   provider: string;
+  kind: PaymentKind;
   reference: string;
   status: ProviderChargeStatus;
+  redirectUrl: string | null;
   depositAddress: string | null;
   amount: string | null;
   token: string | null;
   blockchain: string | null;
+  currency: string | null;
   expiresAt: string | null;
   feeAmount: string | null;
   settlementAmount: string | null;

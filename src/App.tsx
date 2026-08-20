@@ -49,6 +49,7 @@ import CmsServiceCreate from "./pages/cms-services/CmsServiceCreate";
 import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
 import { CmsServiceDetailModal } from "./pages/cms-services/CmsServiceDetailModal";
 import { CmsSettingsPage } from "./pages/cms-settings/CmsSettingsPage";
+import { PaymentMethodsPage } from "./pages/payment-methods/PaymentMethodsPage";
 import { CmsStaffLayout } from "./pages/cms-staff/CmsStaffLayout";
 import CmsStaffCreate from "./pages/cms-staff/CmsStaffCreate";
 import CmsStaffEdit from "./pages/cms-staff/CmsStaffEdit";
@@ -185,6 +186,14 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="cms-settings">
             <CmsSettingsPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/payment-methods"
+        element={
+          <RequireAccess resource="payment-methods">
+            <PaymentMethodsPage />
           </RequireAccess>
         }
       />

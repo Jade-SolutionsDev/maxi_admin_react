@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNotify, useTranslate } from "ra-core";
-import { Check, Copy, CreditCard } from "lucide-react";
+import { Check, Copy, CreditCard, ExternalLink } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { ProviderStatusBadge } from "./OrderBadges";
@@ -51,7 +51,11 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
   </div>
 );
 
-/** Gateway payment details (Mi Billetera charge). Absent for manual payments. */
+/**
+ * Gateway payment details, whatever the platform: the crypto rows only render
+ * when the gateway reported them, the hosted-checkout link only when there is
+ * one. Absent entirely when the order has no attempt.
+ */
 export function PaymentDetailsSection({ payment }: { payment: OrderPayment }) {
   const translate = useTranslate();
   const formatDate = (iso: string | null) =>
@@ -93,9 +97,23 @@ export function PaymentDetailsSection({ payment }: { payment: OrderPayment }) {
         {payment.amount && (
           <Row label={translate("orders.payment.amount", { _: "Monto" })}>
             <span className="font-medium tabular-nums">
-              {payment.amount} {payment.token?.toUpperCase()}
+              {payment.amount}{" "}
+              {payment.token?.toUpperCase() ?? payment.currency ?? ""}
               {payment.blockchain ? ` · ${payment.blockchain}` : ""}
             </span>
+          </Row>
+        )}
+        {payment.redirectUrl && (
+          <Row label={translate("orders.payment.link", { _: "Enlace de pago" })}>
+            <a
+              href={payment.redirectUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              {translate("orders.payment.open_link", { _: "Abrir" })}
+              <ExternalLink size={12} />
+            </a>
           </Row>
         )}
         {payment.feeAmount && (

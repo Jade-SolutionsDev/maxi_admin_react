@@ -350,7 +350,8 @@
       "cmsServices": "Services",
       "cmsStaff": "Staff",
       "cmsSettings": "Website",
-      "cms": "CMS"
+      "cms": "CMS",
+      "metodos_pago": "Payment methods"
     },
     "user": {
       "profile": "Profile"
@@ -776,7 +777,9 @@
       "expiresAt": "Expires",
       "copy_reference": "Copy reference",
       "copy_address": "Copy address",
-      "copy_failed": "Could not copy"
+      "copy_failed": "Could not copy",
+      "link": "Payment link",
+      "open_link": "Open"
     },
     "providerStatus": {
       "PENDING": "Pending",
@@ -921,5 +924,14 @@
     "actions": {
       "add_link": "Add link"
     }
+  },
+  "payment-methods": {
+    "title": "Payment methods",
+    "subtitle": "Choose which gateways customers can use at checkout.",
+    "not_configured": "No credentials",
+    "not_configured_hint": "Add its credentials on the server before enabling it.",
+    "toggle": "Enable method",
+    "enabled": "%{name} enabled",
+    "disabled": "%{name} disabled"
   }
 }
