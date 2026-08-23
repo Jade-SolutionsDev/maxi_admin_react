@@ -220,6 +220,20 @@
   background: #475569;
 }
 
+/* Sidebar scrollbar: thin and token-matched so it blends into the rail in both
+   themes (and covers Firefox, which the hardcoded rules above don't). Swap the
+   thumb color for `transparent` to hide it entirely. */
+[data-slot="sidebar-content"] {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--sidebar-border)) transparent;
+}
+[data-slot="sidebar-content"]::-webkit-scrollbar-thumb {
+  background: hsl(var(--sidebar-border));
+}
+[data-slot="sidebar-content"]::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--sidebar-foreground) / 0.35);
+}
+
 /* Shimmer loading animation */
 @keyframes shimmer {
   0% {
