@@ -30,7 +30,7 @@ const clientFilters = [
 const ClientActions = () => (
   <div className="flex gap-2">
     <RefreshButton />
-    <CreateButton />
+    {/* <CreateButton /> */}
     <ColumnsButton />
     <FilterButton variant="default" size="lg" />
   </div>

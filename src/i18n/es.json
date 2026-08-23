@@ -351,7 +351,17 @@
       "cmsStaff": "Equipo",
       "cmsSettings": "Sitio web",
       "cms": "CMS",
-      "metodos_pago": "Métodos de pago"
+      "metodos_pago": "Métodos de pago",
+      "group": {
+        "ventas": "Ventas",
+        "catalogo": "Catálogo",
+        "inventario": "Inventario",
+        "sistema": "Sistema"
+      },
+      "badge": {
+        "new": "Nuevo",
+        "urgent": "Urgente"
+      }
     },
     "user": {
       "profile": "Perfil"

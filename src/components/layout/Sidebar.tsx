@@ -18,10 +18,12 @@ import {
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 import {
   Translate,
   useCanAccess,
   useGetIdentity,
+  useGetList,
   useLogout,
   useTranslate,
 } from "ra-core";
@@ -32,14 +34,21 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail
+  SidebarRail,
+  SidebarSeparator,
 } from "../ui/sidebar";
 import { useTheme } from "../admin";
+import {
+  useSetSidebarBadge,
+  useSidebarBadge,
+  type SidebarBadge,
+} from "./sidebarBadges";
 
 /** Icon-only mark (the "m" + smile) for the collapsed rail. `currentColor` = "m", brand green = smile. */
 function LogoMark({
@@ -85,87 +94,127 @@ interface NavItem {
   soon?: boolean;
 }
 
-const navItems: NavItem[] = [
+interface NavGroup {
+  /** Section label (i18n key). Omit for the top ungrouped entries. */
+  labelKey?: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
   {
-    labelKey: "app.menu.panel",
-    icon: <LayoutDashboard size={20} />,
-    path: "/",
+    items: [
+      { labelKey: "app.menu.panel", icon: <LayoutDashboard size={20} />, path: "/" },
+    ],
   },
   {
-    labelKey: "app.menu.pedidos",
-    icon: <ShoppingCart size={20} />,
-    path: "/orders",
-    resource: "orders",
+    labelKey: "app.menu.group.ventas",
+    items: [
+      {
+        labelKey: "app.menu.pedidos",
+        icon: <ShoppingCart size={20} />,
+        path: "/orders",
+        resource: "orders",
+      },
+      {
+        labelKey: "app.menu.metodos_pago",
+        icon: <CreditCard size={20} />,
+        path: "/payment-methods",
+        resource: "payment-methods",
+      },
+      {
+        labelKey: "app.menu.clientes",
+        icon: <UserRound size={20} />,
+        path: "/clients",
+        resource: "clients",
+      },
+    ],
   },
   {
-    labelKey: "app.menu.productos",
-    icon: <Package size={20} />,
-    path: "/products",
-    resource: "products",
+    labelKey: "app.menu.group.catalogo",
+    items: [
+      {
+        labelKey: "app.menu.productos",
+        icon: <Package size={20} />,
+        path: "/products",
+        resource: "products",
+      },
+      {
+        labelKey: "app.menu.departamentos",
+        icon: <Building2 size={20} />,
+        path: "/departments",
+        resource: "departments",
+      },
+      {
+        labelKey: "app.menu.categorias",
+        icon: <Tags size={20} />,
+        path: "/categories",
+        resource: "categories",
+      },
+    ],
   },
   {
-    labelKey: "app.menu.departamentos",
-    icon: <Building2 size={20} />,
-    path: "/departments",
-    resource: "departments",
+    labelKey: "app.menu.group.inventario",
+    items: [
+      {
+        labelKey: "app.menu.inventario",
+        icon: <ClipboardList size={20} />,
+        path: "/inventory",
+        resource: "inventory",
+      },
+      {
+        labelKey: "app.menu.almacenes",
+        icon: <Warehouse size={20} />,
+        path: "/stock-locations",
+        resource: "stock-locations",
+      },
+    ],
   },
   {
-    labelKey: "app.menu.categorias",
-    icon: <Tags size={20} />,
-    path: "/categories",
-    resource: "categories",
-  },
-  {
-    labelKey: "app.menu.inventario",
-    icon: <ClipboardList size={20} />,
-    path: "/inventory",
-    resource: "inventory",
-  },
-  {
-    labelKey: "app.menu.almacenes",
-    icon: <Warehouse size={20} />,
-    path: "/stock-locations",
-    resource: "stock-locations",
-  },
-  {
-    labelKey: "app.menu.usuarios",
-    icon: <Users size={20} />,
-    path: "/users",
-    resource: "users",
-  },
-  {
-    labelKey: "app.menu.clientes",
-    icon: <UserRound size={20} />,
-    path: "/clients",
-    resource: "clients",
-  },
-  {
-    labelKey: "app.menu.cms",
-    icon: <PanelsTopLeft size={20} />,
-    path: "/cms-pages",
-    activePrefix: "/cms-",
-    resource: "cms-pages",
-  },
-  {
-    labelKey: "app.menu.metodos_pago",
-    icon: <CreditCard size={20} />,
-    path: "/payment-methods",
-    resource: "payment-methods",
-  },
-  { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
-  {
-    labelKey: "app.menu.configuracion",
-    icon: <Settings size={20} />,
-    path: "/roles",
-    resource: "roles",
+    labelKey: "app.menu.group.sistema",
+    items: [
+      {
+        labelKey: "app.menu.usuarios",
+        icon: <Users size={20} />,
+        path: "/users",
+        resource: "users",
+      },
+      {
+        labelKey: "app.menu.cms",
+        icon: <PanelsTopLeft size={20} />,
+        path: "/cms-pages",
+        activePrefix: "/cms-",
+        resource: "cms-pages",
+      },
+      { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
+      {
+        labelKey: "app.menu.configuracion",
+        icon: <Settings size={20} />,
+        path: "/roles",
+        resource: "roles",
+      },
+    ],
   },
 ];
+
+/** Notification-badge colours. Deliberately just two: brand green for a count
+ *  or "new", red for "urgent". `dot` is the collapsed-rail indicator. */
+function badgePillClass(badge: SidebarBadge): string {
+  if (badge === "urgent") return "bg-destructive text-white uppercase tracking-wide";
+  if (badge === "new") return "bg-sidebar-primary text-white uppercase tracking-wide";
+  return "bg-sidebar-primary text-white tabular-nums";
+}
+function badgeDotClass(badge: SidebarBadge): string {
+  return badge === "urgent" ? "bg-destructive" : "bg-sidebar-primary";
+}
 
 /** Renders a single sidebar entry. */
 function NavEntry({ item }: { item: NavItem }) {
   const location = useLocation();
   const navigate = useNavigate();
   const translate = useTranslate();
+  // "soon" items never carry a notification badge (their slot shows the hint).
+  const rawBadge = useSidebarBadge(item.labelKey);
+  const badge = item.soon ? null : rawBadge;
   const isActive =
     (!!item.path && location.pathname === item.path) ||
     (!!item.activePrefix && location.pathname.startsWith(item.activePrefix));
@@ -187,7 +236,18 @@ function NavEntry({ item }: { item: NavItem }) {
             "opacity-45 hover:bg-transparent hover:text-sidebar-foreground",
         )}
       >
-        <span className="shrink-0 [&>svg]:size-5">{item.icon}</span>
+        <span className="relative shrink-0 [&>svg]:size-5">
+          {item.icon}
+          {/* Collapsed rail: pills hide, so a dot keeps the notice visible. */}
+          {badge && (
+            <span
+              className={cn(
+                "absolute -right-0.5 -top-0.5 hidden size-2 rounded-full ring-2 ring-sidebar group-data-[collapsible=icon]:block",
+                badgeDotClass(badge),
+              )}
+            />
+          )}
+        </span>
         <span className="flex-1 truncate group-data-[collapsible=icon]:hidden">
           <Translate i18nKey={item.labelKey} />
         </span>
@@ -195,6 +255,20 @@ function NavEntry({ item }: { item: NavItem }) {
       {item.soon && (
         <SidebarMenuBadge className="top-3.5 rounded-full bg-muted px-1.5 text-[10px] text-muted-foreground">
           <Translate i18nKey="app.menu.soon" />
+        </SidebarMenuBadge>
+      )}
+      {badge && (
+        <SidebarMenuBadge
+          className={cn(
+            "top-2.5 rounded-full px-1.5 text-[10px] font-semibold",
+            badgePillClass(badge),
+          )}
+        >
+          {badge === "new" || badge === "urgent"
+            ? translate(`app.menu.badge.${badge}`)
+            : badge > 99
+              ? "99+"
+              : badge}
         </SidebarMenuBadge>
       )}
     </SidebarMenuItem>
@@ -209,6 +283,38 @@ function GatedNavEntry({ item }: { item: NavItem }) {
   });
   if (isPending || !canAccess) return null;
   return <NavEntry item={item} />;
+}
+
+/**
+ * The single place that wires live counts into the sidebar badge store. To add a
+ * new badge: gate by canAccess, count with useGetList's `total`, and setBadge on
+ * that item's labelKey. Each feeder renders nothing.
+ */
+function SidebarBadgeFeeders() {
+  return (
+    <>
+      <UsersAwaitingBadge />
+      {/* Follow-up: cancelled/unattended orders once that resource returns a real total. */}
+    </>
+  );
+}
+
+/** Number of users still awaiting approval → badge on "Usuarios". */
+function UsersAwaitingBadge() {
+  const setBadge = useSetSidebarBadge();
+  const { canAccess } = useCanAccess({ resource: "users", action: "list" });
+  const { total } = useGetList(
+    "users",
+    {
+      filter: { status: "awaiting_approval" },
+      pagination: { page: 1, perPage: 1 },
+    },
+    { enabled: !!canAccess },
+  );
+  useEffect(() => {
+    setBadge("app.menu.usuarios", canAccess ? (total ?? null) : null);
+  }, [setBadge, canAccess, total]);
+  return null;
 }
 
 export default function AppSidebar() {
@@ -235,20 +341,34 @@ export default function AppSidebar() {
 
       {/* Navigation */}
       <SidebarContent className="px-1 py-2">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) =>
-                item.resource ? (
-                  <GatedNavEntry key={item.labelKey} item={item} />
-                ) : (
-                  <NavEntry key={item.labelKey} item={item} />
-                ),
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navGroups.map((group, i) => (
+          <SidebarGroup key={group.labelKey ?? `group-${i}`} className="py-1">
+            {group.labelKey && (
+              <>
+                {/* Collapsed rail: the label hides, so a thin separator keeps groups apart. */}
+                <SidebarSeparator className="mx-0 hidden group-data-[collapsible=icon]:block" />
+                <SidebarGroupLabel>
+                  <Translate i18nKey={group.labelKey} />
+                </SidebarGroupLabel>
+              </>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) =>
+                  item.resource ? (
+                    <GatedNavEntry key={item.labelKey} item={item} />
+                  ) : (
+                    <NavEntry key={item.labelKey} item={item} />
+                  ),
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
+
+      {/* Live count feeders (render nothing; they push into the badge store). */}
+      <SidebarBadgeFeeders />
 
       {/* User profile */}
       <SidebarFooter className="border-t border-sidebar-border p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:p-2">

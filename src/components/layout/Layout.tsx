@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { Notification } from "@/components/admin/notification";
 import { SidebarInset, SidebarProvider, useSidebar } from "@/components/ui/sidebar";
+import { SidebarBadgeProvider } from "./SidebarBadgeProvider";
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
   "/": { title: "Panel", breadcrumb: "Inicio / Panel" },
@@ -39,11 +40,13 @@ function LayoutContent({ children }: LayoutProps) {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <SidebarProvider>
-      <Sidebar />
-      <LayoutContent>{children}</LayoutContent>
-      {/* Bridges ra-core useNotify() to sonner toasts and mounts the <Toaster>. */}
-      <Notification />
-    </SidebarProvider>
+    <SidebarBadgeProvider>
+      <SidebarProvider>
+        <Sidebar />
+        <LayoutContent>{children}</LayoutContent>
+        {/* Bridges ra-core useNotify() to sonner toasts and mounts the <Toaster>. */}
+        <Notification />
+      </SidebarProvider>
+    </SidebarBadgeProvider>
   );
 }
