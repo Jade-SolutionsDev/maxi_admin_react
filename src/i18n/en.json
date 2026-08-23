@@ -799,6 +799,11 @@
       "FAILED": "Failed",
       "EXPIRED": "Expired",
       "CANCELLED": "Cancelled"
+    },
+    "cancellationReason": {
+      "payment_not_received": "Cancelled automatically: payment was not received in time and the stock was released.",
+      "paid_after_expiry_out_of_stock": "Paid after expiring, with no stock left: it cannot be fulfilled.",
+      "refundHint": "Contact the customer and refund this order."
     }
   },
   "clients": {

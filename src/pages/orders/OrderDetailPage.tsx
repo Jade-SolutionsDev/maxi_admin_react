@@ -68,6 +68,10 @@ interface OrderItemRow {
   lineTotal: number;
 }
 
+type CancellationReason =
+  | "payment_not_received"
+  | "paid_after_expiry_out_of_stock";
+
 interface OrderRecord {
   id: string;
   orderNumber: string | null;
@@ -81,10 +85,50 @@ interface OrderRecord {
   total: number;
   deliveryAddress: Record<string, unknown> | null;
   customerNotes: string | null;
+  cancellationReason: CancellationReason | null;
   items?: OrderItemRow[];
   payment?: OrderPayment | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Why an order was cancelled. `paid_after_expiry_out_of_stock` is the one that
+ * needs a human: the customer paid after the hold was released and the goods
+ * were gone, so somebody must contact them and refund.
+ */
+function CancellationAlert({
+  reason,
+  needsRefund,
+}: {
+  reason: CancellationReason;
+  needsRefund: boolean;
+}) {
+  const translate = useTranslate();
+  return (
+    <div
+      className={cn(
+        "mb-6 flex items-start gap-3 rounded-lg border p-4 text-sm",
+        needsRefund
+          ? "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+          : "border-border bg-muted/40 text-muted-foreground",
+      )}
+    >
+      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      <div>
+        <p className="font-medium">
+          {translate(`orders.cancellationReason.${reason}`, { _: reason })}
+        </p>
+        {needsRefund && (
+          <p className="mt-1">
+            {translate("orders.cancellationReason.refundHint", {
+              _: "Contact the customer and refund this order.",
+            })}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 /** Pending confirmation dialog state: which change is being confirmed. */
@@ -195,6 +239,13 @@ export default function OrderDetailPage() {
           <PaymentStatusBadge status={order.paymentStatus} />
         </div>
       </div>
+
+      {order.cancellationReason && (
+        <CancellationAlert
+          reason={order.cancellationReason}
+          needsRefund={order.paymentStatus === "paid"}
+        />
+      )}
 
       {/* Actions */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
