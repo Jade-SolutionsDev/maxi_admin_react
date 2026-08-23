@@ -13,6 +13,7 @@ import {
   Settings, LogOut,
   User,
   PanelsTopLeft,
+  CreditCard,
 } from "lucide-react";
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
@@ -144,6 +145,12 @@ const navItems: NavItem[] = [
     path: "/cms-pages",
     activePrefix: "/cms-",
     resource: "cms-pages",
+  },
+  {
+    labelKey: "app.menu.metodos_pago",
+    icon: <CreditCard size={20} />,
+    path: "/payment-methods",
+    resource: "payment-methods",
   },
   { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
   {

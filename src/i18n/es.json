@@ -350,7 +350,8 @@
       "cmsServices": "Servicios",
       "cmsStaff": "Equipo",
       "cmsSettings": "Sitio web",
-      "cms": "CMS"
+      "cms": "CMS",
+      "metodos_pago": "Métodos de pago"
     },
     "user": {
       "profile": "Perfil"
@@ -745,7 +746,8 @@
       "items": "Productos",
       "delivery": "Entrega",
       "notes": "Notas del cliente",
-      "customer": "Cliente"
+      "customer": "Cliente",
+      "payment": "Pago (pasarela)"
     },
     "actions": {
       "updated": "Pedido actualizado",
@@ -762,6 +764,31 @@
       "mark_failed": "Pago fallido",
       "mark_refunded": "Reembolsar",
       "view_customer": "Ver cliente"
+    },
+    "payment": {
+      "provider": "Proveedor",
+      "status": "Estado",
+      "reference": "Referencia",
+      "address": "Dirección de depósito",
+      "amount": "Monto",
+      "fee": "Comisión",
+      "settlement": "Liquidación",
+      "createdAt": "Creado",
+      "expiresAt": "Expira",
+      "copy_reference": "Copiar referencia",
+      "copy_address": "Copiar dirección",
+      "copy_failed": "No se pudo copiar",
+      "link": "Enlace de pago",
+      "open_link": "Abrir"
+    },
+    "providerStatus": {
+      "PENDING": "Pendiente",
+      "REQUIRES_ACTION": "Esperando pago",
+      "PROCESSING": "Procesando",
+      "SUCCEEDED": "Liquidado",
+      "FAILED": "Fallido",
+      "EXPIRED": "Expirado",
+      "CANCELLED": "Cancelado"
     }
   },
   "clients": {
@@ -897,5 +924,14 @@
     "actions": {
       "add_link": "Añadir enlace"
     }
+  },
+  "payment-methods": {
+    "title": "Métodos de pago",
+    "subtitle": "Elegí qué pasarelas puede usar el cliente al finalizar la compra.",
+    "not_configured": "Sin credenciales",
+    "not_configured_hint": "Configurá las credenciales en el servidor para poder activarla.",
+    "toggle": "Activar método",
+    "enabled": "%{name} activado",
+    "disabled": "%{name} desactivado"
   }
 }

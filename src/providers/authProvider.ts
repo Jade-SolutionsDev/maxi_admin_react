@@ -162,6 +162,7 @@ export const authProvider: AuthProvider = {
       case "cms-services":
       case "cms-staff":
       case "cms-settings":
+      case "payment-methods":
         return false;
       // Cross-storage inventory overview: managers (handled above) + kardist.
       // Grocers use the per-storage Almacenes tab instead.

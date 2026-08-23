@@ -53,9 +53,11 @@ import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import {
   GROCER_TARGETS,
   money,
+  type OrderPayment,
   PAYMENT_STATUSES,
   STATUS_TRANSITIONS,
 } from "./orderStatus";
+import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
 interface OrderItemRow {
   productId: string;
@@ -80,6 +82,7 @@ interface OrderRecord {
   deliveryAddress: Record<string, unknown> | null;
   customerNotes: string | null;
   items?: OrderItemRow[];
+  payment?: OrderPayment | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -310,6 +313,12 @@ export default function OrderDetailPage() {
       </section>
 
       {/* Customer + delivery + notes */}
+      {order.payment && (
+        <div className="mb-4">
+          <PaymentDetailsSection payment={order.payment} />
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
