@@ -40,9 +40,20 @@ const validateCoverage = (value: unknown) =>
     ? undefined
     : "stockLocations.coverage.required";
 
-export function CoverageSelector({ source = "coverage" }: { source?: string }) {
+export function CoverageSelector({
+  source = "coverage",
+  required = true,
+}: {
+  source?: string;
+  // A storage must serve somewhere; a delivery option with no zones is
+  // meaningful — it is offered everywhere.
+  required?: boolean;
+}) {
   const translate = useTranslate();
-  const { field, fieldState } = useInput({ source, validate: validateCoverage });
+  const { field, fieldState } = useInput({
+    source,
+    validate: required ? validateCoverage : undefined,
+  });
   const value: CoverageItem[] = Array.isArray(field.value) ? field.value : [];
 
   // `all: true` bypasses the API's active-coverage filter — an admin assigning

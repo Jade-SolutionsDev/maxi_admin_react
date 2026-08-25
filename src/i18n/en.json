@@ -91,6 +91,9 @@
     "cms-settings": {
       "name": "Site settings",
       "name_plural": "Site settings"
+    },
+    "delivery-options": {
+      "name": "Delivery options"
     }
   },
   "list": {
@@ -361,7 +364,8 @@
       "badge": {
         "new": "New",
         "urgent": "Urgent"
-      }
+      },
+      "entregas": "Delivery"
     },
     "user": {
       "profile": "Profile"
@@ -948,5 +952,37 @@
     "toggle": "Enable method",
     "enabled": "%{name} enabled",
     "disabled": "%{name} disabled"
+  },
+  "delivery-options": {
+    "title": "Delivery options",
+    "subtitle": "What the customer can choose at checkout.",
+    "empty": "No delivery options yet — customers can only collect their orders.",
+    "everywhere": "Available everywhere",
+    "zone_count": "%{smart_count} zone |||| %{smart_count} zones",
+    "free": "Free",
+    "fields": {
+      "label": "Name",
+      "description": "Description",
+      "fee": "Delivery fee",
+      "enabled": "Enabled"
+    },
+    "form": {
+      "note": "With no zones selected the option is offered everywhere.",
+      "hints": {
+        "fee": "Added to the order total. Leave it at 0 when delivery is free.",
+        "enabled": "Only enabled options appear at checkout."
+      }
+    }
+  },
+  "fulfillment": {
+    "pickup": {
+      "title": "Pickup in store",
+      "subtitle": "Let customers collect their order at a storage.",
+      "toggle": "Let customers collect their orders",
+      "no_addresses": "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything."
+    },
+    "support_message": {
+      "label": "Message when nothing can be fulfilled"
+    }
   }
 }

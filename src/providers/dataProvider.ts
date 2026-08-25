@@ -71,6 +71,10 @@ export interface ExtendedDataProvider extends DataProvider {
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
   getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
+  getFulfillmentSettings: () => Promise<{ data: FulfillmentSettings }>;
+  updateFulfillmentSettings: (
+    data: Partial<FulfillmentSettings>,
+  ) => Promise<{ data: FulfillmentSettings }>;
   setUserRoles: (userId: string, roleIds: string[]) => Promise<{ data: unknown }>;
   createInventoryOperation: (
     payload: CreateInventoryOperationPayload,
@@ -94,6 +98,14 @@ export interface ExtendedDataProvider extends DataProvider {
   updateSiteSettings: (
     data: SiteSettingsData,
   ) => Promise<{ data: SiteSettingsData }>;
+}
+
+/** Mirror of the API's fulfillment-settings singleton. */
+export interface FulfillmentSettings {
+  pickupEnabled: boolean;
+  supportMessage: string;
+  /** Pickup is on but no active storage has an address to collect from. */
+  pickupEnabledWithoutAddresses: boolean;
 }
 
 /** Mirror of the API's SiteSettingsData (cms/settings singleton document). */
@@ -384,6 +396,21 @@ export const dataProvider: DataProvider = {
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
     return { data: payload.data };
+  },
+
+  async getFulfillmentSettings() {
+    const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
+      method: 'GET',
+    });
+    return { data: unwrapOne(json) as FulfillmentSettings };
+  },
+
+  async updateFulfillmentSettings(data: Partial<FulfillmentSettings>) {
+    const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return { data: unwrapOne(json) as FulfillmentSettings };
   },
 
   async inviteUser(payload: InviteUserPayload) {

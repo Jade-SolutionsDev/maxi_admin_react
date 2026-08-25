@@ -91,6 +91,9 @@
     "cms-settings": {
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
+    },
+    "delivery-options": {
+      "name": "Formas de entrega"
     }
   },
   "list": {
@@ -361,7 +364,8 @@
       "badge": {
         "new": "Nuevo",
         "urgent": "Urgente"
-      }
+      },
+      "entregas": "Entregas"
     },
     "user": {
       "profile": "Perfil"
@@ -948,5 +952,37 @@
     "toggle": "Activar método",
     "enabled": "%{name} activado",
     "disabled": "%{name} desactivado"
+  },
+  "delivery-options": {
+    "title": "Formas de entrega",
+    "subtitle": "Lo que el cliente puede elegir al finalizar la compra.",
+    "empty": "Todavía no hay formas de entrega: los clientes solo pueden recoger su pedido.",
+    "everywhere": "Disponible en todo el país",
+    "zone_count": "%{smart_count} zona |||| %{smart_count} zonas",
+    "free": "Gratis",
+    "fields": {
+      "label": "Nombre",
+      "description": "Descripción",
+      "fee": "Costo de envío",
+      "enabled": "Activa"
+    },
+    "form": {
+      "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
+      "hints": {
+        "fee": "Se suma al total del pedido. Dejalo en 0 si la entrega es gratis.",
+        "enabled": "Solo las formas activas aparecen al finalizar la compra."
+      }
+    }
+  },
+  "fulfillment": {
+    "pickup": {
+      "title": "Recogida en tienda",
+      "subtitle": "Permitile al cliente buscar su pedido en un almacén.",
+      "toggle": "Permitir recoger pedidos en tienda",
+      "no_addresses": "La recogida está activa, pero ningún almacén activo tiene dirección de recogida configurada. El cliente no puede elegir nada."
+    },
+    "support_message": {
+      "label": "Mensaje cuando no se puede entregar ni recoger"
+    }
   }
 }
