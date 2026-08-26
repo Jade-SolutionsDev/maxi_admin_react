@@ -345,7 +345,7 @@ const DataTableEmpty = () => {
           className="mt-4"
           onClick={() => setFilters({}, [])}
         >
-          {translate("ra.action.clear_input_value", { _: "Limpiar filtros" })}
+          {translate("list.empty.clear_filters", { _: "Limpiar filtros" })}
         </Button>
       ) : null}
     </div>

@@ -146,6 +146,9 @@
       "photo": "Photo",
       "alt": "Alt text",
       "resume": "Bio"
+    },
+    "empty": {
+      "clear_filters": "Clear filters"
     }
   },
   "users": {

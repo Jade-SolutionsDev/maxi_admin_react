@@ -146,6 +146,9 @@
       "photo": "Foto",
       "alt": "Texto alternativo",
       "resume": "Reseña"
+    },
+    "empty": {
+      "clear_filters": "Limpiar filtros"
     }
   },
   "users": {
