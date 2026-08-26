@@ -1,3 +1,4 @@
+import { FormDialogContent } from "@/components/admin/form-dialog-content";
 import { useMemo, useState } from "react";
 import {
   useDataProvider,
@@ -20,7 +21,6 @@ import {
 
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -410,7 +410,7 @@ export function CreateOperationWizard({
 
   return (
     <Dialog open={open} onOpenChange={(o) => (o ? undefined : close())}>
-      <DialogContent className="w-full sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+      <FormDialogContent className="w-full sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {translate("stockLocations.operations.title", {
@@ -733,7 +733,7 @@ export function CreateOperationWizard({
             )}
           </div>
         </DialogFooter>
-      </DialogContent>
+      </FormDialogContent>
     </Dialog>
   );
 }

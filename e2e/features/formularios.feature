@@ -23,3 +23,8 @@ Característica: Los formularios de la administración
     Y escribe 25 en el descuento
     Y borra el descuento
     Entonces el descuento queda vacío
+
+  Escenario: Tampoco se cierra el formulario de invitar a alguien
+    Cuando abre el formulario de invitar usuario
+    Y pulsa fuera del formulario
+    Entonces el formulario de invitación sigue abierto

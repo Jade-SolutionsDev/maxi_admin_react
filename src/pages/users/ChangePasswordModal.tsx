@@ -1,3 +1,4 @@
+import { FormDialogContent } from "@/components/admin/form-dialog-content";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,7 +9,6 @@ import { KeyRound } from "lucide-react";
 
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -76,7 +76,7 @@ export default function ChangePasswordModal() {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
+      <FormDialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader className="px-6 py-5 border-b text-left">
@@ -152,7 +152,7 @@ export default function ChangePasswordModal() {
             </div>
           </form>
         </Form>
-      </DialogContent>
+      </FormDialogContent>
     </Dialog>
   );
 }

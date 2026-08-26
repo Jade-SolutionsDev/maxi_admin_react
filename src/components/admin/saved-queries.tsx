@@ -1,3 +1,4 @@
+import { FormDialogContent } from "@/components/admin/form-dialog-content";
 import {
   extractValidSavedQueries,
   useListContext,
@@ -11,7 +12,6 @@ import isEqual from "lodash/isEqual";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -68,7 +68,7 @@ export const AddSavedQueryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <FormDialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {translate("ra.saved_queries.new_dialog_title", {
@@ -97,7 +97,7 @@ export const AddSavedQueryDialog = ({
           </Button>
           <Button onClick={addQuery}>{translate("ra.action.save")}</Button>
         </DialogFooter>
-      </DialogContent>
+      </FormDialogContent>
     </Dialog>
   );
 };
@@ -143,7 +143,7 @@ export const RemoveSavedQueryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <FormDialogContent>
         <DialogHeader>
           <DialogTitle>
             {translate("ra.saved_queries.remove_dialog_title", {
@@ -164,7 +164,7 @@ export const RemoveSavedQueryDialog = ({
             {translate("ra.action.confirm")}
           </Button>
         </DialogFooter>
-      </DialogContent>
+      </FormDialogContent>
     </Dialog>
   );
 };
