@@ -171,6 +171,16 @@ export default function ProductsList() {
           label="list.fields.name"
           render={ProductNameCell}
         />
+        {/* Departamento y categoría, como pide MxH-0012: la API devuelve
+            `departmentId` desde que el listado carga la relación. */}
+        <DataTable.Col
+          label="resources.departments.name"
+          source="departmentId"
+          disableSort
+          cellClassName="min-w-36"
+        >
+          <ReferenceField source="departmentId" reference="departments" />
+        </DataTable.Col>
         <DataTable.Col
           label="resources.categories.name"
           source="categoryId"
