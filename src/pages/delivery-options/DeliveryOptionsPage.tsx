@@ -1,18 +1,16 @@
 import { Link, Outlet } from "react-router-dom";
 import {
+  RecordContextProvider,
   ResourceContextProvider,
   useGetList,
-  useNotify,
-  useRefresh,
   useTranslate,
-  useUpdate,
 } from "ra-core";
 import { Globe2, MapPin, Pencil, Plus, Truck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
+import { ConfirmToggleField } from "@/components/admin/confirm-toggle-field";
 import { FulfillmentSettingsCard } from "./FulfillmentSettingsCard";
 import type { DeliveryZone } from "./deliveryZones";
 
@@ -33,9 +31,6 @@ export interface DeliveryOptionRecord {
  */
 export function DeliveryOptionsPage() {
   const translate = useTranslate();
-  const notify = useNotify();
-  const refresh = useRefresh();
-  const [update] = useUpdate();
 
   const { data, isLoading } = useGetList<DeliveryOptionRecord>(
     "delivery-options",
@@ -44,22 +39,6 @@ export function DeliveryOptionsPage() {
       sort: { field: "sortOrder", order: "ASC" },
     },
   );
-
-  const toggle = (option: DeliveryOptionRecord) => {
-    update(
-      "delivery-options",
-      {
-        id: option.id,
-        data: { enabled: !option.enabled },
-        previousData: option,
-      },
-      {
-        onSuccess: () => refresh(),
-        onError: () =>
-          notify("shared.notifications.error", { type: "warning" }),
-      },
-    );
-  };
 
   return (
     // The create/edit modals render through <CustomRoutes>, so nothing supplies
@@ -145,11 +124,13 @@ export function DeliveryOptionsPage() {
                     </Link>
                   </Button>
 
-                  <Switch
-                    checked={option.enabled}
-                    onCheckedChange={() => toggle(option)}
-                    aria-label={option.label}
-                  />
+                  <RecordContextProvider value={option}>
+                    <ConfirmToggleField
+                      source="enabled"
+                      labelKey="delivery-options.fields.enabled"
+                      confirmKey="delivery-options.confirm.toggle_enabled"
+                    />
+                  </RecordContextProvider>
                 </li>
               ))}
             </ul>

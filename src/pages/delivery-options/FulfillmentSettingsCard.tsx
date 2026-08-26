@@ -5,6 +5,18 @@ import { AlertTriangle, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import type {
   ExtendedDataProvider,
@@ -23,6 +35,9 @@ export function FulfillmentSettingsCard() {
   const [data, setData] = useState<FulfillmentSettings | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState("");
+  // Turning pickup off can leave customers with nothing to choose, so it is
+  // confirmed rather than applied on a stray click.
+  const [pendingPickup, setPendingPickup] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,9 +62,12 @@ export function FulfillmentSettingsCard() {
       const result = await dataProvider.updateFulfillmentSettings(changes);
       setData(result.data);
       setMessage(result.data.supportMessage);
-      notify("shared.notifications.updated", { type: "info" });
+      notify("fulfillment.saved", { type: "info", _: "Changes saved" });
     } catch {
-      notify("shared.notifications.error", { type: "warning" });
+      notify("shared.actions.error", {
+        type: "error",
+        messageArgs: { _: "Could not apply the change" },
+      });
     } finally {
       setIsPending(false);
     }
@@ -77,12 +95,50 @@ export function FulfillmentSettingsCard() {
             _: "Let customers collect their orders",
           })}
         </span>
-        <Switch
-          checked={data.pickupEnabled}
-          disabled={isPending}
-          onCheckedChange={(checked) => void save({ pickupEnabled: checked })}
-          aria-label={translate("fulfillment.pickup.toggle", { _: "Pickup" })}
-        />
+        <AlertDialog
+          open={pendingPickup !== null}
+          onOpenChange={(open) => !open && setPendingPickup(null)}
+        >
+          <Switch
+            checked={data.pickupEnabled}
+            disabled={isPending}
+            onCheckedChange={(checked) => setPendingPickup(checked)}
+            aria-label={translate("fulfillment.pickup.toggle", { _: "Pickup" })}
+          />
+
+          <AlertDialogContent className="sm:max-w-md">
+            <AlertDialogHeader className="space-y-3">
+              <AlertDialogTitle className="text-lg">
+                {translate(
+                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_title`,
+                  { _: "Confirm change" },
+                )}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {translate(
+                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_desc`,
+                  { _: "Are you sure you want to apply this change?" },
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-end">
+              <AlertDialogCancel disabled={isPending}>
+                {translate("shared.actions.cancel", { _: "Cancel" })}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                disabled={isPending}
+                className={cn(buttonVariants())}
+                onClick={() => {
+                  if (pendingPickup === null) return;
+                  void save({ pickupEnabled: pendingPickup });
+                  setPendingPickup(null);
+                }}
+              >
+                {translate("shared.actions.confirm", { _: "Confirm" })}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {data.pickupEnabledWithoutAddresses && (
