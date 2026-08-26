@@ -115,8 +115,7 @@ export const AutocompleteInput = (
   const { id, field, isRequired } = useInput({ ...props, source });
   const uniqueId = useId();
   const translate = useTranslate();
-  const { placeholder = translate("ra.action.search", { _: "Search..." }) } =
-    props;
+  const { placeholder = translate("ra.action.search") } = props;
 
   const getRecordRepresentation = useGetRecordRepresentation(resource);
   const { getChoiceText, getChoiceValue } = useChoices({
@@ -249,7 +248,7 @@ export const AutocompleteInput = (
               {/* We handle the filtering ourselves */}
               <Command shouldFilter={!isFromReference}>
                 <CommandInput
-                  placeholder="Search..."
+                  placeholder={placeholder}
                   value={filterValue}
                   onValueChange={(filter) => {
                     setFilterValue(filter);
@@ -264,7 +263,9 @@ export const AutocompleteInput = (
                   }}
                 />
                 <CommandList ref={listRef}>
-                  <CommandEmpty>No matching item found.</CommandEmpty>
+                  <CommandEmpty>
+                    {translate("ra.navigation.no_results")}
+                  </CommandEmpty>
                   <CommandGroup>
                     {finalChoices.map((choice) => {
                       const isCreateItem =
