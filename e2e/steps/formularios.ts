@@ -44,3 +44,17 @@ Then('puede marcar el producto como destacado', async ({ page }) => {
 Then('el descuento queda vacío', async ({ page }) => {
   await expect(page.locator(DESCUENTO).first()).toHaveValue('');
 });
+
+When('abre el formulario de invitar usuario', async ({ page }) => {
+  // El modal es una ruta, no un botón: `/users/create` lo monta directamente.
+  // Se localiza por su título: los popovers cerrados también son `role=dialog`.
+  await page.goto(`${ADMIN}/users/create`);
+  await expect(dialogoDeInvitacion(page)).toBeVisible({ timeout: 20_000 });
+});
+
+const dialogoDeInvitacion = (page: import('@playwright/test').Page) =>
+  page.getByRole('dialog', { name: /crear nuevo usuario|invitar/i });
+
+Then('el formulario de invitación sigue abierto', async ({ page }) => {
+  await expect(dialogoDeInvitacion(page)).toBeVisible();
+});
