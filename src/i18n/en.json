@@ -321,7 +321,9 @@
     },
     "filters": {
       "yes": "Yes",
-      "no": "No"
+      "no": "No",
+      "all": "All",
+      "only_enabled": "Enabled only"
     },
     "status": {
       "active": "Active",
@@ -1008,5 +1010,10 @@
       "label": "Message when nothing can be fulfilled"
     },
     "saved": "Changes saved"
+  },
+  "ra": {
+    "action": {
+      "reset": "Reset"
+    }
   }
 }

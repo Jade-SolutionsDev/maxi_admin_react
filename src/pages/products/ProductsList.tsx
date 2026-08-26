@@ -1,3 +1,4 @@
+import { OnlyEnabledFilter } from "@/components/admin/only-enabled-filter";
 import { useCanAccess, useTranslate, type RaRecord } from "ra-core";
 import { ImageOff } from "lucide-react";
 
@@ -62,11 +63,7 @@ const productFilters = [
     label="list.fields.featured"
     choices={BOOL_CHOICES}
   />,
-  <SelectInput
-    source="isActive"
-    label="list.fields.isActive"
-    choices={BOOL_CHOICES}
-  />,
+  <OnlyEnabledFilter source="isActive" />,
 ];
 
 const ProductActions = () => {
