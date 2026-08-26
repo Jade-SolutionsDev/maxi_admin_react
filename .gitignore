@@ -26,4 +26,4 @@ dist-ssr
 .tmp_venv/*
 
 .env
-.claude/
+.claude/e2e/.generado/
