@@ -92,6 +92,18 @@
       "name": "Site settings",
       "name_plural": "Site settings"
     },
+    "contact-messages": {
+      "name": "Message",
+      "name_plural": "Contact messages"
+    },
+    "contact-templates": {
+      "name": "Template",
+      "name_plural": "Reply templates"
+    },
+    "nomenclators": {
+      "name": "Option",
+      "name_plural": "Nomenclators"
+    },
     "delivery-options": {
       "name": "Delivery options"
     }
@@ -364,12 +376,16 @@
         "ventas": "Sales",
         "catalogo": "Catalog",
         "inventario": "Inventory",
-        "sistema": "System"
+        "sistema": "System",
+        "soporte": "Support"
       },
       "badge": {
         "new": "New",
         "urgent": "Urgent"
       },
+      "contactoMensajes": "Messages",
+      "contactoPlantillas": "Templates",
+      "nomencladores": "Nomenclators",
       "entregas": "Delivery"
     },
     "user": {
@@ -962,6 +978,89 @@
     "toggle": "Enable method",
     "enabled": "%{name} enabled",
     "disabled": "%{name} disabled"
+  },
+  "contact-messages": {
+    "status": {
+      "nuevo": "New",
+      "en_proceso": "In progress",
+      "respondido": "Answered",
+      "cerrado": "Closed"
+    },
+    "channel": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "telefono": "Phone",
+      "plataforma": "Platform",
+      "nota": "Internal note"
+    },
+    "fields": {
+      "sender": "Sender",
+      "motive": "Motive",
+      "excerpt": "Message",
+      "message": "Customer message",
+      "createdFrom": "From",
+      "createdTo": "To"
+    },
+    "reply_title": "Reply",
+    "reply_subject": "Reply to your message — Maxi",
+    "reply_logged": "Reply logged",
+    "template_placeholder": "Pick a template…",
+    "body_placeholder": "Write the reply or pick a template; the text is loaded into the channel you use.",
+    "call": "Call",
+    "platform_send": "Send by email",
+    "platform_disabled": "Platform sending becomes available once the mail service (Resend) is integrated.",
+    "note_title": "Internal note",
+    "note_placeholder": "Record an action (does not change the status)…",
+    "note_save": "Save note",
+    "history_title": "Reply history",
+    "history_empty": "Nobody has answered this message yet.",
+    "sender_title": "Sender details",
+    "view_client": "View client",
+    "anonymous_sender": "Sender without an account (anonymous form)."
+  },
+  "contact-templates": {
+    "fields": {
+      "body": "Body"
+    },
+    "any_motive": "Any motive",
+    "form": {
+      "create_subtitle": "Create a canned answer for the support team.",
+      "edit_subtitle": "Edit the reply template.",
+      "note": "The text loads as-is into the chosen channel (email, WhatsApp…).",
+      "placeholders": {
+        "title": "Initial greeting",
+        "body": "Hi, thanks for reaching out…"
+      },
+      "hints": {
+        "title": "Internal template name.",
+        "motiveId": "Optional: tie it to a motive.",
+        "body": "Text the customer will receive.",
+        "sortOrder": "Order in the picker (lowest first).",
+        "isActive": "Inactive: hidden from the reply picker."
+      }
+    }
+  },
+  "nomenclators": {
+    "categories": {
+      "contact-motive": "Contact motives"
+    },
+    "fields": {
+      "label": "Label"
+    },
+    "form": {
+      "create_subtitle": "Add an option to this catalog.",
+      "edit_subtitle": "Edit the option.",
+      "note": "The code derives from the label and never changes on rename.",
+      "placeholders": {
+        "label": "Claims"
+      },
+      "hints": {
+        "label": "Text shown on the storefront.",
+        "description": "Optional internal note.",
+        "sortOrder": "Order in the storefront select.",
+        "isActive": "Inactive: no longer offered on the storefront."
+      }
+    }
   },
   "delivery-options": {
     "title": "Delivery options",

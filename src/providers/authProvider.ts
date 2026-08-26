@@ -163,6 +163,8 @@ export const authProvider: AuthProvider = {
       case "cms-staff":
       case "cms-settings":
       case "payment-methods":
+      case "nomenclators":
+      case "contact-motives":
       case "delivery-options":
       case "fulfillment-settings":
         return false;
@@ -170,6 +172,13 @@ export const authProvider: AuthProvider = {
       // Grocers use the per-storage Almacenes tab instead.
       case "inventory":
         return identity.role === "KARDIST";
+      // Support inbox + reply drafts: governed by the 'contact' permission
+      // module so non-admin staff can be granted access via the Roles UI.
+      case "contact-messages":
+      case "contact-templates": {
+        const backendAction = ACTION_MAP[action ?? ""] ?? action ?? "";
+        return permissionsCache.contact?.includes(backendAction) ?? false;
+      }
       default:
         // Catalog + operational modules are governed by the effective
         // permission map (products, categories, departments, stock-locations).

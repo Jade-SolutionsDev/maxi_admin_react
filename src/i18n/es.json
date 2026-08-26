@@ -92,6 +92,18 @@
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
     },
+    "contact-messages": {
+      "name": "Mensaje",
+      "name_plural": "Mensajes de contacto"
+    },
+    "contact-templates": {
+      "name": "Plantilla",
+      "name_plural": "Plantillas de respuesta"
+    },
+    "nomenclators": {
+      "name": "Opción",
+      "name_plural": "Nomencladores"
+    },
     "delivery-options": {
       "name": "Formas de entrega"
     }
@@ -364,12 +376,16 @@
         "ventas": "Ventas",
         "catalogo": "Catálogo",
         "inventario": "Inventario",
-        "sistema": "Sistema"
+        "sistema": "Sistema",
+        "soporte": "Soporte"
       },
       "badge": {
         "new": "Nuevo",
         "urgent": "Urgente"
       },
+      "contactoMensajes": "Mensajes",
+      "contactoPlantillas": "Plantillas",
+      "nomencladores": "Nomencladores",
       "entregas": "Entregas"
     },
     "user": {
@@ -852,7 +868,7 @@
     },
     "mandatory": {
       "title": "Faltan páginas obligatorias",
-      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Creálas para no dejar enlaces rotos:",
+      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Créalas para no dejar enlaces rotos:",
       "create_label": "Crear la página %{title}"
     }
   },
@@ -963,6 +979,89 @@
     "enabled": "%{name} activado",
     "disabled": "%{name} desactivado"
   },
+  "contact-messages": {
+    "status": {
+      "nuevo": "Nuevo",
+      "en_proceso": "En proceso",
+      "respondido": "Respondido",
+      "cerrado": "Cerrado"
+    },
+    "channel": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "telefono": "Teléfono",
+      "plataforma": "Plataforma",
+      "nota": "Nota interna"
+    },
+    "fields": {
+      "sender": "Remitente",
+      "motive": "Motivo",
+      "excerpt": "Mensaje",
+      "message": "Mensaje del cliente",
+      "createdFrom": "Desde",
+      "createdTo": "Hasta"
+    },
+    "reply_title": "Responder",
+    "reply_subject": "Respuesta a tu mensaje — Maxi",
+    "reply_logged": "Respuesta registrada",
+    "template_placeholder": "Elegir una plantilla…",
+    "body_placeholder": "Escribe la respuesta o elige una plantilla; el texto se carga en el canal que uses.",
+    "call": "Llamar",
+    "platform_send": "Enviar por email",
+    "platform_disabled": "El envío desde la plataforma se habilita cuando se integre el servicio de correo (Resend).",
+    "note_title": "Nota interna",
+    "note_placeholder": "Registrar una gestión (no cambia el estado)…",
+    "note_save": "Guardar nota",
+    "history_title": "Historial de respuestas",
+    "history_empty": "Todavía nadie respondió este mensaje.",
+    "sender_title": "Datos del remitente",
+    "view_client": "Ver cliente",
+    "anonymous_sender": "Remitente sin cuenta (formulario anónimo)."
+  },
+  "contact-templates": {
+    "fields": {
+      "body": "Contenido"
+    },
+    "any_motive": "Cualquier motivo",
+    "form": {
+      "create_subtitle": "Crea una respuesta predefinida para el equipo de soporte.",
+      "edit_subtitle": "Edita la plantilla de respuesta.",
+      "note": "El texto se carga tal cual en el canal elegido (email, WhatsApp…).",
+      "placeholders": {
+        "title": "Saludo inicial",
+        "body": "Hola, gracias por escribirnos…"
+      },
+      "hints": {
+        "title": "Nombre interno de la plantilla.",
+        "motiveId": "Opcional: asociarla a un motivo.",
+        "body": "Texto que recibirá el cliente.",
+        "sortOrder": "Orden en el selector (menor primero).",
+        "isActive": "Inactiva: no aparece en el selector de respuestas."
+      }
+    }
+  },
+  "nomenclators": {
+    "categories": {
+      "contact-motive": "Motivos de contacto"
+    },
+    "fields": {
+      "label": "Etiqueta"
+    },
+    "form": {
+      "create_subtitle": "Añade una opción a este nomenclador.",
+      "edit_subtitle": "Edita la opción.",
+      "note": "El código se genera desde la etiqueta y no cambia al renombrarla.",
+      "placeholders": {
+        "label": "Reclamaciones"
+      },
+      "hints": {
+        "label": "Texto visible en la tienda.",
+        "description": "Nota interna opcional.",
+        "sortOrder": "Orden en el selector de la tienda.",
+        "isActive": "Inactiva: deja de ofrecerse en la tienda."
+      }
+    }
+  },
   "delivery-options": {
     "title": "Formas de entrega",
     "subtitle": "Lo que el cliente puede elegir al finalizar la compra.",
@@ -979,7 +1078,7 @@
     "form": {
       "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
       "hints": {
-        "fee": "Se suma al total del pedido. Dejalo en 0 si la entrega es gratis.",
+        "fee": "Se suma al total del pedido. Déjalo en 0 si la entrega es gratis.",
         "enabled": "Solo las formas activas aparecen al finalizar la compra."
       }
     },
@@ -997,7 +1096,7 @@
   "fulfillment": {
     "pickup": {
       "title": "Recogida en tienda",
-      "subtitle": "Permitile al cliente buscar su pedido en un almacén.",
+      "subtitle": "Permítele al cliente buscar su pedido en un almacén.",
       "toggle": "Permitir recoger pedidos en tienda",
       "no_addresses": "La recogida está activa, pero ningún almacén activo tiene dirección de recogida configurada. El cliente no puede elegir nada.",
       "confirm": {

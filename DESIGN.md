@@ -290,3 +290,31 @@ storefront-referenced slug (sobre-nosotros, terminos-y-condiciones,
 politica-de-privacidad, politica-de-reembolso) has no active page and links to
 the create form with title+slug prefilled; the API frees a page's slug on
 soft-delete so recreation lands on the canonical slug.
+
+---
+
+## 10. Contact vertical (Soporte)
+
+- **Inbox** (`src/pages/contact-messages/`): orders-style full pages (list +
+  `/contact-messages/:id` detail), server-paginated. New pattern: the
+  **reply-actions block** — a template `<select>` fills a preview `Textarea`,
+  and each channel button is a plain prefilled link (`mailto:`, Gmail compose
+  url, `wa.me`, `tel:`) whose `onClick` ALSO logs the reply through the
+  `postContactReply` dataProvider verb. Links render only when the sender has
+  that contact datum. The platform-send button stays disabled while
+  `getContactConfig()` reports `platformReplyEnabled: false` (Resend not
+  integrated) — never remove the disabled state, the API fail-closes with 503.
+- **Date-range filters**: two `<TextInput type="date">` entries
+  (`createdFrom` / `createdTo`) — the established lazy pattern; no DateInput
+  component exists.
+- **Nomenclators** (`src/pages/nomenclators/`): ONE generic CRUD serves every
+  option catalog. The active category comes from `nomenclatorCategories.ts`
+  (tab strip in the layout, passed to modals via router outlet context and
+  injected into the create payload by the sanitize transform). Adding a
+  future catalog = one entry there + i18n labels; never fork the quartet per
+  category. `code` is server-derived from the label.
+- **Access**: `contact-messages`/`contact-templates` consult the managed
+  `contact` permission module in `canAccess` (grantable to support staff);
+  `nomenclators` sits in the admin-only case group.
+- **Badge**: `ContactMessagesBadge` in `SidebarBadgeFeeders` counts
+  `status=nuevo` messages (the second feeder; same shape as users).

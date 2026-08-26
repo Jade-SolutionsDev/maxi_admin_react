@@ -95,6 +95,15 @@ export interface ExtendedDataProvider extends DataProvider {
     paymentStatus: OrderPaymentStatus,
   ) => Promise<{ data: unknown }>;
   getSiteSettings: () => Promise<{ data: SiteSettingsData }>;
+  postContactReply: (
+    id: string,
+    payload: { channel: string; templateId?: string; body?: string },
+  ) => Promise<{ data: unknown }>;
+  updateContactMessageStatus: (
+    id: string,
+    status: string,
+  ) => Promise<{ data: unknown }>;
+  getContactConfig: () => Promise<{ data: { platformReplyEnabled: boolean } }>;
   updateSiteSettings: (
     data: SiteSettingsData,
   ) => Promise<{ data: SiteSettingsData }>;
@@ -131,6 +140,9 @@ const RESOURCE_PATHS: Record<string, string> = {
   'cms-banners': 'cms/banners',
   'cms-services': 'cms/services',
   'cms-staff': 'cms/staff',
+  'contact-messages': 'contact/messages',
+  'contact-templates': 'contact/templates',
+  'contact-motives': 'nomenclators',
 };
 
 function resourcePath(resource: string): string {
@@ -387,6 +399,32 @@ export const dataProvider: DataProvider = {
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
     return { data: payload.data };
+  },
+
+  async postContactReply(
+    id: string,
+    payload: { channel: string; templateId?: string; body?: string },
+  ) {
+    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/replies`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async updateContactMessageStatus(id: string, status: string) {
+    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async getContactConfig() {
+    const { json } = await httpClient(`${API_URL}/contact/messages/config`, {
+      method: 'GET',
+    });
+    return { data: unwrapOne(json) as { platformReplyEnabled: boolean } };
   },
 
   async updateSiteSettings(data: SiteSettingsData) {
