@@ -54,7 +54,12 @@ export const NumberInput = (props: NumberInputProps) => {
     const numberValue = parse(value);
 
     setValue(value);
-    field.onChange(numberValue ?? 0);
+    /**
+     * Vaciar el campo lo deja vacío. Antes el `?? 0` devolvía un cero al
+     * instante, así que el campo no se podía borrar: había que seleccionar el
+     * cero y escribir encima, y en los filtros nunca quedaba «sin filtrar».
+     */
+    field.onChange(numberValue);
   };
 
   const [value, setValue] = useState<string | undefined>(

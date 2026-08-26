@@ -59,7 +59,7 @@ export const SearchInput = (inProps: SearchInputProps) => {
         helperText={false}
         placeholder={translate("ra.action.search")}
         className={cn("flex-grow", className)}
-        inputClassName={cn("pr-8", showClearButton ? "pr-16" : "pr-8")}
+        inputClassName={cn("pr-8", showClearButton ? "pr-20" : "pr-8")}
         {...rest}
       />
       <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -69,12 +69,17 @@ export const SearchInput = (inProps: SearchInputProps) => {
           variant="ghost"
           size="sm"
           onClick={handleClear}
-          className="absolute right-8 top-1/2 transform -translate-y-1/2 h-6 w-6 rounded-full p-0 text-muted-foreground"
+          /**
+           * 32 px, no 24: el icono que se ve mide 14 y la gente apunta ahí. Con
+           * el objetivo justo en el mínimo, un clic a dos píxeles del borde se
+           * perdía — «la mayoría de los intentos los ignora», decía QA.
+           */
+          className="absolute right-7 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-full p-0 text-muted-foreground"
           aria-label={translate("ra.action.clear_search", {
             _: "Clear search",
           })}
         >
-          <X className="h-3 w-3" />
+          <X className="h-4 w-4" />
         </Button>
       )}
     </div>

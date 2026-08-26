@@ -92,15 +92,14 @@ export default function ProductFormModal({ mode }: ProductFormModalProps) {
       }}
       transform={sanitizeProduct}
     >
-      <ProductFormFields mode={mode} />
+      <ProductFormFields />
     </ResourceFormModal>
   );
 }
 
-function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
+function ProductFormFields() {
   const translate = useTranslate();
   const { setValue } = useFormContext();
-  const isEdit = mode === "edit";
   // Department is a client-side filter for the category dropdown only; it is not
   // submitted (stripped by sanitizeProduct). On edit it arrives pre-filled from
   // the record — the API derives it from the category's parent department.
@@ -241,9 +240,9 @@ function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
         </div>
       </FormSection>
 
-      {/* Order + visibility are edit-only; create uses the sanitizer's defaults. */}
-      {isEdit && (
-        <FormSection
+      {/* Visibilidad también al crear: un producto puede nacer destacado, y
+          obligar a crearlo y volver a editarlo para marcarlo era trabajo doble. */}
+      <FormSection
           icon={<Eye />}
           title={translate("products.form.sections.visibility", { _: "" })}
           subtitle={translate("products.form.sections.visibility_hint", {
@@ -272,8 +271,7 @@ function ProductFormFields({ mode }: { mode: "create" | "edit" }) {
               />
             </div>
           </div>
-        </FormSection>
-      )}
+      </FormSection>
     </>
   );
 }

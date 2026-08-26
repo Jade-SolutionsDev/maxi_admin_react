@@ -107,6 +107,9 @@ export default function CategoriesList() {
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
         </DataTable.Col>
+        <DataTable.Col label="list.fields.updatedAt" source="updatedAt">
+          <DateField source="updatedAt" showTime />
+        </DataTable.Col>
       </DataTable>
     </List>
   );

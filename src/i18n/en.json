@@ -102,7 +102,7 @@
       "firstName": "First Name",
       "lastName": "Last Name",
       "defaultMunicipality": "Default Municipality",
-      "isActive": "Is Active",
+      "isActive": "Status",
       "onboardingStatus": "Onboarding Status",
       "name": "Name",
       "email": "Email",
@@ -321,7 +321,9 @@
     },
     "filters": {
       "yes": "Yes",
-      "no": "No"
+      "no": "No",
+      "all": "All",
+      "only_enabled": "Enabled only"
     },
     "status": {
       "active": "Active",
@@ -537,7 +539,8 @@
     },
     "stock": {
       "empty_title": "No stock",
-      "empty_hint": "This product has no stock recorded in any storage."
+      "empty_hint": "This product has no stock recorded in any storage.",
+      "total": "Total stock"
     },
     "form": {
       "create_subtitle": "Fill in the information to create a new product.",
@@ -1007,5 +1010,10 @@
       "label": "Message when nothing can be fulfilled"
     },
     "saved": "Changes saved"
+  },
+  "ra": {
+    "action": {
+      "reset": "Reset"
+    }
   }
 }
