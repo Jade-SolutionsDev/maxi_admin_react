@@ -84,12 +84,76 @@ interface OrderRecord {
   deliveryFee: number;
   total: number;
   deliveryAddress: Record<string, unknown> | null;
+  fulfillmentType: "delivery" | "pickup";
+  deliveryOptionLabel: string | null;
+  pickupAddress: {
+    locationName?: string;
+    label?: string | null;
+    address?: string;
+  } | null;
   customerNotes: string | null;
   cancellationReason: CancellationReason | null;
   items?: OrderItemRow[];
   payment?: OrderPayment | null;
   createdAt: string;
   updatedAt: string;
+}
+
+const text = (value: unknown) =>
+  typeof value === "string" && value.trim() ? value.trim() : null;
+
+/**
+ * Where the order goes, in words. The raw snapshot carries ids the shop floor
+ * cannot read; only the names belong on screen.
+ */
+function DeliveryDetails({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+
+  if (order.fulfillmentType === "pickup") {
+    const pickup = order.pickupAddress;
+    return pickup ? (
+      <dl className="space-y-1 text-sm text-muted-foreground">
+        <dt className="font-medium text-foreground">
+          {text(pickup.locationName)}
+        </dt>
+        {text(pickup.label) && <dd>{text(pickup.label)}</dd>}
+        <dd>{text(pickup.address)}</dd>
+        <dd className="pt-1">
+          {translate("orders.fulfillment.pickup", { _: "Recogida en tienda" })}
+        </dd>
+      </dl>
+    ) : (
+      <p className="text-sm text-muted-foreground">—</p>
+    );
+  }
+
+  const address = order.deliveryAddress;
+  if (!address) return <p className="text-sm text-muted-foreground">—</p>;
+
+  const place = [text(address.municipalityName), text(address.provinceName)]
+    .filter(Boolean)
+    .join(", ");
+
+  return (
+    <dl className="space-y-1 text-sm text-muted-foreground">
+      {text(address.label) && (
+        <dt className="font-medium text-foreground">{text(address.label)}</dt>
+      )}
+      <dd>{text(address.street)}</dd>
+      {text(address.betweenStreets) && (
+        <dd>
+          {translate("orders.fulfillment.between", { _: "Entre" })}{" "}
+          {text(address.betweenStreets)}
+        </dd>
+      )}
+      {place && <dd>{place}</dd>}
+      {text(address.reference) && <dd>{text(address.reference)}</dd>}
+      {text(address.contactPhone) && <dd>{text(address.contactPhone)}</dd>}
+      {order.deliveryOptionLabel && (
+        <dd className="pt-1">{order.deliveryOptionLabel}</dd>
+      )}
+    </dl>
+  );
 }
 
 /**
@@ -397,18 +461,7 @@ export default function OrderDetailPage() {
             <MapPin size={16} />
             {translate("orders.sections.delivery", { _: "Entrega" })}
           </h2>
-          {order.deliveryAddress ? (
-            <dl className="space-y-1 text-sm text-muted-foreground">
-              {Object.entries(order.deliveryAddress).map(([key, value]) => (
-                <div key={key} className="flex gap-2">
-                  <dt className="font-medium capitalize">{key}:</dt>
-                  <dd>{String(value)}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : (
-            <p className="text-sm text-muted-foreground">—</p>
-          )}
+          <DeliveryDetails order={order} />
         </section>
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">

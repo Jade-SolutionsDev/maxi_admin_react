@@ -60,6 +60,9 @@ import { NomenclatorsLayout } from "./pages/nomenclators/NomenclatorsLayout";
 import NomenclatorCreate from "./pages/nomenclators/NomenclatorCreate";
 import NomenclatorEdit from "./pages/nomenclators/NomenclatorEdit";
 import { NomenclatorDetailModal } from "./pages/nomenclators/NomenclatorDetailModal";
+import { DeliveryOptionsPage } from "./pages/delivery-options/DeliveryOptionsPage";
+import DeliveryOptionCreate from "./pages/delivery-options/DeliveryOptionCreate";
+import DeliveryOptionEdit from "./pages/delivery-options/DeliveryOptionEdit";
 import { CmsStaffLayout } from "./pages/cms-staff/CmsStaffLayout";
 import CmsStaffCreate from "./pages/cms-staff/CmsStaffCreate";
 import CmsStaffEdit from "./pages/cms-staff/CmsStaffEdit";
@@ -207,6 +210,17 @@ const AdminApp = () => (
           </RequireAccess>
         }
       />
+      <Route
+        path="/delivery-options/*"
+        element={
+          <RequireAccess resource="delivery-options">
+            <DeliveryOptionsPage />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<DeliveryOptionCreate />} />
+        <Route path="edit/:id" element={<DeliveryOptionEdit />} />
+      </Route>
       <Route
         path="/clients/:id"
         element={

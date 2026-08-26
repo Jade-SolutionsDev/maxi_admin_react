@@ -103,6 +103,9 @@
     "nomenclators": {
       "name": "Option",
       "name_plural": "Nomenclators"
+    },
+    "delivery-options": {
+      "name": "Delivery options"
     }
   },
   "list": {
@@ -377,7 +380,8 @@
       },
       "contactoMensajes": "Messages",
       "contactoPlantillas": "Templates",
-      "nomencladores": "Nomenclators"
+      "nomencladores": "Nomenclators",
+      "entregas": "Delivery"
     },
     "user": {
       "profile": "Profile"
@@ -820,6 +824,10 @@
       "payment_not_received": "Cancelled automatically: payment was not received in time and the stock was released.",
       "paid_after_expiry_out_of_stock": "Paid after expiring, with no stock left: it cannot be fulfilled.",
       "refundHint": "Contact the customer and refund this order."
+    },
+    "fulfillment": {
+      "pickup": "Pickup in store",
+      "between": "Between"
     }
   },
   "clients": {
@@ -1047,5 +1055,56 @@
         "isActive": "Inactive: no longer offered on the storefront."
       }
     }
+  },
+  "delivery-options": {
+    "title": "Delivery options",
+    "subtitle": "What the customer can choose at checkout.",
+    "empty": "No delivery options yet — customers can only collect their orders.",
+    "everywhere": "Available everywhere",
+    "zone_count": "%{smart_count} zone |||| %{smart_count} zones",
+    "free": "Free",
+    "fields": {
+      "label": "Name",
+      "description": "Description",
+      "fee": "Delivery fee",
+      "enabled": "Enabled"
+    },
+    "form": {
+      "note": "With no zones selected the option is offered everywhere.",
+      "hints": {
+        "fee": "Added to the order total. Leave it at 0 when delivery is free.",
+        "enabled": "Only enabled options appear at checkout."
+      }
+    },
+    "confirm": {
+      "toggle_enabled": {
+        "on_title": "Enable this delivery option?",
+        "on_desc": "\"%{name}\" will appear at checkout and customers can choose it.",
+        "on_cta": "Enable",
+        "off_title": "Disable this delivery option?",
+        "off_desc": "\"%{name}\" will stop appearing at checkout. Orders that already used it are unchanged.",
+        "off_cta": "Disable"
+      }
+    }
+  },
+  "fulfillment": {
+    "pickup": {
+      "title": "Pickup in store",
+      "subtitle": "Let customers collect their order at a storage.",
+      "toggle": "Let customers collect their orders",
+      "no_addresses": "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything.",
+      "confirm": {
+        "on_title": "Allow pickup in store?",
+        "on_desc": "Customers will be able to collect their order at a storage that has a pickup address.",
+        "off_title": "Disable pickup in store?",
+        "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
+        "on_cta": "Enable",
+        "off_cta": "Disable"
+      }
+    },
+    "support_message": {
+      "label": "Message when nothing can be fulfilled"
+    },
+    "saved": "Changes saved"
   }
 }

@@ -17,6 +17,7 @@ import {
   Inbox,
   ListTree,
   NotebookPen,
+  Truck,
 } from "lucide-react";
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
@@ -123,6 +124,12 @@ const navGroups: NavGroup[] = [
         icon: <CreditCard size={20} />,
         path: "/payment-methods",
         resource: "payment-methods",
+      },
+      {
+        labelKey: "app.menu.entregas",
+        icon: <Truck size={20} />,
+        path: "/delivery-options",
+        resource: "delivery-options",
       },
       {
         labelKey: "app.menu.clientes",

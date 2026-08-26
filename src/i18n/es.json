@@ -103,6 +103,9 @@
     "nomenclators": {
       "name": "Opción",
       "name_plural": "Nomencladores"
+    },
+    "delivery-options": {
+      "name": "Formas de entrega"
     }
   },
   "list": {
@@ -377,7 +380,8 @@
       },
       "contactoMensajes": "Mensajes",
       "contactoPlantillas": "Plantillas",
-      "nomencladores": "Nomencladores"
+      "nomencladores": "Nomencladores",
+      "entregas": "Entregas"
     },
     "user": {
       "profile": "Perfil"
@@ -819,7 +823,11 @@
     "cancellationReason": {
       "payment_not_received": "Cancelado automáticamente: no se recibió el pago a tiempo y se liberó el stock.",
       "paid_after_expiry_out_of_stock": "Pagado fuera de plazo y sin stock disponible: no se puede servir.",
-      "refundHint": "Contactá al cliente y reembolsá este pedido."
+      "refundHint": "Contacta al cliente y reembolsá este pedido."
+    },
+    "fulfillment": {
+      "pickup": "Recogida en tienda",
+      "between": "Entre"
     }
   },
   "clients": {
@@ -854,7 +862,7 @@
     },
     "mandatory": {
       "title": "Faltan páginas obligatorias",
-      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Creálas para no dejar enlaces rotos:",
+      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Créalas para no dejar enlaces rotos:",
       "create_label": "Crear la página %{title}"
     }
   },
@@ -948,7 +956,7 @@
     "hints": {
       "blurb": "Párrafo bajo el logo del pie de página.",
       "copyright": "Línea inferior del pie de página.",
-      "legalLinks": "Elegí una página activa (Contenido → Páginas); el enlace usa su slug.",
+      "legalLinks": "Elige una página activa (Contenido → Páginas); el enlace usa su slug.",
       "email": "Correo de contacto mostrado en el pie y en Contacto.",
       "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
     },
@@ -958,7 +966,7 @@
   },
   "payment-methods": {
     "title": "Métodos de pago",
-    "subtitle": "Elegí qué pasarelas puede usar el cliente al finalizar la compra.",
+    "subtitle": "Elige qué pasarelas puede usar el cliente al finalizar la compra.",
     "not_configured": "Sin credenciales",
     "not_configured_hint": "Configurá las credenciales en el servidor para poder activarla.",
     "toggle": "Activar método",
@@ -991,7 +999,7 @@
     "reply_subject": "Respuesta a tu mensaje — Maxi",
     "reply_logged": "Respuesta registrada",
     "template_placeholder": "Elegir una plantilla…",
-    "body_placeholder": "Escribí la respuesta o elegí una plantilla; el texto se carga en el canal que uses.",
+    "body_placeholder": "Escribe la respuesta o elige una plantilla; el texto se carga en el canal que uses.",
     "call": "Llamar",
     "platform_send": "Enviar por email",
     "platform_disabled": "El envío desde la plataforma se habilita cuando se integre el servicio de correo (Resend).",
@@ -1010,8 +1018,8 @@
     },
     "any_motive": "Cualquier motivo",
     "form": {
-      "create_subtitle": "Creá una respuesta predefinida para el equipo de soporte.",
-      "edit_subtitle": "Editá la plantilla de respuesta.",
+      "create_subtitle": "Crea una respuesta predefinida para el equipo de soporte.",
+      "edit_subtitle": "Edita la plantilla de respuesta.",
       "note": "El texto se carga tal cual en el canal elegido (email, WhatsApp…).",
       "placeholders": {
         "title": "Saludo inicial",
@@ -1034,8 +1042,8 @@
       "label": "Etiqueta"
     },
     "form": {
-      "create_subtitle": "Añadí una opción a este nomenclador.",
-      "edit_subtitle": "Editá la opción.",
+      "create_subtitle": "Añade una opción a este nomenclador.",
+      "edit_subtitle": "Edita la opción.",
       "note": "El código se genera desde la etiqueta y no cambia al renombrarla.",
       "placeholders": {
         "label": "Reclamaciones"
@@ -1047,5 +1055,56 @@
         "isActive": "Inactiva: deja de ofrecerse en la tienda."
       }
     }
+  },
+  "delivery-options": {
+    "title": "Formas de entrega",
+    "subtitle": "Lo que el cliente puede elegir al finalizar la compra.",
+    "empty": "Todavía no hay formas de entrega: los clientes solo pueden recoger su pedido.",
+    "everywhere": "Disponible en todo el país",
+    "zone_count": "%{smart_count} zona |||| %{smart_count} zonas",
+    "free": "Gratis",
+    "fields": {
+      "label": "Nombre",
+      "description": "Descripción",
+      "fee": "Costo de envío",
+      "enabled": "Activa"
+    },
+    "form": {
+      "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
+      "hints": {
+        "fee": "Se suma al total del pedido. Dejalo en 0 si la entrega es gratis.",
+        "enabled": "Solo las formas activas aparecen al finalizar la compra."
+      }
+    },
+    "confirm": {
+      "toggle_enabled": {
+        "on_title": "¿Activar esta forma de entrega?",
+        "on_desc": "«%{name}» aparecerá al finalizar la compra y los clientes podrán elegirla.",
+        "on_cta": "Activar",
+        "off_title": "¿Desactivar esta forma de entrega?",
+        "off_desc": "«%{name}» dejará de aparecer al finalizar la compra. Los pedidos que ya la usaron no cambian.",
+        "off_cta": "Desactivar"
+      }
+    }
+  },
+  "fulfillment": {
+    "pickup": {
+      "title": "Recogida en tienda",
+      "subtitle": "Permitile al cliente buscar su pedido en un almacén.",
+      "toggle": "Permitir recoger pedidos en tienda",
+      "no_addresses": "La recogida está activa, pero ningún almacén activo tiene dirección de recogida configurada. El cliente no puede elegir nada.",
+      "confirm": {
+        "on_title": "¿Permitir recogida en tienda?",
+        "on_desc": "Los clientes podrán elegir buscar su pedido en un almacén con dirección de recogida configurada.",
+        "off_title": "¿Desactivar la recogida en tienda?",
+        "off_desc": "Si no hay ninguna forma de entrega activa, los clientes no podrán completar ningún pedido.",
+        "on_cta": "Activar",
+        "off_cta": "Desactivar"
+      }
+    },
+    "support_message": {
+      "label": "Mensaje cuando no se puede entregar ni recoger"
+    },
+    "saved": "Cambios guardados"
   }
 }

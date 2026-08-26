@@ -80,7 +80,7 @@ export function PaymentMethodsPage() {
         </h1>
         <p className="text-sm text-muted-foreground">
           {translate("payment-methods.subtitle", {
-            _: "Elegí qué pasarelas puede usar el cliente al finalizar la compra.",
+            _: "Elige qué pasarelas puede usar el cliente al finalizar la compra.",
           })}
         </p>
       </header>
