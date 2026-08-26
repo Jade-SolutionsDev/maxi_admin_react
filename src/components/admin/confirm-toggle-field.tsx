@@ -59,9 +59,11 @@ export const ConfirmToggleField = ({
   // Direction being confirmed. Falls back to the direction a click *would*
   // take, so the copy stays stable while the dialog animates closed.
   const dir: "on" | "off" = (nextValue ?? !checked) ? "on" : "off";
-  // Catalog rows carry `name`; users carry first/last name or an email.
+  // Catalog rows carry `name`, delivery options carry `label`; users carry
+  // first/last name or an email.
   const displayName =
     (record.name as string) ||
+    (record.label as string) ||
     [record.firstName, record.lastName].filter(Boolean).join(" ") ||
     (record.email as string) ||
     "";

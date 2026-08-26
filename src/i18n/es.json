@@ -807,7 +807,11 @@
     "cancellationReason": {
       "payment_not_received": "Cancelado automáticamente: no se recibió el pago a tiempo y se liberó el stock.",
       "paid_after_expiry_out_of_stock": "Pagado fuera de plazo y sin stock disponible: no se puede servir.",
-      "refundHint": "Contactá al cliente y reembolsá este pedido."
+      "refundHint": "Contacta al cliente y reembolsá este pedido."
+    },
+    "fulfillment": {
+      "pickup": "Recogida en tienda",
+      "between": "Entre"
     }
   },
   "clients": {
@@ -936,7 +940,7 @@
     "hints": {
       "blurb": "Párrafo bajo el logo del pie de página.",
       "copyright": "Línea inferior del pie de página.",
-      "legalLinks": "Elegí una página activa (Contenido → Páginas); el enlace usa su slug.",
+      "legalLinks": "Elige una página activa (Contenido → Páginas); el enlace usa su slug.",
       "email": "Correo de contacto mostrado en el pie y en Contacto.",
       "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
     },
@@ -946,7 +950,7 @@
   },
   "payment-methods": {
     "title": "Métodos de pago",
-    "subtitle": "Elegí qué pasarelas puede usar el cliente al finalizar la compra.",
+    "subtitle": "Elige qué pasarelas puede usar el cliente al finalizar la compra.",
     "not_configured": "Sin credenciales",
     "not_configured_hint": "Configurá las credenciales en el servidor para poder activarla.",
     "toggle": "Activar método",
@@ -994,7 +998,9 @@
         "on_title": "¿Permitir recogida en tienda?",
         "on_desc": "Los clientes podrán elegir buscar su pedido en un almacén con dirección de recogida configurada.",
         "off_title": "¿Desactivar la recogida en tienda?",
-        "off_desc": "Si no hay ninguna forma de entrega activa, los clientes no podrán completar ningún pedido."
+        "off_desc": "Si no hay ninguna forma de entrega activa, los clientes no podrán completar ningún pedido.",
+        "on_cta": "Activar",
+        "off_cta": "Desactivar"
       }
     },
     "support_message": {

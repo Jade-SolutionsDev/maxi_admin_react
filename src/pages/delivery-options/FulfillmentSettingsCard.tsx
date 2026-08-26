@@ -134,7 +134,10 @@ export function FulfillmentSettingsCard() {
                   setPendingPickup(null);
                 }}
               >
-                {translate("shared.actions.confirm", { _: "Confirm" })}
+                {translate(
+                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_cta`,
+                  { _: translate("shared.actions.confirm_action", { _: "Confirm" }) },
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

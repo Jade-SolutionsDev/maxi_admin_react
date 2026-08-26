@@ -808,6 +808,10 @@
       "payment_not_received": "Cancelled automatically: payment was not received in time and the stock was released.",
       "paid_after_expiry_out_of_stock": "Paid after expiring, with no stock left: it cannot be fulfilled.",
       "refundHint": "Contact the customer and refund this order."
+    },
+    "fulfillment": {
+      "pickup": "Pickup in store",
+      "between": "Between"
     }
   },
   "clients": {
@@ -994,7 +998,9 @@
         "on_title": "Allow pickup in store?",
         "on_desc": "Customers will be able to collect their order at a storage that has a pickup address.",
         "off_title": "Disable pickup in store?",
-        "off_desc": "With no delivery option enabled, customers will not be able to complete any order."
+        "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
+        "on_cta": "Enable",
+        "off_cta": "Disable"
       }
     },
     "support_message": {
