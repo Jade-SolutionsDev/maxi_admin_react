@@ -93,7 +93,17 @@ export function ResourceFormModal({
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       {/* p-0 gap-0 cancels DialogContent's built-in grid/padding; the
           flex + h-[85vh] chain is what makes the body (not the page) scroll. */}
-      <DialogContent className="flex flex-col w-full sm:max-w-3xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden">
+      <DialogContent
+        className="flex flex-col w-full sm:max-w-3xl h-[85vh] sm:h-auto sm:max-h-[85vh] p-0 gap-0 overflow-hidden"
+        /**
+         * Un clic fuera no cierra un formulario a medio escribir. Aquí dentro
+         * hay hasta doce campos y una imagen; perderlos por rozar el fondo es
+         * un accidente caro, y no había forma de recuperarlos. Se cierra por
+         * «Cancelar» o por la equis, que son decisiones, no resbalones.
+         */
+        onPointerDownOutside={(evento) => evento.preventDefault()}
+        onInteractOutside={(evento) => evento.preventDefault()}
+      >
         {mode === "edit" ? (
           <EditBase
             id={id}
