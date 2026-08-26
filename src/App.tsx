@@ -50,6 +50,16 @@ import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
 import { CmsServiceDetailModal } from "./pages/cms-services/CmsServiceDetailModal";
 import { CmsSettingsPage } from "./pages/cms-settings/CmsSettingsPage";
 import { PaymentMethodsPage } from "./pages/payment-methods/PaymentMethodsPage";
+import ContactMessagesList from "./pages/contact-messages/ContactMessagesList";
+import ContactMessageDetailPage from "./pages/contact-messages/ContactMessageDetailPage";
+import { ContactTemplatesLayout } from "./pages/contact-templates/ContactTemplatesLayout";
+import ContactTemplateCreate from "./pages/contact-templates/ContactTemplateCreate";
+import ContactTemplateEdit from "./pages/contact-templates/ContactTemplateEdit";
+import { ContactTemplateDetailModal } from "./pages/contact-templates/ContactTemplateDetailModal";
+import { NomenclatorsLayout } from "./pages/nomenclators/NomenclatorsLayout";
+import NomenclatorCreate from "./pages/nomenclators/NomenclatorCreate";
+import NomenclatorEdit from "./pages/nomenclators/NomenclatorEdit";
+import { NomenclatorDetailModal } from "./pages/nomenclators/NomenclatorDetailModal";
 import { CmsStaffLayout } from "./pages/cms-staff/CmsStaffLayout";
 import CmsStaffCreate from "./pages/cms-staff/CmsStaffCreate";
 import CmsStaffEdit from "./pages/cms-staff/CmsStaffEdit";
@@ -205,6 +215,46 @@ const AdminApp = () => (
           </RequireAccess>
         }
       />
+      <Route
+        path="/contact-messages"
+        element={
+          <RequireAccess resource="contact-messages">
+            <ContactMessagesList />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/contact-messages/:id"
+        element={
+          <RequireAccess resource="contact-messages" action="read">
+            <ContactMessageDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/contact-templates/*"
+        element={
+          <RequireAccess resource="contact-templates">
+            <ContactTemplatesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<ContactTemplateCreate />} />
+        <Route path="edit/:id" element={<ContactTemplateEdit />} />
+        <Route path=":id" element={<ContactTemplateDetailModal />} />
+      </Route>
+      <Route
+        path="/nomenclators/*"
+        element={
+          <RequireAccess resource="nomenclators">
+            <NomenclatorsLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<NomenclatorCreate />} />
+        <Route path="edit/:id" element={<NomenclatorEdit />} />
+        <Route path=":id" element={<NomenclatorDetailModal />} />
+      </Route>
       <Route
         path="/orders"
         element={

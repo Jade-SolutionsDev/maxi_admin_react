@@ -14,6 +14,9 @@ import {
   User,
   PanelsTopLeft,
   CreditCard,
+  Inbox,
+  ListTree,
+  NotebookPen,
 } from "lucide-react";
 import Logo from "@/assets/maxi_habana_logo.png";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
@@ -170,6 +173,30 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    labelKey: "app.menu.group.soporte",
+    items: [
+      {
+        labelKey: "app.menu.contactoMensajes",
+        icon: <Inbox size={20} />,
+        path: "/contact-messages",
+        activePrefix: "/contact-messages",
+        resource: "contact-messages",
+      },
+      {
+        labelKey: "app.menu.contactoPlantillas",
+        icon: <NotebookPen size={20} />,
+        path: "/contact-templates",
+        resource: "contact-templates",
+      },
+      {
+        labelKey: "app.menu.nomencladores",
+        icon: <ListTree size={20} />,
+        path: "/nomenclators",
+        resource: "nomenclators",
+      },
+    ],
+  },
+  {
     labelKey: "app.menu.group.sistema",
     items: [
       {
@@ -294,12 +321,33 @@ function SidebarBadgeFeeders() {
   return (
     <>
       <UsersAwaitingBadge />
+      <ContactMessagesBadge />
       {/* Follow-up: cancelled/unattended orders once that resource returns a real total. */}
     </>
   );
 }
 
 /** Number of users still awaiting approval → badge on "Usuarios". */
+function ContactMessagesBadge() {
+  const setBadge = useSetSidebarBadge();
+  const { canAccess } = useCanAccess({
+    resource: "contact-messages",
+    action: "list",
+  });
+  const { total } = useGetList(
+    "contact-messages",
+    {
+      filter: { status: "nuevo" },
+      pagination: { page: 1, perPage: 1 },
+    },
+    { enabled: !!canAccess },
+  );
+  useEffect(() => {
+    setBadge("app.menu.contactoMensajes", canAccess ? (total ?? null) : null);
+  }, [setBadge, canAccess, total]);
+  return null;
+}
+
 function UsersAwaitingBadge() {
   const setBadge = useSetSidebarBadge();
   const { canAccess } = useCanAccess({ resource: "users", action: "list" });
