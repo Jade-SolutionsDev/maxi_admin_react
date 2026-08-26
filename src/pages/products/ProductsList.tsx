@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { OnlyEnabledFilter } from "@/components/admin/only-enabled-filter";
 import { useCanAccess, useTranslate, type RaRecord } from "ra-core";
 import { ImageOff } from "lucide-react";
@@ -30,6 +32,42 @@ const BOOL_CHOICES = [
   { id: "false", name: "shared.filters.no" },
 ];
 
+/**
+ * Las categorías del departamento elegido, no todas.
+ *
+ * Con los dos filtros sueltos se podía pedir un departamento y una categoría
+ * que no le pertenece, y el listado salía vacío sin explicar por qué. Al
+ * cambiar de departamento se suelta la categoría anterior, que ya no aplica.
+ */
+const CategoryFilter = (_props: { source?: string; alwaysOn?: boolean }) => {
+  const { setValue } = useFormContext();
+  const departmentId = useWatch({ name: "departmentId" });
+  const anterior = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (anterior.current !== undefined && anterior.current !== departmentId) {
+      setValue("categoryId", undefined);
+    }
+    anterior.current = departmentId;
+  }, [departmentId, setValue]);
+
+  return (
+    <ReferenceInput
+      source="categoryId"
+      reference="categories"
+      label="resources.categories.name"
+      filter={departmentId ? { departmentId } : {}}
+      alwaysOn
+    >
+      <SelectInput
+        className="min-w-64"
+        optionText="name"
+        label="resources.categories.name"
+      />
+    </ReferenceInput>
+  );
+};
+
 const productFilters = [
   <SearchInput source="q" alwaysOn />,
   <ReferenceInput
@@ -44,18 +82,7 @@ const productFilters = [
       label="resources.departments.name"
     />
   </ReferenceInput>,
-  <ReferenceInput
-    source="categoryId"
-    reference="categories"
-    label="resources.categories.name"
-    alwaysOn
-  >
-    <SelectInput
-      className="min-w-64"
-      optionText="name"
-      label="resources.categories.name"
-    />
-  </ReferenceInput>,
+  <CategoryFilter source="categoryId" alwaysOn />,
   <NumberInput source="minPrice" label="list.fields.minPrice" min={0} />,
   <NumberInput source="maxPrice" label="list.fields.maxPrice" min={0} />,
   <SelectInput
