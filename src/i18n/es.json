@@ -114,7 +114,7 @@
       "firstName": "Nombre",
       "lastName": "Apellidos",
       "defaultMunicipality": "Municipio predeterminado",
-      "isActive": "Activo",
+      "isActive": "Estado",
       "onboardingStatus": "Estado de incorporación",
       "name": "Nombre",
       "email": "Correo",
@@ -129,7 +129,7 @@
       "actions": "Acciones",
       "description": "Descripción",
       "sortOrder": "Orden",
-      "slug": "Slug",
+      "slug": "Enlace",
       "provider": "Proveedor",
       "imageDesktop": "Imagen (escritorio)",
       "imageMobile": "Imagen (móvil)",
@@ -333,7 +333,9 @@
     },
     "filters": {
       "yes": "Sí",
-      "no": "No"
+      "no": "No",
+      "all": "Todos",
+      "only_enabled": "Solo habilitados"
     },
     "status": {
       "active": "Activo",
@@ -553,7 +555,8 @@
     },
     "stock": {
       "empty_title": "Sin existencias",
-      "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."
+      "empty_hint": "Este producto no tiene existencias registradas en ningún almacén.",
+      "total": "Existencia total"
     },
     "form": {
       "create_subtitle": "Completa la información para crear un nuevo producto.",
@@ -1106,5 +1109,10 @@
       "label": "Mensaje cuando no se puede entregar ni recoger"
     },
     "saved": "Cambios guardados"
+  },
+  "ra": {
+    "action": {
+      "reset": "Restablecer"
+    }
   }
 }

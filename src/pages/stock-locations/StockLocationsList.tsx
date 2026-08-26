@@ -1,3 +1,4 @@
+import { OnlyEnabledFilter } from "@/components/admin/only-enabled-filter";
 import { useState } from "react";
 import {
   ResourceContextProvider,
@@ -15,24 +16,13 @@ import {
   RefreshButton,
   RowNumberField,
   SearchInput,
-  SelectInput,
 } from "@/components/admin";
 import { Button } from "@/components/ui/button";
 import { StockLocationCreateModal } from "./StockLocationCreateModal";
 
-const BOOL_CHOICES = [
-  { id: "true", name: "shared.filters.yes" },
-  { id: "false", name: "shared.filters.no" },
-];
-
 const almacenFilters = [
   <SearchInput source="q" alwaysOn />,
-  <SelectInput
-    source="isActive"
-    label="list.fields.isActive"
-    choices={BOOL_CHOICES}
-    alwaysOn
-  />,
+  <OnlyEnabledFilter source="isActive" alwaysOn />,
 ];
 
 const CoverageSummary = (record: RaRecord) => {

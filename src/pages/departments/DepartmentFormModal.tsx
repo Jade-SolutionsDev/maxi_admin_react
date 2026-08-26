@@ -150,7 +150,6 @@ function DepartmentFormFields({ mode }: { mode: "create" | "edit" }) {
                 </span>
               }
               recommendedSize="600 x 1000"
-              validate={required()}
             />
           </div>
         </div>

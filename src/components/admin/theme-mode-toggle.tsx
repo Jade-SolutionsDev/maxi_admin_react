@@ -1,3 +1,4 @@
+import { useTranslate } from "ra-core";
 import { Check, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,7 @@ import { useTheme } from "@/components/admin/use-theme";
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/thememodetoggle ThemeModeToggle documentation}
  */
 export function ThemeModeToggle() {
+  const translate = useTranslate();
   const { theme, setTheme } = useTheme();
 
   return (
@@ -26,7 +28,7 @@ export function ThemeModeToggle() {
         <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only">{translate("app.theme.toggle", { _: "Cambiar tema" })}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

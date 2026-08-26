@@ -296,6 +296,18 @@ export const SelectInput = (props: SelectInputProps) => {
               ) : null}
             </SelectTrigger>
             <SelectContent>
+              {finalChoices?.length === 0 && !isPending ? (
+                /**
+                 * Un desplegable vacío no explica nada: se abría del tamaño de
+                 * un botón y se cerraba igual. Con las categorías de un
+                 * departamento sin ninguna, parecía que la pantalla fallaba.
+                 */
+                <p className="px-2 py-3 text-center text-sm text-muted-foreground">
+                  {translate("ra.navigation.no_results", {
+                    _: "No hay opciones disponibles",
+                  })}
+                </p>
+              ) : null}
               {finalChoices?.map((choice) => {
                 if (!choice) return null;
                 const value = getChoiceValue(choice);
