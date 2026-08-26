@@ -24,6 +24,10 @@ Característica: Los listados de la administración
     Entonces se le dice que no hay resultados
     Y puede limpiar los filtros
 
+  Escenario: El listado dice a qué departamento pertenece cada producto
+    Cuando abre el listado de "productos"
+    Entonces la fila del producto muestra su departamento y su categoría
+
   Escenario: Los nombres de las columnas tienen todos el mismo tamaño
     Cuando abre el listado de "productos"
     Entonces todas las cabeceras tienen el mismo tamaño de letra

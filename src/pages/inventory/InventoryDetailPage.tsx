@@ -100,7 +100,7 @@ function StorageBreakdown({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-4 text-sm tabular-nums">
-            <span title={translate("list.fields.real", { _: "Real" })}>
+            <span title={translate("list.fields.real", { _: "Existencia" })}>
               {r.quantity} {measureUnit}
             </span>
             <span
@@ -210,7 +210,7 @@ export default function InventoryDetailPage() {
       {/* Totals */}
       <div className="mb-6 grid grid-cols-3 gap-3">
         <StatTile
-          label={translate("list.fields.real", { _: "Real" })}
+          label={translate("list.fields.real", { _: "Existencia" })}
           value={totals.real}
         />
         <StatTile

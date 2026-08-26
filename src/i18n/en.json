@@ -148,7 +148,7 @@
       "productsCount": "Products",
       "minStock": "Min stock",
       "maxStock": "Max stock",
-      "real": "Real",
+      "real": "On hand",
       "reserved": "Reserved",
       "available": "Available",
       "storages": "Storages",

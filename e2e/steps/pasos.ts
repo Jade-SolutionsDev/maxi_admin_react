@@ -125,3 +125,13 @@ async function esperarLaTabla(page: Page) {
     .catch(() => undefined);
   await page.waitForTimeout(1200);
 }
+
+Then(
+  'la fila del producto muestra su departamento y su categoría',
+  async ({ page }) => {
+    // `tbody tr`, no `getByRole('row')`: esta tabla no expone el rol de fila.
+    const fila = page.locator('tbody tr').filter({ hasText: 'Melocotón en Almíbar' }).first();
+    await expect(fila).toContainText('Alimentación');
+    await expect(fila).toContainText('Almíbar y conservas');
+  },
+);
