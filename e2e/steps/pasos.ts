@@ -135,3 +135,26 @@ Then(
     await expect(fila).toContainText('Almíbar y conservas');
   },
 );
+
+Then(
+  'el menú muestra los grupos {string}, {string} e {string}',
+  async ({ page }, uno: string, dos: string, tres: string) => {
+    const menu = page.getByRole('navigation').first().or(page.locator('[data-slot=sidebar]'));
+    for (const grupo of [uno, dos, tres]) {
+      await expect(menu.getByText(grupo, { exact: true }).first()).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+  },
+);
+
+Then(
+  'puede llegar a {string}, {string} y {string} desde el menú',
+  async ({ page }, uno: string, dos: string, tres: string) => {
+    for (const modulo of [uno, dos, tres]) {
+      await expect(
+        page.getByRole('button', { name: modulo, exact: true }).first(),
+      ).toBeVisible({ timeout: 15_000 });
+    }
+  },
+);
