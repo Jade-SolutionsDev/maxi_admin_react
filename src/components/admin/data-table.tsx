@@ -27,12 +27,12 @@ import {
   useTranslate,
   useTranslateLabel,
   useNavigate,
+  useListContext,
 } from "ra-core";
-import { ArrowDownAZ, ArrowUpZA } from "lucide-react";
+import { ArrowDownAZ, ArrowUpZA, SearchX } from "lucide-react";
 import get from "lodash/get";
 import { cn } from "@/lib/utils";
 import { DataTableSkeleton } from "./data-table-skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -303,11 +303,52 @@ const DataTableRow = ({
 const isPromise = (value: any): value is Promise<any> =>
   value && typeof value.then === "function";
 
+/**
+ * Dos vacíos que no son el mismo: una lista sin nada todavía y una búsqueda que
+ * no encontró. Antes ambos decían «No results found.» dentro de una alerta
+ * pequeña, en inglés y sin salida — quien filtraba mal no tenía forma de volver.
+ */
 const DataTableEmpty = () => {
+  const translate = useTranslate();
+  const { filterValues, setFilters } = useListContext();
+
+  const filtros = filterValues ?? {};
+  const buscando = Object.values(filtros).some(
+    (valor) => valor !== undefined && valor !== null && valor !== "",
+  );
+
   return (
-    <Alert>
-      <AlertDescription>No results found.</AlertDescription>
-    </Alert>
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-12 text-center">
+      <SearchX className="mb-3 h-9 w-9 text-muted-foreground" />
+      <p className="font-medium text-foreground">
+        {buscando
+          ? translate("ra.navigation.no_filtered_results", {
+              _: "Sin resultados",
+            })
+          : translate("ra.navigation.no_results", {
+              _: "Todavía no hay nada aquí",
+            })}
+      </p>
+      <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+        {buscando
+          ? translate("ra.navigation.no_filtered_results_hint", {
+              _: "No encontramos nada que coincida. Prueba con otras palabras o quita algún filtro.",
+            })
+          : translate("ra.navigation.no_results_hint", {
+              _: "Cuando se cree el primer registro, aparecerá en esta lista.",
+            })}
+      </p>
+      {buscando && setFilters ? (
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          onClick={() => setFilters({}, [])}
+        >
+          {translate("ra.action.clear_input_value", { _: "Limpiar filtros" })}
+        </Button>
+      ) : null}
+    </div>
   );
 };
 
@@ -436,7 +477,15 @@ function DataTableHeadCell<
           </Tooltip>
         </TooltipProvider>
       ) : (
-        <FieldTitle label={label} source={source} resource={resource} />
+        /**
+         * El mismo trato tipográfico que la cabecera ordenable, que va dentro
+         * de un botón `uppercase tracking-wider`. Sin esto, en una misma tabla
+         * convivían cabeceras en mayúsculas y cabeceras en texto llano, y no se
+         * leían como la misma fila.
+         */
+        <span className="inline-flex h-7 items-center px-2.5 text-[0.8rem] font-medium uppercase tracking-wider">
+          <FieldTitle label={label} source={source} resource={resource} />
+        </span>
       )}
     </TableHead>
   );

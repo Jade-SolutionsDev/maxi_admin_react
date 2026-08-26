@@ -102,7 +102,7 @@
       "firstName": "First Name",
       "lastName": "Last Name",
       "defaultMunicipality": "Default Municipality",
-      "isActive": "Is Active",
+      "isActive": "Status",
       "onboardingStatus": "Onboarding Status",
       "name": "Name",
       "email": "Email",
@@ -537,7 +537,8 @@
     },
     "stock": {
       "empty_title": "No stock",
-      "empty_hint": "This product has no stock recorded in any storage."
+      "empty_hint": "This product has no stock recorded in any storage.",
+      "total": "Total stock"
     },
     "form": {
       "create_subtitle": "Fill in the information to create a new product.",

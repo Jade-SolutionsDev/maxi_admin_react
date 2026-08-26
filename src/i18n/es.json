@@ -102,7 +102,7 @@
       "firstName": "Nombre",
       "lastName": "Apellidos",
       "defaultMunicipality": "Municipio predeterminado",
-      "isActive": "Activo",
+      "isActive": "Estado",
       "onboardingStatus": "Estado de incorporación",
       "name": "Nombre",
       "email": "Correo",
@@ -537,7 +537,8 @@
     },
     "stock": {
       "empty_title": "Sin existencias",
-      "empty_hint": "Este producto no tiene existencias registradas en ningún almacén."
+      "empty_hint": "Este producto no tiene existencias registradas en ningún almacén.",
+      "total": "Existencia total"
     },
     "form": {
       "create_subtitle": "Completa la información para crear un nuevo producto.",

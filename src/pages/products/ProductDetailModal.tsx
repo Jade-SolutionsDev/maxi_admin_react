@@ -92,6 +92,16 @@ function StockByStorageTab({
     );
   }
   return (
+    <>
+      <div className="mb-3 flex items-baseline justify-between rounded-lg border border-border bg-muted/40 px-4 py-3">
+        <span className="text-sm font-medium text-muted-foreground">
+          {translate("products.stock.total", { _: "Existencia total" })}
+        </span>
+        <span className="text-lg font-semibold tabular-nums text-foreground">
+          {rows.reduce((suma, fila) => suma + Number(fila.quantity ?? 0), 0)}{" "}
+          {measureUnit}
+        </span>
+      </div>
     <ul className="divide-y divide-border rounded-lg border border-border">
       {rows.map((r) => (
         <li
@@ -117,6 +127,7 @@ function StockByStorageTab({
         </li>
       ))}
     </ul>
+    </>
   );
 }
 
@@ -387,6 +398,12 @@ export function ProductDetailModal() {
                     icon={<CalendarDays />}
                   >
                     <DateField source="createdAt" showTime />
+                  </DetailField>
+                  <DetailField
+                    label={translate("list.fields.updatedAt")}
+                    icon={<CalendarDays />}
+                  >
+                    <DateField source="updatedAt" showTime />
                   </DetailField>
                 </div>
               </FormSection>

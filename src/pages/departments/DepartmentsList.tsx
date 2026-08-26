@@ -44,7 +44,7 @@ export default function DepartmentsList() {
         hasBulkActions={false}
         rowClick={(id) => `/departments/${id}`}
         rowClassName={() => "[&>td]:py-4"}
-        hiddenColumns={["id", "parentId", "deletedAt", "updatedAt", "slug"]}
+        hiddenColumns={["id", "parentId", "deletedAt", "slug"]}
       >
         <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
           <RowNumberField />
@@ -89,7 +89,7 @@ export default function DepartmentsList() {
           <DateField source="createdAt" />
         </DataTable.Col>
         <DataTable.Col label="list.fields.updatedAt" source="updatedAt">
-          <DateField source="updatedAt" />
+          <DateField source="updatedAt" showTime />
         </DataTable.Col>
       </DataTable>
     </List>
