@@ -1,3 +1,4 @@
+import { useTranslate } from "ra-core";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
@@ -21,9 +22,10 @@ function LayoutContent({ children }: LayoutProps) {
   const location = useLocation();
   const { toggleSidebar } = useSidebar();
 
+  const translate = useTranslate();
   const pageInfo = pageTitles[location.pathname] || {
-    title: "Dashboard",
-    breadcrumb: "Inicio",
+    title: translate("app.menu.panel", { _: "Panel" }),
+    breadcrumb: translate("app.menu.home", { _: "Inicio" }),
   };
 
   return (
