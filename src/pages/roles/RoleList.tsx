@@ -185,7 +185,7 @@ const RoleDeleteButton = () => {
             className={cn(buttonVariants({ variant: "destructive" }))}
           >
             {isPending
-              ? translate("ra.action.loading", { _: "Deleting…" })
+              ? translate("shared.actions.deleting")
               : translate("shared.actions.confirm", { _: "Delete" })}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -52,7 +52,7 @@ export const ClientList = () => {
         <DataTable.Col label="#" disableSort cellClassName="w-10 text-center">
           <RowNumberField />
         </DataTable.Col>
-        <DataTable.Col source="id">
+        <DataTable.Col source="id" label="list.fields.id">
           <BadgeField source="id" variant="default" truncate />
         </DataTable.Col>
         <DataTable.Col
