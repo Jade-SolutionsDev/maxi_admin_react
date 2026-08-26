@@ -1072,7 +1072,7 @@
     "form": {
       "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
       "hints": {
-        "fee": "Se suma al total del pedido. Dejalo en 0 si la entrega es gratis.",
+        "fee": "Se suma al total del pedido. Déjalo en 0 si la entrega es gratis.",
         "enabled": "Solo las formas activas aparecen al finalizar la compra."
       }
     },
@@ -1090,7 +1090,7 @@
   "fulfillment": {
     "pickup": {
       "title": "Recogida en tienda",
-      "subtitle": "Permitile al cliente buscar su pedido en un almacén.",
+      "subtitle": "Permítele al cliente buscar su pedido en un almacén.",
       "toggle": "Permitir recoger pedidos en tienda",
       "no_addresses": "La recogida está activa, pero ningún almacén activo tiene dirección de recogida configurada. El cliente no puede elegir nada.",
       "confirm": {
