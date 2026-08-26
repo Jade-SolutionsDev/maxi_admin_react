@@ -19,7 +19,7 @@ const sanitizeDeliveryOption = (data: Record<string, unknown>) => ({
   label: data.label,
   description: data.description ?? null,
   fee: Number(data.fee ?? 0),
-  sortOrder: data.sortOrder ?? 0,
+  sortOrder: Number(data.sortOrder ?? 0),
   enabled: data.enabled ?? false,
   zones: coverageToZones(
     (data.coverage ?? []) as Parameters<typeof coverageToZones>[0],
