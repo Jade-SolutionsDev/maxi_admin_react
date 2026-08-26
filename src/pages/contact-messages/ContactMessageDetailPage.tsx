@@ -63,6 +63,12 @@ export default function ContactMessageDetailPage() {
     sort: { field: "sortOrder", order: "ASC" },
   });
 
+  const { data: motives } = useGetList("contact-motives", {
+    filter: { category: "contact-motive" },
+    pagination: { page: 1, perPage: 100 },
+    sort: { field: "sortOrder", order: "ASC" },
+  });
+
   const { data: config } = useQuery({
     queryKey: ["contact-config"],
     queryFn: () => dataProvider.getContactConfig(),
@@ -78,6 +84,11 @@ export default function ContactMessageDetailPage() {
     () => (templates ?? []).filter((t) => t.isActive !== false),
     [templates],
   );
+
+  const motiveLabel = (motiveId: unknown) =>
+    (motives ?? []).find((m) => m.id === motiveId)?.label as
+      | string
+      | undefined;
 
   const onTemplateChange = (value: string) => {
     setTemplateId(value);
@@ -211,7 +222,10 @@ export default function ContactMessageDetailPage() {
                 </option>
                 {activeTemplates.map((template) => (
                   <option key={template.id} value={template.id}>
-                    {template.title as string}
+                    {`${template.title as string} — ${
+                      motiveLabel(template.motiveId) ??
+                      translate("contact-templates.any_motive")
+                    }`}
                   </option>
                 ))}
               </select>
