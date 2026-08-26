@@ -315,7 +315,10 @@
         "off_desc": "“%{name}” will stop showing among the featured items.",
         "off_cta": "Remove"
       },
-      "save_changes": "Save changes"
+      "save_changes": "Save changes",
+      "create": "Create",
+      "saving": "Saving…",
+      "deleting": "Deleting…"
     },
     "upload": {
       "choose": "Upload image",
@@ -351,6 +354,7 @@
   "app": {
     "menu": {
       "panel": "Dashboard",
+      "home": "Home",
       "pedidos": "Orders",
       "productos": "Products",
       "departamentos": "Departments",
@@ -387,6 +391,9 @@
     },
     "user": {
       "profile": "Profile"
+    },
+    "theme": {
+      "toggle": "Toggle theme"
     }
   },
   "profile": {
@@ -1112,7 +1119,20 @@
   },
   "ra": {
     "action": {
-      "reset": "Reset"
+      "reset": "Reset",
+      "clear_search": "Clear search",
+      "search_columns": "Search columns"
+    },
+    "navigation": {
+      "breadcrumb_drawer_title": "Navigate to",
+      "breadcrumb_drawer_instructions": "Select a page to navigate to.",
+      "no_filtered_results": "No results",
+      "no_filtered_results_hint": "Nothing matched your search. Try other words or remove a filter.",
+      "no_results_hint": "Once the first record is created, it will show up in this list.",
+      "toggle_menu": "Toggle menu",
+      "sidebar_title": "Sidebar",
+      "sidebar_description": "Displays the mobile navigation menu.",
+      "toggle_sidebar": "Toggle sidebar"
     }
   }
 }

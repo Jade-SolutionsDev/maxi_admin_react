@@ -64,7 +64,7 @@ export function DeliveryOptionsPage() {
             <Button asChild size="sm">
               <Link to="/delivery-options/create">
                 <Plus className="mr-1 size-4" aria-hidden="true" />
-                {translate("shared.actions.create", { _: "Create" })}
+                {translate("shared.actions.create")}
               </Link>
             </Button>
           </header>

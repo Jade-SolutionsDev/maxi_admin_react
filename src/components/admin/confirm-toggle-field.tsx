@@ -125,7 +125,7 @@ export const ConfirmToggleField = ({
             className={cn(buttonVariants())}
           >
             {isPending
-              ? translate("ra.action.loading", { _: "Saving…" })
+              ? translate("shared.actions.saving")
               : translate(`${confirmKey}.${dir}_cta`, {
                   _: translate("shared.actions.confirm_action", {
                     _: "Confirm",

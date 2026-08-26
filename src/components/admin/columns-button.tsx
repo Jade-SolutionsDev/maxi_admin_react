@@ -181,9 +181,7 @@ export const ColumnsSelector = ({ children }: ColumnsSelectorProps) => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setColumnFilter(e.target.value);
             }}
-            placeholder={translate("ra.action.search_columns", {
-              _: "Search columns",
-            })}
+            placeholder={translate("ra.action.search_columns")}
             className="pr-8"
           />
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -191,7 +189,7 @@ export const ColumnsSelector = ({ children }: ColumnsSelectorProps) => {
             <button
               onClick={() => setColumnFilter("")}
               className="absolute right-8 top-2 h-4 w-4 text-muted-foreground"
-              aria-label="Clear"
+              aria-label={translate("ra.action.clear_search")}
             >
               ×
             </button>

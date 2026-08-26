@@ -75,9 +75,7 @@ export const SearchInput = (inProps: SearchInputProps) => {
            * perdía — «la mayoría de los intentos los ignora», decía QA.
            */
           className="absolute right-7 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-full p-0 text-muted-foreground"
-          aria-label={translate("ra.action.clear_search", {
-            _: "Clear search",
-          })}
+          aria-label={translate("ra.action.clear_search")}
         >
           <X className="h-4 w-4" />
         </Button>
