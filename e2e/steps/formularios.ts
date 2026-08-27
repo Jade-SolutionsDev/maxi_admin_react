@@ -73,6 +73,14 @@ When('abre el formulario de nueva categoría', async ({ page }) => {
  * Por el texto de la etiqueta, no por una clase: el asterisco lo pone el
  * marcador de obligatorio y lo que se reportó es que **no se ve**.
  */
+When('abre el formulario de nuevo departamento', async ({ page }) => {
+  await page.goto(`${ADMIN}/departments/create`);
+  await page
+    .locator('input[name="name"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30_000 });
+});
+
 Then('la etiqueta {string} lleva asterisco', async ({ page }, texto: string) => {
   const etiqueta = page.locator('label').filter({ hasText: texto }).first();
   await expect(etiqueta).toBeVisible({ timeout: 20_000 });

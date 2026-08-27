@@ -39,6 +39,11 @@ Característica: Los formularios de la administración
     Cuando abre el formulario de nueva categoría
     Entonces la etiqueta "Imagen (escritorio)" lleva asterisco
 
+  # El mismo defecto estaba en tres formularios y solo se reportó uno.
+  Escenario: Y la de un departamento también
+    Cuando abre el formulario de nuevo departamento
+    Entonces la etiqueta "Imagen (escritorio)" lleva asterisco
+
   Escenario: El descuento nace vacío, igual que el precio base
     Cuando abre el formulario de nuevo producto
     Entonces el descuento está vacío
