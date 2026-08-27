@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { FormError, FormField, FormLabel } from "@/components/admin/form";
-import { useInput, FieldTitle } from "ra-core";
+import { useInput } from "ra-core";
 import { InputHelperText } from "./input-helper-text";
+import { FieldLabel } from "@/components/admin/field-label";
 
 /**
  * Toggle switch for boolean (true/false) values.
@@ -85,7 +86,7 @@ export const BooleanInput = (props: BooleanInputProps) => {
           disabled={disabled || readOnly}
         />
         <FormLabel htmlFor={id}>
-          <FieldTitle
+          <FieldLabel
             label={label}
             source={source}
             resource={resource}
