@@ -321,7 +321,8 @@
       "save_changes": "Guardar cambios",
       "create": "Crear",
       "saving": "Guardando…",
-      "deleting": "Eliminando…"
+      "deleting": "Eliminando…",
+      "open_picker": "Abrir el selector"
     },
     "upload": {
       "choose": "Subir imagen",

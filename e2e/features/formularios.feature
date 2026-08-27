@@ -28,3 +28,32 @@ Característica: Los formularios de la administración
     Cuando abre el formulario de invitar usuario
     Y pulsa fuera del formulario
     Entonces el formulario de invitación sigue abierto
+
+  # Los cuatro de abajo nacen de defectos que se dieron por resueltos dos veces.
+  # Cada uno comprueba **lo que se reportó** —que la etiqueta lleva asterisco,
+  # que el campo nace vacío— y no la propiedad de al lado, que fue el error:
+  # había una prueba de que el descuento «se puede borrar» y el defecto era que
+  # venía escrito.
+
+  Escenario: La imagen obligatoria de una categoría lleva su asterisco
+    Cuando abre el formulario de nueva categoría
+    Entonces la etiqueta "Imagen (escritorio)" lleva asterisco
+
+  # El mismo defecto estaba en tres formularios y solo se reportó uno.
+  Escenario: Y la de un departamento también
+    Cuando abre el formulario de nuevo departamento
+    Entonces la etiqueta "Imagen (escritorio)" lleva asterisco
+
+  Escenario: El descuento nace vacío, igual que el precio base
+    Cuando abre el formulario de nuevo producto
+    Entonces el descuento está vacío
+    Y el precio base está vacío
+
+  Escenario: La unidad de medida nace sin elegir
+    Cuando abre el formulario de nuevo producto
+    Entonces la unidad de medida está vacía
+
+  Escenario: El icono del calendario responde
+    Cuando abre el formulario de nuevo producto
+    Entonces el icono de la fecha es un botón
+    Y al pulsarlo, el campo de fecha queda enfocado

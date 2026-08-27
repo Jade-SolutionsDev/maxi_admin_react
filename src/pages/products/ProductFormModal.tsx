@@ -191,12 +191,14 @@ function ProductFormFields() {
             icon={<DollarSign />}
             helperText="products.form.hints.basePrice"
           />
+          {/* Sin valor inicial, como el precio base: un 0 escrito de antemano
+              hay que borrarlo antes de escribir, y lee como un dato puesto por
+              alguien. Vacío significa lo mismo — `sanitizeProduct` manda 0. */}
           <NumberInput
             source="discount"
             label={translate("list.fields.discount")}
             min={0}
             max={100}
-            defaultValue={0}
             icon={<Percent />}
             helperText="products.form.hints.discount"
           />
@@ -206,7 +208,6 @@ function ProductFormFields() {
             source="measureUnit"
             label={translate("list.fields.measureUnit")}
             choices={MEASURE_UNITS}
-            defaultValue="unidad"
             translateChoice={false}
             icon={<Ruler />}
           />

@@ -34,12 +34,12 @@ import {
   useGetRecordRepresentation,
   useInput,
   useTranslate,
-  FieldTitle,
   useEvent,
   useSupportCreateSuggestion,
 } from "ra-core";
 import { InputHelperText } from "./input-helper-text";
 import { PopoverProps } from "@radix-ui/react-popover";
+import { FieldLabel } from "@/components/admin/field-label";
 
 /**
  * Form control that lets users choose a value from a list using a dropdown with autocompletion.
@@ -212,7 +212,7 @@ export const AutocompleteInput = (
       <FormField className={props.className} id={id} name={field.name}>
         {props.label !== false && (
           <FormLabel id={uniqueId}>
-            <FieldTitle
+            <FieldLabel
               label={props.label}
               source={props.source ?? source}
               resource={resource}
