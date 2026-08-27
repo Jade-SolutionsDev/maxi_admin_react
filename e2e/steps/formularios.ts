@@ -58,3 +58,57 @@ const dialogoDeInvitacion = (page: import('@playwright/test').Page) =>
 Then('el formulario de invitación sigue abierto', async ({ page }) => {
   await expect(dialogoDeInvitacion(page)).toBeVisible();
 });
+
+// ---------------------------------------------- Defectos reportados dos veces
+
+When('abre el formulario de nueva categoría', async ({ page }) => {
+  await page.goto(`${ADMIN}/categories/create`);
+  await page
+    .locator('input[name="name"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30_000 });
+});
+
+/**
+ * Por el texto de la etiqueta, no por una clase: el asterisco lo pone el
+ * marcador de obligatorio y lo que se reportó es que **no se ve**.
+ */
+Then('la etiqueta {string} lleva asterisco', async ({ page }, texto: string) => {
+  const etiqueta = page.locator('label').filter({ hasText: texto }).first();
+  await expect(etiqueta).toBeVisible({ timeout: 20_000 });
+  await expect(etiqueta).toContainText('*');
+});
+
+Then('el descuento está vacío', async ({ page }) => {
+  await expect(page.locator(DESCUENTO).first()).toHaveValue('');
+});
+
+Then('el precio base está vacío', async ({ page }) => {
+  await expect(page.locator('input[name="basePrice"]').first()).toHaveValue('');
+});
+
+Then('la unidad de medida está vacía', async ({ page }) => {
+  // Es un desplegable: sin elegir, no muestra ninguna de las unidades.
+  const campo = page.getByRole('combobox', { name: /unidad de medida/i }).first();
+  await expect(campo).toBeVisible({ timeout: 20_000 });
+  await expect(campo).not.toContainText(/unidad|libra|kilogramo/i);
+});
+
+const iconoDeFecha = (page: import('@playwright/test').Page) =>
+  page.getByRole('button', { name: /abrir el selector/i }).first();
+
+Then('el icono de la fecha es un botón', async ({ page }) => {
+  await expect(iconoDeFecha(page)).toBeVisible({ timeout: 20_000 });
+});
+
+/**
+ * El calendario nativo no se puede observar desde el navegador de pruebas: lo
+ * pinta el sistema, fuera del DOM. Lo que sí se comprueba es que el icono dejó
+ * de ser decorativo y que el clic llega al campo, que es donde estaba el fallo.
+ */
+Then('al pulsarlo, el campo de fecha queda enfocado', async ({ page }) => {
+  await iconoDeFecha(page).click();
+  await expect(page.locator('input[name="expiryDate"]').first()).toBeFocused({
+    timeout: 15_000,
+  });
+});

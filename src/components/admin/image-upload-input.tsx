@@ -3,7 +3,6 @@ import type { InputProps } from "ra-core";
 import {
   useInput,
   useResourceContext,
-  FieldTitle,
   useNotify,
   useTranslate,
 } from "ra-core";
@@ -25,6 +24,7 @@ import {
 } from "@/lib/uploads";
 import type { UploadPrefix } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
+import { FieldLabel } from "@/components/admin/field-label";
 
 export type ImageUploadInputProps = InputProps & {
   className?: string;
@@ -101,7 +101,7 @@ export const ImageUploadInput = (props: ImageUploadInputProps) => {
     <FormField id={id} className={className} name={field.name}>
       {label !== false && (
         <FormLabel>
-          <FieldTitle
+          <FieldLabel
             label={label}
             source={source}
             resource={resource}
