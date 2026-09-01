@@ -329,9 +329,27 @@ function SidebarBadgeFeeders() {
     <>
       <UsersAwaitingBadge />
       <ContactMessagesBadge />
-      {/* Follow-up: cancelled/unattended orders once that resource returns a real total. */}
+      <OrdersNeedingTransferBadge />
     </>
   );
+}
+
+/** Pickup orders holding stock away from their counter → badge on "Pedidos". */
+function OrdersNeedingTransferBadge() {
+  const setBadge = useSetSidebarBadge();
+  const { canAccess } = useCanAccess({ resource: "orders", action: "list" });
+  const { total } = useGetList(
+    "orders",
+    {
+      filter: { needsTransfer: true },
+      pagination: { page: 1, perPage: 1 },
+    },
+    { enabled: !!canAccess },
+  );
+  useEffect(() => {
+    setBadge("app.menu.pedidos", canAccess ? (total ?? null) : null);
+  }, [setBadge, canAccess, total]);
+  return null;
 }
 
 /** Number of users still awaiting approval → badge on "Usuarios". */

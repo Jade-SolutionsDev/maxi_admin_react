@@ -93,6 +93,8 @@ interface OrderRecord {
   } | null;
   customerNotes: string | null;
   cancellationReason: CancellationReason | null;
+  needsTransfer?: boolean;
+  reservationStorages?: { locationId: string; locationName: string }[];
   items?: OrderItemRow[];
   payment?: OrderPayment | null;
   createdAt: string;
@@ -121,6 +123,16 @@ function DeliveryDetails({ order }: { order: OrderRecord }) {
         <dd className="pt-1">
           {translate("orders.fulfillment.pickup", { _: "Recogida en tienda" })}
         </dd>
+        {(order.reservationStorages?.length ?? 0) > 1 && (
+          <dd>
+            {translate("orders.transfer.storages", {
+              _: "Productos en: %{names}",
+              names: (order.reservationStorages ?? [])
+                .map((storage) => storage.locationName)
+                .join(", "),
+            })}
+          </dd>
+        )}
       </dl>
     ) : (
       <p className="text-sm text-muted-foreground">—</p>
@@ -190,6 +202,33 @@ function CancellationAlert({
             })}
           </p>
         )}
+      </div>
+    </div>
+  );
+}
+
+function TransferAlert({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  const pickupName = order.pickupAddress?.locationName ?? "";
+  const others = (order.reservationStorages ?? [])
+    .map((storage) => storage.locationName)
+    .filter((name) => name !== pickupName);
+  return (
+    <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
+      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      <div>
+        <p className="font-medium">
+          {translate("orders.transfer.title", {
+            _: "Este pedido necesita un traslado entre almacenes",
+          })}
+        </p>
+        <p className="mt-1">
+          {translate("orders.transfer.description", {
+            _: "Recogida en %{pickup}: hay productos reservados en %{others}. Coordina el traslado para que el pedido esté completo cuando el cliente llegue.",
+            pickup: pickupName,
+            others: others.join(", "),
+          })}
+        </p>
       </div>
     </div>
   );
@@ -310,6 +349,8 @@ export default function OrderDetailPage() {
           needsRefund={order.paymentStatus === "paid"}
         />
       )}
+
+      {order.needsTransfer && <TransferAlert order={order} />}
 
       {/* Actions */}
       <div className="mb-6 flex flex-wrap items-center gap-2">

@@ -842,6 +842,11 @@
     "fulfillment": {
       "pickup": "Recogida en tienda",
       "between": "Entre"
+    },
+    "transfer": {
+      "title": "Este pedido necesita un traslado entre almacenes",
+      "description": "Recogida en %{pickup}: hay productos reservados en %{others}. Coordina el traslado para que el pedido esté completo cuando el cliente llegue.",
+      "storages": "Productos en: %{names}"
     }
   },
   "clients": {

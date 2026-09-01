@@ -841,6 +841,11 @@
     "fulfillment": {
       "pickup": "Pickup in store",
       "between": "Between"
+    },
+    "transfer": {
+      "title": "This order needs a transfer between storages",
+      "description": "Pickup at %{pickup}: there are products reserved at %{others}. Coordinate the transfer so the order is complete when the customer arrives.",
+      "storages": "Products at: %{names}"
     }
   },
   "clients": {
