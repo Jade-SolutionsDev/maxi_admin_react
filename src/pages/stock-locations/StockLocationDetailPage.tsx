@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
   EditBase,
   ResourceContextProvider,
@@ -30,7 +30,6 @@ import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { StockLocationFormFields } from "./StockLocationFormFields";
 import { sanitizeStockLocation as sanitize } from "./sanitizeStockLocation";
 import { StockLocationProductsTab } from "./StockLocationProductsTab";
-import { CreateOperationWizard } from "./CreateOperationWizard";
 import { OperationHistoryTab } from "../inventory/OperationHistoryTab";
 
 type TabKey = "general" | "productos" | "historial";
@@ -65,7 +64,6 @@ function DetailShell({ isManager }: { isManager: boolean }) {
   const refresh = useRefresh();
   const { record, isLoading } = useEditContext();
   const [tab, setTab] = useState<TabKey>("general");
-  const [opsOpen, setOpsOpen] = useState(false);
   const [deleteOne, { isPending: removing }] = useDelete();
 
   if (isLoading || !record) {
@@ -151,8 +149,13 @@ function DetailShell({ isManager }: { isManager: boolean }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Operaciones — opens the In/Out/Transfer wizard */}
-          <Button type="button" variant="outline" onClick={() => setOpsOpen(true)}>
+          {/* Operaciones — the In/Out/Transfer wizard, URL-routed so a
+              transfer can arrive prefilled from an order's alert */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("operaciones")}
+          >
             <Settings2 className="mr-2 h-4 w-4" />
             {translate("stockLocations.actions.operations", { _: "Operaciones" })}
           </Button>
@@ -179,11 +182,7 @@ function DetailShell({ isManager }: { isManager: boolean }) {
         </div>
       </div>
 
-      <CreateOperationWizard
-        locationId={record.id as string}
-        open={opsOpen}
-        onOpenChange={setOpsOpen}
-      />
+      <Outlet />
 
       {/* Tab strip */}
       <div
