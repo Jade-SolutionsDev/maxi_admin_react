@@ -352,7 +352,8 @@
       "note_title": "Campos obligatorios",
       "note_title_edit": "Importante",
       "required_note": "Los campos marcados con * son requeridos.",
-      "edit_note": "Los cambios se reflejarán en la plataforma una vez que guardes la información."
+      "edit_note": "Los cambios se reflejarán en la plataforma una vez que guardes la información.",
+      "invalid": "Revisa los campos marcados: falta algo por completar."
     }
   },
   "app": {
