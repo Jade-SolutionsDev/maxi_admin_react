@@ -6,6 +6,7 @@ import { Form } from "ra-core";
 import { cn } from "@/lib/utils";
 import { CancelButton } from "@/components/admin/cancel-button";
 import { SaveButton } from "@/components/admin/form";
+import { InvalidFormNotice } from "@/components/admin/invalid-form-notice";
 
 /**
  * A simple form layout with vertical stacking, validation, and default toolbar.
@@ -36,6 +37,7 @@ export const SimpleForm = ({
     className={cn(`flex flex-col gap-4 w-full max-w-lg`, className)}
     {...rest}
   >
+    <InvalidFormNotice />
     {children}
     {toolbar}
   </Form>
