@@ -11,6 +11,7 @@ const RUTAS: Record<string, string> = {
   departamentos: '/departments',
   almacenes: '/stock-locations',
   inventario: '/inventory',
+  pedidos: '/orders',
 };
 
 /** Una sesión por escenario: el admin no comparte estado entre pestañas. */

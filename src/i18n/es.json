@@ -771,7 +771,8 @@
       "deliveryFee": "Envío",
       "quantity": "Cantidad",
       "unitPrice": "Precio unitario",
-      "lineTotal": "Importe"
+      "lineTotal": "Importe",
+      "paymentMethod": "Método de pago"
     },
     "status": {
       "pending": "Pendiente",
@@ -851,6 +852,9 @@
       "note": "Traslado para el pedido %{number}",
       "at_storage": "en %{name}",
       "prepare": "Preparar traslado"
+    },
+    "filters": {
+      "withoutPaymentMethod": "Sin intento de pago"
     }
   },
   "clients": {
