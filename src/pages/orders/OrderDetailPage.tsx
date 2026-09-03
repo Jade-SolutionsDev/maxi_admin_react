@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Ban,
+  ArrowRightLeft,
   CreditCard,
   Loader2,
   MapPin,
@@ -93,6 +94,14 @@ interface OrderRecord {
   } | null;
   customerNotes: string | null;
   cancellationReason: CancellationReason | null;
+  needsTransfer?: boolean;
+  pickupLocationId?: string | null;
+  pendingTransfers?: {
+    locationId: string;
+    locationName: string;
+    items: { productId: string; name: string; quantity: number }[];
+  }[];
+  reservationStorages?: { locationId: string; locationName: string }[];
   items?: OrderItemRow[];
   payment?: OrderPayment | null;
   createdAt: string;
@@ -121,6 +130,16 @@ function DeliveryDetails({ order }: { order: OrderRecord }) {
         <dd className="pt-1">
           {translate("orders.fulfillment.pickup", { _: "Recogida en tienda" })}
         </dd>
+        {(order.reservationStorages?.length ?? 0) > 1 && (
+          <dd>
+            {translate("orders.transfer.storages", {
+              _: "Productos en: %{names}",
+              names: (order.reservationStorages ?? [])
+                .map((storage) => storage.locationName)
+                .join(", "),
+            })}
+          </dd>
+        )}
       </dl>
     ) : (
       <p className="text-sm text-muted-foreground">—</p>
@@ -190,6 +209,75 @@ function CancellationAlert({
             })}
           </p>
         )}
+      </div>
+    </div>
+  );
+}
+
+function TransferAlert({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  const navigate = useNavigate();
+  const pickupName = order.pickupAddress?.locationName ?? "";
+  const groups = order.pendingTransfers ?? [];
+
+  const prepareTransfer = (group: NonNullable<OrderRecord["pendingTransfers"]>[number]) => {
+    const params = new URLSearchParams({
+      type: "TRANSFER",
+      target: order.pickupLocationId ?? "",
+      items: group.items.map((i) => `${i.productId}:${i.quantity}`).join(","),
+      note: translate("orders.transfer.note", {
+        _: "Traslado para el pedido %{number}",
+        number: order.orderNumber ?? order.id,
+      }),
+      orderId: order.id,
+    });
+    navigate(`/stock-locations/${group.locationId}/operaciones?${params}`);
+  };
+
+  return (
+    <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
+      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      <div className="min-w-0 flex-1">
+        <p className="font-medium">
+          {translate("orders.transfer.title", {
+            _: "Este pedido necesita un traslado entre almacenes",
+          })}
+        </p>
+        <p className="mt-1">
+          {translate("orders.transfer.description", {
+            _: "Recogida en %{pickup}: hay productos reservados en %{others}. Coordina el traslado para que el pedido esté completo cuando el cliente llegue.",
+            pickup: pickupName,
+            others: groups.map((g) => g.locationName).join(", "),
+          })}
+        </p>
+        {groups.map((group) => (
+          <div
+            key={group.locationId}
+            className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md bg-amber-500/10 px-3 py-2"
+          >
+            <ul className="min-w-0 text-sm">
+              {group.items.map((item) => (
+                <li key={item.productId} className="truncate">
+                  {item.name} × {item.quantity} —{" "}
+                  {translate("orders.transfer.at_storage", {
+                    _: "en %{name}",
+                    name: group.locationName,
+                  })}
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="border-amber-500/40 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+              onClick={() => prepareTransfer(group)}
+            >
+              <ArrowRightLeft className="mr-2 h-4 w-4" />
+              {translate("orders.transfer.prepare", { _: "Preparar traslado" })}
+            </Button>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -310,6 +398,8 @@ export default function OrderDetailPage() {
           needsRefund={order.paymentStatus === "paid"}
         />
       )}
+
+      {order.needsTransfer && <TransferAlert order={order} />}
 
       {/* Actions */}
       <div className="mb-6 flex flex-wrap items-center gap-2">

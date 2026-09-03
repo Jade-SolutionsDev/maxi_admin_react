@@ -19,6 +19,7 @@ import ProductEdit from "./pages/products/ProductEdit";
 import { ProductDetailModal } from "./pages/products/ProductDetailModal";
 import StockLocationsList from "./pages/stock-locations/StockLocationsList";
 import StockLocationDetailPage from "./pages/stock-locations/StockLocationDetailPage";
+import { CreateOperationWizard } from "./pages/stock-locations/CreateOperationWizard";
 import InventoryList from "./pages/inventory/InventoryList";
 import InventoryDetailPage from "./pages/inventory/InventoryDetailPage";
 import OrdersList from "./pages/orders/OrdersList";
@@ -294,13 +295,15 @@ const AdminApp = () => (
         }
       />
       <Route
-        path="/stock-locations/:id"
+        path="/stock-locations/:id/*"
         element={
           <RequireAccess resource="stock-locations" action="read">
             <StockLocationDetailPage />
           </RequireAccess>
         }
-      />
+      >
+        <Route path="operaciones" element={<CreateOperationWizard />} />
+      </Route>
       <Route
         path="/inventory"
         element={

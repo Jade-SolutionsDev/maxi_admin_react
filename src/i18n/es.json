@@ -838,11 +838,19 @@
     "cancellationReason": {
       "payment_not_received": "Cancelado automáticamente: no se recibió el pago a tiempo y se liberó el stock.",
       "paid_after_expiry_out_of_stock": "Pagado fuera de plazo y sin stock disponible: no se puede servir.",
-      "refundHint": "Contacta al cliente y reembolsá este pedido."
+      "refundHint": "Contacta al cliente y reembolsa este pedido."
     },
     "fulfillment": {
       "pickup": "Recogida en tienda",
       "between": "Entre"
+    },
+    "transfer": {
+      "title": "Este pedido necesita un traslado entre almacenes",
+      "description": "Recogida en %{pickup}: hay productos reservados en %{others}. Coordina el traslado para que el pedido esté completo cuando el cliente llegue.",
+      "storages": "Existencias en: %{names}",
+      "note": "Traslado para el pedido %{number}",
+      "at_storage": "en %{name}",
+      "prepare": "Preparar traslado"
     }
   },
   "clients": {

@@ -51,6 +51,7 @@ export interface CreateInventoryOperationPayload {
   type: InventoryOperationType;
   targetLocationId?: string;
   note?: string;
+  orderId?: string;
   items: { productId: string; quantity: number }[];
 }
 

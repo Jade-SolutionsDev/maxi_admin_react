@@ -1,5 +1,6 @@
 import { FormDialogContent } from "@/components/admin/form-dialog-content";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   useDataProvider,
   useGetList,
@@ -54,11 +55,7 @@ import type {
   InventoryOperationType,
 } from "@/providers/dataProvider";
 
-interface WizardProps {
-  locationId: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+
 
 interface ItemRow {
   key: number;
@@ -242,24 +239,45 @@ function ProductCombobox({
   );
 }
 
-export function CreateOperationWizard({
-  locationId,
-  open,
-  onOpenChange,
-}: WizardProps) {
+export function CreateOperationWizard() {
   const translate = useTranslate();
   const notify = useNotify();
   const refresh = useRefresh();
+  const navigate = useNavigate();
   const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const { id: locationId = "" } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
 
-  const [step, setStep] = useState(1);
-  const [type, setType] = useState<InventoryOperationType | null>(null);
-  const [targetLocationId, setTargetLocationId] = useState("");
-  const [note, setNote] = useState("");
+  const prefill = useMemo(() => {
+    const type = searchParams.get("type");
+    if (type !== "TRANSFER") return null;
+    return {
+      target: searchParams.get("target") ?? "",
+      note: searchParams.get("note") ?? "",
+      orderId: searchParams.get("orderId") ?? undefined,
+      items: (searchParams.get("items") ?? "")
+        .split(",")
+        .map((pair) => {
+          const [productId, quantity] = pair.split(":");
+          return { productId, quantity: Number(quantity) };
+        })
+        .filter((i) => i.productId && Number.isInteger(i.quantity) && i.quantity > 0),
+    };
+  }, [searchParams]);
+
+  const [step, setStep] = useState(prefill ? 3 : 1);
+  const [type, setType] = useState<InventoryOperationType | null>(
+    prefill ? "TRANSFER" : null,
+  );
+  const [targetLocationId, setTargetLocationId] = useState(
+    prefill?.target ?? "",
+  );
+  const [note, setNote] = useState(prefill?.note ?? "");
   const [items, setItems] = useState<ItemRow[]>([
     { key: 0, productId: "", productName: "", quantity: "" },
   ]);
   const [submitting, setSubmitting] = useState(false);
+  const open = true;
 
   // Destination storages for a transfer: active, excluding the current one.
   const { data: locations } = useGetList(
@@ -306,19 +324,28 @@ export function CreateOperationWizard({
       }));
   }, [invRows, invProducts]);
 
-  const reset = () => {
-    setStep(1);
-    setType(null);
-    setTargetLocationId("");
-    setNote("");
-    setItems([{ key: 0, productId: "", productName: "", quantity: "" }]);
-    setSubmitting(false);
-  };
+  // A deep-linked transfer fills its rows once the stock list can name them;
+  // quantities beyond current availability surface as the normal invalid row.
+  const prefillSeeded = useRef(false);
+  useEffect(() => {
+    if (!prefill || prefillSeeded.current || stock.length === 0) return;
+    prefillSeeded.current = true;
+    setItems(
+      prefill.items.map((item, index) => {
+        const held = stock.find((s) => s.id === item.productId);
+        return {
+          key: index,
+          productId: item.productId,
+          productName: held?.name ?? item.productId,
+          quantity: String(item.quantity),
+          available: held?.available,
+        };
+      }),
+    );
+  }, [prefill, stock]);
 
   const close = () => {
-    onOpenChange(false);
-    // Delay reset so it doesn't flash during the close animation.
-    setTimeout(reset, 200);
+    navigate(`/stock-locations/${locationId}`);
   };
 
   const selectType = (t: InventoryOperationType) => {
@@ -370,6 +397,7 @@ export function CreateOperationWizard({
       await dataProvider.createInventoryOperation({
         locationId,
         type,
+        orderId: prefill?.orderId,
         targetLocationId:
           type === "TRANSFER" ? targetLocationId : undefined,
         note: note.trim() || undefined,

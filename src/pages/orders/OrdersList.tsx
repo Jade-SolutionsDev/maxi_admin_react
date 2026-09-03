@@ -3,7 +3,7 @@ import {
   useRecordContext,
   useTranslate,
 } from "ra-core";
-import { ShoppingCart } from "lucide-react";
+import { AlertTriangle, ShoppingCart } from "lucide-react";
 
 import {
   DataTable,
@@ -39,6 +39,7 @@ const orderFilters = [
 
 const NumberCell = () => {
   const record = useRecordContext();
+  const translate = useTranslate();
   if (!record) return null;
   return (
     <div className="flex items-center gap-2">
@@ -48,6 +49,15 @@ const NumberCell = () => {
       <span className="font-medium text-foreground">
         {(record.orderNumber as string) ?? record.id}
       </span>
+      {record.needsTransfer === true && (
+        <AlertTriangle
+          size={16}
+          className="shrink-0 text-amber-500"
+          aria-label={translate("orders.transfer.title", {
+            _: "Este pedido necesita un traslado entre almacenes",
+          })}
+        />
+      )}
     </div>
   );
 };
