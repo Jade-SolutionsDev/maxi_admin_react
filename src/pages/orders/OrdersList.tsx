@@ -16,6 +16,7 @@ import {
 } from "@/components/admin";
 import type { OrderStatus, OrderPaymentStatus } from "@/providers/dataProvider";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
+import { PaymentMethodFilter } from "./PaymentMethodFilter";
 import { money, ORDER_STATUSES, PAYMENT_STATUSES } from "./orderStatus";
 
 const orderFilters = [
@@ -35,7 +36,28 @@ const orderFilters = [
     }))}
     alwaysOn
   />,
+  <PaymentMethodFilter alwaysOn />,
 ];
+
+/**
+ * La pasarela del último intento. Un pedido puede no tener ninguno —uno de cada
+ * diez en producción—, y entonces se dice, en vez de dejar la celda muda.
+ */
+const PaymentMethodCell = () => {
+  const record = useRecordContext();
+  const translate = useTranslate();
+  if (!record) return null;
+  const method = record.paymentMethod as { label?: string } | undefined;
+  return method?.label ? (
+    <span>{method.label}</span>
+  ) : (
+    <span className="text-muted-foreground">
+      {translate("orders.filters.withoutPaymentMethod", {
+        _: "Sin intento de pago",
+      })}
+    </span>
+  );
+};
 
 const NumberCell = () => {
   const record = useRecordContext();
@@ -127,6 +149,13 @@ export default function OrdersList() {
             label="orders.fields.paymentStatus"
           >
             <PaymentCell />
+          </DataTable.Col>
+          <DataTable.Col
+            source="paymentMethod"
+            label="orders.fields.paymentMethod"
+            disableSort
+          >
+            <PaymentMethodCell />
           </DataTable.Col>
           <DataTable.Col source="total" label="orders.fields.total">
             <TotalCell />
