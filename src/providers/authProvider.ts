@@ -155,6 +155,7 @@ export const authProvider: AuthProvider = {
       // already returned true above).
       case "users":
       case "clients":
+      case "dashboard-stats": // KPI aggregates; ADMIN+ like /clients
       case "roles":
       case "settings":
       case "cms-pages":

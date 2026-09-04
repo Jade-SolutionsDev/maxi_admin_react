@@ -851,6 +851,36 @@
       "prepare": "Prepare transfer"
     }
   },
+  "dashboard": {
+    "kpi": {
+      "revenue": { "subtitle": "Sales in the last 30 days" },
+      "orders": { "subtitle": "Orders in the last 30 days" },
+      "products": { "subtitle": "Active products" },
+      "clients": { "subtitle": "New customers in 30 days" }
+    },
+    "trend": {
+      "new": "New",
+      "flat": "No change",
+      "newCount": "+%{smart_count} new |||| +%{smart_count} new"
+    },
+    "stats": {
+      "error": "Could not load the statistics."
+    },
+    "recentOrders": {
+      "title": "Recent orders",
+      "viewAll": "View all",
+      "empty": "No orders yet.",
+      "error": "Could not load the orders.",
+      "noClient": "No name",
+      "columns": {
+        "number": "#",
+        "client": "Customer",
+        "total": "Total",
+        "status": "Status",
+        "date": "Date"
+      }
+    }
+  },
   "clients": {
     "tabs": {
       "general": "General",

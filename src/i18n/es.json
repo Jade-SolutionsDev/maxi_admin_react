@@ -857,6 +857,36 @@
       "withoutPaymentMethod": "Sin intento de pago"
     }
   },
+  "dashboard": {
+    "kpi": {
+      "revenue": { "subtitle": "Ventas de los últimos 30 días" },
+      "orders": { "subtitle": "Pedidos de los últimos 30 días" },
+      "products": { "subtitle": "Productos activos" },
+      "clients": { "subtitle": "Clientes nuevos en 30 días" }
+    },
+    "trend": {
+      "new": "Nuevo",
+      "flat": "Sin cambios",
+      "newCount": "+%{smart_count} nuevo |||| +%{smart_count} nuevos"
+    },
+    "stats": {
+      "error": "No se pudieron cargar las estadísticas."
+    },
+    "recentOrders": {
+      "title": "Órdenes recientes",
+      "viewAll": "Ver todas",
+      "empty": "Todavía no hay pedidos.",
+      "error": "No se pudieron cargar los pedidos.",
+      "noClient": "Sin nombre",
+      "columns": {
+        "number": "#",
+        "client": "Cliente",
+        "total": "Total",
+        "status": "Estado",
+        "date": "Fecha"
+      }
+    }
+  },
   "clients": {
     "tabs": {
       "general": "Datos generales",
