@@ -131,7 +131,7 @@ export interface DashboardProductsMetric extends DashboardMetric {
 /** Mirror of the API's DashboardStatsResponseDto (GET /dashboard/stats). */
 export interface DashboardStats {
   period: { days: number; previousFrom: string; from: string; to: string };
-  /** Cancelled orders excluded — this is money. */
+  /** Money collected: cancelled and unpaid orders excluded. */
   revenue: DashboardMetric;
   /** Cancelled orders included — this is demand, not money. */
   orders: DashboardMetric;
@@ -142,7 +142,7 @@ export interface DashboardStats {
 /** Mirror of the API's DashboardTopProductsResponseDto (GET /dashboard/top-products). */
 export interface DashboardTopProducts {
   period: { days: number; from: string; to: string };
-  /** Ranked by units sold, descending; cancelled orders excluded. */
+  /** Ranked by units sold, descending; cancelled and unpaid orders excluded. */
   items: Array<{
     id: string;
     /** The product's current name, not the snapshot on the order item. */

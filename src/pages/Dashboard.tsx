@@ -118,7 +118,7 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
       value: moneyKpi(data.revenue.current),
       subtitle: translate("dashboard.kpi.revenue.subtitle", {
         days,
-        _: "Ventas de los últimos %{days} días",
+        _: "Ventas cobradas en los últimos %{days} días",
       }),
       trend: percentTrend(data.revenue, translate),
     },

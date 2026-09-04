@@ -853,10 +853,10 @@
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Sales in the last 30 days" },
-      "orders": { "subtitle": "Orders in the last 30 days" },
+      "revenue": { "subtitle": "Sales collected in the last %{days} days" },
+      "orders": { "subtitle": "Orders in the last %{days} days" },
       "products": { "subtitle": "Active products" },
-      "clients": { "subtitle": "New customers in 30 days" }
+      "clients": { "subtitle": "New customers in %{days} days" }
     },
     "trend": {
       "new": "New",
