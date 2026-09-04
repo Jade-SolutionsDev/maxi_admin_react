@@ -20,8 +20,10 @@ async function esperarLasTarjetas(page: Page) {
 /** El texto de las cuatro tarjetas, ya sin esqueletos. */
 async function textoDeLasTarjetas(page: Page): Promise<string[]> {
   await esperarLasTarjetas(page);
+  // Sin tag: las tarjetas KPI son <a> (llevan a su listado filtrado) y las
+  // demás secciones del panel siguen siendo <div>.
   return page
-    .locator('div.rounded-2xl.shadow-card')
+    .locator('.rounded-2xl.shadow-card')
     .filter({ hasNotText: 'Órdenes recientes' })
     .allInnerTexts();
 }

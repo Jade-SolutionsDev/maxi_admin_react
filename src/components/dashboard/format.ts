@@ -3,20 +3,20 @@ import type { useTranslate } from "ra-core";
 type Translate = ReturnType<typeof useTranslate>;
 
 /**
- * Currency for a KPI headline, with no cents.
+ * Currency for a KPI headline, to the exact cent.
  *
- * `money()` in pages/orders/orderStatus.ts renders "$424,652.00", and
- * KpiCard's AnimatedNumber counts up with Math.round() before snapping to the
- * exact string on the last frame — so a value with cents visibly jumps by
- * ".00" at the end. Whole dollars is also what a headline number wants.
- * Use `money()` in the orders table, where the cents do matter.
+ * `revenue` is SUM(orders.total) over a numeric(12,2) column, so two decimals
+ * are the whole figure, not an approximation of it — rounding the headline to
+ * whole dollars made the panel disagree with the API it is reporting. The
+ * ".00" jump this used to avoid is gone: AnimatedNumber now counts up at the
+ * same precision as the string it lands on.
  */
 export const moneyKpi = (value: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 
 export interface Trend {
