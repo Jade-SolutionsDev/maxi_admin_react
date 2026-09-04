@@ -87,6 +87,9 @@ export interface ExtendedDataProvider extends DataProvider {
     productId?: string;
     locationId?: string;
   }) => Promise<{ data: InventoryHistoryEvent[] }>;
+  getDashboardStats: (params?: {
+    days?: number;
+  }) => Promise<{ data: DashboardStats }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -108,6 +111,28 @@ export interface ExtendedDataProvider extends DataProvider {
   updateSiteSettings: (
     data: SiteSettingsData,
   ) => Promise<{ data: SiteSettingsData }>;
+}
+
+/** Mirror of the API's DashboardMetricDto — one figure over two adjacent windows. */
+export interface DashboardMetric {
+  current: number;
+  previous: number;
+}
+
+export interface DashboardProductsMetric extends DashboardMetric {
+  /** Active products right now: a snapshot. `current`/`previous` count new ones. */
+  active: number;
+}
+
+/** Mirror of the API's DashboardStatsResponseDto (GET /dashboard/stats). */
+export interface DashboardStats {
+  period: { days: number; previousFrom: string; from: string; to: string };
+  /** Cancelled orders excluded — this is money. */
+  revenue: DashboardMetric;
+  /** Cancelled orders included — this is demand, not money. */
+  orders: DashboardMetric;
+  products: DashboardProductsMetric;
+  clients: DashboardMetric;
 }
 
 /** Mirror of the API's fulfillment-settings singleton. */
@@ -532,6 +557,15 @@ export const dataProvider: DataProvider = {
     const { json } = await httpClient(`${API_URL}/${path}`);
     const { rows } = unwrapList(json);
     return { data: rows as InventoryHistoryEvent[] };
+  },
+
+  async getDashboardStats(params: { days?: number } = {}) {
+    // `toQueryString` drops undefined, so a bare call sends no query at all and
+    // the API applies its own 30-day default — `?days=undefined` would 400 under
+    // the backend's `forbidNonWhitelisted` validation.
+    const query = toQueryString({ days: params.days });
+    const { json } = await httpClient(`${API_URL}/dashboard/stats${query}`);
+    return { data: unwrapOne(json) as DashboardStats };
   },
 
   async updateOrderStatus(id: string, status: OrderStatus) {
