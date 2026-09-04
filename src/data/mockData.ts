@@ -1,6 +1,7 @@
-// Datos de ejemplo. Solo quedan los tres widgets que todavía no tienen respaldo
-// en la API: SalesChart, TopProducts y CategoryChart. Los KPI salen de
-// GET /dashboard/stats y las órdenes recientes de GET /orders.
+// Datos de ejemplo. Solo quedan los dos widgets que todavía no tienen respaldo
+// en la API: SalesChart y CategoryChart. Los KPI salen de GET /dashboard/stats,
+// los más vendidos de GET /dashboard/top-products y las órdenes recientes de
+// GET /orders.
 
 export const salesData = [
   { month: 'Ene', value: 28000 },
@@ -25,10 +26,3 @@ export const categoryData = [
   { category: 'Belleza', value: 39000 },
 ];
 
-export const topProducts = [
-  { name: 'Auriculares Bluetooth Pro', sold: 128, percent: 95 },
-  { name: 'Cargador Rápido USB-C', sold: 96, percent: 72 },
-  { name: 'Funda iPhone 15 Pro Max', sold: 84, percent: 62 },
-  { name: 'Lámpara LED Escritorio', sold: 67, percent: 50 },
-  { name: 'Mochila Antirrobo', sold: 54, percent: 40 },
-];

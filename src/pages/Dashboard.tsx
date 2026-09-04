@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
 import { useCanAccess, useDataProvider, useTranslate } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +9,11 @@ import KpiCardSkeleton from "@/components/dashboard/KpiCardSkeleton";
 import RecentOrders from "@/components/dashboard/RecentOrders";
 import SalesChart from "@/components/dashboard/SalesChart";
 import TopProducts from "@/components/dashboard/TopProducts";
+import WindowSelector from "@/components/dashboard/WindowSelector";
+import {
+  DEFAULT_WINDOW_DAYS,
+  type WindowDays,
+} from "@/components/dashboard/window";
 import {
   countTrend,
   moneyKpi,
@@ -19,9 +24,6 @@ import type {
   DashboardStats,
   ExtendedDataProvider,
 } from "@/providers/dataProvider";
-
-/** Rolling window the API measures; it also reports the previous one. */
-const WINDOW_DAYS = 30;
 
 // Presentation only. The figures come from GET /dashboard/stats; this holds
 // what the API has no business knowing — which icon and which tile colour.
@@ -48,7 +50,12 @@ const KpiSkeletons = () => (
   </Grid>
 );
 
-function KpiRow() {
+interface KpiRowProps {
+  days: WindowDays;
+  onDaysChange: (days: WindowDays) => void;
+}
+
+function KpiRow({ days, onDaysChange }: KpiRowProps) {
   const translate = useTranslate();
   const dataProvider = useDataProvider<ExtendedDataProvider>();
   // The endpoint is ADMIN+, so a grocer would take a 403 that react-query would
@@ -58,26 +65,50 @@ function KpiRow() {
     action: "read",
   });
 
+  // `days` is part of the key AND of the request: a window switch is a distinct
+  // cache entry, so going back to a window already fetched is instant.
   const { data, isPending, isError } = useQuery<DashboardStats>({
-    queryKey: ["dashboard-stats", WINDOW_DAYS],
-    queryFn: () => dataProvider.getDashboardStats().then((r) => r.data),
+    queryKey: ["dashboard-stats", days],
+    queryFn: () => dataProvider.getDashboardStats({ days }).then((r) => r.data),
     enabled: !!canAccess,
+    // Keep the previous window's figures on screen while the next one loads, so
+    // switching does not flash the whole row back to skeletons.
+    placeholderData: (previous) => previous,
   });
 
   if (checkingAccess) return <KpiSkeletons />;
   if (!canAccess) return null;
 
+  // Rendered above every state below, so the window stays switchable even when
+  // the current one failed to load.
+  const selector = (
+    <div className="flex justify-end">
+      <WindowSelector
+        value={days}
+        onChange={onDaysChange}
+        disabled={isPending}
+      />
+    </div>
+  );
+
+  const section = (children: ReactNode) => (
+    <div className="space-y-4">
+      {selector}
+      {children}
+    </div>
+  );
+
   if (isError) {
-    return (
+    return section(
       <div className="rounded-2xl bg-card p-6 shadow-card text-sm text-muted-foreground">
         {translate("dashboard.stats.error", {
           _: "No se pudieron cargar las estadísticas.",
         })}
-      </div>
+      </div>,
     );
   }
 
-  if (isPending || !data) return <KpiSkeletons />;
+  if (isPending || !data) return section(<KpiSkeletons />);
 
   const figures: Record<
     KpiKey,
@@ -86,14 +117,16 @@ function KpiRow() {
     revenue: {
       value: moneyKpi(data.revenue.current),
       subtitle: translate("dashboard.kpi.revenue.subtitle", {
-        _: "Ventas de los últimos 30 días",
+        days,
+        _: "Ventas de los últimos %{days} días",
       }),
       trend: percentTrend(data.revenue, translate),
     },
     orders: {
       value: data.orders.current.toLocaleString(),
       subtitle: translate("dashboard.kpi.orders.subtitle", {
-        _: "Pedidos de los últimos 30 días",
+        days,
+        _: "Pedidos de los últimos %{days} días",
       }),
       trend: percentTrend(data.orders, translate),
     },
@@ -109,13 +142,14 @@ function KpiRow() {
     clients: {
       value: data.clients.current.toLocaleString(),
       subtitle: translate("dashboard.kpi.clients.subtitle", {
-        _: "Clientes nuevos en 30 días",
+        days,
+        _: "Clientes nuevos en %{days} días",
       }),
       trend: percentTrend(data.clients, translate),
     },
   };
 
-  return (
+  return section(
     <Grid>
       {KPI_STYLE.map(({ key, icon, iconBg, iconColor }) => (
         <KpiCard
@@ -129,23 +163,27 @@ function KpiRow() {
           iconColor={iconColor}
         />
       ))}
-    </Grid>
+    </Grid>,
   );
 }
 
 export default function Dashboard() {
+  // Owned here so the KPI row and the product ranking always report the same
+  // period; the selector that drives it lives inside KpiRow.
+  const [days, setDays] = useState<WindowDays>(DEFAULT_WINDOW_DAYS);
+
   return (
     <div className="space-y-6">
-      <KpiRow />
+      <KpiRow days={days} onDaysChange={setDays} />
       {/* Todavía con datos de ejemplo (src/data/mockData.ts): la API no tiene
-          agregados de series ni de ventas por producto/categoría. */}
+          agregados de series ni de ventas por categoría. */}
       <SalesChart />
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3">
           <RecentOrders />
         </div>
         <div className="lg:col-span-2">
-          <TopProducts />
+          <TopProducts days={days} />
         </div>
       </div>
       <CategoryChart />

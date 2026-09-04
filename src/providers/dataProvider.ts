@@ -90,6 +90,10 @@ export interface ExtendedDataProvider extends DataProvider {
   getDashboardStats: (params?: {
     days?: number;
   }) => Promise<{ data: DashboardStats }>;
+  getDashboardTopProducts: (params?: {
+    days?: number;
+    limit?: number;
+  }) => Promise<{ data: DashboardTopProducts }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -133,6 +137,19 @@ export interface DashboardStats {
   orders: DashboardMetric;
   products: DashboardProductsMetric;
   clients: DashboardMetric;
+}
+
+/** Mirror of the API's DashboardTopProductsResponseDto (GET /dashboard/top-products). */
+export interface DashboardTopProducts {
+  period: { days: number; from: string; to: string };
+  /** Ranked by units sold, descending; cancelled orders excluded. */
+  items: Array<{
+    id: string;
+    /** The product's current name, not the snapshot on the order item. */
+    name: string;
+    imageUrl: string | null;
+    sold: number;
+  }>;
 }
 
 /** Mirror of the API's fulfillment-settings singleton. */
@@ -566,6 +583,18 @@ export const dataProvider: DataProvider = {
     const query = toQueryString({ days: params.days });
     const { json } = await httpClient(`${API_URL}/dashboard/stats${query}`);
     return { data: unwrapOne(json) as DashboardStats };
+  },
+
+  async getDashboardTopProducts(
+    params: { days?: number; limit?: number } = {},
+  ) {
+    // Same reason as getDashboardStats: `toQueryString` drops undefined, so a
+    // bare call sends no query and the API applies its own defaults.
+    const query = toQueryString({ days: params.days, limit: params.limit });
+    const { json } = await httpClient(
+      `${API_URL}/dashboard/top-products${query}`,
+    );
+    return { data: unwrapOne(json) as DashboardTopProducts };
   },
 
   async updateOrderStatus(id: string, status: OrderStatus) {
