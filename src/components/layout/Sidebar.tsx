@@ -46,6 +46,7 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "../ui/sidebar";
+import { useTheme } from "../admin";
 import {
   useSetSidebarBadge,
   useSidebarBadge,
@@ -262,6 +263,9 @@ function NavEntry({ item }: { item: NavItem }) {
         className={cn(
           "gap-3 rounded-[10px] text-[14px] text-sidebar-foreground",
           "data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground",
+          // Dark theme keeps the pre-existing subtle highlight instead of the
+          // solid brand pill used on the light rail.
+          "dark:data-[active=true]:bg-sidebar-primary/10 dark:data-[active=true]:text-sidebar-primary",
           // Collapsed rail: fill and center the button + icon, drop the label.
           "group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!",
           item.soon &&
@@ -285,7 +289,7 @@ function NavEntry({ item }: { item: NavItem }) {
         </span>
       </SidebarMenuButton>
       {item.soon && (
-        <SidebarMenuBadge className="top-3.5 rounded-full bg-sidebar-accent px-1.5 text-[10px] text-sidebar-foreground/70">
+        <SidebarMenuBadge className="top-3.5 rounded-full bg-sidebar-accent px-1.5 text-[10px] text-sidebar-foreground/70 dark:bg-muted dark:text-muted-foreground">
           <Translate i18nKey="app.menu.soon" />
         </SidebarMenuBadge>
       )}
@@ -392,6 +396,7 @@ export default function AppSidebar() {
   const logout = useLogout();
   const translate = useTranslate();
   const { data: identity } = useGetIdentity();
+  const { resolvedTheme } = useTheme();
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
@@ -404,7 +409,8 @@ export default function AppSidebar() {
         />
         <LogoMark
           className="hidden h-7 w-auto group-data-[collapsible=icon]:block"
-          smileColor="#5EEAD4"
+          letterColor={resolvedTheme === "dark" ? "#FFFFFF" : "currentColor"}
+          smileColor={resolvedTheme === "dark" ? "#FFFFFF" : "#5EEAD4"}
         />
       </SidebarHeader>
 
@@ -442,7 +448,7 @@ export default function AppSidebar() {
       {/* User profile */}
       <SidebarFooter className="border-t border-sidebar-border p-3 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:p-2">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sidebar-primary text-sidebar-primary-foreground dark:bg-primary/10 dark:text-primary">
             {identity?.avatar ? (
               <img
                 src={identity.avatar}
@@ -458,11 +464,11 @@ export default function AppSidebar() {
             )}
           </div>
           <div className="overflow-hidden group-data-[collapsible=icon]:hidden">
-            <p className="truncate text-[13px] font-medium text-sidebar-primary-foreground">
+            <p className="truncate text-[13px] font-medium text-sidebar-primary-foreground dark:text-foreground">
               {identity?.fullName}
             </p>
             {identity?.email && (
-              <p className="truncate text-[11px] text-sidebar-foreground/70">
+              <p className="truncate text-[11px] text-sidebar-foreground/70 dark:text-muted-foreground">
                 {identity.email}
               </p>
             )}
@@ -470,7 +476,7 @@ export default function AppSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="ml-auto text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
+            className="ml-auto text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground dark:text-muted-foreground dark:hover:text-foreground group-data-[collapsible=icon]:hidden"
             title={translate("ra.auth.logout")}
             onClick={() => logout()}
           >
