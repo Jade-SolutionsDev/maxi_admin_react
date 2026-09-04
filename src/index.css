@@ -74,15 +74,17 @@
     --ring: 160 84% 39%;
     --radius: 0.625rem;
 
-    /* Light sidebar (green-accent redesign) */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 20% 40%;
-    --sidebar-primary: 160 84% 39%;
+    /* Brand green rail (light theme). Kept as a flat HSL triplet because the
+       token is consumed with opacity (/10, /70, /35); the gradient is a
+       separate background-image layer further down. */
+    --sidebar-background: 158 79% 20%;
+    --sidebar-foreground: 152 25% 84%;
+    --sidebar-primary: 152 58% 34%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 84% 39%;
-    --sidebar-accent-foreground: 222 47% 17%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-accent: 158 55% 26%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 158 40% 28%;
+    --sidebar-ring: 152 60% 48%;
 
     /* Custom theme tokens */
     --cream-bg: #FFFBF5;
@@ -166,12 +168,6 @@
 }
 
 @layer utilities {
-  .sidebar-dark {
-    background-color: #134E4A;
-  }
-  .dark .sidebar-dark {
-    background-color: #0D3634;
-  }
   .cream-bg {
     background-color: #FFFBF5;
   }
@@ -218,6 +214,21 @@
 }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* Brand rail: a subtle vertical gradient over --sidebar-background. Light theme
+   only — in dark mode the rail stays flat. */
+[data-slot="sidebar-inner"],
+[data-slot="sidebar"][data-mobile="true"] {
+  background-image: linear-gradient(
+    180deg,
+    hsl(158 74% 24%) 0%,
+    hsl(158 82% 16%) 100%
+  );
+}
+.dark [data-slot="sidebar-inner"],
+.dark [data-slot="sidebar"][data-mobile="true"] {
+  background-image: none;
 }
 
 /* Sidebar scrollbar: thin and token-matched so it blends into the rail in both

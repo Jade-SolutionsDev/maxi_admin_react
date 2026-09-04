@@ -11,7 +11,40 @@ import { DataTable } from "@/components/admin/data-table";
 import { List } from "@/components/admin/list";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { RowNumberField } from "@/components/admin/row-number-field";
-import { useTranslate } from "ra-core";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { personInitials } from "@/lib/initials";
+import { useRecordContext, useTranslate } from "ra-core";
+import { User } from "lucide-react";
+
+/**
+ * Avatar del cliente, con iniciales de respaldo.
+ *
+ * Radix cambia solo a `AvatarFallback` cuando la imagen no carga o cuando no
+ * hay `src`, que es lo que este listado necesitaba: antes pintaba un
+ * placeholder remoto fijo y lo que se veía era el icono de imagen rota.
+ */
+const ClientAvatar = () => {
+  const record = useRecordContext();
+  if (!record) return null;
+
+  const firstName = (record.firstName as string | null) ?? "";
+  const lastName = (record.lastName as string | null) ?? "";
+  const email = (record.email as string | null) ?? "";
+  const initials = personInitials({ firstName, lastName, email });
+  const name = `${firstName} ${lastName}`.trim() || email;
+
+  return (
+    <Avatar className="h-10 w-10 border border-border/50">
+      <AvatarImage
+        src={(record.avatarUrl as string | null) ?? undefined}
+        alt={name || "Avatar"}
+      />
+      <AvatarFallback className="bg-muted text-muted-foreground text-xs font-medium">
+        {initials || <User size={16} aria-hidden />}
+      </AvatarFallback>
+    </Avatar>
+  );
+};
 
 const clientFilters = [
   <SearchInput source="q" alwaysOn />,
@@ -60,11 +93,7 @@ export const ClientList = () => {
           disableSort
           label="list.fields.avatar"
         >
-          <img
-            src="https://via.placeholder.com/40"
-            alt="Avatar"
-            className="w-10 h-10 bg-accent rounded-full"
-          />
+          <ClientAvatar />
         </DataTable.Col>
         <DataTable.Col source="email" label="list.fields.email" />
         <DataTable.Col source="firstName" label="list.fields.firstName" />
