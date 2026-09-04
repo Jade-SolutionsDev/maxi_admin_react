@@ -25,13 +25,59 @@ import type {
   ExtendedDataProvider,
 } from "@/providers/dataProvider";
 
+/**
+ * Deep link to a list, pre-filtered.
+ *
+ * ra-core's useListParams reads the filter off the URL as JSON and gives it
+ * precedence over the stored one, and FilterForm shows any filter that carries
+ * a value — so a link is all it takes to land on a filtered list.
+ */
+const listLink = (resource: string, filter?: Record<string, string>) =>
+  filter
+    ? `/${resource}?filter=${encodeURIComponent(JSON.stringify(filter))}`
+    : `/${resource}`;
+
 // Presentation only. The figures come from GET /dashboard/stats; this holds
-// what the API has no business knowing — which icon and which tile colour.
+// what the API has no business knowing — which icon, which tile colour, and
+// which list the figure is a summary of.
 const KPI_STYLE = [
-  { key: "revenue", icon: DollarSign, iconBg: "#ECFDF5", iconColor: "#059669" },
-  { key: "orders", icon: ShoppingCart, iconBg: "#F0FDFA", iconColor: "#0D9488" },
-  { key: "products", icon: Package, iconBg: "#FFFBEB", iconColor: "#D97706" },
-  { key: "clients", icon: Users, iconBg: "#FFF1F2", iconColor: "#E11D48" },
+  {
+    key: "revenue",
+    icon: DollarSign,
+    iconBg: "#ECFDF5",
+    iconColor: "#059669",
+    // The API sums orders that are not cancelled AND have payment_status
+    // 'paid'. There is no "pagada" order *status* — filtering by anything else
+    // here would open a list that does not add up to the figure above it.
+    to: listLink("orders", { paymentStatus: "paid" }),
+  },
+  {
+    key: "orders",
+    icon: ShoppingCart,
+    iconBg: "#F0FDFA",
+    iconColor: "#0D9488",
+    // Demand, cancellations included: the whole list, unfiltered.
+    to: listLink("orders"),
+  },
+  {
+    key: "products",
+    icon: Package,
+    iconBg: "#FFFBEB",
+    iconColor: "#D97706",
+    // String "true", not a boolean: that is what OnlyEnabledFilter emits and
+    // what the API expects.
+    to: listLink("products", { isActive: "true" }),
+  },
+  {
+    key: "clients",
+    icon: Users,
+    iconBg: "#FFF1F2",
+    iconColor: "#E11D48",
+    // The card counts clients registered in the window, and /clients has no
+    // date filter. Inventing one that does not match would be worse than
+    // landing on the full list.
+    to: listLink("clients"),
+  },
 ] as const;
 
 type KpiKey = (typeof KPI_STYLE)[number]["key"];
@@ -112,7 +158,7 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
 
   const figures: Record<
     KpiKey,
-    { value: string; subtitle: string; trend: Trend }
+    { value: string; subtitle: string; trend: Trend; linkLabel: string }
   > = {
     revenue: {
       value: moneyKpi(data.revenue.current),
@@ -121,6 +167,9 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
         _: "Ventas cobradas en los últimos %{days} días",
       }),
       trend: percentTrend(data.revenue, translate),
+      linkLabel: translate("dashboard.kpi.revenue.link", {
+        _: "Ver pedidos pagados",
+      }),
     },
     orders: {
       value: data.orders.current.toLocaleString(),
@@ -129,6 +178,9 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
         _: "Pedidos de los últimos %{days} días",
       }),
       trend: percentTrend(data.orders, translate),
+      linkLabel: translate("dashboard.kpi.orders.link", {
+        _: "Ver todos los pedidos",
+      }),
     },
     products: {
       // A snapshot of the catalogue, so the badge counts new arrivals instead
@@ -138,6 +190,9 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
         _: "Productos activos",
       }),
       trend: countTrend(data.products, translate),
+      linkLabel: translate("dashboard.kpi.products.link", {
+        _: "Ver productos activos",
+      }),
     },
     clients: {
       value: data.clients.current.toLocaleString(),
@@ -146,12 +201,15 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
         _: "Clientes nuevos en %{days} días",
       }),
       trend: percentTrend(data.clients, translate),
+      linkLabel: translate("dashboard.kpi.clients.link", {
+        _: "Ver clientes",
+      }),
     },
   };
 
   return section(
     <Grid>
-      {KPI_STYLE.map(({ key, icon, iconBg, iconColor }) => (
+      {KPI_STYLE.map(({ key, icon, iconBg, iconColor, to }) => (
         <KpiCard
           key={key}
           value={figures[key].value}
@@ -161,6 +219,8 @@ function KpiRow({ days, onDaysChange }: KpiRowProps) {
           icon={icon}
           iconBg={iconBg}
           iconColor={iconColor}
+          to={to}
+          linkLabel={figures[key].linkLabel}
         />
       ))}
     </Grid>,

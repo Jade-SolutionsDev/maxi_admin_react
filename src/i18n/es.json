@@ -859,10 +859,10 @@
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Ventas cobradas en los últimos %{days} días" },
-      "orders": { "subtitle": "Pedidos de los últimos %{days} días" },
-      "products": { "subtitle": "Productos activos" },
-      "clients": { "subtitle": "Clientes nuevos en %{days} días" }
+      "revenue": { "subtitle": "Ventas cobradas en los últimos %{days} días", "link": "Ver pedidos pagados" },
+      "orders": { "subtitle": "Pedidos de los últimos %{days} días", "link": "Ver todos los pedidos" },
+      "products": { "subtitle": "Productos activos", "link": "Ver productos activos" },
+      "clients": { "subtitle": "Clientes nuevos en %{days} días", "link": "Ver clientes" }
     },
     "trend": {
       "new": "Nuevo",
