@@ -853,10 +853,10 @@
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Sales collected in the last %{days} days" },
-      "orders": { "subtitle": "Orders in the last %{days} days" },
-      "products": { "subtitle": "Active products" },
-      "clients": { "subtitle": "New customers in %{days} days" }
+      "revenue": { "subtitle": "Sales collected in the last %{days} days", "link": "View paid orders" },
+      "orders": { "subtitle": "Orders in the last %{days} days", "link": "View all orders" },
+      "products": { "subtitle": "Active products", "link": "View active products" },
+      "clients": { "subtitle": "New customers in %{days} days", "link": "View clients" }
     },
     "trend": {
       "new": "New",
