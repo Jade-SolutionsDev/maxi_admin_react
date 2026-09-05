@@ -7,6 +7,7 @@ import type {
   ExtendedDataProvider,
 } from '@/providers/dataProvider';
 import { useTheme } from '../admin';
+import { moneyKpi } from './format';
 import { DEFAULT_WINDOW_DAYS, type WindowDays } from './window';
 
 /** How many products the card ranks. The API caps this at 20. */
@@ -66,6 +67,20 @@ function Rows({ count, mode }: { count: number; mode: string }) {
             />
             <div
               className="h-2 rounded w-1/3"
+              style={{
+                backgroundColor: mode === 'dark' ? '#1A2535' : '#F1F5F9',
+              }}
+            />
+          </div>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <div
+              className="h-3 w-14 rounded"
+              style={{
+                backgroundColor: mode === 'dark' ? '#1A2535' : '#F1F5F9',
+              }}
+            />
+            <div
+              className="h-1 w-16 rounded-full"
               style={{
                 backgroundColor: mode === 'dark' ? '#1A2535' : '#F1F5F9',
               }}
@@ -179,16 +194,28 @@ export default function TopProducts({
               </p>
             </div>
 
-            <div
-              className="w-16 h-1 rounded-full overflow-hidden shrink-0"
-              style={{
-                backgroundColor: mode === 'dark' ? '#1A2535' : '#F1F5F9',
-              }}
-            >
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+              <p
+                className="text-[13px] font-semibold tabular-nums"
+                style={{ color: mode === 'dark' ? '#E2E8F0' : '#1E293B' }}
+                title={translate('dashboard.topProducts.revenue', {
+                  _: 'Facturado en el período',
+                })}
+              >
+                {moneyKpi(product.revenue)}
+              </p>
+
               <div
-                className="h-full bg-[#10B981] rounded-full transition-all duration-500"
-                style={{ width: `${barWidth(product.sold, leader)}%` }}
-              />
+                className="w-16 h-1 rounded-full overflow-hidden"
+                style={{
+                  backgroundColor: mode === 'dark' ? '#1A2535' : '#F1F5F9',
+                }}
+              >
+                <div
+                  className="h-full bg-[#10B981] rounded-full transition-all duration-500"
+                  style={{ width: `${barWidth(product.sold, leader)}%` }}
+                />
+              </div>
             </div>
           </div>
         ))}
