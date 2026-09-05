@@ -149,6 +149,7 @@ export interface DashboardTopProducts {
     name: string;
     imageUrl: string | null;
     sold: number;
+    revenue: number;
   }>;
 }
 
