@@ -1,5 +1,6 @@
 import { DataProvider, fetchUtils } from 'ra-core';
 import { getApiToken } from '../lib/clerk/clerkRefs';
+import { resetIdentityCache } from './authProvider';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
@@ -400,6 +401,9 @@ export const dataProvider: DataProvider = {
         );
         result = unwrapOne(permJson) ?? result;
       }
+      // Grants changed — refetch /auth/me so the acting admin's canAccess map
+      // stays current without a full reload.
+      resetIdentityCache();
       return { data: result as never };
     }
 
@@ -426,6 +430,7 @@ export const dataProvider: DataProvider = {
     const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
       method: 'DELETE',
     });
+    if (resource === 'roles') resetIdentityCache();
     return { data: (unwrapOne(json) ?? params.previousData) as never };
   },
 
@@ -549,6 +554,8 @@ export const dataProvider: DataProvider = {
       `${API_URL}/permissions/users/${userId}/roles`,
       { method: 'PUT', body: JSON.stringify({ roleIds }) },
     );
+    // Assignments changed — refetch /auth/me on next access-check.
+    resetIdentityCache();
     return { data: unwrapOne(json) };
   },
 

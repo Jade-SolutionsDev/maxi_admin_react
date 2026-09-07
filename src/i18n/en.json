@@ -113,7 +113,12 @@
       "name_plural": "Nomenclators"
     },
     "delivery-options": {
-      "name": "Delivery options"
+      "name": "Delivery options",
+      "name_plural": "Delivery options"
+    },
+    "payment-methods": {
+      "name": "Payment method",
+      "name_plural": "Payment methods"
     }
   },
   "list": {
@@ -454,14 +459,36 @@
       "products": "Products",
       "categories": "Categories",
       "departments": "Departments",
-      "stock-locations": "Warehouses"
+      "stock-locations": "Warehouses",
+      "inventory": "Inventory",
+      "orders": "Orders",
+      "clients": "Clients",
+      "contact": "Contact (messages & templates)",
+      "cms-pages": "CMS — Pages",
+      "cms-banners": "CMS — Banners",
+      "cms-services": "CMS — Services",
+      "cms-staff": "CMS — Staff",
+      "cms-settings": "CMS — Site settings",
+      "nomenclators": "Nomenclators",
+      "delivery-options": "Delivery options",
+      "fulfillment-settings": "Fulfillment settings",
+      "payment-methods": "Payment methods",
+      "dashboard": "Dashboard (KPIs)",
+      "uploads": "Image uploads"
     },
     "actions": {
       "list": "List",
       "read": "View",
       "create": "Create",
       "update": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "reply": "Reply",
+      "update-status": "Change status",
+      "update-payment-status": "Change payment",
+      "aggregate": "Global view",
+      "history": "History",
+      "create-operation": "Operations",
+      "view": "View"
     }
   },
   "roles": {

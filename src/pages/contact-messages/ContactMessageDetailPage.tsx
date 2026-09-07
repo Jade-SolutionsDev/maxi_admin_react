@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
+  useCanAccess,
   useDataProvider,
   useGetList,
   useGetOne,
@@ -75,6 +76,13 @@ export default function ContactMessageDetailPage() {
     staleTime: 5 * 60_000,
   });
   const platformReplyEnabled = config?.data.platformReplyEnabled ?? false;
+
+  // Replying (any channel, notes included) posts to /replies, which requires
+  // the `contact:reply` grant — hide the tools from users who only triage.
+  const { canAccess: canReply } = useCanAccess({
+    resource: "contact-messages",
+    action: "reply",
+  });
 
   const [templateId, setTemplateId] = useState("");
   const [body, setBody] = useState("");
@@ -205,6 +213,7 @@ export default function ContactMessageDetailPage() {
             </p>
           </section>
 
+          {canReply && (
           <section className="rounded-xl border border-border p-5">
             <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
               {translate("contact-messages.reply_title")}
@@ -303,7 +312,9 @@ export default function ContactMessageDetailPage() {
               )}
             </div>
           </section>
+          )}
 
+          {canReply && (
           <section className="rounded-xl border border-border p-5">
             <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
               {translate("contact-messages.note_title")}
@@ -329,6 +340,7 @@ export default function ContactMessageDetailPage() {
               </Button>
             </div>
           </section>
+          )}
 
           <section className="rounded-xl border border-border p-5">
             <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
