@@ -815,7 +815,10 @@
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
       "mark_refunded": "Refund",
-      "view_customer": "View customer"
+      "view_customer": "View customer",
+      "direct_label": "Set status directly",
+      "direct_placeholder": "Jump to status…",
+      "confirm_direct_description": "You are about to skip the intermediate steps and set the order to \"%{value}\". Stock is adjusted as if each step had run. Continue?"
     },
     "payment": {
       "provider": "Provider",
@@ -862,10 +865,22 @@
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Sales collected in the last %{days} days", "link": "View paid orders" },
-      "orders": { "subtitle": "Orders in the last %{days} days", "link": "View all orders" },
-      "products": { "subtitle": "Active products", "link": "View active products" },
-      "clients": { "subtitle": "New customers in %{days} days", "link": "View clients" }
+      "revenue": {
+        "subtitle": "Sales collected in the last %{days} days",
+        "link": "View paid orders"
+      },
+      "orders": {
+        "subtitle": "Orders in the last %{days} days",
+        "link": "View all orders"
+      },
+      "products": {
+        "subtitle": "Active products",
+        "link": "View active products"
+      },
+      "clients": {
+        "subtitle": "New customers in %{days} days",
+        "link": "View clients"
+      }
     },
     "trend": {
       "new": "New",

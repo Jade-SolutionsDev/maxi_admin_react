@@ -17,6 +17,7 @@ import {
   Ban,
   ArrowRightLeft,
   CreditCard,
+  FastForward,
   Loader2,
   MapPin,
   ShoppingCart,
@@ -54,10 +55,18 @@ import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import {
   GROCER_TARGETS,
   money,
+  ORDER_STATUSES,
   type OrderPayment,
   PAYMENT_STATUSES,
   STATUS_TRANSITIONS,
 } from "./orderStatus";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
 interface OrderItemRow {
@@ -285,8 +294,13 @@ function TransferAlert({ order }: { order: OrderRecord }) {
 
 /** Pending confirmation dialog state: which change is being confirmed. */
 type PendingAction =
-  | { kind: "status"; value: OrderStatus }
+  | { kind: "status"; value: OrderStatus; direct?: boolean }
   | { kind: "payment"; value: OrderPaymentStatus };
+
+const DIRECT_JUMP_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN", "GROCER"];
+const FORWARD_CHAIN: OrderStatus[] = ORDER_STATUSES.filter(
+  (s) => s !== "cancelled",
+);
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -317,7 +331,11 @@ export default function OrderDetailPage() {
   const mutation = useMutation({
     mutationFn: (action: PendingAction) =>
       action.kind === "status"
-        ? dataProvider.updateOrderStatus(id as string, action.value)
+        ? dataProvider.updateOrderStatus(
+            id as string,
+            action.value,
+            action.direct ?? false,
+          )
         : dataProvider.updateOrderPaymentStatus(id as string, action.value),
     onSuccess: () => {
       setPending(null);
@@ -352,6 +370,18 @@ export default function OrderDetailPage() {
   const targets = STATUS_TRANSITIONS[order.status].filter(
     (t) => isManager || GROCER_TARGETS.includes(t),
   );
+
+  // Direct jumps skip the chain: forward statuses beyond the immediate next
+  // step (cancel already has its own button). Trusted roles only — the
+  // step-by-step buttons stay the safe path for future lower-privilege roles.
+  const canDirectJump = DIRECT_JUMP_ROLES.includes(
+    (identity?.role as Role) ?? "KARDIST",
+  );
+  const chainIndex = FORWARD_CHAIN.indexOf(order.status);
+  const directTargets =
+    canDirectJump && chainIndex >= 0
+      ? FORWARD_CHAIN.slice(chainIndex + 2)
+      : [];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -423,6 +453,40 @@ export default function OrderDetailPage() {
             {translate(`orders.actions.set_${target}`, { _: target })}
           </Button>
         ))}
+        {directTargets.length > 0 && (
+          <Select
+            value=""
+            disabled={mutation.isPending}
+            onValueChange={(value) =>
+              setPending({
+                kind: "status",
+                value: value as OrderStatus,
+                direct: true,
+              })
+            }
+          >
+            <SelectTrigger
+              className="w-auto gap-2"
+              aria-label={translate("orders.actions.direct_label", {
+                _: "Cambiar estado directamente",
+              })}
+            >
+              <FastForward className="h-4 w-4" />
+              <SelectValue
+                placeholder={translate("orders.actions.direct_placeholder", {
+                  _: "Saltar a estado…",
+                })}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {directTargets.map((target) => (
+                <SelectItem key={target} value={target}>
+                  {translate(`orders.status.${target}`, { _: target })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {isManager &&
           PAYMENT_STATUSES.filter((p) => p !== order.paymentStatus).map(
             (target) => (
@@ -583,7 +647,9 @@ export default function OrderDetailPage() {
               {pending &&
                 translate(
                   pending.kind === "status"
-                    ? "orders.actions.confirm_status_description"
+                    ? pending.direct
+                      ? "orders.actions.confirm_direct_description"
+                      : "orders.actions.confirm_status_description"
                     : "orders.actions.confirm_payment_description",
                   {
                     _: "¿Aplicar el cambio a %{value}?",
