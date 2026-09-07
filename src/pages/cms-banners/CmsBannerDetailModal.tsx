@@ -13,6 +13,7 @@ import {
   GalleryHorizontalEnd,
   Image as ImageIcon,
   ImageOff,
+  Link2,
   Monitor,
   Pencil,
   Smartphone,
@@ -29,6 +30,8 @@ import {
 } from "@/components/admin/resource-detail-modal";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { CmsBannerTarget } from "./cms-banner-target";
+import { CmsBannerTargetSummary } from "./CmsBannerTargetSummary";
 
 export function CmsBannerDetailModal() {
   const translate = useTranslate();
@@ -161,6 +164,18 @@ export function CmsBannerDetailModal() {
                 );
               })}
             </div>
+          </FormSection>
+
+          <FormSection
+            icon={<Link2 />}
+            title={translate("cms-banners.target.section_title")}
+            subtitle={translate("cms-banners.target.detail_hint")}
+            className="border-t pt-5"
+          >
+            <CmsBannerTargetSummary
+              target={record.target as CmsBannerTarget | null | undefined}
+              showSlug
+            />
           </FormSection>
 
           <div className="grid gap-4 border-t pt-5 sm:grid-cols-3">

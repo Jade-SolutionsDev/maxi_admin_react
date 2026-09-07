@@ -120,3 +120,34 @@ Then('al pulsarlo, el campo de fecha queda enfocado', async ({ page }) => {
     timeout: 15_000,
   });
 });
+
+When('abre el formulario de nuevo banner', async ({ page }) => {
+  await page.goto(`${ADMIN}/cms-banners/create`);
+  await page
+    .locator('input[name="alt"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 30_000 });
+});
+
+When(
+  'elige {string} como tipo de destino',
+  async ({ page }, tipo: string) => {
+    await page.getByRole('combobox', { name: /tipo de destino/i }).click();
+    await page.getByRole('option', { name: tipo, exact: true }).click();
+  },
+);
+
+Then('puede buscar el destino del banner', async ({ page }) => {
+  await expect(
+    page.getByRole('combobox', { name: /^destino$/i }),
+  ).toBeVisible();
+});
+
+Then(
+  'el tipo de destino está en {string}',
+  async ({ page }, valor: string) => {
+    await expect(
+      page.getByRole('combobox', { name: /tipo de destino/i }),
+    ).toContainText(valor);
+  },
+);

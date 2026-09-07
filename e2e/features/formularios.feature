@@ -57,3 +57,12 @@ Característica: Los formularios de la administración
     Cuando abre el formulario de nuevo producto
     Entonces el icono de la fecha es un botón
     Y al pulsarlo, el campo de fecha queda enfocado
+
+  Escenario: Un banner puede enlazar a un producto
+    Cuando abre el formulario de nuevo banner
+    Y elige "Producto" como tipo de destino
+    Entonces puede buscar el destino del banner
+
+  Escenario: Un banner puede quedar sin enlace
+    Cuando abre el formulario de nuevo banner
+    Entonces el tipo de destino está en "Sin destino"
