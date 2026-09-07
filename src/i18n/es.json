@@ -939,6 +939,26 @@
     }
   },
   "cms-banners": {
+    "target": {
+      "section_title": "Destino del banner",
+      "section_hint": "Enlazá el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
+      "detail_hint": "El slug se resuelve automáticamente y puede cambiar sin editar el banner.",
+      "type_label": "Tipo de destino",
+      "destination_label": "Destino",
+      "none": "Sin destino",
+      "none_hint": "El banner se mostrará sin enlace.",
+      "type_hint": "Elegí qué clase de contenido abrirá el banner.",
+      "destination_hint": "Podés asociar contenido inactivo para preparar una campaña.",
+      "search_placeholder": "Buscar por nombre",
+      "available": "Disponible",
+      "unavailable": "No disponible",
+      "unavailable_edit_hint": "El destino actual, %{name}, no está disponible públicamente. El banner seguirá activo, pero se ocultará mientras el destino no esté disponible.",
+      "types": {
+        "department": "Departamento",
+        "category": "Categoría",
+        "product": "Producto"
+      }
+    },
     "form": {
       "create_subtitle": "Añade un slide al carrusel principal de la tienda.",
       "edit_subtitle": "Edita el slide del carrusel.",

@@ -933,6 +933,26 @@
     }
   },
   "cms-banners": {
+    "target": {
+      "section_title": "Banner destination",
+      "section_hint": "Link the slide to a department, category, or product. The link uses its stable identifier, not its slug.",
+      "detail_hint": "The current slug is resolved automatically and can change without editing the banner.",
+      "type_label": "Destination type",
+      "destination_label": "Destination",
+      "none": "No destination",
+      "none_hint": "The banner will be displayed without a link.",
+      "type_hint": "Choose the kind of content the banner will open.",
+      "destination_hint": "Inactive content can be linked in advance for future campaigns.",
+      "search_placeholder": "Search by name",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "unavailable_edit_hint": "The current destination, %{name}, is not publicly available. The banner will remain active, but will be hidden until the destination becomes available.",
+      "types": {
+        "department": "Department",
+        "category": "Category",
+        "product": "Product"
+      }
+    },
     "form": {
       "create_subtitle": "Add a slide to the storefront hero carousel.",
       "edit_subtitle": "Edit the carousel slide.",
