@@ -97,6 +97,7 @@ export interface ExtendedDataProvider extends DataProvider {
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
+    direct?: boolean,
   ) => Promise<{ data: unknown }>;
   updateOrderPaymentStatus: (
     id: string,
@@ -598,10 +599,10 @@ export const dataProvider: DataProvider = {
     return { data: unwrapOne(json) as DashboardTopProducts };
   },
 
-  async updateOrderStatus(id: string, status: OrderStatus) {
+  async updateOrderStatus(id: string, status: OrderStatus, direct = false) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(direct ? { status, direct } : { status }),
     });
     return { data: unwrapOne(json) };
   },
