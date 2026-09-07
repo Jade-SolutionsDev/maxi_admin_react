@@ -19,7 +19,10 @@ const ACTION_ORDER = [
   "create",
   "update",
   "delete",
+<<<<<<< HEAD
   "view-all",
+=======
+>>>>>>> 85c41ea (feat(permissions): espejo de denegación por defecto en el back-office)
   "reply",
   "update-status",
   "update-payment-status",

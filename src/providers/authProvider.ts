@@ -266,6 +266,22 @@ export const authProvider: AuthProvider = {
         }
         // Anything else stays readable by any authenticated backoffice user.
         return true;
+    if (
+      [
+        "users",
+        "roles",
+        "cms-faq-categories",
+        "cms-faq-questions",
+      ].includes(resource)
+    ) {
+      return false;
     }
+
+    const rule = RESOURCE_RULES[resource];
+    if (!rule) return false;
+
+    const raw = action ?? "list";
+    const backendAction = rule.actions?.[raw] ?? ACTION_MAP[raw] ?? raw;
+    return permissionsCache[rule.module]?.includes(backendAction) ?? false;
   },
 };

@@ -400,6 +400,25 @@ const AdminApp = () => (
     <Resource name="roles" {...roles} />
     <Resource name="cms-faq-categories" recordRepresentation="title" />
     <Resource name="cms-faq-questions" recordRepresentation="question" />
+    <Resource
+      name="roles"
+      {...roles}
+      list={
+        <RequireAccess resource="roles">
+          <roles.list />
+        </RequireAccess>
+      }
+      create={
+        <RequireAccess resource="roles" action="create">
+          <roles.create />
+        </RequireAccess>
+      }
+      edit={
+        <RequireAccess resource="roles" action="edit">
+          <roles.edit />
+        </RequireAccess>
+      }
+    />
     {/* users / departments / categories are handled via CustomRoutes above. */}
   </Admin>
 );
