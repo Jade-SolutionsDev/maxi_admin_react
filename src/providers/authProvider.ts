@@ -216,6 +216,7 @@ export const authProvider: AuthProvider = {
     ) {
       return false;
     }
+    if (resource === "users" || resource === "roles") return false;
 
     const rule = RESOURCE_RULES[resource];
     if (!rule) return false;
