@@ -105,7 +105,12 @@
       "name_plural": "Nomencladores"
     },
     "delivery-options": {
-      "name": "Formas de entrega"
+      "name": "Formas de entrega",
+      "name_plural": "Formas de entrega"
+    },
+    "payment-methods": {
+      "name": "Método de pago",
+      "name_plural": "Métodos de pago"
     }
   },
   "list": {
@@ -447,14 +452,36 @@
       "products": "Productos",
       "categories": "Categorías",
       "departments": "Departamentos",
-      "stock-locations": "Almacenes"
+      "stock-locations": "Almacenes",
+      "inventory": "Inventario",
+      "orders": "Pedidos",
+      "clients": "Clientes",
+      "contact": "Contacto (mensajes y plantillas)",
+      "cms-pages": "CMS — Páginas",
+      "cms-banners": "CMS — Banners",
+      "cms-services": "CMS — Servicios",
+      "cms-staff": "CMS — Equipo",
+      "cms-settings": "CMS — Ajustes del sitio",
+      "nomenclators": "Nomencladores",
+      "delivery-options": "Opciones de entrega",
+      "fulfillment-settings": "Ajustes de entrega",
+      "payment-methods": "Métodos de pago",
+      "dashboard": "Panel (indicadores)",
+      "uploads": "Subida de imágenes"
     },
     "actions": {
       "list": "Listar",
       "read": "Ver",
       "create": "Crear",
       "update": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "reply": "Responder",
+      "update-status": "Cambiar estado",
+      "update-payment-status": "Cambiar pago",
+      "aggregate": "Vista global",
+      "history": "Historial",
+      "create-operation": "Operaciones",
+      "view": "Ver"
     }
   },
   "roles": {

@@ -321,10 +321,37 @@ const AdminApp = () => (
         }
       />
     </CustomRoutes>
-    <Resource name="clients" list={ClientList} />
+    {/* <Resource> does NOT consult canAccess — wrap every element, or a direct
+        URL renders the page for anyone (the API would still reject the data). */}
+    <Resource
+      name="clients"
+      list={
+        <RequireAccess resource="clients">
+          <ClientList />
+        </RequireAccess>
+      }
+    />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission
         matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
-    <Resource name="roles" {...roles} />
+    <Resource
+      name="roles"
+      {...roles}
+      list={
+        <RequireAccess resource="roles">
+          <roles.list />
+        </RequireAccess>
+      }
+      create={
+        <RequireAccess resource="roles" action="create">
+          <roles.create />
+        </RequireAccess>
+      }
+      edit={
+        <RequireAccess resource="roles" action="edit">
+          <roles.edit />
+        </RequireAccess>
+      }
+    />
     {/* users / departments / categories are handled via CustomRoutes above. */}
   </Admin>
 );

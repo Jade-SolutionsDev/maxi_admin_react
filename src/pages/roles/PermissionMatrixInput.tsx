@@ -10,15 +10,46 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// Column order for the matrix (must match backend actions).
-const ACTIONS = ["list", "read", "create", "update", "delete"] as const;
+// Preferred column order; any action the API returns that isn't listed here is
+// appended, so a new backend action renders without a frontend change (its
+// label falls back to the raw key until i18n catches up).
+const ACTION_ORDER = [
+  "list",
+  "read",
+  "create",
+  "update",
+  "delete",
+  "reply",
+  "update-status",
+  "update-payment-status",
+  "aggregate",
+  "history",
+  "create-operation",
+  "view",
+];
 
-// Preferred row order; any extra modules returned by the API are appended.
+// Preferred row order (mirrors the backend MODULE_ACTIONS catalog); any extra
+// modules returned by the API are appended alphabetically.
 const MODULE_ORDER = [
   "products",
   "categories",
   "departments",
   "stock-locations",
+  "inventory",
+  "orders",
+  "clients",
+  "contact",
+  "cms-pages",
+  "cms-banners",
+  "cms-services",
+  "cms-staff",
+  "cms-settings",
+  "nomenclators",
+  "delivery-options",
+  "fulfillment-settings",
+  "payment-methods",
+  "dashboard",
+  "uploads",
 ];
 
 interface PermissionRecord {
@@ -54,22 +85,28 @@ export function PermissionMatrixInput({
     ? (field.value as string[])
     : [];
 
-  const { modules, byModuleAction } = useMemo(() => {
+  const { modules, actions, byModuleAction } = useMemo(() => {
     const map = new Map<string, string>();
     const moduleSet = new Set<string>();
+    const actionSet = new Set<string>();
     (permissions ?? []).forEach((p) => {
       moduleSet.add(p.module);
+      actionSet.add(p.action);
       map.set(`${p.module}:${p.action}`, p.id);
     });
-    const orderedModules = [...moduleSet].sort((a, b) => {
-      const ia = MODULE_ORDER.indexOf(a);
-      const ib = MODULE_ORDER.indexOf(b);
+    const byPreferredOrder = (order: string[]) => (a: string, b: string) => {
+      const ia = order.indexOf(a);
+      const ib = order.indexOf(b);
       if (ia === -1 && ib === -1) return a.localeCompare(b);
       if (ia === -1) return 1;
       if (ib === -1) return -1;
       return ia - ib;
-    });
-    return { modules: orderedModules, byModuleAction: map };
+    };
+    return {
+      modules: [...moduleSet].sort(byPreferredOrder(MODULE_ORDER)),
+      actions: [...actionSet].sort(byPreferredOrder(ACTION_ORDER)),
+      byModuleAction: map,
+    };
   }, [permissions]);
 
   const setSelected = useCallback(
@@ -96,7 +133,7 @@ export function PermissionMatrixInput({
   };
 
   const idsForModule = (module: string) =>
-    ACTIONS.map((a) => byModuleAction.get(`${module}:${a}`)).filter(
+    actions.map((a) => byModuleAction.get(`${module}:${a}`)).filter(
       (id): id is string => Boolean(id),
     );
 
@@ -121,7 +158,7 @@ export function PermissionMatrixInput({
             <TableHead className="min-w-[160px]">
               {translate("roles.matrix.module")}
             </TableHead>
-            {ACTIONS.map((action) => {
+            {actions.map((action) => {
               const ids = idsForAction(action);
               const allChecked =
                 ids.length > 0 && ids.every((id) => selected.includes(id));
@@ -160,7 +197,7 @@ export function PermissionMatrixInput({
                     <span>{translate(`permissions.modules.${module}`)}</span>
                   </div>
                 </TableCell>
-                {ACTIONS.map((action) => {
+                {actions.map((action) => {
                   const id = byModuleAction.get(`${module}:${action}`);
                   return (
                     <TableCell key={action} className="text-center">
