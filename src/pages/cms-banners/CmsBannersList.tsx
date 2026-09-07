@@ -10,6 +10,8 @@ import {
   RefreshButton,
   RowNumberField,
 } from "@/components/admin";
+import type { CmsBannerTarget } from "./cms-banner-target";
+import { CmsBannerTargetSummary } from "./CmsBannerTargetSummary";
 
 const CmsBannersActions = () => {
   const { canAccess: canCreate } = useCanAccess({
@@ -34,6 +36,15 @@ const BannerThumbnail = () => {
       src={src}
       alt=""
       className="h-10 w-24 rounded-md border border-border object-cover"
+    />
+  );
+};
+
+const BannerTarget = () => {
+  const record = useRecordContext();
+  return (
+    <CmsBannerTargetSummary
+      target={record?.target as CmsBannerTarget | null | undefined}
     />
   );
 };
@@ -65,6 +76,9 @@ export default function CmsBannersList() {
           source="alt"
           cellClassName="min-w-[200px]"
         />
+        <DataTable.Col label="cms-banners.target.destination_label" disableSort>
+          <BannerTarget />
+        </DataTable.Col>
         <DataTable.Col
           source="sortOrder"
           label="list.fields.sortOrder"
