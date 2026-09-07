@@ -21,6 +21,11 @@ import {
   ResourceFormModal,
   TextInput,
 } from "@/components/admin";
+import { CmsBannerTargetInput } from "./CmsBannerTargetInput";
+import {
+  cmsBannerTargetsEqual,
+  toCmsBannerTargetPayload,
+} from "./cms-banner-target";
 
 interface CmsBannerFormModalProps {
   mode: "create" | "edit";
@@ -38,14 +43,27 @@ const asAsset = (value: unknown) => {
 };
 
 // Nested variant objects round-trip as-is; server-managed fields are dropped.
-const sanitizeCmsBanner = (data: Record<string, unknown>) => ({
-  alt: data.alt,
-  desktop: asAsset(data.desktop),
-  tablet: asAsset(data.tablet),
-  mobile: asAsset(data.mobile),
-  sortOrder: data.sortOrder ?? 0,
-  isActive: data.isActive ?? true,
-});
+// On edit an unchanged target is deliberately omitted: this preserves a stale
+// reference if its content was deleted, matching the backend PATCH semantics.
+const sanitizeCmsBanner = (
+  data: Record<string, unknown>,
+  options?: { previousData: Record<string, unknown> },
+) => {
+  const target = toCmsBannerTargetPayload(data.target);
+  const previousTarget = toCmsBannerTargetPayload(options?.previousData?.target);
+  const payload = {
+    alt: data.alt,
+    desktop: asAsset(data.desktop),
+    tablet: asAsset(data.tablet),
+    mobile: asAsset(data.mobile),
+    sortOrder: data.sortOrder ?? 0,
+    isActive: data.isActive ?? true,
+  };
+
+  return options?.previousData && cmsBannerTargetsEqual(target, previousTarget)
+    ? payload
+    : { ...payload, target };
+};
 
 export default function CmsBannerFormModal({ mode }: CmsBannerFormModalProps) {
   const navigate = useNavigate();
@@ -164,6 +182,8 @@ function CmsBannerFormFields({ mode }: { mode: "create" | "edit" }) {
         placeholder={translate("cms-banners.form.placeholders.alt", { _: "" })}
         helperText="cms-banners.form.hints.alt"
       />
+
+      <CmsBannerTargetInput />
 
       <FormSection
         icon={<ImageIcon />}
