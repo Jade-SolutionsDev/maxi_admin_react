@@ -380,7 +380,7 @@
       "usuarios": "Users",
       "clientes": "Clients",
       "reportes": "Reports",
-      "configuracion": "Settings",
+      "rolesPermisos": "Roles & permissions",
       "soon": "Coming soon",
       "cmsPages": "Pages",
       "cmsBanners": "Banners",
@@ -482,6 +482,7 @@
       "create": "Create",
       "update": "Edit",
       "delete": "Delete",
+      "view-all": "View all",
       "reply": "Reply",
       "update-status": "Change status",
       "update-payment-status": "Change payment",
@@ -665,8 +666,8 @@
       "info_hint": "Warehouse name and availability.",
       "coverage": "Coverage area",
       "coverage_hint": "Select the provinces and municipalities this warehouse serves.",
-      "grocers": "Managers",
-      "grocers_hint": "GROCER users who can manage this warehouse.",
+      "grocers": "Assigned users",
+      "grocers_hint": "Users with storage permissions who can work in this warehouse.",
       "pickupAddresses": "Pickup addresses",
       "pickupAddresses_hint": "Places where customers can pick up their orders."
     },
@@ -688,7 +689,7 @@
       "required": "Select at least one coverage area."
     },
     "grocers": {
-      "empty": "No GROCER users available."
+      "empty": "No users with storage permissions to assign."
     },
     "status": {
       "active": "Active",
