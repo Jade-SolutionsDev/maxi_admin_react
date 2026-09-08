@@ -18,6 +18,14 @@ export interface RoleSummary {
   description?: string | null;
 }
 
+export interface AssignableStorageUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  role: string;
+}
+
 export type InventoryOperationType = "IN" | "OUT" | "TRANSFER";
 
 export interface ProductStockLocation {
@@ -73,6 +81,8 @@ export interface ExtendedDataProvider extends DataProvider {
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
   getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
+  /** Users an admin may assign to a storage (they hold a stock-locations grant). */
+  getAssignableStorageUsers: () => Promise<{ data: AssignableStorageUser[] }>;
   getFulfillmentSettings: () => Promise<{ data: FulfillmentSettings }>;
   updateFulfillmentSettings: (
     data: Partial<FulfillmentSettings>,
@@ -545,6 +555,14 @@ export const dataProvider: DataProvider = {
     );
     const { rows } = unwrapList(json);
     return { data: rows as RoleSummary[] };
+  },
+
+  async getAssignableStorageUsers() {
+    const { json } = await httpClient(
+      `${API_URL}/stock-locations/assignable-users`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as AssignableStorageUser[] };
   },
 
   async setUserRoles(userId: string, roleIds: string[]) {

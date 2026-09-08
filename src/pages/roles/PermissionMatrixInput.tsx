@@ -19,6 +19,7 @@ const ACTION_ORDER = [
   "create",
   "update",
   "delete",
+  "view-all",
   "reply",
   "update-status",
   "update-payment-status",

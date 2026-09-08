@@ -10,7 +10,7 @@ import {
   Users,
   UserRound,
   BarChart3,
-  Settings, LogOut,
+  ShieldCheck, LogOut,
   User,
   PanelsTopLeft,
   CreditCard,
@@ -219,9 +219,10 @@ const navGroups: NavGroup[] = [
         resource: "cms-pages",
       },
       { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
+      // Direct entry: the old "Configuración" only ever held this page.
       {
-        labelKey: "app.menu.configuracion",
-        icon: <Settings size={20} />,
+        labelKey: "app.menu.rolesPermisos",
+        icon: <ShieldCheck size={20} />,
         path: "/roles",
         resource: "roles",
       },

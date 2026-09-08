@@ -374,7 +374,7 @@
       "usuarios": "Usuarios",
       "clientes": "Clientes",
       "reportes": "Reportes",
-      "configuracion": "Configuración",
+      "rolesPermisos": "Roles y permisos",
       "soon": "Próximamente",
       "cmsPages": "Páginas",
       "cmsBanners": "Banners",
@@ -475,6 +475,7 @@
       "create": "Crear",
       "update": "Editar",
       "delete": "Eliminar",
+      "view-all": "Ver todos",
       "reply": "Responder",
       "update-status": "Cambiar estado",
       "update-payment-status": "Cambiar pago",
@@ -658,8 +659,8 @@
       "info_hint": "Nombre y disponibilidad del almacén.",
       "coverage": "Zona de compra",
       "coverage_hint": "Seleccione las provincias y municipios donde opera este almacén.",
-      "grocers": "Encargados",
-      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén.",
+      "grocers": "Usuarios asignados",
+      "grocers_hint": "Usuarios con permiso de almacenes que pueden trabajar en este almacén.",
       "pickupAddresses": "Direcciones de recogida",
       "pickupAddresses_hint": "Puntos donde los clientes pueden recoger sus pedidos."
     },
@@ -681,7 +682,7 @@
       "required": "Selecciona al menos una zona de compra."
     },
     "grocers": {
-      "empty": "No hay usuarios GROCER disponibles."
+      "empty": "No hay usuarios con permiso de almacenes para asignar."
     },
     "status": {
       "active": "Activo",

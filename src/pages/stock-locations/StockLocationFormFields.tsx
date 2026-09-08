@@ -53,10 +53,10 @@ export function StockLocationFormFields({
           <FormSection
             icon={<Users />}
             title={translate("stockLocations.sections.grocers", {
-              _: "Encargados",
+              _: "Usuarios asignados",
             })}
             subtitle={translate("stockLocations.sections.grocers_hint", {
-              _: "Usuarios GROCER que pueden gestionar este almacén.",
+              _: "Usuarios con permiso de almacenes que pueden trabajar en este almacén.",
             })}
             className="gap-2 pt-2"
           >
