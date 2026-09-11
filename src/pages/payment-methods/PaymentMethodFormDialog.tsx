@@ -14,6 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ACCEPTED_IMAGE_LABEL,
+  ACCEPTED_IMAGE_TYPES,
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_IMAGE_SIZE_LABEL,
+  uploadImage,
+} from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 import type { PaymentMethodRecord } from "./PaymentMethodsPage";
 
@@ -117,6 +124,47 @@ export function PaymentMethodFormDialog({
   const [create, { isPending: creating }] = useCreate();
   const [update, { isPending: updating }] = useUpdate();
   const [form, setForm] = useState<FormState>(() => emptyForm(method));
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  /**
+   * El QR se sube y en el método sólo queda la URL, igual que el resto de
+   * imágenes del back-office. Los límites salen del mismo sitio que usa el
+   * backend, para que no se contradigan.
+   */
+  const handleQrUpload = async (file: File) => {
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setUploadError(
+        translate("payment-methods.form.qr_type_error", {
+          _: `Formato no admitido. Usa ${ACCEPTED_IMAGE_LABEL}.`,
+        }),
+      );
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setUploadError(
+        translate("payment-methods.form.qr_size_error", {
+          _: `La imagen supera ${MAX_IMAGE_SIZE_LABEL}.`,
+        }),
+      );
+      return;
+    }
+
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, "payments");
+      set({ imageUrl: url });
+    } catch {
+      setUploadError(
+        translate("payment-methods.form.qr_upload_error", {
+          _: "No pudimos subir la imagen. Inténtalo de nuevo.",
+        }),
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const isEdit = Boolean(method);
   const isPending = creating || updating;
@@ -128,7 +176,7 @@ export function PaymentMethodFormDialog({
     (form.type === "bank" &&
       (!form.bankName.trim() ||
         (!form.accountNumber.trim() && !form.cardNumber.trim()))) ||
-    (form.type === "qr" && !form.imageUrl.trim()) ||
+    (form.type === "qr" && (!form.imageUrl.trim() || uploading)) ||
     (form.type === "link" && !form.url.trim()) ||
     (form.type === "crypto" && (!form.address.trim() || !form.network.trim()));
 
@@ -272,15 +320,44 @@ export function PaymentMethodFormDialog({
           )}
 
           {form.type === "qr" && (
-            <Field
-              id="qr-url"
-              label={translate("payment-methods.form.qr_url", {
-                _: "URL de la imagen del QR",
-              })}
-              value={form.imageUrl}
-              onChange={(imageUrl) => set({ imageUrl })}
-              placeholder="https://…/qr.png"
-            />
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="qr-file">
+                {translate("payment-methods.form.qr_image", {
+                  _: "Imagen del QR",
+                })}
+              </Label>
+              {form.imageUrl && (
+                <img
+                  src={form.imageUrl}
+                  alt={translate("payment-methods.form.qr_preview", {
+                    _: "Vista previa del código QR",
+                  })}
+                  className="h-32 w-32 rounded-md border border-border bg-white object-contain p-2"
+                />
+              )}
+              <Input
+                id="qr-file"
+                type="file"
+                accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                disabled={uploading}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleQrUpload(file);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                {uploading
+                  ? translate("payment-methods.form.qr_uploading", {
+                      _: "Subiendo…",
+                    })
+                  : translate("payment-methods.form.qr_hint", {
+                      _: `${ACCEPTED_IMAGE_LABEL} · hasta ${MAX_IMAGE_SIZE_LABEL}`,
+                    })}
+              </p>
+              {uploadError && (
+                <p className="text-xs text-destructive">{uploadError}</p>
+              )}
+            </div>
           )}
 
           {form.type === "link" && (

@@ -23,7 +23,7 @@ export const ACCEPTED_IMAGE_LABEL = ACCEPTED_IMAGE_TYPES.map((type) =>
   .replace("AVIF", "AVIF");
 
 /** Storage folders the backend accepts (see uploads.controller allowlist). */
-export type UploadPrefix = "taxonomy" | "cms";
+export type UploadPrefix = "taxonomy" | "cms" | "payments";
 
 /**
  * Upload an image to the backend (multipart) and return its stored public URL.
