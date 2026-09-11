@@ -868,7 +868,10 @@
       "copy_address": "Copiar dirección",
       "copy_failed": "No se pudo copiar",
       "link": "Enlace de pago",
-      "open_link": "Abrir"
+      "open_link": "Abrir",
+      "customer_reference": "Comprobante del cliente",
+      "copy_customer_reference": "Copiar comprobante",
+      "view_receipt": "Ver captura"
     },
     "providerStatus": {
       "PENDING": "Pendiente",
@@ -1149,7 +1152,45 @@
     "not_configured_hint": "Configurá las credenciales en el servidor para poder activarla.",
     "toggle": "Activar método",
     "enabled": "%{name} activado",
-    "disabled": "%{name} desactivado"
+    "disabled": "%{name} desactivado",
+    "create": "Nuevo método",
+    "types": {
+      "bank": "Transferencia",
+      "qr": "Código QR",
+      "link": "Enlace",
+      "crypto": "Cripto"
+    },
+    "form": {
+      "create_title": "Nuevo método de pago",
+      "edit_title": "Editar método de pago",
+      "subtitle": "El cliente verá estas instrucciones y alguien confirmará el pago a mano.",
+      "label": "Nombre",
+      "description": "Descripción",
+      "type": "Tipo de pago",
+      "bank": "Banco",
+      "holder": "Titular",
+      "account": "Número de cuenta",
+      "card": "Número de tarjeta",
+      "link_url": "Enlace de pago",
+      "address": "Dirección de la wallet",
+      "network": "Red (obligatoria)",
+      "network_hint": "Enviar por la red equivocada pierde los fondos.",
+      "asset": "Moneda",
+      "memo": "Memo / Tag",
+      "memo_hint": "Sólo si tu dirección lo pide: sin él el pago se traba.",
+      "note": "Nota para el cliente",
+      "qr_image": "Imagen del QR",
+      "qr_preview": "Vista previa del código QR",
+      "qr_uploading": "Subiendo…",
+      "qr_hint": "JPG, PNG, WebP, AVIF · hasta 2 MB",
+      "qr_type_error": "Formato no admitido. Usa JPG, PNG, WebP o AVIF.",
+      "qr_size_error": "La imagen supera 2 MB.",
+      "qr_upload_error": "No pudimos subir la imagen. Inténtalo de nuevo."
+    },
+    "delete": {
+      "title": "¿Borrar este método de pago?",
+      "description": "Dejará de aparecer al finalizar la compra. Los pedidos que ya lo usaron conservan sus instrucciones."
+    }
   },
   "contact-messages": {
     "status": {
