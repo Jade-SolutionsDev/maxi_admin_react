@@ -76,7 +76,6 @@ const RESOURCE_RULES: Record<
     module: "fulfillment-settings",
     actions: { list: "read", show: "read", edit: "update" },
   },
-  "payment-methods": { module: "payment-methods" },
   // Inbox + reply templates share the backend `contact` module.
   "contact-messages": { module: "contact" },
   "contact-templates": { module: "contact" },
@@ -205,8 +204,15 @@ export const authProvider: AuthProvider = {
     // System admins bypass every check (mirrors the backend).
     if (MANAGER_ROLES.includes(identity.role)) return true;
 
-    // Hard admin-only surfaces — never grantable.
-    if (resource === "users" || resource === "roles") return false;
+    // Hard admin-only surfaces — never grantable. Los métodos de pago entran
+    // aquí: quien los toca decide a qué cuenta va el dinero.
+    if (
+      resource === "users" ||
+      resource === "roles" ||
+      resource === "payment-methods"
+    ) {
+      return false;
+    }
 
     const rule = RESOURCE_RULES[resource];
     if (!rule) return false;

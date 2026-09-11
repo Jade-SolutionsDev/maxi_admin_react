@@ -856,7 +856,10 @@
       "copy_address": "Copy address",
       "copy_failed": "Could not copy",
       "link": "Payment link",
-      "open_link": "Open"
+      "open_link": "Open",
+      "customer_reference": "Customer proof",
+      "copy_customer_reference": "Copy proof",
+      "view_receipt": "View receipt"
     },
     "providerStatus": {
       "PENDING": "Pending",
@@ -1088,7 +1091,39 @@
     "not_configured_hint": "Add its credentials on the server before enabling it.",
     "toggle": "Enable method",
     "enabled": "%{name} enabled",
-    "disabled": "%{name} disabled"
+    "disabled": "%{name} disabled",
+    "create": "New method",
+    "types": {
+      "bank": "Bank transfer",
+      "qr": "QR code",
+      "link": "Link",
+      "crypto": "Crypto"
+    },
+    "form": {
+      "create_title": "New payment method",
+      "edit_title": "Edit payment method",
+      "subtitle": "The customer sees these instructions and someone confirms the payment by hand.",
+      "label": "Name",
+      "description": "Description",
+      "type": "Payment type",
+      "bank": "Bank",
+      "holder": "Account holder",
+      "account": "Account number",
+      "card": "Card number",
+      "qr_url": "QR image URL",
+      "link_url": "Payment link",
+      "address": "Wallet address",
+      "network": "Network (required)",
+      "network_hint": "Sending on the wrong network loses the funds.",
+      "asset": "Asset",
+      "memo": "Memo / Tag",
+      "memo_hint": "Only if your address needs one: without it the payment stalls.",
+      "note": "Note for the customer"
+    },
+    "delete": {
+      "title": "Delete this payment method?",
+      "description": "It stops appearing at checkout. Orders that already used it keep their instructions."
+    }
   },
   "contact-messages": {
     "status": {
