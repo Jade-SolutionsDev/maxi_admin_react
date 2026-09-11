@@ -180,8 +180,8 @@
     "roles": {
       "SUPER_ADMIN": "Súper administrador",
       "ADMIN": "Administrador",
-      "GROCER": "Almacenero",
-      "KARDIST": "Kardista"
+      "STAFF": "Empleado",
+      "none": "Sin roles"
     },
     "actions": {
       "add": "Invitar usuario",
@@ -223,7 +223,10 @@
       "delete_confirm_description_no_restore": "¿Seguro que quieres eliminar a %{name}?",
       "update_success": "Usuario actualizado",
       "change_password": "Cambiar contraseña",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "staff_roles": "Roles del empleado",
+      "staff_roles_hint": "Elige los roles que definen lo que este empleado puede hacer. Puedes cambiarlos luego.",
+      "staff_roles_required": "Elige al menos un rol para el empleado."
     },
     "password": {
       "title": "Cambiar contraseña",

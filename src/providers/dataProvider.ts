@@ -7,6 +7,8 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 export interface InviteUserPayload {
   email: string;
   role: string;
+  /** Managed roles a STAFF invitee gets on registration (never for admins). */
+  roleIds?: string[];
   firstName?: string;
   lastName?: string;
   organizationId?: string;

@@ -25,6 +25,7 @@ import { useEffect } from "react";
 import {
   Translate,
   useCanAccess,
+  useCanAccessResources,
   useGetIdentity,
   useGetList,
   useLogout,
@@ -312,6 +313,54 @@ function NavEntry({ item }: { item: NavItem }) {
   );
 }
 
+/**
+ * One sidebar group. A LABELED group renders only when at least one of its
+ * permission-gated items is visible — otherwise the whole thing (label,
+ * separator and any ungated "soon" teasers) disappears, so a user granted
+ * only, say, orders never sees empty section headers.
+ */
+function NavGroupSection({ group }: { group: (typeof navGroups)[number] }) {
+  const gatedResources = group.items
+    .map((item) => item.resource)
+    .filter((r): r is string => Boolean(r));
+  const { canAccess, isPending } = useCanAccessResources({
+    resources: gatedResources,
+    action: "list",
+  });
+
+  if (group.labelKey) {
+    // Same behavior as the per-item gate: render nothing while pending.
+    if (isPending) return null;
+    const anyVisible = gatedResources.some((r) => canAccess?.[r]);
+    if (!anyVisible) return null;
+  }
+
+  return (
+    <SidebarGroup className="py-1">
+      {group.labelKey && (
+        <>
+          {/* Collapsed rail: the label hides, so a thin separator keeps groups apart. */}
+          <SidebarSeparator className="mx-0 hidden group-data-[collapsible=icon]:block" />
+          <SidebarGroupLabel>
+            <Translate i18nKey={group.labelKey} />
+          </SidebarGroupLabel>
+        </>
+      )}
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map((item) =>
+            item.resource ? (
+              <GatedNavEntry key={item.labelKey} item={item} />
+            ) : (
+              <NavEntry key={item.labelKey} item={item} />
+            ),
+          )}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
+
 /** Resource-bound entry: hidden unless the user can list the resource. */
 function GatedNavEntry({ item }: { item: NavItem }) {
   const { canAccess, isPending } = useCanAccess({
@@ -418,28 +467,7 @@ export default function AppSidebar() {
       {/* Navigation */}
       <SidebarContent className="px-1 py-2">
         {navGroups.map((group, i) => (
-          <SidebarGroup key={group.labelKey ?? `group-${i}`} className="py-1">
-            {group.labelKey && (
-              <>
-                {/* Collapsed rail: the label hides, so a thin separator keeps groups apart. */}
-                <SidebarSeparator className="mx-0 hidden group-data-[collapsible=icon]:block" />
-                <SidebarGroupLabel>
-                  <Translate i18nKey={group.labelKey} />
-                </SidebarGroupLabel>
-              </>
-            )}
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) =>
-                  item.resource ? (
-                    <GatedNavEntry key={item.labelKey} item={item} />
-                  ) : (
-                    <NavEntry key={item.labelKey} item={item} />
-                  ),
-                )}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <NavGroupSection key={group.labelKey ?? `group-${i}`} group={group} />
         ))}
       </SidebarContent>
 

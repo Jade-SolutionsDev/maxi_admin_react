@@ -53,7 +53,7 @@ import type {
 } from "@/providers/dataProvider";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import {
-  GROCER_TARGETS,
+  STAFF_TARGETS,
   money,
   ORDER_STATUSES,
   type OrderPayment,
@@ -297,7 +297,6 @@ type PendingAction =
   | { kind: "status"; value: OrderStatus; direct?: boolean }
   | { kind: "payment"; value: OrderPaymentStatus };
 
-const DIRECT_JUMP_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN", "GROCER"];
 const FORWARD_CHAIN: OrderStatus[] = ORDER_STATUSES.filter(
   (s) => s !== "cancelled",
 );
@@ -311,13 +310,19 @@ export default function OrderDetailPage() {
   const dataProvider = useDataProvider<ExtendedDataProvider>();
   const { data: identity } = useGetIdentity();
   const isManager = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
+    (identity?.role as Role) ?? "STAFF",
   );
   // The customer link only renders when the actor may open /clients
-  // (admin-only resource — GROCER gets plain text).
+  // (admin-only resource — staff get plain text).
   const { canAccess: canViewClient } = useCanAccess({
     resource: "clients",
     action: "read",
+  });
+  // Direct jumps are a grantable permission (admins pass via the manager
+  // bypass inside canAccess).
+  const { canAccess: canDirectJump } = useCanAccess({
+    resource: "orders",
+    action: "update-status-direct",
   });
 
   const {
@@ -366,17 +371,14 @@ export default function OrderDetailPage() {
     );
   }
 
-  // Legal next statuses for this order, restricted for non-managers (GROCER).
+  // Legal next statuses for this order, restricted for non-managers.
   const targets = STATUS_TRANSITIONS[order.status].filter(
-    (t) => isManager || GROCER_TARGETS.includes(t),
+    (t) => isManager || STAFF_TARGETS.includes(t),
   );
 
   // Direct jumps skip the chain: forward statuses beyond the immediate next
-  // step (cancel already has its own button). Trusted roles only — the
-  // step-by-step buttons stay the safe path for future lower-privilege roles.
-  const canDirectJump = DIRECT_JUMP_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
-  );
+  // step (cancel already has its own button). Permission-gated — the
+  // step-by-step buttons stay the safe path for everyone else.
   const chainIndex = FORWARD_CHAIN.indexOf(order.status);
   const directTargets =
     canDirectJump && chainIndex >= 0

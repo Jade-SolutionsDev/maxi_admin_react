@@ -4,7 +4,7 @@ import { getApiToken, clerkSignOut } from "../lib/clerk/clerkRefs";
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
 /** Backoffice system roles (mirrors the backend `Role` enum). */
-export type Role = "SUPER_ADMIN" | "ADMIN" | "GROCER" | "KARDIST";
+export type Role = "SUPER_ADMIN" | "ADMIN" | "STAFF";
 
 /** Roles allowed to manage users and other privileged backoffice areas. */
 export const MANAGER_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];

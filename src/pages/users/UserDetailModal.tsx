@@ -66,7 +66,7 @@ export default function UserDetailModal() {
   );
 
   const canManage = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
+    (identity?.role as Role) ?? "STAFF",
   );
 
   const firstName = (record?.firstName as string | null) ?? "";

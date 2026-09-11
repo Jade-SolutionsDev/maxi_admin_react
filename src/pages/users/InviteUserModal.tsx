@@ -32,13 +32,22 @@ import {
 import { Button } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
 import { ROLE_IDS } from "./roleChoices";
+import { RolesChecklist } from "./RolesChecklist";
 
-const inviteSchema = z.object({
-  firstName: z.string().trim().min(1).max(100),
-  lastName: z.string().trim().min(1).max(100),
-  email: z.string().trim().email(),
-  role: z.enum(ROLE_IDS),
-});
+const inviteSchema = z
+  .object({
+    firstName: z.string().trim().min(1).max(100),
+    lastName: z.string().trim().min(1).max(100),
+    email: z.string().trim().email(),
+    role: z.enum(ROLE_IDS),
+    roleIds: z.array(z.string()),
+  })
+  // An invited employee with zero roles registers locked out of everything —
+  // force the choice here, where the admin is already looking at the list.
+  .refine((v) => v.role !== "STAFF" || v.roleIds.length >= 1, {
+    path: ["roleIds"],
+    message: "roles_required",
+  });
 
 type InviteFormValues = z.infer<typeof inviteSchema>;
 
@@ -55,8 +64,9 @@ export default function InviteUserModal() {
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { firstName: "", lastName: "", email: "" },
+    defaultValues: { firstName: "", lastName: "", email: "", roleIds: [] },
   });
+  const selectedRole = form.watch("role");
 
   const onClose = () => navigate("/users");
 
@@ -67,6 +77,8 @@ export default function InviteUserModal() {
         role: values.role,
         firstName: values.firstName,
         lastName: values.lastName,
+        // Admin tiers bypass permissions; the backend rejects roles for them.
+        ...(values.role === "STAFF" ? { roleIds: values.roleIds } : {}),
       });
       toast.success(
         translate("users.actions.invite_success", {
@@ -227,6 +239,41 @@ export default function InviteUserModal() {
                   </FormItem>
                 )}
               />
+
+              {selectedRole === "STAFF" && (
+                <FormField
+                  control={form.control}
+                  name="roleIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("users.actions.staff_roles", "Roles del empleado")}{" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "users.actions.staff_roles_hint",
+                          "Elige los roles que definen lo que este empleado puede hacer. Puedes cambiarlos luego.",
+                        )}
+                      </p>
+                      <FormControl>
+                        <RolesChecklist
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      {form.formState.errors.roleIds && (
+                        <p className="text-sm text-destructive">
+                          {t(
+                            "users.actions.staff_roles_required",
+                            "Elige al menos un rol para el empleado.",
+                          )}
+                        </p>
+                      )}
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="flex items-start gap-3 rounded-lg bg-primary/5 border border-primary/20 px-4 py-3">
                 <Info className="h-5 w-5 shrink-0 text-primary" />

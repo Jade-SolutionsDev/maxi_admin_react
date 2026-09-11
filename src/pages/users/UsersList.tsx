@@ -1,6 +1,8 @@
-import { useGetIdentity, useTranslate } from "ra-core";
+import { useGetIdentity, useGetList, useTranslate } from "ra-core";
 import { UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
+
+import type { RoleSummary } from "@/providers/dataProvider";
 
 import {
   ColumnsButton,
@@ -22,15 +24,36 @@ import { roleChoices } from "./roleChoices";
 import { RoleBadge } from "./RoleBadge";
 import { StatusCell, UserAvatar, UserNameCell } from "./userCells";
 
+/**
+ * One "Rol" dropdown mixing the three access tiers with the custom managed
+ * roles. The backend's `role` filter is overloaded to accept both: a tier
+ * value hits the enum column, a role uuid joins user_roles.
+ */
+const RoleFilterInput = ({ source }: { source: string; alwaysOn?: boolean }) => {
+  const { data: customRoles = [] } = useGetList<RoleSummary>("roles", {
+    pagination: { page: 1, perPage: 1000 },
+    sort: { field: "name", order: "ASC" },
+  });
+
+  const choices = [
+    ...roleChoices,
+    ...customRoles.map((r) => ({ id: String(r.id), name: r.name })),
+  ];
+
+  return (
+    <SelectInput
+      source={source}
+      label="list.fields.role"
+      choices={choices}
+      alwaysOn
+      emptyText="users.filters.all"
+    />
+  );
+};
+
 const userFilters = [
   <SearchInput source="q" alwaysOn />,
-  <SelectInput
-    source="role"
-    label="list.fields.role"
-    choices={roleChoices}
-    alwaysOn
-    emptyText="users.filters.all"
-  />,
+  <RoleFilterInput source="role" alwaysOn />,
   <StatusToggleInput source="status" alwaysOn />,
   <ShowDeletedInput source="includeDeleted" alwaysOn />,
 ];
@@ -39,7 +62,7 @@ const UserActions = () => {
   const translate = useTranslate();
   const { data: identity } = useGetIdentity();
   const canManage = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
+    (identity?.role as Role) ?? "STAFF",
   );
 
   return (
