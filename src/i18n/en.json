@@ -88,6 +88,14 @@
       "name": "Staff member",
       "name_plural": "Staff"
     },
+    "cms-faq-categories": {
+      "name": "FAQ category",
+      "name_plural": "FAQ categories"
+    },
+    "cms-faq-questions": {
+      "name": "FAQ question",
+      "name_plural": "FAQ questions"
+    },
     "cms-settings": {
       "name": "Site settings",
       "name_plural": "Site settings"
@@ -381,6 +389,7 @@
       "cmsBanners": "Banners",
       "cmsServices": "Services",
       "cmsStaff": "Staff",
+      "cmsFaq": "Frequently asked questions",
       "cmsSettings": "Website",
       "cms": "CMS",
       "metodos_pago": "Payment methods",
@@ -961,6 +970,52 @@
       "title": "Mandatory pages missing",
       "description": "The storefront links these pages by slug (footer and About us). Create them to avoid broken links:",
       "create_label": "Create the %{title} page"
+    }
+  },
+  "cms-faq": {
+    "tabs": {
+      "categories": "Categories",
+      "questions": "Questions"
+    },
+    "fields": {
+      "category": "Category",
+      "question": "Question",
+      "answer": "Answer",
+      "questionCount": "Questions",
+      "linkLabel": "Link label",
+      "linkHref": "Link destination"
+    },
+    "actions": {
+      "manage_questions": "Manage questions",
+      "create_question": "New question"
+    },
+    "common": {
+      "sort_hint": "Lower numbers appear first."
+    },
+    "category": {
+      "create_subtitle": "Create a section for related questions.",
+      "edit_subtitle": "Edit the category name, order or visibility.",
+      "note": "An inactive category hides all its questions from the storefront.",
+      "title_hint": "Heading displayed above the accordion group.",
+      "status_hint": "Inactive: the category and its questions are not published.",
+      "detail_subtitle": "%{count} registered questions",
+      "delete_title": "Delete category",
+      "delete_description": "The category and all its questions will no longer be available.",
+      "visible": "This category is published on the storefront.",
+      "hidden": "This category is hidden from the storefront."
+    },
+    "question": {
+      "create_subtitle": "Add a customer-facing answer.",
+      "edit_subtitle": "Edit the content and its position in the FAQ.",
+      "note": "Publish only behavior confirmed by the platform.",
+      "category_hint": "Group where the question will be displayed.",
+      "question_hint": "Write it as a customer would ask it.",
+      "answer_hint": "Use simple, direct, non-technical language.",
+      "link_label_hint": "Optional. If set, provide a destination too.",
+      "link_href_hint": "Internal path (/contacto) or secure https:// URL.",
+      "status_hint": "Inactive: this question is not published.",
+      "delete_title": "Delete question",
+      "delete_description": "The question will no longer appear on the storefront."
     }
   },
   "cms-banners": {

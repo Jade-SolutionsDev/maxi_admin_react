@@ -23,6 +23,7 @@ import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
 import { RoleBadge } from "./RoleBadge";
 import { StatusCell, UserAvatar, UserNameCell } from "./userCells";
+import { UserActionsCell } from "./userRowActions";
 
 /**
  * One "Rol" dropdown mixing the three access tiers with the custom managed
@@ -91,6 +92,13 @@ export default function UsersList() {
       title={translate("resources.users.name_plural")}
       perPage={10}
       sort={{ field: "id", order: "DESC" }}
+      /*
+        Sin esto la lista no traia las invitaciones pendientes, y como sus
+        acciones inline —reenviar y revocar— solo salen en filas con
+        `isPending`, no habia forma de reenviar una invitacion desde el modulo
+        (MxH-0098). La API ya las devolvia; nadie se las pedia.
+      */
+      filter={{ includeInvitations: true }}
     >
       <DataTable
         hasBulkActions={false}
@@ -140,13 +148,22 @@ export default function UsersList() {
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
         </DataTable.Col>
-        {/* <DataTable.Col
+        {/*
+          Estaba comentada, y con ella desaparecieron las unicas acciones que
+          no viven en el modal de detalle: reenviar y revocar una invitacion
+          pendiente, y restaurar un usuario eliminado. Ninguna de esas filas
+          abre modal —una invitacion no es un usuario y un eliminado no lo
+          devuelve GET /users/:id—, asi que sin esta columna no habia forma de
+          hacerlo desde el modulo (MxH-0098). La celda se pinta sola cuando no
+          hay nada que ofrecer.
+        */}
+        <DataTable.Col
           label="list.fields.actions"
           disableSort
           cellClassName="text-center w-28"
         >
           <UserActionsCell />
-        </DataTable.Col> */}
+        </DataTable.Col>
       </DataTable>
     </List>
   );

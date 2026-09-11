@@ -30,6 +30,12 @@ export const CMS_BANNER_TARGET_RESOURCES: Record<
   product: "products",
 };
 
+export function getCmsBannerTargetAdminPath(
+  target: Pick<CmsBannerTarget, "type" | "id">,
+) {
+  return `/${CMS_BANNER_TARGET_RESOURCES[target.type]}/${target.id}`;
+}
+
 export function toCmsBannerTargetPayload(
   value: unknown,
 ): CmsBannerTargetPayload | null {
