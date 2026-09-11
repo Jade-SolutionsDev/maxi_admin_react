@@ -76,6 +76,35 @@ export function PaymentDetailsSection({ payment }: { payment: OrderPayment }) {
         <Row label={translate("orders.payment.status", { _: "Estado" })}>
           <ProviderStatusBadge status={payment.status} />
         </Row>
+        {payment.customerReference && (
+          <Row
+            label={translate("orders.payment.customer_reference", {
+              _: "Comprobante del cliente",
+            })}
+          >
+            <div className="flex flex-col items-end gap-1">
+              <CopyValue
+                value={payment.customerReference}
+                label={translate("orders.payment.copy_customer_reference", {
+                  _: "Copiar comprobante",
+                })}
+              />
+              {payment.receiptUrl && (
+                <a
+                  href={payment.receiptUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-xs text-primary underline"
+                >
+                  {translate("orders.payment.view_receipt", {
+                    _: "Ver captura",
+                  })}
+                </a>
+              )}
+            </div>
+          </Row>
+        )}
+
         <Row label={translate("orders.payment.reference", { _: "Referencia" })}>
           <CopyValue
             value={payment.reference}

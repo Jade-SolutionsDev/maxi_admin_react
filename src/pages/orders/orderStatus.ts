@@ -90,6 +90,9 @@ export interface OrderPayment {
   feeAmount: string | null;
   settlementAmount: string | null;
   errorMessage: string | null;
+  /** Lo que dice el cliente haber pagado: con esto se casa el pago. */
+  customerReference: string | null;
+  receiptUrl: string | null;
   createdAt: string;
 }
 
