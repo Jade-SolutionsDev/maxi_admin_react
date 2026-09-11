@@ -397,6 +397,9 @@ const AdminApp = () => (
         </RequireAccess>
       }
     />
+    <Resource name="roles" {...roles} />
+    <Resource name="cms-faq-categories" recordRepresentation="title" />
+    <Resource name="cms-faq-questions" recordRepresentation="question" />
     {/* users / departments / categories are handled via CustomRoutes above. */}
   </Admin>
 );
