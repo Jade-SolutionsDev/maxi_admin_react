@@ -224,5 +224,48 @@ export const authProvider: AuthProvider = {
     const raw = action ?? "list";
     const backendAction = rule.actions?.[raw] ?? ACTION_MAP[raw] ?? raw;
     return permissionsCache[rule.module]?.includes(backendAction) ?? false;
+    switch (resource) {
+      // Admin-only surfaces.
+      // Admin-only surfaces; CMS content is an admin task too (managers
+      // already returned true above).
+      case "users":
+      case "clients":
+      case "dashboard-stats": // KPI aggregates; ADMIN+ like /clients
+      case "roles":
+      case "settings":
+      case "cms-pages":
+      case "cms-banners":
+      case "cms-services":
+      case "cms-staff":
+      case "cms-faq-categories":
+      case "cms-faq-questions":
+      case "cms-settings":
+      case "payment-methods":
+      case "nomenclators":
+      case "contact-motives":
+      case "delivery-options":
+      case "fulfillment-settings":
+        return false;
+      // Cross-storage inventory overview: managers (handled above) + kardist.
+      // Grocers use the per-storage Almacenes tab instead.
+      case "inventory":
+        return identity.role === "KARDIST";
+      // Support inbox + reply drafts: governed by the 'contact' permission
+      // module so non-admin staff can be granted access via the Roles UI.
+      case "contact-messages":
+      case "contact-templates": {
+        const backendAction = ACTION_MAP[action ?? ""] ?? action ?? "";
+        return permissionsCache.contact?.includes(backendAction) ?? false;
+      }
+      default:
+        // Catalog + operational modules are governed by the effective
+        // permission map (products, categories, departments, stock-locations).
+        if (MANAGED_MODULES.includes(resource)) {
+          const backendAction = ACTION_MAP[action ?? ""] ?? action ?? "";
+          return permissionsCache[resource]?.includes(backendAction) ?? false;
+        }
+        // Anything else stays readable by any authenticated backoffice user.
+        return true;
+    }
   },
 };
