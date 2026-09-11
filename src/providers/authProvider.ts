@@ -162,6 +162,8 @@ export const authProvider: AuthProvider = {
       case "cms-banners":
       case "cms-services":
       case "cms-staff":
+      case "cms-faq-categories":
+      case "cms-faq-questions":
       case "cms-settings":
       case "payment-methods":
       case "nomenclators":

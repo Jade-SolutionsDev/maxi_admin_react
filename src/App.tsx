@@ -76,6 +76,12 @@ import roles from "./pages/roles";
 import Loading from "./pages/Loading";
 import AccessDenied from "./pages/AccessDenied";
 import { RequireAccess } from "./components/auth/RequireAccess";
+import { CmsFaqCategoriesLayout } from "./pages/cms-faq/CmsFaqCategoriesLayout";
+import { CmsFaqCategoryFormModal } from "./pages/cms-faq/CmsFaqCategoryFormModal";
+import { CmsFaqCategoryDetailModal } from "./pages/cms-faq/CmsFaqCategoryDetailModal";
+import { CmsFaqQuestionsLayout } from "./pages/cms-faq/CmsFaqQuestionsLayout";
+import { CmsFaqQuestionFormModal } from "./pages/cms-faq/CmsFaqQuestionFormModal";
+import { CmsFaqQuestionDetailModal } from "./pages/cms-faq/CmsFaqQuestionDetailModal";
 
 // Shared store so the standalone invite route and the Admin app read the same
 // persisted preferences (e.g. the light/dark theme).
@@ -204,6 +210,42 @@ const AdminApp = () => (
         }
       />
       <Route
+        path="/cms-faq-categories/*"
+        element={
+          <RequireAccess resource="cms-faq-categories">
+            <CmsFaqCategoriesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route
+          path="create"
+          element={<CmsFaqCategoryFormModal mode="create" />}
+        />
+        <Route
+          path="edit/:id"
+          element={<CmsFaqCategoryFormModal mode="edit" />}
+        />
+        <Route path=":id" element={<CmsFaqCategoryDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-faq-questions/*"
+        element={
+          <RequireAccess resource="cms-faq-questions">
+            <CmsFaqQuestionsLayout />
+          </RequireAccess>
+        }
+      >
+        <Route
+          path="create"
+          element={<CmsFaqQuestionFormModal mode="create" />}
+        />
+        <Route
+          path="edit/:id"
+          element={<CmsFaqQuestionFormModal mode="edit" />}
+        />
+        <Route path=":id" element={<CmsFaqQuestionDetailModal />} />
+      </Route>
+      <Route
         path="/payment-methods"
         element={
           <RequireAccess resource="payment-methods">
@@ -325,6 +367,8 @@ const AdminApp = () => (
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission
         matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
     <Resource name="roles" {...roles} />
+    <Resource name="cms-faq-categories" recordRepresentation="title" />
+    <Resource name="cms-faq-questions" recordRepresentation="question" />
     {/* users / departments / categories are handled via CustomRoutes above. */}
   </Admin>
 );
