@@ -184,6 +184,8 @@ const RESOURCE_PATHS: Record<string, string> = {
   'cms-banners': 'cms/banners',
   'cms-services': 'cms/services',
   'cms-staff': 'cms/staff',
+  'cms-faq-categories': 'cms/faq/categories',
+  'cms-faq-questions': 'cms/faq/questions',
   'contact-messages': 'contact/messages',
   'contact-templates': 'contact/templates',
   'contact-motives': 'nomenclators',

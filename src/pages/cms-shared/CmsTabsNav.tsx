@@ -4,6 +4,7 @@ import {
   FileText,
   GalleryHorizontalEnd,
   HandHeart,
+  CircleHelp,
   Settings2,
   UsersRound,
 } from "lucide-react";
@@ -18,6 +19,12 @@ const tabs = [
   },
   { labelKey: "app.menu.cmsServices", path: "/cms-services", icon: HandHeart },
   { labelKey: "app.menu.cmsStaff", path: "/cms-staff", icon: UsersRound },
+  {
+    labelKey: "app.menu.cmsFaq",
+    path: "/cms-faq-categories",
+    activePrefixes: ["/cms-faq-categories", "/cms-faq-questions"],
+    icon: CircleHelp,
+  },
   {
     labelKey: "app.menu.cmsSettings",
     path: "/cms-settings",
@@ -41,8 +48,10 @@ export function CmsTabsNav() {
       aria-label={translate("app.menu.cms", { _: "CMS" })}
       className="mb-4 flex gap-1 overflow-x-auto border-b border-border px-4 pt-4"
     >
-      {tabs.map(({ labelKey, path, icon: Icon }) => {
-        const active = location.pathname.startsWith(path);
+      {tabs.map(({ labelKey, path, activePrefixes, icon: Icon }) => {
+        const active = (activePrefixes ?? [path]).some((prefix) =>
+          location.pathname.startsWith(prefix),
+        );
         return (
           <button
             key={path}

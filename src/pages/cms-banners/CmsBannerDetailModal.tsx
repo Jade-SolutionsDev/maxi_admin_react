@@ -169,12 +169,10 @@ export function CmsBannerDetailModal() {
           <FormSection
             icon={<Link2 />}
             title={translate("cms-banners.target.section_title")}
-            subtitle={translate("cms-banners.target.detail_hint")}
             className="border-t pt-5"
           >
             <CmsBannerTargetSummary
               target={record.target as CmsBannerTarget | null | undefined}
-              showSlug
             />
           </FormSection>
 
