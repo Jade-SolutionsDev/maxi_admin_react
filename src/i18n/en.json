@@ -1110,7 +1110,6 @@
       "holder": "Account holder",
       "account": "Account number",
       "card": "Card number",
-      "qr_url": "QR image URL",
       "link_url": "Payment link",
       "address": "Wallet address",
       "network": "Network (required)",
@@ -1118,7 +1117,14 @@
       "asset": "Asset",
       "memo": "Memo / Tag",
       "memo_hint": "Only if your address needs one: without it the payment stalls.",
-      "note": "Note for the customer"
+      "note": "Note for the customer",
+      "qr_image": "QR image",
+      "qr_preview": "QR code preview",
+      "qr_uploading": "Uploading…",
+      "qr_hint": "JPG, PNG, WebP, AVIF · up to 2 MB",
+      "qr_type_error": "Unsupported format. Use JPG, PNG, WebP or AVIF.",
+      "qr_size_error": "The image is larger than 2 MB.",
+      "qr_upload_error": "We could not upload the image. Try again."
     },
     "delete": {
       "title": "Delete this payment method?",

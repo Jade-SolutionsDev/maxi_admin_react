@@ -1116,7 +1116,6 @@
       "holder": "Titular",
       "account": "Número de cuenta",
       "card": "Número de tarjeta",
-      "qr_url": "URL de la imagen del QR",
       "link_url": "Enlace de pago",
       "address": "Dirección de la wallet",
       "network": "Red (obligatoria)",
@@ -1124,7 +1123,14 @@
       "asset": "Moneda",
       "memo": "Memo / Tag",
       "memo_hint": "Sólo si tu dirección lo pide: sin él el pago se traba.",
-      "note": "Nota para el cliente"
+      "note": "Nota para el cliente",
+      "qr_image": "Imagen del QR",
+      "qr_preview": "Vista previa del código QR",
+      "qr_uploading": "Subiendo…",
+      "qr_hint": "JPG, PNG, WebP, AVIF · hasta 2 MB",
+      "qr_type_error": "Formato no admitido. Usa JPG, PNG, WebP o AVIF.",
+      "qr_size_error": "La imagen supera 2 MB.",
+      "qr_upload_error": "No pudimos subir la imagen. Inténtalo de nuevo."
     },
     "delete": {
       "title": "¿Borrar este método de pago?",
