@@ -88,6 +88,14 @@
       "name": "Miembro del equipo",
       "name_plural": "Equipo"
     },
+    "cms-faq-categories": {
+      "name": "Categoría de preguntas",
+      "name_plural": "Categorías de preguntas"
+    },
+    "cms-faq-questions": {
+      "name": "Pregunta frecuente",
+      "name_plural": "Preguntas frecuentes"
+    },
     "cms-settings": {
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
@@ -380,6 +388,7 @@
       "cmsBanners": "Banners",
       "cmsServices": "Servicios",
       "cmsStaff": "Equipo",
+      "cmsFaq": "Preguntas frecuentes",
       "cmsSettings": "Sitio web",
       "cms": "CMS",
       "metodos_pago": "Métodos de pago",
@@ -964,6 +973,52 @@
       "title": "Faltan páginas obligatorias",
       "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Créalas para no dejar enlaces rotos:",
       "create_label": "Crear la página %{title}"
+    }
+  },
+  "cms-faq": {
+    "tabs": {
+      "categories": "Categorías",
+      "questions": "Preguntas"
+    },
+    "fields": {
+      "category": "Categoría",
+      "question": "Pregunta",
+      "answer": "Respuesta",
+      "questionCount": "Preguntas",
+      "linkLabel": "Texto del enlace",
+      "linkHref": "Destino del enlace"
+    },
+    "actions": {
+      "manage_questions": "Administrar preguntas",
+      "create_question": "Nueva pregunta"
+    },
+    "common": {
+      "sort_hint": "Los números menores aparecen primero."
+    },
+    "category": {
+      "create_subtitle": "Crea una sección para agrupar preguntas relacionadas.",
+      "edit_subtitle": "Edita el nombre, orden o visibilidad de la categoría.",
+      "note": "Una categoría inactiva oculta todas sus preguntas en la tienda.",
+      "title_hint": "Título visible sobre el grupo de acordeones.",
+      "status_hint": "Inactiva: la categoría y sus preguntas no se publican.",
+      "detail_subtitle": "%{count} preguntas registradas",
+      "delete_title": "Eliminar categoría",
+      "delete_description": "La categoría y todas sus preguntas dejarán de estar disponibles.",
+      "visible": "Esta categoría está publicada en la tienda.",
+      "hidden": "Esta categoría está oculta en la tienda."
+    },
+    "question": {
+      "create_subtitle": "Añade una respuesta orientada al cliente.",
+      "edit_subtitle": "Edita el contenido y su ubicación dentro de la FAQ.",
+      "note": "Publica únicamente comportamientos confirmados de la plataforma.",
+      "category_hint": "Grupo en el que se mostrará la pregunta.",
+      "question_hint": "Escríbela como la formularía un cliente.",
+      "answer_hint": "Usa lenguaje sencillo, directo y poco técnico.",
+      "link_label_hint": "Opcional. Si lo completas, indica también el destino.",
+      "link_href_hint": "Ruta interna (/contacto) o URL segura con https://.",
+      "status_hint": "Inactiva: esta pregunta no se publica.",
+      "delete_title": "Eliminar pregunta",
+      "delete_description": "La pregunta dejará de mostrarse en la tienda."
     }
   },
   "cms-banners": {

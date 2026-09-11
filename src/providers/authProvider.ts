@@ -206,7 +206,13 @@ export const authProvider: AuthProvider = {
     if (MANAGER_ROLES.includes(identity.role)) return true;
 
     // Hard admin-only surfaces — never grantable.
-    if (resource === "users" || resource === "roles") return false;
+    if (
+      ["users", "roles", "cms-faq-categories", "cms-faq-questions"].includes(
+        resource,
+      )
+    ) {
+      return false;
+    }
 
     const rule = RESOURCE_RULES[resource];
     if (!rule) return false;
