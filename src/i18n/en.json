@@ -482,10 +482,7 @@
       "create": "Create",
       "update": "Edit",
       "delete": "Delete",
-<<<<<<< HEAD
       "view-all": "View all",
-=======
->>>>>>> 85c41ea (feat(permissions): espejo de denegación por defecto en el back-office)
       "reply": "Reply",
       "update-status": "Change status",
       "update-payment-status": "Change payment",

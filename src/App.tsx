@@ -375,9 +375,6 @@ const AdminApp = () => (
     />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission
         matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
-    <Resource name="roles" {...roles} />
-    <Resource name="cms-faq-categories" recordRepresentation="title" />
-    <Resource name="cms-faq-questions" recordRepresentation="question" />
     <Resource
       name="roles"
       {...roles}
@@ -397,28 +394,8 @@ const AdminApp = () => (
         </RequireAccess>
       }
     />
-    <Resource name="roles" {...roles} />
     <Resource name="cms-faq-categories" recordRepresentation="title" />
     <Resource name="cms-faq-questions" recordRepresentation="question" />
-    <Resource
-      name="roles"
-      {...roles}
-      list={
-        <RequireAccess resource="roles">
-          <roles.list />
-        </RequireAccess>
-      }
-      create={
-        <RequireAccess resource="roles" action="create">
-          <roles.create />
-        </RequireAccess>
-      }
-      edit={
-        <RequireAccess resource="roles" action="edit">
-          <roles.edit />
-        </RequireAccess>
-      }
-    />
     {/* users / departments / categories are handled via CustomRoutes above. */}
   </Admin>
 );
