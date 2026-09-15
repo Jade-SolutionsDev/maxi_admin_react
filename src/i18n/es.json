@@ -845,6 +845,8 @@
       "set_shipped": "Marcar enviado",
       "set_delivered": "Marcar entregado",
       "set_cancelled": "Cancelar pedido",
+      "reinstate": "Restablecer orden",
+      "confirm_reinstate_description": "El pedido volverá a \"Pendiente\" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?",
       "mark_pending": "Pago pendiente",
       "mark_paid": "Marcar pagado",
       "mark_failed": "Pago fallido",
@@ -881,6 +883,9 @@
       "FAILED": "Fallido",
       "EXPIRED": "Expirado",
       "CANCELLED": "Cancelado"
+    },
+    "reinstated": {
+      "notice": "Restablecida el %{date}. El plazo de pago volvió a empezar; si no se paga a tiempo, se cancelará de nuevo."
     },
     "cancellationReason": {
       "payment_not_received": "Cancelado automáticamente: no se recibió el pago a tiempo y se liberó el stock.",

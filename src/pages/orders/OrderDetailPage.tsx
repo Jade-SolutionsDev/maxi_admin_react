@@ -20,6 +20,7 @@ import {
   FastForward,
   Loader2,
   MapPin,
+  RotateCcw,
   ShoppingCart,
   StickyNote,
   UserRound,
@@ -103,6 +104,8 @@ interface OrderRecord {
   } | null;
   customerNotes: string | null;
   cancellationReason: CancellationReason | null;
+  /** Set when an admin brought the order back from cancelled to pending. */
+  reinstatedAt?: string | null;
   needsTransfer?: boolean;
   pickupLocationId?: string | null;
   pendingTransfers?: {
@@ -295,7 +298,8 @@ function TransferAlert({ order }: { order: OrderRecord }) {
 /** Pending confirmation dialog state: which change is being confirmed. */
 type PendingAction =
   | { kind: "status"; value: OrderStatus; direct?: boolean }
-  | { kind: "payment"; value: OrderPaymentStatus };
+  | { kind: "payment"; value: OrderPaymentStatus }
+  | { kind: "reinstate" };
 
 const FORWARD_CHAIN: OrderStatus[] = ORDER_STATUSES.filter(
   (s) => s !== "cancelled",
@@ -334,14 +338,18 @@ export default function OrderDetailPage() {
   const [pending, setPending] = useState<PendingAction | null>(null);
 
   const mutation = useMutation({
-    mutationFn: (action: PendingAction) =>
-      action.kind === "status"
+    mutationFn: (action: PendingAction) => {
+      if (action.kind === "reinstate") {
+        return dataProvider.reinstateOrder(id as string);
+      }
+      return action.kind === "status"
         ? dataProvider.updateOrderStatus(
             id as string,
             action.value,
             action.direct ?? false,
           )
-        : dataProvider.updateOrderPaymentStatus(id as string, action.value),
+        : dataProvider.updateOrderPaymentStatus(id as string, action.value);
+    },
     onSuccess: () => {
       setPending(null);
       notify("orders.actions.updated", {
@@ -375,6 +383,13 @@ export default function OrderDetailPage() {
   const targets = STATUS_TRANSITIONS[order.status].filter(
     (t) => isManager || STAFF_TARGETS.includes(t),
   );
+
+  // «Restablecer orden»: managers only, and only for a cancelled order that
+  // can still be served. The paid-after-expiry case needs a refund instead.
+  const canReinstate =
+    isManager &&
+    order.status === "cancelled" &&
+    order.cancellationReason !== "paid_after_expiry_out_of_stock";
 
   // Direct jumps skip the chain: forward statuses beyond the immediate next
   // step (cancel already has its own button). Permission-gated — the
@@ -430,11 +445,30 @@ export default function OrderDetailPage() {
           needsRefund={order.paymentStatus === "paid"}
         />
       )}
+      {order.status !== "cancelled" && order.reinstatedAt && (
+        <p className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+          <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
+          {translate("orders.reinstated.notice", {
+            _: "Restablecida el %{date}. El plazo de pago volvió a empezar; si no se paga a tiempo, se cancelará de nuevo.",
+            date: new Date(order.reinstatedAt).toLocaleString(),
+          })}
+        </p>
+      )}
 
       {order.needsTransfer && <TransferAlert order={order} />}
 
       {/* Actions */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
+        {canReinstate && (
+          <Button
+            type="button"
+            disabled={mutation.isPending}
+            onClick={() => setPending({ kind: "reinstate" })}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {translate("orders.actions.reinstate", { _: "Restablecer orden" })}
+          </Button>
+        )}
         {targets.map((target) => (
           <Button
             key={target}
@@ -646,7 +680,12 @@ export default function OrderDetailPage() {
               })}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center sm:text-left">
+              {pending?.kind === "reinstate" &&
+                translate("orders.actions.confirm_reinstate_description", {
+                  _: "El pedido volverá a \"Pendiente\" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?",
+                })}
               {pending &&
+                pending.kind !== "reinstate" &&
                 translate(
                   pending.kind === "status"
                     ? pending.direct
