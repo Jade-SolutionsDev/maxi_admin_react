@@ -802,6 +802,8 @@
       "set_shipped": "Mark shipped",
       "set_delivered": "Mark delivered",
       "set_cancelled": "Cancel order",
+      "reinstate": "Reinstate order",
+      "confirm_reinstate_description": "The order goes back to \"Pending\" and its stock is reserved again. The payment status does not change and the payment window restarts: if it is not paid in time, it will be cancelled again. Continue?",
       "mark_pending": "Payment pending",
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
@@ -832,6 +834,9 @@
       "FAILED": "Failed",
       "EXPIRED": "Expired",
       "CANCELLED": "Cancelled"
+    },
+    "reinstated": {
+      "notice": "Reinstated on %{date}. The payment window restarted; if it is not paid in time, it will be cancelled again."
     },
     "cancellationReason": {
       "payment_not_received": "Cancelled automatically: payment was not received in time and the stock was released.",

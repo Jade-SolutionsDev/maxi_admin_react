@@ -94,6 +94,8 @@ export interface ExtendedDataProvider extends DataProvider {
     days?: number;
     limit?: number;
   }) => Promise<{ data: DashboardTopProducts }>;
+  /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
+  reinstateOrder: (id: string) => Promise<{ data: unknown }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -602,6 +604,13 @@ export const dataProvider: DataProvider = {
     const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async reinstateOrder(id: string) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/reinstate`, {
+      method: 'POST',
     });
     return { data: unwrapOne(json) };
   },
