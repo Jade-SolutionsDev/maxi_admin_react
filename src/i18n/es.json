@@ -906,6 +906,28 @@
     },
     "filters": {
       "withoutPaymentMethod": "Sin intento de pago"
+    },
+    "history": {
+      "title": "Historial",
+      "empty": "Sin movimientos registrados. El historial se guarda desde que se activó esta función; los pedidos anteriores no lo tienen.",
+      "error": "No se pudo cargar el historial.",
+      "via": "vía %{provider}",
+      "reference": "ref. %{reference}",
+      "direct": "salto directo",
+      "actor": {
+        "system": "Sistema",
+        "admin": "Administración",
+        "client": "Cliente"
+      },
+      "kind": {
+        "created": "Pedido creado",
+        "status_changed": "Cambio de estado",
+        "payment_status_changed": "Cambio de pago",
+        "payment_attempt": "Intento de pago",
+        "proof_submitted": "Comprobante enviado",
+        "reinstated": "Pedido restablecido",
+        "expired": "Caducado por falta de pago"
+      }
     }
   },
   "dashboard": {

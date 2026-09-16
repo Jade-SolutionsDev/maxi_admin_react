@@ -900,6 +900,28 @@
       "note": "Transfer for order %{number}",
       "at_storage": "at %{name}",
       "prepare": "Prepare transfer"
+    },
+    "history": {
+      "title": "History",
+      "empty": "No recorded activity. History is kept since this feature was enabled; older orders have none.",
+      "error": "Could not load the history.",
+      "via": "via %{provider}",
+      "reference": "ref. %{reference}",
+      "direct": "direct jump",
+      "actor": {
+        "system": "System",
+        "admin": "Staff",
+        "client": "Customer"
+      },
+      "kind": {
+        "created": "Order placed",
+        "status_changed": "Status changed",
+        "payment_status_changed": "Payment changed",
+        "payment_attempt": "Payment attempt",
+        "proof_submitted": "Proof submitted",
+        "reinstated": "Order reinstated",
+        "expired": "Expired unpaid"
+      }
     }
   },
   "dashboard": {

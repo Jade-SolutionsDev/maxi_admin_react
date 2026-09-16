@@ -1,8 +1,8 @@
-import { DataProvider, fetchUtils } from 'ra-core';
-import { getApiToken } from '../lib/clerk/clerkRefs';
-import { resetIdentityCache } from './authProvider';
+import { DataProvider, fetchUtils } from "ra-core";
+import { getApiToken } from "../lib/clerk/clerkRefs";
+import { resetIdentityCache } from "./authProvider";
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
 export interface InviteUserPayload {
   email: string;
@@ -38,6 +38,28 @@ export interface ProductStockLocation {
   reservedQuantity: number;
   isActive: boolean;
   available: number;
+}
+
+export type OrderEventKind =
+  | "created"
+  | "status_changed"
+  | "payment_status_changed"
+  | "payment_attempt"
+  | "proof_submitted"
+  | "reinstated"
+  | "expired";
+
+export interface OrderEvent {
+  id: string;
+  kind: OrderEventKind;
+  actorKind: "admin" | "client" | "system";
+  actorName: string | null;
+  field: string | null;
+  previousValue: string | null;
+  nextValue: string | null;
+  reason: string | null;
+  meta: Record<string, unknown> | null;
+  createdAt: string;
 }
 
 export interface InventoryHistoryEvent {
@@ -89,7 +111,10 @@ export interface ExtendedDataProvider extends DataProvider {
   updateFulfillmentSettings: (
     data: Partial<FulfillmentSettings>,
   ) => Promise<{ data: FulfillmentSettings }>;
-  setUserRoles: (userId: string, roleIds: string[]) => Promise<{ data: unknown }>;
+  setUserRoles: (
+    userId: string,
+    roleIds: string[],
+  ) => Promise<{ data: unknown }>;
   createInventoryOperation: (
     payload: CreateInventoryOperationPayload,
   ) => Promise<{ data: unknown }>;
@@ -109,6 +134,8 @@ export interface ExtendedDataProvider extends DataProvider {
   }) => Promise<{ data: DashboardTopProducts }>;
   /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
+  /** Historial del pedido, del más antiguo al más reciente. */
+  getOrderEvents: (id: string) => Promise<{ data: OrderEvent[] }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -191,20 +218,20 @@ export interface SiteSettingsData {
 
 // Resources whose REST path differs from the react-admin resource name.
 const RESOURCE_PATHS: Record<string, string> = {
-  roles: 'permissions/roles',
+  roles: "permissions/roles",
   // The Inventory page lists stock aggregated by product across all storages.
-  inventory: 'inventory/aggregate',
+  inventory: "inventory/aggregate",
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
-  'storage-inventory': 'inventory',
-  'cms-pages': 'cms/pages',
-  'cms-banners': 'cms/banners',
-  'cms-services': 'cms/services',
-  'cms-staff': 'cms/staff',
-  'cms-faq-categories': 'cms/faq/categories',
-  'cms-faq-questions': 'cms/faq/questions',
-  'contact-messages': 'contact/messages',
-  'contact-templates': 'contact/templates',
-  'contact-motives': 'nomenclators',
+  "storage-inventory": "inventory",
+  "cms-pages": "cms/pages",
+  "cms-banners": "cms/banners",
+  "cms-services": "cms/services",
+  "cms-staff": "cms/staff",
+  "cms-faq-categories": "cms/faq/categories",
+  "cms-faq-questions": "cms/faq/questions",
+  "contact-messages": "contact/messages",
+  "contact-templates": "contact/templates",
+  "contact-motives": "nomenclators",
 };
 
 function resourcePath(resource: string): string {
@@ -215,12 +242,12 @@ async function httpClient(url: string, options: fetchUtils.Options = {}) {
   const token = await getApiToken();
 
   if (!options.headers) {
-    options.headers = new Headers({ Accept: 'application/json' });
+    options.headers = new Headers({ Accept: "application/json" });
   }
 
   const headers = options.headers as Headers;
   if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
   return fetchUtils.fetchJson(url, options);
@@ -229,12 +256,12 @@ async function httpClient(url: string, options: fetchUtils.Options = {}) {
 function toQueryString(filter: Record<string, unknown>): string {
   const params = new URLSearchParams();
   Object.entries(filter).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       params.set(key, String(value));
     }
   });
   const qs = params.toString();
-  return qs ? `?${qs}` : '';
+  return qs ? `?${qs}` : "";
 }
 
 /**
@@ -305,7 +332,9 @@ function sortRecords(
       String(av).trim() !== "" &&
       String(bv).trim() !== "";
     if (numeric) return (an - bn) * dir;
-    return String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir;
+    return (
+      String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir
+    );
   });
 }
 
@@ -317,7 +346,7 @@ function unwrapOne(json: unknown): unknown {
 export const dataProvider: DataProvider = {
   async getList(resource, params) {
     const { page, perPage } = params.pagination ?? { page: 1, perPage: 25 };
-    const { field, order } = params.sort ?? { field: 'id', order: 'ASC' };
+    const { field, order } = params.sort ?? { field: "id", order: "ASC" };
 
     const query = toQueryString({
       ...params.filter,
@@ -327,7 +356,9 @@ export const dataProvider: DataProvider = {
       sortOrder: order.toLowerCase(),
     });
 
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows, total, serverPaginated } = unwrapList(json);
 
     // Server already paged/sorted (e.g. users) → use as-is.
@@ -359,13 +390,17 @@ export const dataProvider: DataProvider = {
   },
 
   async getOne(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+    );
     return { data: unwrapOne(json) as never };
   },
 
   async getMany(resource, params) {
-    const query = toQueryString({ id: params.ids.join(',') });
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const query = toQueryString({ id: params.ids.join(",") });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows } = unwrapList(json);
     return { data: rows as never[] };
   },
@@ -375,14 +410,16 @@ export const dataProvider: DataProvider = {
       ...params.filter,
       [params.target]: params.id,
     });
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows, total } = unwrapList(json);
     return { data: rows as never[], total };
   },
 
   async create(resource, params) {
     const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(params.data),
     });
     return { data: unwrapOne(json) as never };
@@ -391,12 +428,12 @@ export const dataProvider: DataProvider = {
   async update(resource, params) {
     // A managed role stores its editable fields and its permission matrix on two
     // separate endpoints — PATCH the fields, then bulk-set the permissions.
-    if (resource === 'roles') {
+    if (resource === "roles") {
       const data = params.data as Record<string, unknown>;
       const { json } = await httpClient(
         `${API_URL}/permissions/roles/${params.id}`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           body: JSON.stringify({
             name: data.name,
             description: data.description,
@@ -409,7 +446,7 @@ export const dataProvider: DataProvider = {
         const { json: permJson } = await httpClient(
           `${API_URL}/permissions/roles/${params.id}/permissions`,
           {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify({ permissionIds: data.permissionIds }),
           },
         );
@@ -421,10 +458,13 @@ export const dataProvider: DataProvider = {
       return { data: result as never };
     }
 
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(params.data),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(params.data),
+      },
+    );
     return { data: unwrapOne(json) as never };
   },
 
@@ -432,7 +472,7 @@ export const dataProvider: DataProvider = {
     await Promise.all(
       params.ids.map((id) =>
         httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
-          method: 'PATCH',
+          method: "PATCH",
           body: JSON.stringify(params.data),
         }),
       ),
@@ -441,10 +481,13 @@ export const dataProvider: DataProvider = {
   },
 
   async delete(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
-      method: 'DELETE',
-    });
-    if (resource === 'roles') resetIdentityCache();
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: "DELETE",
+      },
+    );
+    if (resource === "roles") resetIdentityCache();
     return { data: (unwrapOne(json) ?? params.previousData) as never };
   },
 
@@ -452,7 +495,7 @@ export const dataProvider: DataProvider = {
     await Promise.all(
       params.ids.map((id) =>
         httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         }),
       ),
     );
@@ -461,7 +504,7 @@ export const dataProvider: DataProvider = {
 
   async getSiteSettings() {
     const { json } = await httpClient(`${API_URL}/cms/settings`, {
-      method: 'GET',
+      method: "GET",
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
     return { data: payload.data };
@@ -471,31 +514,37 @@ export const dataProvider: DataProvider = {
     id: string,
     payload: { channel: string; templateId?: string; body?: string },
   ) {
-    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/replies`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/contact/messages/${id}/replies`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
     return { data: unwrapOne(json) };
   },
 
   async updateContactMessageStatus(id: string, status: string) {
-    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status }),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/contact/messages/${id}/status`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      },
+    );
     return { data: unwrapOne(json) };
   },
 
   async getContactConfig() {
     const { json } = await httpClient(`${API_URL}/contact/messages/config`, {
-      method: 'GET',
+      method: "GET",
     });
     return { data: unwrapOne(json) as { platformReplyEnabled: boolean } };
   },
 
   async updateSiteSettings(data: SiteSettingsData) {
     const { json } = await httpClient(`${API_URL}/cms/settings`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
@@ -504,14 +553,14 @@ export const dataProvider: DataProvider = {
 
   async getFulfillmentSettings() {
     const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
-      method: 'GET',
+      method: "GET",
     });
     return { data: unwrapOne(json) as FulfillmentSettings };
   },
 
   async updateFulfillmentSettings(data: Partial<FulfillmentSettings>) {
     const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
     return { data: unwrapOne(json) as FulfillmentSettings };
@@ -519,7 +568,7 @@ export const dataProvider: DataProvider = {
 
   async inviteUser(payload: InviteUserPayload) {
     const { json } = await httpClient(`${API_URL}/users/invite`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
@@ -528,7 +577,7 @@ export const dataProvider: DataProvider = {
   async revokeInvitation(id: string) {
     const { json } = await httpClient(
       `${API_URL}/users/invitations/${id}/revoke`,
-      { method: 'POST' },
+      { method: "POST" },
     );
     return { data: unwrapOne(json) };
   },
@@ -536,21 +585,21 @@ export const dataProvider: DataProvider = {
   async resendInvitation(id: string) {
     const { json } = await httpClient(
       `${API_URL}/users/invitations/${id}/resend`,
-      { method: 'POST' },
+      { method: "POST" },
     );
     return { data: unwrapOne(json) };
   },
 
   async restoreUser(id: string) {
     const { json } = await httpClient(`${API_URL}/users/${id}/restore`, {
-      method: 'POST',
+      method: "POST",
     });
     return { data: unwrapOne(json) };
   },
 
   async setUserPassword(id: string, password: string) {
     await httpClient(`${API_URL}/users/${id}/password`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify({ password }),
     });
   },
@@ -574,7 +623,7 @@ export const dataProvider: DataProvider = {
   async setUserRoles(userId: string, roleIds: string[]) {
     const { json } = await httpClient(
       `${API_URL}/permissions/users/${userId}/roles`,
-      { method: 'PUT', body: JSON.stringify({ roleIds }) },
+      { method: "PUT", body: JSON.stringify({ roleIds }) },
     );
     // Assignments changed — refetch /auth/me on next access-check.
     resetIdentityCache();
@@ -583,7 +632,7 @@ export const dataProvider: DataProvider = {
 
   async createInventoryOperation(payload: CreateInventoryOperationPayload) {
     const { json } = await httpClient(`${API_URL}/inventory/operations`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
@@ -632,15 +681,21 @@ export const dataProvider: DataProvider = {
 
   async updateOrderStatus(id: string, status: OrderStatus, direct = false) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(direct ? { status, direct } : { status }),
     });
     return { data: unwrapOne(json) };
   },
 
+  async getOrderEvents(id: string) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/events`);
+    const { rows } = unwrapList(json);
+    return { data: rows as OrderEvent[] };
+  },
+
   async reinstateOrder(id: string) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/reinstate`, {
-      method: 'POST',
+      method: "POST",
     });
     return { data: unwrapOne(json) };
   },
@@ -651,7 +706,7 @@ export const dataProvider: DataProvider = {
   ) {
     const { json } = await httpClient(
       `${API_URL}/orders/${id}/payment-status`,
-      { method: 'PATCH', body: JSON.stringify({ paymentStatus }) },
+      { method: "PATCH", body: JSON.stringify({ paymentStatus }) },
     );
     return { data: unwrapOne(json) };
   },
