@@ -9,7 +9,7 @@ import {
   useRefresh,
   useTranslate,
 } from "ra-core";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -68,6 +68,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { OrderHistorySection } from "./OrderHistorySection";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
 interface OrderItemRow {
@@ -80,8 +81,7 @@ interface OrderItemRow {
 }
 
 type CancellationReason =
-  | "payment_not_received"
-  | "paid_after_expiry_out_of_stock";
+  "payment_not_received" | "paid_after_expiry_out_of_stock";
 
 interface OrderRecord {
   id: string;
@@ -232,7 +232,9 @@ function TransferAlert({ order }: { order: OrderRecord }) {
   const pickupName = order.pickupAddress?.locationName ?? "";
   const groups = order.pendingTransfers ?? [];
 
-  const prepareTransfer = (group: NonNullable<OrderRecord["pendingTransfers"]>[number]) => {
+  const prepareTransfer = (
+    group: NonNullable<OrderRecord["pendingTransfers"]>[number],
+  ) => {
     const params = new URLSearchParams({
       type: "TRANSFER",
       target: order.pickupLocationId ?? "",
@@ -312,10 +314,9 @@ export default function OrderDetailPage() {
   const notify = useNotify();
   const refresh = useRefresh();
   const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const queryClient = useQueryClient();
   const { data: identity } = useGetIdentity();
-  const isManager = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "STAFF",
-  );
+  const isManager = MANAGER_ROLES.includes((identity?.role as Role) ?? "STAFF");
   // The customer link only renders when the actor may open /clients
   // (admin-only resource — staff get plain text).
   const { canAccess: canViewClient } = useCanAccess({
@@ -352,6 +353,9 @@ export default function OrderDetailPage() {
     },
     onSuccess: () => {
       setPending(null);
+      void queryClient.invalidateQueries({
+        queryKey: ["orders", id as string, "events"],
+      });
       notify("orders.actions.updated", {
         type: "success",
         messageArgs: { _: "Pedido actualizado" },
@@ -396,9 +400,7 @@ export default function OrderDetailPage() {
   // step-by-step buttons stay the safe path for everyone else.
   const chainIndex = FORWARD_CHAIN.indexOf(order.status);
   const directTargets =
-    canDirectJump && chainIndex >= 0
-      ? FORWARD_CHAIN.slice(chainIndex + 2)
-      : [];
+    canDirectJump && chainIndex >= 0 ? FORWARD_CHAIN.slice(chainIndex + 2) : [];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -601,7 +603,9 @@ export default function OrderDetailPage() {
         </Table>
         <div className="space-y-1 border-t border-border px-4 py-3 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>{translate("orders.fields.subtotal", { _: "Subtotal" })}</span>
+            <span>
+              {translate("orders.fields.subtotal", { _: "Subtotal" })}
+            </span>
             <span className="tabular-nums">{money(order.subtotal)}</span>
           </div>
           <div className="flex justify-between text-muted-foreground">
@@ -664,6 +668,8 @@ export default function OrderDetailPage() {
         </section>
       </div>
 
+      <OrderHistorySection orderId={order.id} />
+
       {/* Confirm dialog */}
       <AlertDialog
         open={pending !== null}
@@ -682,7 +688,7 @@ export default function OrderDetailPage() {
             <AlertDialogDescription className="text-center sm:text-left">
               {pending?.kind === "reinstate" &&
                 translate("orders.actions.confirm_reinstate_description", {
-                  _: "El pedido volverá a \"Pendiente\" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?",
+                  _: 'El pedido volverá a "Pendiente" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?',
                 })}
               {pending &&
                 pending.kind !== "reinstate" &&
