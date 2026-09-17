@@ -921,9 +921,17 @@
         "proof_submitted": "Proof submitted",
         "reinstated": "Order reinstated",
         "expired": "Expired unpaid",
-        "payment_attempt_removed": "Payment attempt removed"
+        "payment_attempt_removed": "Payment attempt removed",
+        "items_changed": "Lines corrected",
+        "total_changed": "Total recalculated"
       },
-      "correction": "correction"
+      "correction": "correction",
+      "line_added": "Added %{name} × %{quantity}",
+      "line_removed": "Removed %{name} (%{quantity})",
+      "line_quantity": "%{name}: %{from} → %{to} units",
+      "line_price": "%{name}: price %{from} → %{to}",
+      "paid_more": "The order was paid: %{diff} left to collect.",
+      "paid_less": "The order was paid: %{diff} to refund."
     },
     "correction": {
       "title": "Correct status (super admin)",
@@ -947,6 +955,28 @@
       "confirm_description": "Order: %{from} → %{to}. Payment: %{pfrom} → %{pto}. Stock will adjust accordingly. Continue?",
       "confirm_remove_title": "Remove payment attempt",
       "confirm_remove_description": "The attempt %{reference} (%{provider}) will be deleted and the order will stop showing it. Continue?"
+    },
+    "items_editor": {
+      "open": "Correct lines",
+      "title": "Correct the order's lines",
+      "add": "Add a product",
+      "add_placeholder": "Search by name…",
+      "no_results": "No product with that name.",
+      "new": "new",
+      "remove": "Remove from the order",
+      "less": "One less",
+      "more": "One more",
+      "empty": "An order cannot be left with no products. Add one or cancel the order.",
+      "summary": "Will be saved:",
+      "difference": "Before: %{before}. Difference: %{diff}.",
+      "paid_more": "This order is paid and the total goes up by %{diff}: collect that difference separately.",
+      "paid_less": "This order is paid and the total goes down by %{diff}: refund that difference.",
+      "reason_placeholder": "For example: the customer asked for two more units by phone",
+      "save": "Save changes",
+      "saved": "Order lines corrected",
+      "stock_cancelled": "The order is cancelled: no stock is held, so this does not touch the warehouse.",
+      "stock_pending": "The order is pending: what you add is held and what you remove is released.",
+      "stock_committed": "The order already left the warehouse: what you add is deducted and what you remove comes back in, with its inventory movement."
     }
   },
   "dashboard": {

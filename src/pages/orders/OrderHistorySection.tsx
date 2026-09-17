@@ -6,6 +6,7 @@ import {
   Clock,
   FileCheck,
   History,
+  PackagePlus,
   RotateCcw,
   ShoppingBag,
   Trash2,
@@ -75,7 +76,54 @@ const KIND_ICON: Record<OrderEvent["kind"], typeof History> = {
   reinstated: RotateCcw,
   expired: Clock,
   payment_attempt_removed: Trash2,
+  items_changed: PackagePlus,
+  total_changed: CircleDollarSign,
 };
+
+/** Un cambio de línea, tal como lo guarda la API en `meta.changes`. */
+interface LineChange {
+  type: "added" | "removed" | "quantity" | "price";
+  name?: string;
+  quantity?: number;
+  unitPrice?: number;
+  from?: string | number;
+  to?: string | number;
+}
+
+function changeLabel(
+  translate: ReturnType<typeof useTranslate>,
+  change: LineChange,
+): string {
+  const name = change.name ?? "";
+  switch (change.type) {
+    case "added":
+      return translate("orders.history.line_added", {
+        _: "Se añadió %{name} × %{quantity}",
+        name,
+        quantity: change.quantity ?? 0,
+      });
+    case "removed":
+      return translate("orders.history.line_removed", {
+        _: "Se quitó %{name} (%{quantity})",
+        name,
+        quantity: change.quantity ?? 0,
+      });
+    case "quantity":
+      return translate("orders.history.line_quantity", {
+        _: "%{name}: %{from} → %{to} unidades",
+        name,
+        from: String(change.from ?? ""),
+        to: String(change.to ?? ""),
+      });
+    default:
+      return translate("orders.history.line_price", {
+        _: "%{name}: precio %{from} → %{to}",
+        name,
+        from: String(change.from ?? ""),
+        to: String(change.to ?? ""),
+      });
+  }
+}
 
 function HistoryRow({ event }: { event: OrderEvent }) {
   const translate = useTranslate();
@@ -132,6 +180,28 @@ function HistoryRow({ event }: { event: OrderEvent }) {
             </span>
           )}
         </p>
+        {Array.isArray(meta.changes) && meta.changes.length > 0 && (
+          <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-muted-foreground">
+            {(meta.changes as LineChange[]).map((change, index) => (
+              <li key={`${change.type}-${change.name ?? index}`}>
+                {changeLabel(translate, change)}
+              </li>
+            ))}
+          </ul>
+        )}
+        {typeof meta.paidDifference === "string" && (
+          <p className="mt-1 text-xs font-medium text-destructive">
+            {Number(meta.paidDifference) > 0
+              ? translate("orders.history.paid_more", {
+                  _: "El pedido estaba pagado: quedan %{diff} por cobrar.",
+                  diff: meta.paidDifference,
+                })
+              : translate("orders.history.paid_less", {
+                  _: "El pedido estaba pagado: hay que devolver %{diff}.",
+                  diff: String(Math.abs(Number(meta.paidDifference))),
+                })}
+          </p>
+        )}
         {Boolean(event.reason || provider || meta.reference) && (
           <p className="mt-0.5 text-xs text-muted-foreground">
             {[

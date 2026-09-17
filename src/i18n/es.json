@@ -927,9 +927,17 @@
         "proof_submitted": "Comprobante enviado",
         "reinstated": "Pedido restablecido",
         "expired": "Caducado por falta de pago",
-        "payment_attempt_removed": "Intento de pago eliminado"
+        "payment_attempt_removed": "Intento de pago eliminado",
+        "items_changed": "Productos corregidos",
+        "total_changed": "Total recalculado"
       },
-      "correction": "corrección"
+      "correction": "corrección",
+      "line_added": "Se añadió %{name} × %{quantity}",
+      "line_removed": "Se quitó %{name} (%{quantity})",
+      "line_quantity": "%{name}: %{from} → %{to} unidades",
+      "line_price": "%{name}: precio %{from} → %{to}",
+      "paid_more": "El pedido estaba pagado: quedan %{diff} por cobrar.",
+      "paid_less": "El pedido estaba pagado: hay que devolver %{diff}."
     },
     "correction": {
       "title": "Corregir estado (superadministrador)",
@@ -953,6 +961,28 @@
       "confirm_description": "Pedido: %{from} → %{to}. Pago: %{pfrom} → %{pto}. El stock se ajustará según el cambio. ¿Continuar?",
       "confirm_remove_title": "Quitar intento de pago",
       "confirm_remove_description": "Se elimina el intento %{reference} (%{provider}). El pedido dejará de mostrarlo. ¿Continuar?"
+    },
+    "items_editor": {
+      "open": "Corregir productos",
+      "title": "Corregir los productos del pedido",
+      "add": "Añadir un producto",
+      "add_placeholder": "Busca por nombre…",
+      "no_results": "Ningún producto con ese nombre.",
+      "new": "nuevo",
+      "remove": "Quitar del pedido",
+      "less": "Una menos",
+      "more": "Una más",
+      "empty": "Un pedido no puede quedarse sin productos. Añade alguno o cancela el pedido.",
+      "summary": "Se guardará:",
+      "difference": "Antes: %{before}. Diferencia: %{diff}.",
+      "paid_more": "Este pedido está pagado y el total sube %{diff}: hay que cobrar esa diferencia aparte.",
+      "paid_less": "Este pedido está pagado y el total baja %{diff}: hay que devolver esa diferencia al cliente.",
+      "reason_placeholder": "Por ejemplo: el cliente pidió dos unidades más por teléfono",
+      "save": "Guardar cambios",
+      "saved": "Productos del pedido corregidos",
+      "stock_cancelled": "El pedido está cancelado: no hay stock apartado, así que esto no toca el almacén.",
+      "stock_pending": "El pedido está pendiente: lo que subas se aparta del stock y lo que bajes se suelta.",
+      "stock_committed": "El pedido ya salió del almacén: lo que subas se descuenta y lo que bajes vuelve a entrar, con su movimiento de inventario."
     }
   },
   "dashboard": {

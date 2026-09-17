@@ -48,7 +48,17 @@ export type OrderEventKind =
   | "proof_submitted"
   | "reinstated"
   | "expired"
-  | "payment_attempt_removed";
+  | "payment_attempt_removed"
+  | "items_changed"
+  | "total_changed";
+
+/** Una línea del pedido tal como se manda a corregir. */
+export interface OrderLinePayload {
+  productId: string;
+  quantity: number;
+  /** Solo cuando se escribe a mano; si falta manda el precio ya guardado o el del catálogo. */
+  unitPrice?: number;
+}
 
 export interface OrderEvent {
   id: string;
@@ -158,6 +168,11 @@ export interface ExtendedDataProvider extends DataProvider {
       paymentStatus?: OrderPaymentStatus;
       reason: string;
     },
+  ) => Promise<{ data: unknown }>;
+  /** Corrección de superadmin: las líneas del pedido, tal como deben quedar. */
+  updateOrderItems: (
+    id: string,
+    body: { items: OrderLinePayload[]; reason: string },
   ) => Promise<{ data: unknown }>;
   /** Todos los intentos de pago del pedido, del más reciente al más antiguo. */
   getPaymentAttempts: (id: string) => Promise<{ data: PaymentAttempt[] }>;
@@ -728,6 +743,17 @@ export const dataProvider: DataProvider = {
   ) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/correct`, {
       method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async updateOrderItems(
+    id: string,
+    body: { items: OrderLinePayload[]; reason: string },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/items`, {
+      method: "PATCH",
       body: JSON.stringify(body),
     });
     return { data: unwrapOne(json) };

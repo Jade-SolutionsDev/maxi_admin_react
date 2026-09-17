@@ -20,6 +20,7 @@ import {
   FastForward,
   Loader2,
   MapPin,
+  Pencil,
   RotateCcw,
   ShoppingCart,
   StickyNote,
@@ -69,6 +70,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { OrderCorrectionCard } from "./OrderCorrectionCard";
+import { OrderItemsEditor } from "./OrderItemsEditor";
 import { OrderHistorySection } from "./OrderHistorySection";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
@@ -339,6 +341,7 @@ export default function OrderDetailPage() {
   } = useGetOne<OrderRecord & { id: string }>("orders", { id: id as string });
 
   const [pending, setPending] = useState<PendingAction | null>(null);
+  const [editingItems, setEditingItems] = useState(false);
 
   const mutation = useMutation({
     mutationFn: (action: PendingAction) => {
@@ -558,9 +561,42 @@ export default function OrderDetailPage() {
 
       {/* Items */}
       <section className="mb-6 rounded-lg border border-border">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-foreground">
-          {translate("orders.sections.items", { _: "Productos" })}
-        </h2>
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
+          <h2 className="text-sm font-semibold text-foreground">
+            {translate("orders.sections.items", { _: "Productos" })}
+          </h2>
+          {isSuperAdmin && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setEditingItems(true)}
+            >
+              <Pencil className="mr-1 h-3.5 w-3.5" />
+              {translate("orders.items_editor.open", {
+                _: "Corregir productos",
+              })}
+            </Button>
+          )}
+        </div>
+        {isSuperAdmin && (
+          <OrderItemsEditor
+            key={`${order.updatedAt}/${(order.items ?? []).length}`}
+            orderId={order.id}
+            status={order.status}
+            paymentStatus={order.paymentStatus}
+            deliveryFee={Number(order.deliveryFee)}
+            currentTotal={Number(order.total)}
+            items={(order.items ?? []).map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              quantity: item.quantity,
+              unitPrice: Number(item.unitPrice),
+            }))}
+            open={editingItems}
+            onOpenChange={setEditingItems}
+          />
+        )}
         <Table>
           <TableHeader>
             <TableRow>
