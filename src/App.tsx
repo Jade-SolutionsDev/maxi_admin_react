@@ -24,6 +24,7 @@ import InventoryList from "./pages/inventory/InventoryList";
 import InventoryDetailPage from "./pages/inventory/InventoryDetailPage";
 import OrdersList from "./pages/orders/OrdersList";
 import OrderDetailPage from "./pages/orders/OrderDetailPage";
+import RefundsQueuePage from "./pages/refunds/RefundsQueuePage";
 import ClientDetailPage from "./pages/clients/ClientDetailPage";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
@@ -325,6 +326,14 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="orders" action="read">
             <OrderDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/refunds"
+        element={
+          <RequireAccess resource="refunds">
+            <RefundsQueuePage />
           </RequireAccess>
         }
       />

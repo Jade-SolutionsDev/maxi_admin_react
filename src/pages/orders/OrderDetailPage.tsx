@@ -46,6 +46,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import type {
@@ -72,6 +74,7 @@ import {
 import { OrderCorrectionCard } from "./OrderCorrectionCard";
 import { OrderItemsEditor } from "./OrderItemsEditor";
 import { OrderHistorySection } from "./OrderHistorySection";
+import { OrderRefundsCard } from "./OrderRefundsCard";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
 interface OrderItemRow {
@@ -342,6 +345,10 @@ export default function OrderDetailPage() {
 
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [editingItems, setEditingItems] = useState(false);
+  // Quién se lleva el pedido. Solo se pregunta al entregar: en una recogida
+  // casi nunca es el comprador, y de esa fecha cuelga el plazo para reclamar.
+  const [pickupName, setPickupName] = useState("");
+  const [pickupIdCard, setPickupIdCard] = useState("");
 
   const mutation = useMutation({
     mutationFn: (action: PendingAction) => {
@@ -353,11 +360,19 @@ export default function OrderDetailPage() {
             id as string,
             action.value,
             action.direct ?? false,
+            action.value === "delivered" && pickupName.trim()
+              ? {
+                  name: pickupName.trim(),
+                  idCard: pickupIdCard.trim() || undefined,
+                }
+              : undefined,
           )
         : dataProvider.updateOrderPaymentStatus(id as string, action.value);
     },
     onSuccess: () => {
       setPending(null);
+      setPickupName("");
+      setPickupIdCard("");
       void queryClient.invalidateQueries({
         queryKey: ["orders", id as string, "events"],
       });
@@ -559,6 +574,12 @@ export default function OrderDetailPage() {
         />
       )}
 
+      <OrderRefundsCard
+        key={`refunds/${order.paymentStatus}`}
+        orderId={order.id}
+        paymentStatus={order.paymentStatus}
+      />
+
       {/* Items */}
       <section className="mb-6 rounded-lg border border-border">
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
@@ -756,6 +777,42 @@ export default function OrderDetailPage() {
                   },
                 )}
             </AlertDialogDescription>
+            {pending?.kind === "status" && pending.value === "delivered" && (
+              <div className="space-y-3 pt-1 text-left">
+                <p className="text-sm text-muted-foreground">
+                  {translate("orders.actions.delivered_hint", {
+                    _: "Anota a quién se le entrega. Desde esta fecha cuentan las 48 horas para reclamar.",
+                  })}
+                </p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pickup-name">
+                    {translate("orders.actions.picked_up_by", {
+                      _: "Quién retira",
+                    })}
+                  </Label>
+                  <Input
+                    id="pickup-name"
+                    value={pickupName}
+                    onChange={(e) => setPickupName(e.target.value)}
+                    placeholder={translate("orders.actions.picked_up_by", {
+                      _: "Quién retira",
+                    })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pickup-id">
+                    {translate("orders.actions.picked_up_id", {
+                      _: "Carné de identidad",
+                    })}
+                  </Label>
+                  <Input
+                    id="pickup-id"
+                    value={pickupIdCard}
+                    onChange={(e) => setPickupIdCard(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-end">
             <AlertDialogCancel disabled={mutation.isPending}>

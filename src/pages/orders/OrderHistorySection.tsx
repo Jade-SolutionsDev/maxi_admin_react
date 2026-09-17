@@ -1,11 +1,14 @@
 import { useDataProvider, useTranslate } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Ban,
+  Banknote,
   Bot,
   CircleDollarSign,
   Clock,
   FileCheck,
   History,
+  PackageCheck,
   PackagePlus,
   RotateCcw,
   ShoppingBag,
@@ -78,6 +81,10 @@ const KIND_ICON: Record<OrderEvent["kind"], typeof History> = {
   payment_attempt_removed: Trash2,
   items_changed: PackagePlus,
   total_changed: CircleDollarSign,
+  delivered: PackageCheck,
+  refund_requested: Banknote,
+  refund_completed: Banknote,
+  refund_rejected: Ban,
 };
 
 /** Un cambio de línea, tal como lo guarda la API en `meta.changes`. */

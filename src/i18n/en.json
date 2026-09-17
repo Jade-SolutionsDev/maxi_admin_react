@@ -407,7 +407,8 @@
       "contactoMensajes": "Messages",
       "contactoPlantillas": "Templates",
       "nomencladores": "Nomenclators",
-      "entregas": "Delivery"
+      "entregas": "Delivery",
+      "devoluciones": "Refunds"
     },
     "user": {
       "profile": "Profile"
@@ -851,7 +852,10 @@
       "view_customer": "View customer",
       "direct_label": "Set status directly",
       "direct_placeholder": "Jump to status…",
-      "confirm_direct_description": "You are about to skip the intermediate steps and set the order to \"%{value}\". Stock is adjusted as if each step had run. Continue?"
+      "confirm_direct_description": "You are about to skip the intermediate steps and set the order to \"%{value}\". Stock is adjusted as if each step had run. Continue?",
+      "delivered_hint": "Record who collects it. The 48-hour claim window starts from this date.",
+      "picked_up_by": "Collected by",
+      "picked_up_id": "ID card"
     },
     "payment": {
       "provider": "Provider",
@@ -977,6 +981,40 @@
       "stock_cancelled": "The order is cancelled: no stock is held, so this does not touch the warehouse.",
       "stock_pending": "The order is pending: what you add is held and what you remove is released.",
       "stock_committed": "The order already left the warehouse: what you add is deducted and what you remove comes back in, with its inventory movement."
+    },
+    "refunds": {
+      "title": "Refunds",
+      "charged": "Charged",
+      "returned": "Refunded",
+      "committed": "Committed",
+      "refundable": "Refundable",
+      "amount": "Amount (USD)",
+      "amountHint": "Leave empty to refund everything left.",
+      "destination": "USDT address (BEP20)",
+      "destinationHint": "If you don't have it yet, we ask the customer by email.",
+      "providerRef": "Transaction reference",
+      "reason": "Reason (required)",
+      "request": "Log refund",
+      "requested": "Refund logged. The money has not left yet.",
+      "markPaid": "Confirm it was sent",
+      "completed": "Refund confirmed and the customer notified.",
+      "reject": "Reject",
+      "rejectedBecause": "Rejected:",
+      "bySystem": "The system",
+      "paidOn": "paid",
+      "confirmRequest": "Log this refund?",
+      "confirmRequestBody": "It commits",
+      "confirmRequestNote": "No money moves now: the order stays paid until you confirm the transfer.",
+      "confirmComplete": "Has the money left?",
+      "confirmCompleteBody": "This marks as refunded",
+      "confirmCompleteTail": "and emails the customer. Confirm only if you already made the transfer.",
+      "confirmReject": "Reject this refund?",
+      "confirmRejectNote": "It stays on file with its reason; nothing is deleted.",
+      "status": {
+        "requested": "Awaiting payout",
+        "completed": "Paid",
+        "rejected": "Rejected"
+      }
     }
   },
   "dashboard": {
@@ -1419,5 +1457,12 @@
       "sidebar_description": "Displays the mobile navigation menu.",
       "toggle_sidebar": "Toggle sidebar"
     }
+  },
+  "refunds": {
+    "title": "Refunds",
+    "pendingTotal": "Pending payout:",
+    "empty": "No refunds in this state.",
+    "outOfStock": "Paid with no stock left",
+    "requestedOn": "Logged"
   }
 }
