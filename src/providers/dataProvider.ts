@@ -47,7 +47,8 @@ export type OrderEventKind =
   | "payment_attempt"
   | "proof_submitted"
   | "reinstated"
-  | "expired";
+  | "expired"
+  | "payment_attempt_removed";
 
 export interface OrderEvent {
   id: string;
@@ -59,6 +60,19 @@ export interface OrderEvent {
   nextValue: string | null;
   reason: string | null;
   meta: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+/** Un intento de pago tal como lo lista GET /orders/:id/payment-attempts. */
+export interface PaymentAttempt {
+  id: string;
+  provider: string;
+  reference: string;
+  status: string;
+  amount: string | null;
+  currency: string | null;
+  customerReference: string | null;
+  receiptUrl: string | null;
   createdAt: string;
 }
 
@@ -136,6 +150,23 @@ export interface ExtendedDataProvider extends DataProvider {
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
   /** Historial del pedido, del más antiguo al más reciente. */
   getOrderEvents: (id: string) => Promise<{ data: OrderEvent[] }>;
+  /** Corrección de superadmin: cualquier estado, con motivo. */
+  correctOrder: (
+    id: string,
+    body: {
+      status?: OrderStatus;
+      paymentStatus?: OrderPaymentStatus;
+      reason: string;
+    },
+  ) => Promise<{ data: unknown }>;
+  /** Todos los intentos de pago del pedido, del más reciente al más antiguo. */
+  getPaymentAttempts: (id: string) => Promise<{ data: PaymentAttempt[] }>;
+  /** Quita un intento no completado (superadmin), con motivo. */
+  removePaymentAttempt: (
+    id: string,
+    chargeId: string,
+    reason: string,
+  ) => Promise<{ data: unknown }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -684,6 +715,37 @@ export const dataProvider: DataProvider = {
       method: "PATCH",
       body: JSON.stringify(direct ? { status, direct } : { status }),
     });
+    return { data: unwrapOne(json) };
+  },
+
+  async correctOrder(
+    id: string,
+    body: {
+      status?: OrderStatus;
+      paymentStatus?: OrderPaymentStatus;
+      reason: string;
+    },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/correct`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async getPaymentAttempts(id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${id}/payment-attempts`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as PaymentAttempt[] };
+  },
+
+  async removePaymentAttempt(id: string, chargeId: string, reason: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${id}/payment-attempts/${chargeId}`,
+      { method: "DELETE", body: JSON.stringify({ reason }) },
+    );
     return { data: unwrapOne(json) };
   },
 

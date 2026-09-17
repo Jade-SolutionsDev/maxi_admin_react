@@ -926,8 +926,33 @@
         "payment_attempt": "Intento de pago",
         "proof_submitted": "Comprobante enviado",
         "reinstated": "Pedido restablecido",
-        "expired": "Caducado por falta de pago"
-      }
+        "expired": "Caducado por falta de pago",
+        "payment_attempt_removed": "Intento de pago eliminado"
+      },
+      "correction": "corrección"
+    },
+    "correction": {
+      "title": "Corregir estado (superadministrador)",
+      "hint": "Cualquier estado, en cualquier dirección. El stock se ajusta solo: al salir de cancelado se vuelve a apartar; al entrar, se libera; al pasar de confirmado en adelante, se descuenta; al retroceder, vuelve al almacén. Si el pedido queda pendiente y sin pagar, el plazo de pago empieza de nuevo. Todo queda en el historial con tu nombre y el motivo.",
+      "status": "Estado del pedido",
+      "payment": "Estado del pago",
+      "current": "actual",
+      "reason": "Motivo (obligatorio)",
+      "reason_placeholder": "Por ejemplo: el cliente pagó por transferencia y se marcó por error",
+      "reason_short": "Escribe al menos cinco caracteres.",
+      "reason_first": "Escribe el motivo arriba.",
+      "apply": "Aplicar corrección",
+      "reset": "Descartar",
+      "applied": "Corrección aplicada",
+      "attempts": "Intentos de pago",
+      "no_attempts": "Sin intentos de pago.",
+      "remove": "Quitar",
+      "attempt_removed": "Intento de pago eliminado",
+      "succeeded_locked": "Un cobro con éxito no se quita: se reembolsa.",
+      "confirm_title": "Aplicar corrección",
+      "confirm_description": "Pedido: %{from} → %{to}. Pago: %{pfrom} → %{pto}. El stock se ajustará según el cambio. ¿Continuar?",
+      "confirm_remove_title": "Quitar intento de pago",
+      "confirm_remove_description": "Se elimina el intento %{reference} (%{provider}). El pedido dejará de mostrarlo. ¿Continuar?"
     }
   },
   "dashboard": {

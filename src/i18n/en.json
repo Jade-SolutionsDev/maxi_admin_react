@@ -920,8 +920,33 @@
         "payment_attempt": "Payment attempt",
         "proof_submitted": "Proof submitted",
         "reinstated": "Order reinstated",
-        "expired": "Expired unpaid"
-      }
+        "expired": "Expired unpaid",
+        "payment_attempt_removed": "Payment attempt removed"
+      },
+      "correction": "correction"
+    },
+    "correction": {
+      "title": "Correct status (super admin)",
+      "hint": "Any status, in any direction. Stock adjusts itself: leaving cancelled re-reserves; entering it releases; moving to confirmed or beyond commits; moving back restocks. If the order ends pending and unpaid, the payment window restarts. Everything lands in the history with your name and the reason.",
+      "status": "Order status",
+      "payment": "Payment status",
+      "current": "current",
+      "reason": "Reason (required)",
+      "reason_placeholder": "For example: the customer paid by transfer and it was marked by mistake",
+      "reason_short": "Write at least five characters.",
+      "reason_first": "Write the reason above.",
+      "apply": "Apply correction",
+      "reset": "Discard",
+      "applied": "Correction applied",
+      "attempts": "Payment attempts",
+      "no_attempts": "No payment attempts.",
+      "remove": "Remove",
+      "attempt_removed": "Payment attempt removed",
+      "succeeded_locked": "A succeeded charge is never removed: refund it.",
+      "confirm_title": "Apply correction",
+      "confirm_description": "Order: %{from} → %{to}. Payment: %{pfrom} → %{pto}. Stock will adjust accordingly. Continue?",
+      "confirm_remove_title": "Remove payment attempt",
+      "confirm_remove_description": "The attempt %{reference} (%{provider}) will be deleted and the order will stop showing it. Continue?"
     }
   },
   "dashboard": {
