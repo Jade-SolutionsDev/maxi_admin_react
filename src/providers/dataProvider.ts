@@ -50,7 +50,11 @@ export type OrderEventKind =
   | "expired"
   | "payment_attempt_removed"
   | "items_changed"
-  | "total_changed";
+  | "total_changed"
+  | "delivered"
+  | "refund_requested"
+  | "refund_completed"
+  | "refund_rejected";
 
 /** Una línea del pedido tal como se manda a corregir. */
 export interface OrderLinePayload {
@@ -71,6 +75,43 @@ export interface OrderEvent {
   reason: string | null;
   meta: Record<string, unknown> | null;
   createdAt: string;
+}
+
+export type RefundStatus = "requested" | "completed" | "rejected";
+
+/** Una devolución de dinero. Varias por pedido cuando hay parciales. */
+export interface Refund {
+  id: string;
+  orderId: string;
+  orderNumber: string | null;
+  clientName: string | null;
+  clientEmail: string | null;
+  orderTotal: string | null;
+  /** Pagó tarde y ya no había mercancía: dinero dentro sin contrapartida. */
+  paidAfterExpiryOutOfStock: boolean;
+  amount: string;
+  currency: string;
+  status: RefundStatus;
+  method: "manual" | "gateway";
+  origin: string;
+  reason: string;
+  destination: string | null;
+  providerRef: string | null;
+  notes: string | null;
+  requestedByName: string | null;
+  requestedAt: string;
+  completedByName: string | null;
+  completedAt: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+}
+
+/** Cuánto se cobró de un pedido y cuánto queda por devolver. */
+export interface RefundSummary {
+  total: string;
+  refunded: string;
+  requested: string;
+  refundable: string;
 }
 
 /** Un intento de pago tal como lo lista GET /orders/:id/payment-attempts. */
@@ -186,7 +227,25 @@ export interface ExtendedDataProvider extends DataProvider {
     id: string,
     status: OrderStatus,
     direct?: boolean,
+    pickedUpBy?: { name: string; idCard?: string },
   ) => Promise<{ data: unknown }>;
+  /** Devoluciones de un pedido, de la más reciente a la más antigua. */
+  getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
+  /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
+  getRefundSummary: (orderId: string) => Promise<{ data: RefundSummary }>;
+  /** Registra el compromiso de devolver. No mueve dinero. */
+  requestRefund: (
+    orderId: string,
+    body: { amount?: string; reason: string; destination?: string },
+  ) => Promise<{ data: Refund }>;
+  /** Confirma que el dinero salió: esto es lo que puede dejar el pedido reembolsado. */
+  completeRefund: (
+    refundId: string,
+    body: { destination?: string; providerRef?: string; notes?: string },
+  ) => Promise<{ data: Refund }>;
+  rejectRefund: (refundId: string, reason: string) => Promise<{ data: Refund }>;
+  /** La cola: lo que espera a que alguien mueva el dinero. */
+  getRefundQueue: (status?: RefundStatus) => Promise<{ data: Refund[] }>;
   updateOrderPaymentStatus: (
     id: string,
     paymentStatus: OrderPaymentStatus,
@@ -725,12 +784,69 @@ export const dataProvider: DataProvider = {
     return { data: unwrapOne(json) as DashboardTopProducts };
   },
 
-  async updateOrderStatus(id: string, status: OrderStatus, direct = false) {
+  async updateOrderStatus(
+    id: string,
+    status: OrderStatus,
+    direct = false,
+    pickedUpBy?: { name: string; idCard?: string },
+  ) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
       method: "PATCH",
-      body: JSON.stringify(direct ? { status, direct } : { status }),
+      body: JSON.stringify({
+        status,
+        ...(direct ? { direct } : {}),
+        ...(pickedUpBy ? { pickedUpBy } : {}),
+      }),
     });
     return { data: unwrapOne(json) };
+  },
+
+  async getRefunds(orderId: string) {
+    const { json } = await httpClient(`${API_URL}/orders/${orderId}/refunds`);
+    return { data: unwrapList(json).rows as Refund[] };
+  },
+
+  async getRefundSummary(orderId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${orderId}/refunds/summary`,
+    );
+    return { data: unwrapOne(json) as RefundSummary };
+  },
+
+  async requestRefund(
+    orderId: string,
+    body: { amount?: string; reason: string; destination?: string },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${orderId}/refunds`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async completeRefund(
+    refundId: string,
+    body: { destination?: string; providerRef?: string; notes?: string },
+  ) {
+    const { json } = await httpClient(
+      `${API_URL}/refunds/${refundId}/complete`,
+      { method: "POST", body: JSON.stringify(body) },
+    );
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async rejectRefund(refundId: string, reason: string) {
+    const { json } = await httpClient(`${API_URL}/refunds/${refundId}/reject`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    });
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async getRefundQueue(status?: RefundStatus) {
+    const query = status ? `?status=${status}` : "";
+    const { json } = await httpClient(`${API_URL}/refunds${query}`);
+    return { data: unwrapList(json).rows as Refund[] };
   },
 
   async correctOrder(

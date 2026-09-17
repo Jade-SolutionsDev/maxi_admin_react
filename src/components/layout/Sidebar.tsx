@@ -1,23 +1,25 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  ShoppingCart,
-  Package,
-  Building2,
-  Tags,
-  ClipboardList,
-  Warehouse,
-  Users,
-  UserRound,
+  Banknote,
   BarChart3,
-  ShieldCheck, LogOut,
-  User,
-  PanelsTopLeft,
+  Building2,
+  ClipboardList,
   CreditCard,
   Inbox,
+  LayoutDashboard,
   ListTree,
+  LogOut,
   NotebookPen,
+  Package,
+  PanelsTopLeft,
+  ShieldCheck,
+  ShoppingCart,
+  Tags,
   Truck,
+  User,
+  UserRound,
+  Users,
+  Warehouse,
 } from "lucide-react";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
 import { cn } from "@/lib/utils";
@@ -107,7 +109,11 @@ interface NavGroup {
 const navGroups: NavGroup[] = [
   {
     items: [
-      { labelKey: "app.menu.panel", icon: <LayoutDashboard size={20} />, path: "/" },
+      {
+        labelKey: "app.menu.panel",
+        icon: <LayoutDashboard size={20} />,
+        path: "/",
+      },
     ],
   },
   {
@@ -118,6 +124,12 @@ const navGroups: NavGroup[] = [
         icon: <ShoppingCart size={20} />,
         path: "/orders",
         resource: "orders",
+      },
+      {
+        labelKey: "app.menu.devoluciones",
+        icon: <Banknote size={20} />,
+        path: "/refunds",
+        resource: "refunds",
       },
       {
         labelKey: "app.menu.metodos_pago",
@@ -219,7 +231,11 @@ const navGroups: NavGroup[] = [
         activePrefix: "/cms-",
         resource: "cms-pages",
       },
-      { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
+      {
+        labelKey: "app.menu.reportes",
+        icon: <BarChart3 size={20} />,
+        soon: true,
+      },
       // Direct entry: the old "Configuración" only ever held this page.
       {
         labelKey: "app.menu.rolesPermisos",
@@ -234,8 +250,10 @@ const navGroups: NavGroup[] = [
 /** Notification-badge colours. Deliberately just two: brand green for a count
  *  or "new", red for "urgent". `dot` is the collapsed-rail indicator. */
 function badgePillClass(badge: SidebarBadge): string {
-  if (badge === "urgent") return "bg-destructive text-white uppercase tracking-wide";
-  if (badge === "new") return "bg-sidebar-primary text-white uppercase tracking-wide";
+  if (badge === "urgent")
+    return "bg-destructive text-white uppercase tracking-wide";
+  if (badge === "new")
+    return "bg-sidebar-primary text-white uppercase tracking-wide";
   return "bg-sidebar-primary text-white tabular-nums";
 }
 function badgeDotClass(badge: SidebarBadge): string {

@@ -409,7 +409,8 @@
       "contactoMensajes": "Mensajes",
       "contactoPlantillas": "Plantillas",
       "nomencladores": "Nomencladores",
-      "entregas": "Entregas"
+      "entregas": "Entregas",
+      "devoluciones": "Devoluciones"
     },
     "user": {
       "profile": "Perfil"
@@ -854,7 +855,10 @@
       "view_customer": "Ver cliente",
       "direct_label": "Cambiar estado directamente",
       "direct_placeholder": "Saltar a estado…",
-      "confirm_direct_description": "Vas a saltar los pasos intermedios y dejar el pedido en \"%{value}\". El stock se ajusta igual que si hubieras recorrido cada paso. ¿Continuar?"
+      "confirm_direct_description": "Vas a saltar los pasos intermedios y dejar el pedido en \"%{value}\". El stock se ajusta igual que si hubieras recorrido cada paso. ¿Continuar?",
+      "delivered_hint": "Anota a quién se le entrega. Desde esta fecha cuentan las 48 horas para reclamar.",
+      "picked_up_by": "Quién retira",
+      "picked_up_id": "Carné de identidad"
     },
     "payment": {
       "provider": "Proveedor",
@@ -983,6 +987,40 @@
       "stock_cancelled": "El pedido está cancelado: no hay stock apartado, así que esto no toca el almacén.",
       "stock_pending": "El pedido está pendiente: lo que subas se aparta del stock y lo que bajes se suelta.",
       "stock_committed": "El pedido ya salió del almacén: lo que subas se descuenta y lo que bajes vuelve a entrar, con su movimiento de inventario."
+    },
+    "refunds": {
+      "title": "Devoluciones",
+      "charged": "Cobrado",
+      "returned": "Devuelto",
+      "committed": "Comprometido",
+      "refundable": "Se puede devolver",
+      "amount": "Importe (USD)",
+      "amountHint": "Vacío devuelve todo lo que queda.",
+      "destination": "Dirección USDT (BEP20)",
+      "destinationHint": "Si todavía no la tienes, se la pedimos al cliente por correo.",
+      "providerRef": "Referencia de la transacción",
+      "reason": "Motivo (obligatorio)",
+      "request": "Registrar devolución",
+      "requested": "Devolución registrada. El dinero no ha salido todavía.",
+      "markPaid": "Confirmar que salió",
+      "completed": "Devolución confirmada y avisado el cliente.",
+      "reject": "Rechazar",
+      "rejectedBecause": "Rechazada:",
+      "bySystem": "El sistema",
+      "paidOn": "pagada",
+      "confirmRequest": "¿Registrar esta devolución?",
+      "confirmRequestBody": "Queda comprometida por",
+      "confirmRequestNote": "El dinero no sale ahora: el pedido sigue cobrado hasta que confirmes el envío.",
+      "confirmComplete": "¿El dinero ya salió?",
+      "confirmCompleteBody": "Esto da por devueltos",
+      "confirmCompleteTail": "y avisa al cliente por correo. Confírmalo solo si ya hiciste la transferencia.",
+      "confirmReject": "¿Rechazar esta devolución?",
+      "confirmRejectNote": "Queda en la ficha con el motivo; no se borra.",
+      "status": {
+        "requested": "Esperando pago",
+        "completed": "Pagada",
+        "rejected": "Rechazada"
+      }
     }
   },
   "dashboard": {
@@ -1425,5 +1463,12 @@
       "sidebar_description": "Muestra el menú de navegación en el móvil.",
       "toggle_sidebar": "Mostrar u ocultar el menú lateral"
     }
+  },
+  "refunds": {
+    "title": "Devoluciones",
+    "pendingTotal": "Pendiente de pagar:",
+    "empty": "No hay devoluciones en este estado.",
+    "outOfStock": "Pagó y no había mercancía",
+    "requestedOn": "Registrada"
   }
 }
