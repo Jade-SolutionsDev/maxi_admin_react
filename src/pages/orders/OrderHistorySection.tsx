@@ -8,6 +8,7 @@ import {
   History,
   RotateCcw,
   ShoppingBag,
+  Trash2,
   UserRound,
   Wrench,
 } from "lucide-react";
@@ -73,6 +74,7 @@ const KIND_ICON: Record<OrderEvent["kind"], typeof History> = {
   proof_submitted: FileCheck,
   reinstated: RotateCcw,
   expired: Clock,
+  payment_attempt_removed: Trash2,
 };
 
 function HistoryRow({ event }: { event: OrderEvent }) {
@@ -110,6 +112,11 @@ function HistoryRow({ event }: { event: OrderEvent }) {
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-foreground">
           {translate(`orders.history.kind.${event.kind}`, { _: event.kind })}
+          {meta.correction === true && (
+            <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+              {translate("orders.history.correction", { _: "corrección" })}
+            </span>
+          )}
           {event.field && event.previousValue && event.nextValue && (
             <span className="font-normal text-muted-foreground">
               {" · "}

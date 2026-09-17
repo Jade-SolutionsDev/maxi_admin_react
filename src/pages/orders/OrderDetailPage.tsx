@@ -68,6 +68,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { OrderCorrectionCard } from "./OrderCorrectionCard";
 import { OrderHistorySection } from "./OrderHistorySection";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
@@ -317,6 +318,7 @@ export default function OrderDetailPage() {
   const queryClient = useQueryClient();
   const { data: identity } = useGetIdentity();
   const isManager = MANAGER_ROLES.includes((identity?.role as Role) ?? "STAFF");
+  const isSuperAdmin = identity?.role === "SUPER_ADMIN";
   // The customer link only renders when the actor may open /clients
   // (admin-only resource — staff get plain text).
   const { canAccess: canViewClient } = useCanAccess({
@@ -544,6 +546,15 @@ export default function OrderDetailPage() {
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         )}
       </div>
+
+      {isSuperAdmin && (
+        <OrderCorrectionCard
+          key={`${order.status}/${order.paymentStatus}`}
+          orderId={order.id}
+          status={order.status}
+          paymentStatus={order.paymentStatus}
+        />
+      )}
 
       {/* Items */}
       <section className="mb-6 rounded-lg border border-border">
