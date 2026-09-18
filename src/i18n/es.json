@@ -512,7 +512,8 @@
     "matrix": {
       "title": "Permisos por módulo",
       "module": "Módulo",
-      "toggle_all": "Seleccionar todo"
+      "toggle_all": "Seleccionar todo",
+      "lectura_implicada": "Hace falta para trabajar en este módulo: sin poder verlo, el módulo no aparece en el menú."
     },
     "actions": {
       "manage_user_roles": "Gestionar roles"

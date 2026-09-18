@@ -510,7 +510,8 @@
     "matrix": {
       "title": "Permissions by module",
       "module": "Module",
-      "toggle_all": "Toggle all"
+      "toggle_all": "Toggle all",
+      "lectura_implicada": "Required to work in this module: without list access the module never shows in the menu."
     },
     "actions": {
       "manage_user_roles": "Manage roles"
