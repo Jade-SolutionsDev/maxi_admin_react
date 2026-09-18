@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
 import { ROLE_IDS } from "./roleChoices";
 import { RolesChecklist } from "./RolesChecklist";
+import { backendMessage } from "./errors";
 
 const inviteSchema = z
   .object({
@@ -89,13 +90,17 @@ export default function InviteUserModal() {
       refresh();
       navigate("/users");
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : translate("users.actions.invite_error", {
-              _: "Could not send the invitation",
-            });
-      toast.error(message);
+      // El motivo real viene del servidor ("ya hay un usuario activo con ese
+      // correo…"); `error.message` de un HttpError llega vacío y la alerta
+      // salía sin decir nada.
+      toast.error(
+        backendMessage(
+          error,
+          translate("users.actions.invite_error", {
+            _: "No se pudo enviar la invitación",
+          }),
+        ),
+      );
     }
   };
 
@@ -279,7 +284,10 @@ export default function InviteUserModal() {
                 <Info className="h-5 w-5 shrink-0 text-primary" />
                 <div className="text-sm">
                   <p className="font-medium text-foreground">
-                    {t("users.actions.invite_note_title", "Información importante")}
+                    {t(
+                      "users.actions.invite_note_title",
+                      "Información importante",
+                    )}
                   </p>
                   <p className="text-muted-foreground">
                     {t(
