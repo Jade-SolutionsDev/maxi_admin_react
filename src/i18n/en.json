@@ -511,7 +511,8 @@
       "title": "Permissions by module",
       "module": "Module",
       "toggle_all": "Toggle all",
-      "lectura_implicada": "Required to work in this module: without list access the module never shows in the menu."
+      "lectura_implicada": "Required to work in this module: without list access the module never shows in the menu.",
+      "al_menos_uno": "Tick at least one permission: a role with no access is useless."
     },
     "actions": {
       "manage_user_roles": "Manage roles"
