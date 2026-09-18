@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useGetList, useInput, useTranslate } from "ra-core";
+import { useGetList, useInput, useTranslate, type Validator } from "ra-core";
 import {
   Table,
   TableBody,
@@ -65,6 +65,8 @@ interface PermissionRecord {
 interface PermissionMatrixInputProps {
   source: string;
   disabled?: boolean;
+  /** Validación del formulario, igual que en cualquier otro input. */
+  validate?: Validator | Validator[];
 }
 
 /**
@@ -74,9 +76,10 @@ interface PermissionMatrixInputProps {
 export function PermissionMatrixInput({
   source,
   disabled,
+  validate,
 }: PermissionMatrixInputProps) {
   const translate = useTranslate();
-  const { field } = useInput({ source });
+  const { field, fieldState, isRequired } = useInput({ source, validate });
   const { data: permissions, isPending } = useGetList<PermissionRecord>(
     "permissions",
     {
@@ -195,86 +198,104 @@ export function PermissionMatrixInput({
   }
 
   return (
-    <div className="w-full overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="min-w-[160px]">
-              {translate("roles.matrix.module")}
-            </TableHead>
-            {actions.map((action) => {
-              const ids = idsForAction(action);
+    <div className="w-full">
+      {fieldState.error && (
+        <p className="mb-2 text-sm text-destructive">
+          {translate(fieldState.error.message ?? "", {
+            _: fieldState.error.message ?? "",
+          })}
+        </p>
+      )}
+      {isRequired && !fieldState.error && (
+        <p className="mb-2 text-sm text-muted-foreground">
+          {translate("roles.matrix.al_menos_uno", {
+            _: "Marca al menos un permiso: un rol sin acceso a nada no sirve.",
+          })}
+        </p>
+      )}
+      <div className="w-full overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="min-w-[160px]">
+                {translate("roles.matrix.module")}
+              </TableHead>
+              {actions.map((action) => {
+                const ids = idsForAction(action);
+                const allChecked =
+                  ids.length > 0 && ids.every((id) => selected.includes(id));
+                return (
+                  <TableHead key={action} className="text-center">
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span>{translate(`permissions.actions.${action}`)}</span>
+                      <Checkbox
+                        checked={allChecked}
+                        disabled={disabled || ids.length === 0}
+                        onCheckedChange={(c) => toggleMany(ids, c === true)}
+                        aria-label={translate("roles.matrix.toggle_all")}
+                      />
+                    </div>
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {modules.map((module) => {
+              const moduleIds = idsForModule(module);
               const allChecked =
-                ids.length > 0 && ids.every((id) => selected.includes(id));
+                moduleIds.length > 0 &&
+                moduleIds.every((id) => selected.includes(id));
               return (
-                <TableHead key={action} className="text-center">
-                  <div className="flex flex-col items-center gap-1.5">
-                    <span>{translate(`permissions.actions.${action}`)}</span>
-                    <Checkbox
-                      checked={allChecked}
-                      disabled={disabled || ids.length === 0}
-                      onCheckedChange={(c) => toggleMany(ids, c === true)}
-                      aria-label={translate("roles.matrix.toggle_all")}
-                    />
-                  </div>
-                </TableHead>
+                <TableRow key={module}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={allChecked}
+                        disabled={disabled || moduleIds.length === 0}
+                        onCheckedChange={(c) =>
+                          toggleMany(moduleIds, c === true)
+                        }
+                        aria-label={translate("roles.matrix.toggle_all")}
+                      />
+                      <span>{translate(`permissions.modules.${module}`)}</span>
+                    </div>
+                  </TableCell>
+                  {actions.map((action) => {
+                    const id = byModuleAction.get(`${module}:${action}`);
+                    return (
+                      <TableCell key={action} className="text-center">
+                        {id ? (
+                          <Checkbox
+                            checked={
+                              selected.includes(id) ||
+                              lecturaImplicada(module, action)
+                            }
+                            disabled={
+                              disabled || lecturaImplicada(module, action)
+                            }
+                            onCheckedChange={() => toggleId(id)}
+                            aria-label={`${module}:${action}`}
+                            title={
+                              lecturaImplicada(module, action)
+                                ? translate("roles.matrix.lectura_implicada", {
+                                    _: "Hace falta para trabajar en este módulo: sin poder verlo, el módulo no aparece en el menú.",
+                                  })
+                                : undefined
+                            }
+                          />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
               );
             })}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {modules.map((module) => {
-            const moduleIds = idsForModule(module);
-            const allChecked =
-              moduleIds.length > 0 &&
-              moduleIds.every((id) => selected.includes(id));
-            return (
-              <TableRow key={module}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      checked={allChecked}
-                      disabled={disabled || moduleIds.length === 0}
-                      onCheckedChange={(c) => toggleMany(moduleIds, c === true)}
-                      aria-label={translate("roles.matrix.toggle_all")}
-                    />
-                    <span>{translate(`permissions.modules.${module}`)}</span>
-                  </div>
-                </TableCell>
-                {actions.map((action) => {
-                  const id = byModuleAction.get(`${module}:${action}`);
-                  return (
-                    <TableCell key={action} className="text-center">
-                      {id ? (
-                        <Checkbox
-                          checked={
-                            selected.includes(id) ||
-                            lecturaImplicada(module, action)
-                          }
-                          disabled={
-                            disabled || lecturaImplicada(module, action)
-                          }
-                          onCheckedChange={() => toggleId(id)}
-                          aria-label={`${module}:${action}`}
-                          title={
-                            lecturaImplicada(module, action)
-                              ? translate("roles.matrix.lectura_implicada", {
-                                  _: "Hace falta para trabajar en este módulo: sin poder verlo, el módulo no aparece en el menú.",
-                                })
-                              : undefined
-                          }
-                        />
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
