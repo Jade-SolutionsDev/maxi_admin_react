@@ -1347,7 +1347,8 @@
     "history_empty": "Nobody has answered this message yet.",
     "sender_title": "Sender details",
     "view_client": "View client",
-    "anonymous_sender": "Sender without an account (anonymous form)."
+    "anonymous_sender": "Sender without an account (anonymous form).",
+    "body_required": "Write the reply or pick a template: that is what the history keeps."
   },
   "contact-templates": {
     "fields": {

@@ -150,6 +150,19 @@ export default function ContactMessageDetailPage() {
     _: "Respuesta a tu mensaje — Maxi",
   });
 
+  /**
+   * Correo y WhatsApp abren la herramienta de fuera **con este texto**, y lo
+   * que abren es lo mismo que se guarda en el historial. Con el cuadro vacío
+   * abrían un correo en blanco y dejaban una respuesta sin contenido: en
+   * producción quedaron así 36 de 92, y lo escrito luego en Gmail no hay forma
+   * de recuperarlo. El teléfono y la nota interna no piden texto, que ahí no
+   * viene a cuento.
+   */
+  const sinTexto = replyBody.length === 0;
+  const avisoSinTexto = translate("contact-messages.body_required", {
+    _: "Escribe la respuesta o elige una plantilla: es lo que se guarda en el historial.",
+  });
+
   const recordAction = (channel: string) => {
     logReply.mutate({
       channel,
@@ -250,19 +263,35 @@ export default function ContactMessageDetailPage() {
                 {email && (
                   <>
                     <a
-                      href={mailtoHref(email, subject, replyBody)}
-                      onClick={() => recordAction("email")}
-                      className={cn(buttonVariants({ variant: "outline" }))}
+                      href={sinTexto ? undefined : mailtoHref(email, subject, replyBody)}
+                      aria-disabled={sinTexto}
+                      title={sinTexto ? avisoSinTexto : undefined}
+                      onClick={(event) => {
+                        if (sinTexto) return event.preventDefault();
+                        recordAction("email");
+                      }}
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        sinTexto && "cursor-not-allowed opacity-50",
+                      )}
                     >
                       <Mail className="mr-2 h-4 w-4" />
                       Email
                     </a>
                     <a
-                      href={gmailHref(email, subject, replyBody)}
+                      href={sinTexto ? undefined : gmailHref(email, subject, replyBody)}
+                      aria-disabled={sinTexto}
+                      title={sinTexto ? avisoSinTexto : undefined}
                       target="_blank"
                       rel="noreferrer"
-                      onClick={() => recordAction("email")}
-                      className={cn(buttonVariants({ variant: "outline" }))}
+                      onClick={(event) => {
+                        if (sinTexto) return event.preventDefault();
+                        recordAction("email");
+                      }}
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        sinTexto && "cursor-not-allowed opacity-50",
+                      )}
                     >
                       <Mail className="mr-2 h-4 w-4" />
                       Gmail
@@ -272,11 +301,19 @@ export default function ContactMessageDetailPage() {
                 {phone && (
                   <>
                     <a
-                      href={waHref(phone, replyBody)}
+                      href={sinTexto ? undefined : waHref(phone, replyBody)}
+                      aria-disabled={sinTexto}
+                      title={sinTexto ? avisoSinTexto : undefined}
                       target="_blank"
                       rel="noreferrer"
-                      onClick={() => recordAction("whatsapp")}
-                      className={cn(buttonVariants({ variant: "outline" }))}
+                      onClick={(event) => {
+                        if (sinTexto) return event.preventDefault();
+                        recordAction("whatsapp");
+                      }}
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        sinTexto && "cursor-not-allowed opacity-50",
+                      )}
                     >
                       <MessageSquareText className="mr-2 h-4 w-4" />
                       WhatsApp
@@ -305,6 +342,11 @@ export default function ContactMessageDetailPage() {
                   {translate("contact-messages.platform_send")}
                 </Button>
               </div>
+              {sinTexto && (
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  {avisoSinTexto}
+                </p>
+              )}
               {!platformReplyEnabled && (
                 <p className="text-xs text-muted-foreground">
                   {translate("contact-messages.platform_disabled")}

@@ -1353,7 +1353,8 @@
     "history_empty": "Todavía nadie respondió este mensaje.",
     "sender_title": "Datos del remitente",
     "view_client": "Ver cliente",
-    "anonymous_sender": "Remitente sin cuenta (formulario anónimo)."
+    "anonymous_sender": "Remitente sin cuenta (formulario anónimo).",
+    "body_required": "Escribe la respuesta o elige una plantilla: es lo que se guarda en el historial."
   },
   "contact-templates": {
     "fields": {
