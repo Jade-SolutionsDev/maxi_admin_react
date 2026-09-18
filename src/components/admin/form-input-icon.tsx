@@ -28,7 +28,10 @@ export function FormInputIcon({
       aria-hidden
       className={cn(
         "pointer-events-none absolute inset-y-px left-px flex w-9 items-center justify-center",
-        "rounded-l-md bg-primary/10 text-primary [&_svg]:size-4",
+        // El radio interior de un borde es el exterior menos su grosor: con el
+        // mismo `rounded-md` del control, las esquinas del recuadro asoman por
+        // encima de la línea del borde.
+        "rounded-l-[calc(var(--radius)-3px)] bg-primary/10 text-primary [&_svg]:size-4",
         className,
       )}
     >

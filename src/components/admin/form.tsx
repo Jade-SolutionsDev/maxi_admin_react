@@ -64,7 +64,13 @@ function FormField({ className, id, name, ...props }: FormItemProps) {
     <FormItemContext.Provider value={contextValue}>
       <div
         data-slot="form-item"
-        className={cn("grid gap-2", className)}
+        // `content-start`: en una fila de dos columnas, el campo más bajo se
+        // estira a la altura del más alto (una ayuda de dos líneas basta para
+        // provocarlo). Al estirarse, la fila del control crece, y el recuadro
+        // del icono —anclado al contenedor con `inset-y-px`— crece con ella
+        // mientras el input mantiene su altura fija: el fondo verde se salía
+        // por arriba y por abajo. Con esto las filas nunca se estiran.
+        className={cn("grid content-start gap-2", className)}
         role="group"
         {...props}
       />
