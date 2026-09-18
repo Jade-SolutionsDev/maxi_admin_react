@@ -19,26 +19,6 @@ import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import { PaymentMethodFilter } from "./PaymentMethodFilter";
 import { money, ORDER_STATUSES, PAYMENT_STATUSES } from "./orderStatus";
 
-const orderFilters = [
-  <SearchInput source="q" alwaysOn />,
-  <SelectInput
-    source="status"
-    label="list.fields.status"
-    choices={ORDER_STATUSES.map((s) => ({ id: s, name: `orders.status.${s}` }))}
-    alwaysOn
-  />,
-  <SelectInput
-    source="paymentStatus"
-    label="orders.fields.paymentStatus"
-    choices={PAYMENT_STATUSES.map((s) => ({
-      id: s,
-      name: `orders.paymentStatus.${s}`,
-    }))}
-    alwaysOn
-  />,
-  <PaymentMethodFilter alwaysOn />,
-];
-
 /**
  * La pasarela del último intento. Un pedido puede no tener ninguno —uno de cada
  * diez en producción—, y entonces se dice, en vez de dejar la celda muda.
@@ -121,6 +101,35 @@ const TotalCell = () => {
 
 export default function OrdersList() {
   const translate = useTranslate();
+  const orderFilters = [
+    <SearchInput
+      source="q"
+      placeholder={translate("orders.search_placeholder", {
+        _: "Buscar por pedido, cliente, correo o teléfono",
+      })}
+      alwaysOn
+    />,
+    <SelectInput
+      source="status"
+      label="list.fields.status"
+      choices={ORDER_STATUSES.map((s) => ({
+        id: s,
+        name: `orders.status.${s}`,
+      }))}
+      alwaysOn
+    />,
+    <SelectInput
+      source="paymentStatus"
+      label="orders.fields.paymentStatus"
+      choices={PAYMENT_STATUSES.map((s) => ({
+        id: s,
+        name: `orders.paymentStatus.${s}`,
+      }))}
+      alwaysOn
+    />,
+    <PaymentMethodFilter alwaysOn />,
+  ];
+
   return (
     <ResourceContextProvider value="orders">
       <List

@@ -803,6 +803,7 @@
     }
   },
   "orders": {
+    "search_placeholder": "Buscar por pedido, cliente, correo o teléfono",
     "fields": {
       "orderNumber": "Número",
       "client": "Cliente",
@@ -1066,6 +1067,7 @@
     }
   },
   "clients": {
+    "search_placeholder": "Buscar por nombre, apellidos, correo o teléfono",
     "tabs": {
       "general": "Datos generales",
       "orders": "Pedidos"

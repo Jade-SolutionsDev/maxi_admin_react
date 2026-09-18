@@ -801,6 +801,7 @@
     }
   },
   "orders": {
+    "search_placeholder": "Search by order, customer, email, or phone",
     "fields": {
       "orderNumber": "Number",
       "client": "Customer",
@@ -1060,6 +1061,7 @@
     }
   },
   "clients": {
+    "search_placeholder": "Search by name, surname, email, or phone",
     "tabs": {
       "general": "General",
       "orders": "Orders"
