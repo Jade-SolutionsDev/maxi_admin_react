@@ -1020,6 +1020,13 @@
         "completed": "Paid",
         "rejected": "Rejected"
       }
+    },
+    "promise": {
+      "committed": "Committed for",
+      "on_time": "Delivered on time",
+      "late": "Delivered late",
+      "overdue": "Past due",
+      "pending_payment": "Promise of %{days} working days; the date is set when payment arrives."
     }
   },
   "dashboard": {
@@ -1407,13 +1414,15 @@
       "label": "Name",
       "description": "Description",
       "fee": "Delivery fee",
-      "enabled": "Enabled"
+      "enabled": "Enabled",
+      "promiseDays": "Promise (working days)"
     },
     "form": {
       "note": "With no zones selected the option is offered everywhere.",
       "hints": {
         "fee": "Added to the order total. Leave it at 0 when delivery is free.",
-        "enabled": "Only enabled options appear at checkout."
+        "enabled": "Only enabled options appear at checkout.",
+        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
       }
     },
     "confirm": {
@@ -1440,6 +1449,11 @@
         "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
         "on_cta": "Enable",
         "off_cta": "Disable"
+      },
+      "promise_days": {
+        "label": "Days to have the order ready (working days)",
+        "empty": "No promise",
+        "hint": "Counted from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
       }
     },
     "support_message": {

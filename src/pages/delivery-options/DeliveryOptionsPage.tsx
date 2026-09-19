@@ -52,16 +52,21 @@ export function DeliveryOptionsPage() {
     // The create/edit modals render through <CustomRoutes>, so nothing supplies
     // the resource their CreateBase/EditBase need — this does.
     <ResourceContextProvider value="delivery-options">
-        <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {canReadFulfillment && <FulfillmentSettingsCard />}
 
         <section className="rounded-lg border bg-card p-4 sm:p-6">
           <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Truck className="size-5 text-muted-foreground" aria-hidden="true" />
+              <Truck
+                className="size-5 text-muted-foreground"
+                aria-hidden="true"
+              />
               <div>
                 <h2 className="text-base font-semibold">
-                  {translate("delivery-options.title", { _: "Delivery options" })}
+                  {translate("delivery-options.title", {
+                    _: "Delivery options",
+                  })}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {translate("delivery-options.subtitle", { _: "" })}

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type {
   ExtendedDataProvider,
@@ -35,6 +36,9 @@ export function FulfillmentSettingsCard() {
   const [data, setData] = useState<FulfillmentSettings | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState("");
+  // Días hábiles hasta tener el pedido listo para recoger. Vacío = sin
+  // compromiso, que es lo honesto mientras no se quiera prometer nada.
+  const [plazoRecogida, setPlazoRecogida] = useState("");
   // Turning pickup off can leave customers with nothing to choose, so it is
   // confirmed rather than applied on a stray click.
   const [pendingPickup, setPendingPickup] = useState<boolean | null>(null);
@@ -47,6 +51,11 @@ export function FulfillmentSettingsCard() {
         if (cancelled) return;
         setData(settings);
         setMessage(settings.supportMessage);
+        setPlazoRecogida(
+          settings.pickupPromiseDays != null
+            ? String(settings.pickupPromiseDays)
+            : "",
+        );
       })
       .catch(() => {
         if (!cancelled) notify("shared.actions.error", { type: "error" });
@@ -62,6 +71,11 @@ export function FulfillmentSettingsCard() {
       const result = await dataProvider.updateFulfillmentSettings(changes);
       setData(result.data);
       setMessage(result.data.supportMessage);
+      setPlazoRecogida(
+        result.data.pickupPromiseDays != null
+          ? String(result.data.pickupPromiseDays)
+          : "",
+      );
       notify("fulfillment.saved", { type: "info", _: "Changes saved" });
     } catch {
       notify("shared.actions.error", {
@@ -110,13 +124,13 @@ export function FulfillmentSettingsCard() {
             <AlertDialogHeader className="space-y-3">
               <AlertDialogTitle className="text-lg">
                 {translate(
-                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_title`,
+                  `fulfillment.pickup.confirm.${(pendingPickup ?? !data.pickupEnabled) ? "on" : "off"}_title`,
                   { _: "Confirm change" },
                 )}
               </AlertDialogTitle>
               <AlertDialogDescription>
                 {translate(
-                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_desc`,
+                  `fulfillment.pickup.confirm.${(pendingPickup ?? !data.pickupEnabled) ? "on" : "off"}_desc`,
                   { _: "Are you sure you want to apply this change?" },
                 )}
               </AlertDialogDescription>
@@ -135,8 +149,12 @@ export function FulfillmentSettingsCard() {
                 }}
               >
                 {translate(
-                  `fulfillment.pickup.confirm.${pendingPickup ?? !data.pickupEnabled ? "on" : "off"}_cta`,
-                  { _: translate("shared.actions.confirm_action", { _: "Confirm" }) },
+                  `fulfillment.pickup.confirm.${(pendingPickup ?? !data.pickupEnabled) ? "on" : "off"}_cta`,
+                  {
+                    _: translate("shared.actions.confirm_action", {
+                      _: "Confirm",
+                    }),
+                  },
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -146,12 +164,62 @@ export function FulfillmentSettingsCard() {
 
       {data.pickupEnabledWithoutAddresses && (
         <p className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <AlertTriangle
+            className="mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
           {translate("fulfillment.pickup.no_addresses", {
             _: "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything.",
           })}
         </p>
       )}
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium" htmlFor="pickupPromiseDays">
+          {translate("fulfillment.pickup.promise_days.label", {
+            _: "Plazo para tener el pedido listo (días hábiles)",
+          })}
+        </label>
+        <div className="flex items-start gap-2">
+          <Input
+            id="pickupPromiseDays"
+            type="number"
+            min={1}
+            max={60}
+            className="w-32"
+            value={plazoRecogida}
+            onChange={(event) => setPlazoRecogida(event.target.value)}
+            placeholder={translate("fulfillment.pickup.promise_days.empty", {
+              _: "Sin plazo",
+            })}
+          />
+          <Button
+            type="button"
+            size="sm"
+            disabled={
+              isPending ||
+              plazoRecogida ===
+                (data.pickupPromiseDays != null
+                  ? String(data.pickupPromiseDays)
+                  : "")
+            }
+            onClick={() =>
+              void save({
+                pickupPromiseDays: plazoRecogida.trim()
+                  ? Number(plazoRecogida)
+                  : null,
+              })
+            }
+          >
+            {translate("shared.actions.save", { _: "Save" })}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {translate("fulfillment.pickup.promise_days.hint", {
+            _: "Se cuenta desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha.",
+          })}
+        </p>
+      </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium" htmlFor="supportMessage">

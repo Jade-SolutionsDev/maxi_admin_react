@@ -309,6 +309,8 @@ export interface DashboardTopProducts {
 export interface FulfillmentSettings {
   pickupEnabled: boolean;
   supportMessage: string;
+  /** Días hábiles hasta tener el pedido listo para recoger; null = sin plazo. */
+  pickupPromiseDays?: number | null;
   /** Pickup is on but no active storage has an address to collect from. */
   pickupEnabledWithoutAddresses: boolean;
 }
