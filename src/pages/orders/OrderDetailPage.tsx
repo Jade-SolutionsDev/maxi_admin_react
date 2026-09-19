@@ -14,10 +14,11 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
-  Ban,
   ArrowRightLeft,
+  Ban,
   CreditCard,
   FastForward,
+  FileDown,
   Loader2,
   MapPin,
   Pencil,
@@ -313,6 +314,59 @@ const FORWARD_CHAIN: OrderStatus[] = ORDER_STATUSES.filter(
   (s) => s !== "cancelled",
 );
 
+/**
+ * Descarga el comprobante del pedido. El PDF lo compone la API: aquí solo se
+ * pide y se guarda, para que el documento sea idéntico venga de donde venga.
+ */
+function ExportarPdfButton({ orderId }: { orderId: string }) {
+  const translate = useTranslate();
+  const notify = useNotify();
+  const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const [descargando, setDescargando] = useState(false);
+
+  const descargar = async () => {
+    setDescargando(true);
+    try {
+      const { blob, filename } = await dataProvider.downloadOrderPdf(orderId);
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = filename;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      notify(
+        error instanceof Error
+          ? error.message
+          : translate("orders.actions.pdf_error", {
+              _: "No se pudo generar el PDF",
+            }),
+        { type: "error" },
+      );
+    } finally {
+      setDescargando(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => void descargar()}
+      disabled={descargando}
+    >
+      {descargando ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <FileDown size={16} />
+      )}
+      {translate("orders.actions.export_pdf", { _: "Exportar a PDF" })}
+    </Button>
+  );
+}
+
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const translate = useTranslate();
@@ -456,6 +510,7 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ExportarPdfButton orderId={order.id} />
           <OrderStatusBadge status={order.status} />
           <PaymentStatusBadge status={order.paymentStatus} />
         </div>

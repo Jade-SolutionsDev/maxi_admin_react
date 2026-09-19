@@ -861,7 +861,9 @@
       "confirm_direct_description": "Vas a saltar los pasos intermedios y dejar el pedido en \"%{value}\". El stock se ajusta igual que si hubieras recorrido cada paso. ¿Continuar?",
       "delivered_hint": "Anota a quién se le entrega. Desde esta fecha cuentan las 48 horas para reclamar.",
       "picked_up_by": "Quién retira",
-      "picked_up_id": "Carné de identidad"
+      "picked_up_id": "Carné de identidad",
+      "export_pdf": "Exportar a PDF",
+      "pdf_error": "No se pudo generar el PDF"
     },
     "payment": {
       "provider": "Proveedor",
