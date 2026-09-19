@@ -13,9 +13,13 @@ export const zonesToCoverage = (zones: DeliveryZone[] = []): CoverageItem[] =>
     municipalityId: zone.municipalityId ?? null,
   }));
 
-export const coverageToZones = (coverage: CoverageItem[] = []): DeliveryZone[] =>
+export const coverageToZones = (
+  coverage: CoverageItem[] = [],
+): DeliveryZone[] =>
   coverage.map((item) => ({
     provinceId: item.provinceId,
     municipalityId:
-      item.coverageType === "municipality" ? (item.municipalityId ?? null) : null,
+      item.coverageType === "municipality"
+        ? (item.municipalityId ?? null)
+        : null,
   }));

@@ -1,6 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { required, useTranslate } from "ra-core";
-import { AlignLeft, ArrowUpDown, Coins, Heading, Truck } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowUpDown,
+  CalendarClock,
+  Coins,
+  Heading,
+  Truck,
+} from "lucide-react";
 
 import {
   BooleanInput,
@@ -99,6 +106,17 @@ function DeliveryOptionFormFields() {
         step={0.01}
         icon={<Coins />}
         helperText="delivery-options.form.hints.fee"
+      />
+
+      <NumberInput
+        source="promiseDays"
+        label={translate("delivery-options.fields.promiseDays", {
+          _: "Plazo (días hábiles)",
+        })}
+        min={1}
+        max={60}
+        icon={<CalendarClock />}
+        helperText="delivery-options.form.hints.promiseDays"
       />
 
       <NumberInput

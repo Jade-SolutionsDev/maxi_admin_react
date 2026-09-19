@@ -16,6 +16,7 @@ import {
   ArrowRight,
   ArrowRightLeft,
   Ban,
+  CalendarClock,
   CreditCard,
   FastForward,
   FileDown,
@@ -113,6 +114,11 @@ interface OrderRecord {
   cancellationReason: CancellationReason | null;
   /** Set when an admin brought the order back from cancelled to pending. */
   reinstatedAt?: string | null;
+  /** Días hábiles prometidos al comprar. */
+  promiseDays?: number | null;
+  /** Hasta cuándo está comprometida la entrega; se sella con el pago. */
+  promisedAt?: string | null;
+  deliveredAt?: string | null;
   needsTransfer?: boolean;
   pickupLocationId?: string | null;
   pendingTransfers?: {
@@ -364,6 +370,73 @@ function ExportarPdfButton({ orderId }: { orderId: string }) {
       )}
       {translate("orders.actions.export_pdf", { _: "Exportar a PDF" })}
     </Button>
+  );
+}
+
+/**
+ * Hasta cuándo está comprometido el pedido, y si se cumplió.
+ *
+ * La fecha se sella con el pago, así que un pedido sin cobrar enseña el plazo
+ * pactado pero todavía no una fecha: no hay desde cuándo contar.
+ */
+function CompromisoDeEntrega({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  if (!order.promiseDays && !order.promisedAt) {
+    return null;
+  }
+
+  const comprometido = order.promisedAt ? new Date(order.promisedAt) : null;
+  const entregado = order.deliveredAt ? new Date(order.deliveredAt) : null;
+  const aTiempo = comprometido && entregado ? entregado <= comprometido : null;
+  const vencido =
+    comprometido && !entregado && new Date() > comprometido ? true : false;
+
+  const fecha = (valor: Date) =>
+    valor.toLocaleDateString("es-CU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+  return (
+    <div className="mt-3 border-t border-border pt-3 text-sm">
+      {comprometido ? (
+        <p className="flex flex-wrap items-center gap-2">
+          <CalendarClock size={14} className="text-muted-foreground" />
+          <span className="text-muted-foreground">
+            {translate("orders.promise.committed", {
+              _: "Comprometido para el",
+            })}
+          </span>
+          <span className="font-medium text-foreground">
+            {fecha(comprometido)}
+          </span>
+          {aTiempo === true && (
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-700 dark:text-emerald-400">
+              {translate("orders.promise.on_time", { _: "Entregado a tiempo" })}
+            </span>
+          )}
+          {aTiempo === false && (
+            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-400">
+              {translate("orders.promise.late", { _: "Entregado tarde" })}
+            </span>
+          )}
+          {aTiempo === null && vencido && (
+            <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+              {translate("orders.promise.overdue", { _: "Plazo vencido" })}
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="flex items-center gap-2 text-muted-foreground">
+          <CalendarClock size={14} />
+          {translate("orders.promise.pending_payment", {
+            _: "Plazo de %{days} días hábiles; la fecha se fija cuando entre el pago.",
+            days: order.promiseDays ?? 0,
+          })}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -779,6 +852,7 @@ export default function OrderDetailPage() {
             {translate("orders.sections.delivery", { _: "Entrega" })}
           </h2>
           <DeliveryDetails order={order} />
+          <CompromisoDeEntrega order={order} />
         </section>
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
