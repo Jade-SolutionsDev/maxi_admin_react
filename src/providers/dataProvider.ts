@@ -229,6 +229,10 @@ export interface ExtendedDataProvider extends DataProvider {
     direct?: boolean,
     pickedUpBy?: { name: string; idCard?: string },
   ) => Promise<{ data: unknown }>;
+  /** Descarga el comprobante del pedido en PDF, tal como lo compone la API. */
+  downloadOrderPdf: (
+    orderId: string,
+  ) => Promise<{ blob: Blob; filename: string }>;
   /** Devoluciones de un pedido, de la más reciente a la más antigua. */
   getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
   /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
@@ -799,6 +803,23 @@ export const dataProvider: DataProvider = {
       }),
     });
     return { data: unwrapOne(json) };
+  },
+
+  async downloadOrderPdf(orderId: string) {
+    // `fetchJson` da por hecho que la respuesta es JSON; un PDF no lo es, así
+    // que esta llamada va directa con el mismo token.
+    const token = await getApiToken();
+    const response = await fetch(`${API_URL}/orders/${orderId}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    if (!response.ok) {
+      throw new Error(`No se pudo generar el PDF (${response.status})`);
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filename =
+      /filename="([^"]+)"/.exec(disposition)?.[1] ?? `${orderId}.pdf`;
+    return { blob, filename };
   },
 
   async getRefunds(orderId: string) {

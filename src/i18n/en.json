@@ -858,7 +858,9 @@
       "confirm_direct_description": "You are about to skip the intermediate steps and set the order to \"%{value}\". Stock is adjusted as if each step had run. Continue?",
       "delivered_hint": "Record who collects it. The 48-hour claim window starts from this date.",
       "picked_up_by": "Collected by",
-      "picked_up_id": "ID card"
+      "picked_up_id": "ID card",
+      "export_pdf": "Export to PDF",
+      "pdf_error": "Could not generate the PDF"
     },
     "payment": {
       "provider": "Provider",
