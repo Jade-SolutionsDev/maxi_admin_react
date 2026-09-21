@@ -22,10 +22,18 @@ interface DeliveryOptionFormModalProps {
   mode: "create" | "edit";
 }
 
+// Ojo al tocar esto: arma el envío campo a campo, así que un campo nuevo en
+// el formulario que no se añada aquí se escribe, se guarda… y se pierde por
+// el camino sin decir nada. Pasó con el plazo.
 const sanitizeDeliveryOption = (data: Record<string, unknown>) => ({
   label: data.label,
   description: data.description ?? null,
   fee: Number(data.fee ?? 0),
+  // Vacío es «sin compromiso», no cero: cero días sería prometer hoy mismo.
+  promiseDays:
+    data.promiseDays === "" || data.promiseDays == null
+      ? null
+      : Number(data.promiseDays),
   sortOrder: Number(data.sortOrder ?? 0),
   enabled: data.enabled ?? false,
   zones: coverageToZones(
