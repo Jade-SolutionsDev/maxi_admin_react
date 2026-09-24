@@ -14,6 +14,20 @@ export interface InviteUserPayload {
   organizationId?: string;
 }
 
+export interface InviteClientPayload {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface ClientInvitationResult {
+  email: string;
+  invitationId: string;
+  /** El enlace de activación: sirve para dárselo a mano si el correo no llegó. */
+  url: string;
+  emailSent: boolean;
+}
+
 export interface RoleSummary {
   id: string;
   name: string;
@@ -165,6 +179,9 @@ export type OrderPaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
+  inviteClient: (
+    payload: InviteClientPayload,
+  ) => Promise<{ data: ClientInvitationResult }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
@@ -683,6 +700,21 @@ export const dataProvider: DataProvider = {
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
+  },
+
+  /**
+   * Alta de un cliente que compró por otro canal: crea su cuenta en la tienda
+   * y le manda el enlace para que elija contraseña.
+   *
+   * No es `create('clients', …)`: ese endpoint pide el `clerkId` de una cuenta
+   * que ya exista, y aquí justamente no existe todavía.
+   */
+  async inviteClient(payload: InviteClientPayload) {
+    const { json } = await httpClient(`${API_URL}/clients/invitations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return { data: unwrapOne(json) as ClientInvitationResult };
   },
 
   async revokeInvitation(id: string) {

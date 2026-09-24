@@ -1095,6 +1095,26 @@
     "orders": {
       "empty_title": "Sin pedidos",
       "empty_hint": "Este cliente aún no ha realizado pedidos."
+    },
+    "actions": {
+      "invite": "Invitar cliente",
+      "inviting": "Invitando…",
+      "invite_success": "Invitación enviada a %{email}",
+      "invite_error": "No se pudo invitar a este cliente",
+      "copy_link": "Copiar enlace",
+      "link_copied": "Enlace copiado"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico"
+    },
+    "invite": {
+      "title": "Invitar a un cliente",
+      "help": "Le creamos la cuenta y le mandamos un correo para que elija su contraseña. Aparecerá en el listado cuando la active.",
+      "footnote": "La contraseña la elige el cliente: nosotros no la vemos.",
+      "email_failed_title": "La cuenta quedó invitada, pero el correo no salió",
+      "email_failed_help": "Pásale este enlace por WhatsApp. Es personal y sirve una sola vez: con él elige su contraseña y entra."
     }
   },
   "cms-pages": {

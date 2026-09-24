@@ -1,7 +1,7 @@
 import {
   BadgeField,
   BooleanField,
-  ColumnsButton, DateField,
+  ColumnsButton, CreateButton, DateField,
   FilterButton,
   RefreshButton,
   SearchInput,
@@ -49,7 +49,7 @@ const ClientAvatar = () => {
 const ClientActions = () => (
   <div className="flex gap-2">
     <RefreshButton />
-    {/* <CreateButton /> */}
+    <CreateButton label="clients.actions.invite" />
     <ColumnsButton />
     <FilterButton variant="default" size="lg" />
   </div>
