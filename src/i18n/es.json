@@ -912,8 +912,8 @@
       "sent": "Reporte enviado a %{count} destinatarios",
       "send_error": "No se pudo enviar el reporte",
       "no_recipients": "Escribe al menos un correo o elige un rol",
-      "no_email": "%{nombre} (%{rol}) no tiene correo",
-      "empty_role": "El rol %{rol} no tiene a nadie"
+      "empty_role": "El rol %{rol} no tiene a nadie",
+      "skipped": "%{nombre} (%{rol}): %{motivo}"
     }
   },
   "dashboard": {

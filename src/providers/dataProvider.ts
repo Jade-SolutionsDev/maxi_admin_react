@@ -131,7 +131,7 @@ export interface ExtendedDataProvider extends DataProvider {
     fallidos: { email: string; motivo: string }[];
     destinatarios: { email: string; nombre: string | null; motivo: string }[];
     rolesVacios: string[];
-    sinCorreo: { nombre: string | null; rol: string }[];
+    sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
   }>;
   updateOrderStatus: (
     id: string,
@@ -708,7 +708,7 @@ export const dataProvider: DataProvider = {
       fallidos: { email: string; motivo: string }[];
       destinatarios: { email: string; nombre: string | null; motivo: string }[];
       rolesVacios: string[];
-      sinCorreo: { nombre: string | null; rol: string }[];
+      sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
     };
   },
 
