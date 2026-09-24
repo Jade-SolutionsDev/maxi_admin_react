@@ -268,7 +268,7 @@ export interface ExtendedDataProvider extends DataProvider {
     fallidos: { email: string; motivo: string }[];
     destinatarios: { email: string; nombre: string | null; motivo: string }[];
     rolesVacios: string[];
-    sinCorreo: { nombre: string | null; rol: string }[];
+    sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
   }>;
   /** Devoluciones de un pedido, de la más reciente a la más antigua. */
   getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
@@ -922,7 +922,7 @@ export const dataProvider: DataProvider = {
       fallidos: { email: string; motivo: string }[];
       destinatarios: { email: string; nombre: string | null; motivo: string }[];
       rolesVacios: string[];
-      sinCorreo: { nombre: string | null; rol: string }[];
+      sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
     };
   },
 
