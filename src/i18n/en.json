@@ -860,7 +860,10 @@
       "picked_up_by": "Collected by",
       "picked_up_id": "ID card",
       "export_pdf": "Export to PDF",
-      "pdf_error": "Could not generate the PDF"
+      "pdf_error": "Could not generate the PDF",
+      "report": "Export to PDF",
+      "report_loading": "Generating…",
+      "report_error": "Could not generate the report"
     },
     "payment": {
       "provider": "Provider",
@@ -1027,6 +1030,10 @@
       "late": "Delivered late",
       "overdue": "Past due",
       "pending_payment": "Promise of %{days} working days; the date is set when payment arrives."
+    },
+    "filters": {
+      "from": "From",
+      "to": "To"
     }
   },
   "dashboard": {

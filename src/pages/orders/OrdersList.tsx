@@ -13,9 +13,11 @@ import {
   RowNumberField,
   SearchInput,
   SelectInput,
+  TextInput,
 } from "@/components/admin";
 import type { OrderStatus, OrderPaymentStatus } from "@/providers/dataProvider";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
+import { ExportOrdersButton } from "./ExportOrdersButton";
 import { PaymentMethodFilter } from "./PaymentMethodFilter";
 import { money, ORDER_STATUSES, PAYMENT_STATUSES } from "./orderStatus";
 
@@ -128,13 +130,23 @@ export default function OrdersList() {
       alwaysOn
     />,
     <PaymentMethodFilter alwaysOn />,
+    // El rango acota el reporte: sin él, «los de esta semana» obliga a contar
+    // en pantalla. Con `type="date"` para que salga el calendario del
+    // navegador; no hay un DateInput propio en los componentes del panel.
+    <TextInput source="from" label="orders.filters.from" type="date" />,
+    <TextInput source="to" label="orders.filters.to" type="date" />,
   ];
 
   return (
     <ResourceContextProvider value="orders">
       <List
         filters={orderFilters}
-        actions={<RefreshButton />}
+        actions={
+          <div className="flex items-center gap-2">
+            <ExportOrdersButton />
+            <RefreshButton />
+          </div>
+        }
         title={translate("resources.orders.name_plural", { _: "Pedidos" })}
         sort={{ field: "createdAt", order: "DESC" }}
         perPage={10}
