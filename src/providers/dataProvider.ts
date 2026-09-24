@@ -250,6 +250,26 @@ export interface ExtendedDataProvider extends DataProvider {
   downloadOrderPdf: (
     orderId: string,
   ) => Promise<{ blob: Blob; filename: string }>;
+  /** Reporte del listado en PDF, con los criterios del formulario. */
+  downloadOrdersReport: (
+    filtros: Record<string, unknown>,
+  ) => Promise<{ blob: Blob; filename: string }>;
+  /**
+   * Manda ese mismo reporte por correo. Los roles se resuelven en el servidor
+   * al enviar, así que aquí solo viajan sus identificadores.
+   */
+  sendOrdersReport: (cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) => Promise<{
+    enviados: string[];
+    fallidos: { email: string; motivo: string }[];
+    destinatarios: { email: string; nombre: string | null; motivo: string }[];
+    rolesVacios: string[];
+    sinCorreo: { nombre: string | null; rol: string }[];
+  }>;
   /** Devoluciones de un pedido, de la más reciente a la más antigua. */
   getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
   /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
@@ -881,6 +901,29 @@ export const dataProvider: DataProvider = {
     const filename =
       /filename="([^"]+)"/.exec(disposition)?.[1] ?? "pedidos.pdf";
     return { blob, filename };
+  },
+
+  /**
+   * Manda el reporte por correo (MxH-0120). Los roles se resuelven en el
+   * servidor al enviar, así que aquí solo viajan sus identificadores.
+   */
+  async sendOrdersReport(cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) {
+    const { json } = await httpClient(`${API_URL}/orders/report/email`, {
+      method: "POST",
+      body: JSON.stringify(cuerpo),
+    });
+    return unwrapOne(json) as {
+      enviados: string[];
+      fallidos: { email: string; motivo: string }[];
+      destinatarios: { email: string; nombre: string | null; motivo: string }[];
+      rolesVacios: string[];
+      sinCorreo: { nombre: string | null; rol: string }[];
+    };
   },
 
   async getRefunds(orderId: string) {
