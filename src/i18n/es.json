@@ -863,7 +863,10 @@
       "picked_up_by": "Quién retira",
       "picked_up_id": "Carné de identidad",
       "export_pdf": "Exportar a PDF",
-      "pdf_error": "No se pudo generar el PDF"
+      "pdf_error": "No se pudo generar el PDF",
+      "report": "Exportar a PDF",
+      "report_loading": "Generando…",
+      "report_error": "No se pudo generar el reporte"
     },
     "payment": {
       "provider": "Proveedor",
@@ -914,7 +917,9 @@
       "prepare": "Preparar traslado"
     },
     "filters": {
-      "withoutPaymentMethod": "Sin intento de pago"
+      "withoutPaymentMethod": "Sin intento de pago",
+      "from": "Desde",
+      "to": "Hasta"
     },
     "history": {
       "title": "Historial",
