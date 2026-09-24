@@ -647,8 +647,9 @@ export const dataProvider: DataProvider = {
   },
 
   /**
-   * El reporte del listado (MxH-0120). Se le pasan los mismos filtros que
-   * tiene la pantalla: lo que se ve es lo que sale.
+   * El reporte de pedidos (MxH-0120). Recibe los criterios del formulario
+   * —filtros más `groupBy` para el resumen por periodos— y los manda tal cual;
+   * los vacíos no se envían, para que el servidor no los tome por un filtro.
    */
   async downloadOrdersReport(filtros: Record<string, unknown>) {
     const token = await getApiToken();

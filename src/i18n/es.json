@@ -877,6 +877,32 @@
       "withoutPaymentMethod": "Sin intento de pago",
       "from": "Desde",
       "to": "Hasta"
+    },
+    "report": {
+      "open": "Reporte",
+      "title": "Reporte de pedidos",
+      "description": "Elige qué pedidos entran. Los campos que dejes vacíos no filtran nada.",
+      "from": "Fecha de inicio",
+      "to": "Fecha de fin",
+      "status": "Estado del pedido",
+      "paymentStatus": "Estado de pago",
+      "paymentMethod": "Método de pago",
+      "fulfillment": "Tipo de entrega",
+      "delivery": "A domicilio",
+      "pickup": "Recogida en tienda",
+      "pickupLocation": "Punto de recogida",
+      "groupBy": "Resumen por",
+      "noGroup": "Sin resumen",
+      "day": "Días",
+      "week": "Semanas",
+      "month": "Meses",
+      "minTotal": "Importe desde",
+      "maxTotal": "Importe hasta",
+      "all": "Todos",
+      "reset": "Limpiar",
+      "submit": "Generar PDF",
+      "loading": "Generando…",
+      "error": "No se pudo generar el reporte"
     }
   },
   "dashboard": {
