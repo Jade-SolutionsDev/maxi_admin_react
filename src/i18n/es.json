@@ -820,7 +820,10 @@
       "mark_paid": "Marcar pagado",
       "mark_failed": "Pago fallido",
       "mark_refunded": "Reembolsar",
-      "view_customer": "Ver cliente"
+      "view_customer": "Ver cliente",
+      "report": "Exportar a PDF",
+      "report_loading": "Generando…",
+      "report_error": "No se pudo generar el reporte"
     },
     "payment": {
       "provider": "Proveedor",
@@ -871,7 +874,9 @@
       "prepare": "Preparar traslado"
     },
     "filters": {
-      "withoutPaymentMethod": "Sin intento de pago"
+      "withoutPaymentMethod": "Sin intento de pago",
+      "from": "Desde",
+      "to": "Hasta"
     }
   },
   "dashboard": {

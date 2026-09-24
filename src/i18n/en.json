@@ -817,7 +817,14 @@
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
       "mark_refunded": "Refund",
-      "view_customer": "View customer"
+      "view_customer": "View customer",
+      "report": "Export to PDF",
+      "report_loading": "Generating…",
+      "report_error": "Could not generate the report"
+    },
+    "filters": {
+      "from": "From",
+      "to": "To"
     },
     "payment": {
       "provider": "Provider",

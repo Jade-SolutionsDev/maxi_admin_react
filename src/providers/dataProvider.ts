@@ -96,6 +96,10 @@ export interface ExtendedDataProvider extends DataProvider {
   }) => Promise<{ data: DashboardTopProducts }>;
   /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
+  /** Reporte del listado en PDF, con los criterios del formulario. */
+  downloadOrdersReport: (
+    filtros: Record<string, unknown>,
+  ) => Promise<{ blob: Blob; filename: string }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -608,6 +612,32 @@ export const dataProvider: DataProvider = {
       body: JSON.stringify({ status }),
     });
     return { data: unwrapOne(json) };
+  },
+
+  /**
+   * El reporte del listado (MxH-0120). Se le pasan los mismos filtros que
+   * tiene la pantalla: lo que se ve es lo que sale.
+   */
+  async downloadOrdersReport(filtros: Record<string, unknown>) {
+    const token = await getApiToken();
+    const params = new URLSearchParams();
+    for (const [clave, valor] of Object.entries(filtros)) {
+      if (valor !== undefined && valor !== null && valor !== "") {
+        params.set(clave, String(valor));
+      }
+    }
+    const response = await fetch(
+      `${API_URL}/orders/report/pdf?${params.toString()}`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+    );
+    if (!response.ok) {
+      throw new Error(`No se pudo generar el reporte (${response.status})`);
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filename =
+      /filename="([^"]+)"/.exec(disposition)?.[1] ?? "pedidos.pdf";
+    return { blob, filename };
   },
 
   async reinstateOrder(id: string) {
