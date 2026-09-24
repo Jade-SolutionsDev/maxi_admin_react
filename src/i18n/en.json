@@ -1091,6 +1091,26 @@
     "orders": {
       "empty_title": "No orders",
       "empty_hint": "This customer has not placed any orders yet."
+    },
+    "actions": {
+      "invite": "Invite customer",
+      "inviting": "Inviting…",
+      "invite_success": "Invitation sent to %{email}",
+      "invite_error": "Could not invite this customer",
+      "copy_link": "Copy link",
+      "link_copied": "Link copied"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email"
+    },
+    "invite": {
+      "title": "Invite a customer",
+      "help": "We create the account and email them to choose a password. They appear in the list once it is active.",
+      "footnote": "The customer picks the password: we never see it.",
+      "email_failed_title": "The account was invited, but the email did not go out",
+      "email_failed_help": "Send them this link. It is personal and single-use: with it they choose a password and get in."
     }
   },
   "cms-pages": {
