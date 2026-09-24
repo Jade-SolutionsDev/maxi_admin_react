@@ -174,11 +174,14 @@ export const ReportDialog = ({
       for (const fallo of r.fallidos) {
         notify(`${fallo.email}: ${fallo.motivo}`, { type: "error" });
       }
+      // El motivo lo da el servidor: sin correo, cuenta desactivada o borrada.
+      // Quien marca un rol de seis y recibe cinco tiene que saber cuál falta.
       for (const persona of r.sinCorreo) {
         notify(
-          t("orders.report.no_email", "%{nombre} (%{rol}) no tiene correo")
+          t("orders.report.skipped", "%{nombre} (%{rol}): %{motivo}")
             .replace("%{nombre}", persona.nombre ?? "—")
-            .replace("%{rol}", persona.rol),
+            .replace("%{rol}", persona.rol)
+            .replace("%{motivo}", persona.motivo),
           { type: "warning" },
         );
       }
