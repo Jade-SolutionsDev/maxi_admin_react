@@ -850,7 +850,18 @@
       "reset": "Clear",
       "submit": "Generate PDF",
       "loading": "Generating…",
-      "error": "Could not generate the report"
+      "error": "Could not generate the report",
+      "send_title": "Send it by email (optional)",
+      "emails": "Emails, comma separated",
+      "roles": "Or to a whole role",
+      "roles_hint": "A role reaches every user in it who has an email, as the role stands at send time.",
+      "send": "Send by email",
+      "sending": "Sending…",
+      "sent": "Report sent to %{count} recipients",
+      "send_error": "Could not send the report",
+      "no_recipients": "Type at least one email or pick a role",
+      "no_email": "%{nombre} (%{rol}) has no email",
+      "empty_role": "Role %{rol} has nobody"
     },
     "payment": {
       "provider": "Provider",

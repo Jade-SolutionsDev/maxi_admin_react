@@ -117,6 +117,22 @@ export interface ExtendedDataProvider extends DataProvider {
   downloadOrdersReport: (
     filtros: Record<string, unknown>,
   ) => Promise<{ blob: Blob; filename: string }>;
+  /**
+   * Manda ese mismo reporte por correo. Los roles se resuelven en el servidor
+   * al enviar, así que aquí solo viajan sus identificadores.
+   */
+  sendOrdersReport: (cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) => Promise<{
+    enviados: string[];
+    fallidos: { email: string; motivo: string }[];
+    destinatarios: { email: string; nombre: string | null; motivo: string }[];
+    rolesVacios: string[];
+    sinCorreo: { nombre: string | null; rol: string }[];
+  }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -671,6 +687,29 @@ export const dataProvider: DataProvider = {
     const filename =
       /filename="([^"]+)"/.exec(disposition)?.[1] ?? "pedidos.pdf";
     return { blob, filename };
+  },
+
+  /**
+   * Manda el reporte por correo (MxH-0120). Los roles se resuelven en el
+   * servidor al enviar, así que aquí solo viajan sus identificadores.
+   */
+  async sendOrdersReport(cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) {
+    const { json } = await httpClient(`${API_URL}/orders/report/email`, {
+      method: "POST",
+      body: JSON.stringify(cuerpo),
+    });
+    return unwrapOne(json) as {
+      enviados: string[];
+      fallidos: { email: string; motivo: string }[];
+      destinatarios: { email: string; nombre: string | null; motivo: string }[];
+      rolesVacios: string[];
+      sinCorreo: { nombre: string | null; rol: string }[];
+    };
   },
 
   async reinstateOrder(id: string) {
