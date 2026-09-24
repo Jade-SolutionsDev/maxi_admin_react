@@ -1,4 +1,4 @@
-import { FileDown, Loader2 } from "lucide-react";
+import { FileDown, Loader2, Send } from "lucide-react";
 import { useGetList, useListContext, useNotify, useTranslate } from "ra-core";
 import { useDataProvider } from "ra-core";
 import { useState } from "react";
@@ -19,7 +19,7 @@ import { ORDER_STATUSES, PAYMENT_STATUSES } from "./orderStatus";
 import { SIN_METODO } from "./PaymentMethodFilter";
 
 /** Lo que se le manda al servidor. Vacío = sin filtrar por eso. */
-export interface CriteriosDelReporte {
+export interface CriteriosDelReporte extends Record<string, string> {
   from: string;
   to: string;
   status: string;
@@ -55,6 +55,18 @@ interface Almacen {
   id: string;
   name: string;
 }
+
+interface Rol {
+  id: string;
+  name: string;
+}
+
+/** Separadores razonables: la gente pega correos con comas, espacios o saltos. */
+const partirCorreos = (texto: string): string[] =>
+  texto
+    .split(/[\s,;]+/)
+    .map((c) => c.trim())
+    .filter(Boolean);
 
 const claseSelect =
   "h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -108,6 +120,9 @@ export const ReportDialog = ({
     ),
   });
   const [generando, setGenerando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [correos, setCorreos] = useState("");
+  const [roles, setRoles] = useState<string[]>([]);
 
   const { data: metodos } = useGetList<MetodoDePago>("payment-methods", {
     pagination: { page: 1, perPage: 50 },
@@ -117,9 +132,75 @@ export const ReportDialog = ({
     pagination: { page: 1, perPage: 100 },
     sort: { field: "name", order: "ASC" },
   });
+  const { data: rolesDisponibles } = useGetList<Rol>("roles", {
+    pagination: { page: 1, perPage: 100 },
+    sort: { field: "name", order: "ASC" },
+  });
 
   const cambiar = (campo: keyof CriteriosDelReporte) => (valor: string) =>
     setCriterios((previos) => ({ ...previos, [campo]: valor }));
+
+  const enviar = async () => {
+    const listaDeCorreos = partirCorreos(correos);
+    if (!listaDeCorreos.length && !roles.length) {
+      notify(
+        t(
+          "orders.report.no_recipients",
+          "Escribe al menos un correo o elige un rol",
+        ),
+        { type: "warning" },
+      );
+      return;
+    }
+    setEnviando(true);
+    try {
+      const { groupBy, ...filtros } = criterios;
+      const r = await dataProvider.sendOrdersReport({
+        emails: listaDeCorreos,
+        roleIds: roles,
+        filtros,
+        groupBy: groupBy || undefined,
+      });
+
+      if (r.enviados.length) {
+        notify(
+          t("orders.report.sent", "Reporte enviado a %{count} destinatarios")
+            .replace("%{count}", String(r.enviados.length)),
+          { type: "success" },
+        );
+      }
+      // Lo que no salió se dice, no se calla: quien lo manda tiene que saber
+      // que a dos de los seis economistas no les llegó nada.
+      for (const fallo of r.fallidos) {
+        notify(`${fallo.email}: ${fallo.motivo}`, { type: "error" });
+      }
+      for (const persona of r.sinCorreo) {
+        notify(
+          t("orders.report.no_email", "%{nombre} (%{rol}) no tiene correo")
+            .replace("%{nombre}", persona.nombre ?? "—")
+            .replace("%{rol}", persona.rol),
+          { type: "warning" },
+        );
+      }
+      for (const rol of r.rolesVacios) {
+        notify(
+          t("orders.report.empty_role", "El rol %{rol} no tiene a nadie")
+            .replace("%{rol}", rol),
+          { type: "warning" },
+        );
+      }
+      if (r.enviados.length) onCerrar();
+    } catch (error) {
+      notify(
+        error instanceof Error
+          ? error.message
+          : t("orders.report.send_error", "No se pudo enviar el reporte"),
+        { type: "error" },
+      );
+    } finally {
+      setEnviando(false);
+    }
+  };
 
   const generar = async () => {
     setGenerando(true);
@@ -294,6 +375,53 @@ export const ReportDialog = ({
           </Campo>
         </div>
 
+        <div className="border-t pt-4">
+          <p className="mb-3 text-sm font-medium">
+            {t("orders.report.send_title", "Mandarlo por correo (opcional)")}
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Campo
+              etiqueta={t("orders.report.emails", "Correos, separados por comas")}
+            >
+              <Input
+                type="text"
+                placeholder="ana@ejemplo.com, luis@ejemplo.com"
+                value={correos}
+                onChange={(e) => setCorreos(e.target.value)}
+              />
+            </Campo>
+            <Campo etiqueta={t("orders.report.roles", "O a todo un rol")}>
+              <div className="flex max-h-24 flex-col gap-1 overflow-y-auto rounded-md border border-input p-2">
+                {(rolesDisponibles ?? []).map((rol) => (
+                  <label
+                    key={rol.id}
+                    className="flex items-center gap-2 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={roles.includes(rol.id)}
+                      onChange={(e) =>
+                        setRoles((previos) =>
+                          e.target.checked
+                            ? [...previos, rol.id]
+                            : previos.filter((id) => id !== rol.id),
+                        )
+                      }
+                    />
+                    {rol.name}
+                  </label>
+                ))}
+              </div>
+            </Campo>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t(
+              "orders.report.roles_hint",
+              "A un rol le llega a todos sus usuarios con correo, tal como esté el rol en el momento de enviarlo.",
+            )}
+          </p>
+        </div>
+
         <DialogFooter className="gap-2 sm:gap-2">
           <Button
             type="button"
@@ -311,7 +439,26 @@ export const ReportDialog = ({
           >
             {t("ra.action.cancel", "Cancelar")}
           </Button>
-          <Button type="button" onClick={generar} disabled={generando}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={enviar}
+            disabled={enviando || generando}
+          >
+            {enviando ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <Send className="mr-2 h-4 w-4" aria-hidden />
+            )}
+            {enviando
+              ? t("orders.report.sending", "Enviando…")
+              : t("orders.report.send", "Enviar por correo")}
+          </Button>
+          <Button
+            type="button"
+            onClick={generar}
+            disabled={generando || enviando}
+          >
             {generando ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
             ) : (

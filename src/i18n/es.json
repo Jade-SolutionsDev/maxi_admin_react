@@ -1063,7 +1063,18 @@
       "reset": "Limpiar",
       "submit": "Generar PDF",
       "loading": "Generando…",
-      "error": "No se pudo generar el reporte"
+      "error": "No se pudo generar el reporte",
+      "send_title": "Mandarlo por correo (opcional)",
+      "emails": "Correos, separados por comas",
+      "roles": "O a todo un rol",
+      "roles_hint": "A un rol le llega a todos sus usuarios con correo, tal como esté el rol en el momento de enviarlo.",
+      "send": "Enviar por correo",
+      "sending": "Enviando…",
+      "sent": "Reporte enviado a %{count} destinatarios",
+      "send_error": "No se pudo enviar el reporte",
+      "no_recipients": "Escribe al menos un correo o elige un rol",
+      "no_email": "%{nombre} (%{rol}) no tiene correo",
+      "empty_role": "El rol %{rol} no tiene a nadie"
     }
   },
   "dashboard": {
