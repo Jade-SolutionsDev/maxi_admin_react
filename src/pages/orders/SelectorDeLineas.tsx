@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useGetList, useTranslate } from "ra-core";
 import { Minus, Plus, Search, ShoppingCart, Trash2 } from "lucide-react";
 
@@ -31,25 +31,39 @@ const round = (value: number) => Math.round(value * 100) / 100;
  * el alta de un pedido desde el panel. Está compartido a propósito — dos
  * selectores separados acabarían enseñando stock distinto, que es justo lo que
  * pasó con el reporte de pedidos antes de compartir el constructor de filtros.
+ *
+ * Devuelve un fragmento con dos hermanos (la tabla de líneas y el buscador),
+ * sin envoltorio propio: el espaciado entre ambos y el resto del formulario
+ * lo pone quien lo use.
+ *
+ * El campo de búsqueda usa un `id` fijo (`items-search`); no pongas dos
+ * selectores en la misma pantalla o sus `<label htmlFor>` colisionarán.
  */
 export function SelectorDeLineas({
   lines,
   onChange,
   /** Precios editables. El editor de pedidos los deja tocar; el alta también. */
   allowPriceEdit = true,
+  /**
+   * Productos que ya estaban en el pedido guardado. Lo que no esté aquí se
+   * marca como «nuevo». Si se omite, no se marca nada: en un pedido que aún
+   * no existe, no hay contra qué comparar.
+   */
+  originales,
 }: {
   lines: EditableLine[];
   onChange: (lines: EditableLine[]) => void;
   allowPriceEdit?: boolean;
-}) {
+  originales?: string[];
+}): React.ReactElement {
   const translate = useTranslate();
   const [search, setSearch] = useState("");
 
-  // Qué líneas había al montar el selector: solo para marcar "nuevo" en la
-  // tabla. Se congela una vez, igual que hacía el editor de pedidos con el
-  // pedido tal como llegó antes de tocar nada.
-  const [original] = useState<Map<string, EditableLine>>(
-    () => new Map(lines.map((line) => [line.productId, line])),
+  // Set de consulta rápida para la marca "nuevo"; `null` cuando no hay nada
+  // contra qué comparar (alta de pedido), así ninguna línea se marca.
+  const originalesSet = useMemo(
+    () => (originales ? new Set(originales) : null),
+    [originales],
   );
 
   // Catálogo para añadir productos. Se consulta solo cuando hay búsqueda: la
@@ -106,13 +120,14 @@ export function SelectorDeLineas({
     <>
       <ul className="divide-y divide-border rounded-md border border-border">
         {lines.map((line) => {
-          const before = original.get(line.productId);
+          const esNuevo =
+            originalesSet !== null && !originalesSet.has(line.productId);
           return (
             <li key={line.productId} className="space-y-2 p-3">
               <div className="flex items-start justify-between gap-2">
                 <span className="font-medium text-foreground">
                   {line.name}
-                  {!before && (
+                  {esNuevo && (
                     <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 text-xs font-normal text-emerald-700 dark:text-emerald-400">
                       {translate("orders.items_editor.new", { _: "nuevo" })}
                     </span>

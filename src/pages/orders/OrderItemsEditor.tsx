@@ -103,6 +103,13 @@ export function OrderItemsEditor({
     [items],
   );
 
+  // Para la marca "nuevo" del selector: los productos que ya estaban en el
+  // pedido guardado, no en la copia editable (`lines`).
+  const originalProductIds = useMemo(
+    () => items.map((line) => line.productId),
+    [items],
+  );
+
   const subtotal = round(
     lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
   );
@@ -207,7 +214,11 @@ export function OrderItemsEditor({
         </DialogHeader>
 
         <div className="space-y-4">
-          <SelectorDeLineas lines={lines} onChange={setLines} />
+          <SelectorDeLineas
+            lines={lines}
+            onChange={setLines}
+            originales={originalProductIds}
+          />
 
           <div className="space-y-1 rounded-md border border-border p-3 text-sm">
             <div className="flex justify-between text-muted-foreground">
