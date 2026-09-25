@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   ResourceContextProvider,
+  useCanAccess,
   useRecordContext,
   useTranslate,
 } from "ra-core";
@@ -16,7 +17,6 @@ import {
   SelectInput,
   TextInput,
 } from "@/components/admin";
-import { RequireAccess } from "@/components/auth/RequireAccess";
 import { Button } from "@/components/ui/button";
 import type { OrderStatus, OrderPaymentStatus } from "@/providers/dataProvider";
 import { CrearPedidoDialog } from "./CrearPedidoDialog";
@@ -105,6 +105,28 @@ const TotalCell = () => {
   return <span className="font-medium tabular-nums">{money(record.total)}</span>;
 };
 
+/**
+ * El botón de crear, oculto a quien no tenga el permiso.
+ *
+ * No es `<RequireAccess>`: ese componente es un guarda de ruta —a quien no
+ * tiene el permiso le pinta la página entera de «Acceso denegado»— y aquí es
+ * un botón dentro de una barra. Se usa `useCanAccess` directamente, igual que
+ * `GatedNavEntry` en el menú lateral: sin permiso, no se pinta nada.
+ */
+const BotonCrearPedido = ({ onClick }: { onClick: () => void }) => {
+  const translate = useTranslate();
+  const { canAccess, isPending } = useCanAccess({
+    resource: "orders",
+    action: "create",
+  });
+  if (isPending || !canAccess) return null;
+  return (
+    <Button onClick={onClick}>
+      {translate("orders.create.button", { _: "Crear pedido" })}
+    </Button>
+  );
+};
+
 export default function OrdersList() {
   const translate = useTranslate();
   const [crearAbierto, setCrearAbierto] = useState(false);
@@ -148,11 +170,7 @@ export default function OrdersList() {
         filters={orderFilters}
         actions={
           <div className="flex items-center gap-2">
-            <RequireAccess resource="orders" action="create">
-              <Button onClick={() => setCrearAbierto(true)}>
-                {translate("orders.create.button", { _: "Crear pedido" })}
-              </Button>
-            </RequireAccess>
+            <BotonCrearPedido onClick={() => setCrearAbierto(true)} />
             <ExportOrdersButton />
             <RefreshButton />
           </div>

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Phone, Search } from "lucide-react";
 import {
+  useCanAccess,
   useDataProvider,
   useGetList,
   useNotify,
@@ -10,7 +11,6 @@ import {
 import { useState } from "react";
 
 import { FormDialogContent } from "@/components/admin/form-dialog-content";
-import { RequireAccess } from "@/components/auth/RequireAccess";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -102,6 +102,13 @@ export function CrearPedidoDialog({
   const dataProvider = useDataProvider<ExtendedDataProvider>();
   const t = (clave: string, porDefecto: string, args?: Record<string, unknown>) =>
     translate(clave, { _: porDefecto, ...args });
+
+  // La casilla «ya cobrado» solo se pinta a quien tenga el permiso: no es
+  // `<RequireAccess>` (eso es un guarda de ruta, pinta la página entera de
+  // «Acceso denegado» si falta el permiso), es `useCanAccess` directo, igual
+  // que `GatedNavEntry` en el menú lateral. Sin permiso, no se pinta nada.
+  const { canAccess: puedeCobrar, isPending: revisandoPermisoCobro } =
+    useCanAccess({ resource: "orders", action: "update-payment-status" });
 
   const [cliente, setCliente] = useState<{ id: string; label: string } | null>(
     null,
@@ -493,9 +500,7 @@ export function CrearPedidoDialog({
             {/* Pago */}
             <div className="space-y-3">
               <Label>{t("orders.create.payment", "Pago")}</Label>
-              {/* Solo se pinta a quien tenga el permiso de cobros. Que el botón
-                  exista sin permiso solo serviría para que la API conteste 403. */}
-              <RequireAccess resource="orders" action="update-payment-status">
+              {!revisandoPermisoCobro && puedeCobrar && (
                 <div className="space-y-3 rounded-md border border-border p-3">
                   <label className="flex items-start gap-2 text-sm">
                     <Checkbox
@@ -551,7 +556,7 @@ export function CrearPedidoDialog({
                     </div>
                   )}
                 </div>
-              </RequireAccess>
+              )}
             </div>
 
             {/* Notas */}
