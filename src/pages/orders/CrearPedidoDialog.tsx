@@ -384,9 +384,10 @@ export function CrearPedidoDialog({
           contactPhone: entrega.telefono.trim(),
           // Con el id, la API compara la dirección contra el municipio del
           // pedido y rechaza la contradicción; sin él, se salta esa
-          // comprobación en silencio. El nombre y la provincia son para que
-          // el detalle y el PDF —que arman el lugar con ellos— no salgan sin
-          // decir dónde es.
+          // comprobación en silencio. El nombre y la provincia son los que
+          // lee el detalle del pedido en el panel (OrderDetailPage.tsx) para
+          // decir dónde es — el PDF de la API todavía no los lee (defecto
+          // aparte, no de este formulario), así que ahí no se ve todavía.
           municipalityId: municipioId,
           municipalityName: municipio?.name ?? null,
           provinceName: municipio ? (provinciaPorId.get(municipio.provinceId) ?? null) : null,
