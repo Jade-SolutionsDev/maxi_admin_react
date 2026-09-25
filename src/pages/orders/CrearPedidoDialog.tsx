@@ -43,6 +43,12 @@ interface ClienteResumen {
 interface MunicipioResumen {
   id: string;
   name: string;
+  provinceId: string;
+}
+
+interface ProvinciaResumen {
+  id: string;
+  name: string;
 }
 
 interface MetodoDePagoResumen {
@@ -67,6 +73,13 @@ const money = (value: number) =>
     value,
   );
 
+const round = (value: number) => Math.round(value * 100) / 100;
+
+// El carné cubano son 11 dígitos (AAMMDD + 5). La API valida la fecha que
+// llevan dentro de verdad; esto es solo la pista en pantalla para no dejar
+// pasar un "123" o un campo vacío antes de mandarlo.
+const carnetValido = (valor: string) => /^\d{11}$/.test(valor.trim());
+
 const nombreCliente = (c: ClienteResumen) =>
   [c.firstName, c.lastName].filter(Boolean).join(" ").trim() ||
   c.email ||
@@ -77,6 +90,8 @@ const ESTADO_INICIAL_ENTREGA = {
   entreCalles: "",
   referencia: "",
   telefono: "",
+  nombreRecibe: "",
+  carnetEntrega: "",
   quienRecoge: "",
   carnet: "",
   telefonoRecoge: "",
@@ -117,6 +132,13 @@ export function CrearPedidoDialog({
   const { canAccess: puedeCobrar, isPending: revisandoPermisoCobro } =
     useCanAccess({ resource: "orders", action: "update-payment-status" });
 
+  // El enlace de invitar solo se pinta a quien de verdad puede invitar
+  // clientes: sin el permiso, `InviteClientModal` lo rechazaría igual.
+  const { canAccess: puedeInvitar } = useCanAccess({
+    resource: "clients",
+    action: "create",
+  });
+
   const [cliente, setCliente] = useState<{ id: string; label: string } | null>(
     null,
   );
@@ -124,6 +146,25 @@ export function CrearPedidoDialog({
   const [invitando, setInvitando] = useState(false);
 
   const [lines, setLines] = useState<EditableLine[]>([]);
+  // Precio de catálogo con el que se añadió cada producto, para saber luego
+  // si alguien lo pactó distinto por teléfono (ver el envío del `unitPrice`
+  // más abajo) — el mismo criterio que usa el editor de líneas de un pedido
+  // ya existente, pero aquí no hay "original" del que partir: el primer
+  // precio que trae la línea al añadirse ES el de catálogo.
+  const [preciosCatalogo, setPreciosCatalogo] = useState<
+    Record<string, number>
+  >({});
+
+  const manejarLineas = (nuevas: EditableLine[]) => {
+    setPreciosCatalogo((prev) => {
+      const faltantes = nuevas.filter((l) => !(l.productId in prev));
+      if (faltantes.length === 0) return prev;
+      const siguiente = { ...prev };
+      for (const l of faltantes) siguiente[l.productId] = l.unitPrice;
+      return siguiente;
+    });
+    setLines(nuevas);
+  };
 
   // El municipio manda la consulta de qué se puede ofrecer (GET /fulfillment
   // la exige); se prellena con el del cliente si tiene uno guardado, pero
@@ -148,6 +189,7 @@ export function CrearPedidoDialog({
     setBusquedaCliente("");
     setInvitando(false);
     setLines([]);
+    setPreciosCatalogo({});
     setMunicipioId("");
     setTipoEntrega("delivery");
     setDeliveryOptionId("");
@@ -162,26 +204,55 @@ export function CrearPedidoDialog({
   const { data: clientesEncontrados } = useGetList<ClienteResumen>(
     "clients",
     {
-      filter: { q: busquedaCliente },
+      // Solo activos: uno desactivado dispararía el mismo 409 que un cliente
+      // sin stock — mejor no ofrecerlo que dejarlo elegir para que falle.
+      filter: { q: busquedaCliente, isActive: true },
       pagination: { page: 1, perPage: 8 },
       sort: { field: "firstName", order: "ASC" },
     },
     { enabled: busquedaCliente.trim().length >= 2 },
   );
 
-  const { data: municipios } = useGetList<MunicipioResumen>("municipalities", {
-    filter: { all: true },
-    pagination: { page: 1, perPage: 200 },
-    sort: { field: "name", order: "ASC" },
-  });
+  // Puede abrir el formulario sin llegar a usarlo: estas listas no hace falta
+  // pedirlas solo por tener el listado de pedidos abierto.
+  const { data: municipios } = useGetList<MunicipioResumen>(
+    "municipalities",
+    {
+      filter: { all: true },
+      pagination: { page: 1, perPage: 200 },
+      sort: { field: "name", order: "ASC" },
+    },
+    { enabled: open },
+  );
 
-  const { data: metodosDePago } = useGetList<MetodoDePagoResumen>(
+  const { data: provincias } = useGetList<ProvinciaResumen>(
+    "provinces",
+    {
+      pagination: { page: 1, perPage: 50 },
+      sort: { field: "name", order: "ASC" },
+    },
+    { enabled: open },
+  );
+  const provinciaPorId = new Map((provincias ?? []).map((p) => [p.id, p.name]));
+
+  const {
+    data: metodosDePago,
+    isPending: cargandoMetodos,
+    isError: errorMetodos,
+  } = useGetList<MetodoDePagoResumen>(
     "payment-methods",
     {
       pagination: { page: 1, perPage: 50 },
       sort: { field: "sortOrder", order: "ASC" },
     },
+    { enabled: open },
   );
+  // GET /payment-methods es solo de ADMIN/SUPER_ADMIN; el permiso de cobros
+  // (`orders:update-payment-status`) se puede conceder a cualquier rol. Sin
+  // esto, a un empleado con el permiso pero sin ser admin se le queda el
+  // desplegable mudo y sin explicación.
+  const tieneMetodosDisponibles =
+    !cargandoMetodos && !errorMetodos && (metodosDePago ?? []).length > 0;
 
   // Mismo cálculo que ve la tienda para esa zona: opciones de entrega con su
   // tarifa y puntos de recogida. Solo se pide con cliente elegido y municipio
@@ -222,16 +293,45 @@ export function CrearPedidoDialog({
     ? pickupAddressId
     : (opciones?.pickupPoints[0]?.id ?? "");
 
-  // Hace falta una entrega elegida de verdad: con la zona resuelta y sin
-  // "unavailableMessage", y con el id concreto de la opción o del punto — el
+  // "unavailableMessage" no es de fiar por sí solo: es el mensaje de soporte
+  // de los ajustes, y se puede guardar vacío. Lo que de verdad dice que la
+  // zona no admite nada es que las dos listas vengan vacías.
+  const sinNadaQueOfrecer = !!opciones && !tieneDelivery && !tienePickup;
+
+  // Datos de quien recibe, completos de verdad — nunca cadenas vacías que
+  // luego la API rechaza con un mensaje en inglés y en jerga de campo JSON.
+  // En entrega a domicilio se manda `contact` igual que en recogida (es lo
+  // que hace la tienda: `dto.contact ?? address`, y su dirección siempre
+  // trae destinatario), y `contact.idCard` lo exige la API con un carné
+  // cubano válido — por eso el carné es obligatorio también a domicilio,
+  // aunque el pedido en sí no lo use para nada más que identificar a quien
+  // firma al recibir.
+  const entregaDatosCompletos =
+    tipoEntregaEfectivo === "delivery"
+      ? entrega.calle.trim().length > 0 &&
+        entrega.telefono.trim().length > 0 &&
+        entrega.nombreRecibe.trim().length > 0 &&
+        carnetValido(entrega.carnetEntrega)
+      : entrega.quienRecoge.trim().length > 0 &&
+        entrega.telefonoRecoge.trim().length > 0 &&
+        carnetValido(entrega.carnet);
+
+  // Hace falta una entrega elegida de verdad: con la zona resuelta y con
+  // algo que ofrecer, con el id concreto de la opción o del punto —el
   // fallback de la API a "la única opción" no vale apoyo, y mandar vacío es
-  // un 400 seguro.
+  // un 400 seguro— y con los datos de quien recibe completos.
   const tieneEntregaValida =
     !!opciones &&
-    !opciones.unavailableMessage &&
+    !sinNadaQueOfrecer &&
     (tipoEntregaEfectivo === "delivery"
       ? !!deliveryOptionIdEfectivo
-      : !!pickupAddressIdEfectivo);
+      : !!pickupAddressIdEfectivo) &&
+    entregaDatosCompletos;
+
+  // Si la casilla está marcada, hace falta un método elegido de una lista que
+  // de verdad se pudo cargar.
+  const tieneCobroValido =
+    !yaCobrado || (!!metodoCobro && tieneMetodosDisponibles);
 
   const crear = useMutation({
     mutationFn: async () => {
@@ -240,11 +340,20 @@ export function CrearPedidoDialog({
 
       const payload: CreateOrderForClientPayload = {
         clientId: cliente.id,
-        items: lines.map((line) => ({
-          productId: line.productId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-        })),
+        items: lines.map((line) => {
+          const catalogo = preciosCatalogo[line.productId];
+          // Solo viaja cuando de verdad difiere del precio con que se añadió
+          // la línea: la API interpreta cualquier `unitPrice` presente como
+          // un precio pactado por una persona, y no todas las líneas se
+          // tocaron.
+          const pactado =
+            catalogo === undefined || round(catalogo) !== round(line.unitPrice);
+          return {
+            productId: line.productId,
+            quantity: line.quantity,
+            ...(pactado ? { unitPrice: line.unitPrice } : {}),
+          };
+        }),
         fulfillmentType: tipoEntregaEfectivo,
         deliveryMunicipalityId: municipioId,
         customerNotes: notas.trim() || undefined,
@@ -252,17 +361,26 @@ export function CrearPedidoDialog({
 
       if (tipoEntregaEfectivo === "delivery") {
         payload.deliveryOptionId = deliveryOptionIdEfectivo;
-        const direccion: Record<string, unknown> = {};
-        if (entrega.calle.trim()) direccion.street = entrega.calle.trim();
-        if (entrega.entreCalles.trim())
-          direccion.betweenStreets = entrega.entreCalles.trim();
-        if (entrega.referencia.trim())
-          direccion.reference = entrega.referencia.trim();
-        if (entrega.telefono.trim())
-          direccion.contactPhone = entrega.telefono.trim();
-        if (Object.keys(direccion).length > 0) {
-          payload.deliveryAddress = direccion;
-        }
+        const municipio = (municipios ?? []).find((m) => m.id === municipioId);
+        payload.deliveryAddress = {
+          street: entrega.calle.trim(),
+          betweenStreets: entrega.entreCalles.trim() || null,
+          reference: entrega.referencia.trim() || null,
+          contactPhone: entrega.telefono.trim(),
+          // Con el id, la API compara la dirección contra el municipio del
+          // pedido y rechaza la contradicción; sin él, se salta esa
+          // comprobación en silencio. El nombre y la provincia son para que
+          // el detalle y el PDF —que arman el lugar con ellos— no salgan sin
+          // decir dónde es.
+          municipalityId: municipioId,
+          municipalityName: municipio?.name ?? null,
+          provinceName: municipio ? (provinciaPorId.get(municipio.provinceId) ?? null) : null,
+        };
+        payload.contact = {
+          recipientName: entrega.nombreRecibe.trim(),
+          idCard: entrega.carnetEntrega.trim(),
+          contactPhone: entrega.telefono.trim(),
+        };
       } else {
         payload.pickupAddressId = pickupAddressIdEfectivo;
         payload.contact = {
@@ -297,18 +415,25 @@ export function CrearPedidoDialog({
       onOpenChange(false);
     },
     onError: (error: unknown) => {
-      // 409: sin stock suficiente en la zona del cliente. Se dice en cubano
-      // en vez del mensaje crudo que manda la API en inglés.
-      if ((error as { status?: number })?.status === 409) {
-        notify(t("orders.create.no_stock", "No hay stock suficiente para algún producto"), {
-          type: "error",
-        });
-        return;
-      }
-      notify(
-        backendMessage(error, t("orders.create.error", "No se pudo crear el pedido")),
-        { type: "error" },
+      // Un 409 no es siempre "sin stock" —también salta si el cliente está
+      // desactivado—, así que se enseña el mensaje real de la API en vez de
+      // sustituirlo por uno propio. El de stock trae además un detalle por
+      // línea (`"Producto": only N available`): sin esto, en un pedido de
+      // varios productos no se sabe cuál falla.
+      const detalles = (
+        error as {
+          body?: { error?: { details?: { message: string }[] } };
+        }
+      )?.body?.error?.details;
+      const base = backendMessage(
+        error,
+        t("orders.create.error", "No se pudo crear el pedido"),
       );
+      const mensaje =
+        detalles && detalles.length > 0
+          ? `${base}: ${detalles.map((d) => d.message).join("; ")}`
+          : base;
+      notify(mensaje, { type: "error" });
     },
   });
 
@@ -316,6 +441,7 @@ export function CrearPedidoDialog({
     cliente !== null &&
     lines.length > 0 &&
     tieneEntregaValida &&
+    tieneCobroValido &&
     !crear.isPending;
 
   const cambiarApertura = (next: boolean) => {
@@ -413,13 +539,18 @@ export function CrearPedidoDialog({
                       )}
                     </ul>
                   )}
-                  <button
-                    type="button"
-                    className="text-xs text-primary underline-offset-2 hover:underline"
-                    onClick={() => setInvitando(true)}
-                  >
-                    {t("orders.create.client_missing", "¿No tiene cuenta? Invítalo")}
-                  </button>
+                  {puedeInvitar && (
+                    <button
+                      type="button"
+                      className="text-xs text-primary underline-offset-2 hover:underline"
+                      onClick={() => setInvitando(true)}
+                    >
+                      {t(
+                        "orders.create.client_missing",
+                        "¿No tiene cuenta? Invítalo: podrás hacerle el pedido cuando active la cuenta.",
+                      )}
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -427,7 +558,7 @@ export function CrearPedidoDialog({
             {/* Productos */}
             <div className="space-y-3">
               <Label>{t("orders.create.lines", "Productos")}</Label>
-              <SelectorDeLineas lines={lines} onChange={setLines} />
+              <SelectorDeLineas lines={lines} onChange={manejarLineas} />
             </div>
 
             {/* Entrega */}
@@ -462,6 +593,9 @@ export function CrearPedidoDialog({
                       {(municipios ?? []).map((m) => (
                         <option key={m.id} value={m.id}>
                           {m.name}
+                          {provinciaPorId.get(m.provinceId)
+                            ? ` (${provinciaPorId.get(m.provinceId)})`
+                            : ""}
                         </option>
                       ))}
                     </select>
@@ -488,36 +622,48 @@ export function CrearPedidoDialog({
                         "No se pudo consultar las opciones de entrega.",
                       )}
                     </p>
-                  ) : opciones?.unavailableMessage ? (
-                    // Mensaje de la API tal cual: es el mismo texto que vería
-                    // el cliente en la tienda para esta zona.
+                  ) : sinNadaQueOfrecer ? (
+                    // El mensaje de la API es el de soporte de los ajustes y
+                    // se puede guardar vacío; con uno propio de reserva, la
+                    // pantalla nunca se queda muda sobre por qué no se puede
+                    // crear el pedido.
                     <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-                      {opciones.unavailableMessage}
+                      {opciones?.unavailableMessage ||
+                        t(
+                          "orders.create.fulfillment_unavailable_fallback",
+                          "Esta zona no admite entrega a domicilio ni recogida en tienda.",
+                        )}
                     </p>
                   ) : opciones ? (
                     <>
-                      <select
-                        className={claseSelect}
-                        value={tipoEntregaEfectivo}
-                        onChange={(e) =>
-                          setTipoEntrega(e.target.value as TipoEntrega)
-                        }
-                      >
-                        {opciones.deliveryOptions.length > 0 && (
-                          <option value="delivery">
-                            {t("orders.fulfillment.delivery", "A domicilio")}
-                          </option>
-                        )}
-                        {opciones.pickupEnabled &&
-                          opciones.pickupPoints.length > 0 && (
-                            <option value="pickup">
-                              {t(
-                                "orders.fulfillment.pickup",
-                                "Recogida en tienda",
-                              )}
+                      <div className="space-y-1.5">
+                        <Label htmlFor="entrega-tipo" className="text-xs">
+                          {t("orders.create.fulfillment_type", "Tipo de entrega")}
+                        </Label>
+                        <select
+                          id="entrega-tipo"
+                          className={claseSelect}
+                          value={tipoEntregaEfectivo}
+                          onChange={(e) =>
+                            setTipoEntrega(e.target.value as TipoEntrega)
+                          }
+                        >
+                          {opciones.deliveryOptions.length > 0 && (
+                            <option value="delivery">
+                              {t("orders.fulfillment.delivery", "A domicilio")}
                             </option>
                           )}
-                      </select>
+                          {opciones.pickupEnabled &&
+                            opciones.pickupPoints.length > 0 && (
+                              <option value="pickup">
+                                {t(
+                                  "orders.fulfillment.pickup",
+                                  "Recogida en tienda",
+                                )}
+                              </option>
+                            )}
+                        </select>
+                      </div>
 
                       {tipoEntregaEfectivo === "delivery" ? (
                         <div className="grid gap-3 sm:grid-cols-2">
@@ -604,6 +750,42 @@ export function CrearPedidoDialog({
                               }
                             />
                           </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-nombre-recibe" className="text-xs">
+                              {t(
+                                "orders.create.delivery_recipient",
+                                "Nombre de quien recibe",
+                              )}
+                            </Label>
+                            <Input
+                              id="entrega-nombre-recibe"
+                              value={entrega.nombreRecibe}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  nombreRecibe: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-carnet" className="text-xs">
+                              {t("orders.create.pickup_id_card", "Carné de identidad")}
+                            </Label>
+                            <Input
+                              id="entrega-carnet"
+                              value={entrega.carnetEntrega}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  carnetEntrega: e.target.value,
+                                }))
+                              }
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              {t("orders.create.id_card_hint", "Son 11 dígitos.")}
+                            </p>
+                          </div>
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -658,6 +840,9 @@ export function CrearPedidoDialog({
                                   }))
                                 }
                               />
+                              <p className="text-xs text-muted-foreground">
+                                {t("orders.create.id_card_hint", "Son 11 dígitos.")}
+                              </p>
                             </div>
                             <div className="space-y-1.5">
                               <Label htmlFor="recogida-telefono" className="text-xs">
@@ -694,6 +879,7 @@ export function CrearPedidoDialog({
                   <label className="flex items-start gap-2 text-sm">
                     <Checkbox
                       checked={yaCobrado}
+                      disabled={!tieneMetodosDisponibles}
                       onCheckedChange={(v) => setYaCobrado(v === true)}
                       className="mt-0.5"
                     />
@@ -710,7 +896,18 @@ export function CrearPedidoDialog({
                     </span>
                   </label>
 
-                  {yaCobrado && (
+                  {!cargandoMetodos && !tieneMetodosDisponibles && (
+                    // GET /payment-methods es solo de ADMIN/SUPER_ADMIN; el
+                    // permiso de cobros se puede tener sin serlo.
+                    <p className="text-xs text-destructive">
+                      {t(
+                        "orders.create.payment_methods_unavailable",
+                        "No se pudo cargar el catálogo de métodos de pago; no puedes marcar este pedido como cobrado.",
+                      )}
+                    </p>
+                  )}
+
+                  {yaCobrado && tieneMetodosDisponibles && (
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="space-y-1.5">
                         <Label htmlFor="cobro-metodo" className="text-xs">
