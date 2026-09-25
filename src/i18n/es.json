@@ -905,6 +905,7 @@
       "refundHint": "Contacta al cliente y reembolsa este pedido."
     },
     "fulfillment": {
+      "delivery": "A domicilio",
       "pickup": "Recogida en tienda",
       "between": "Entre"
     },
@@ -1075,6 +1076,40 @@
       "no_recipients": "Escribe al menos un correo o elige un rol",
       "empty_role": "El rol %{rol} no tiene a nadie",
       "skipped": "%{nombre} (%{rol}): %{motivo}"
+    },
+    "create": {
+      "button": "Crear pedido",
+      "title": "Crear un pedido para un cliente",
+      "subtitle": "Para quien compra por WhatsApp o por teléfono.",
+      "client": "Cliente",
+      "client_missing": "¿No tiene cuenta? Invítalo",
+      "client_search_placeholder": "Busca por nombre, correo o teléfono…",
+      "client_no_results": "Ningún cliente con esos datos.",
+      "client_change": "Cambiar",
+      "lines": "Productos",
+      "fulfillment": "Entrega",
+      "delivery_municipality": "Municipio",
+      "delivery_municipality_default": "Usar el municipio guardado del cliente",
+      "delivery_street": "Calle",
+      "delivery_between": "Entre calles",
+      "delivery_reference": "Punto de referencia",
+      "delivery_phone": "Teléfono de contacto",
+      "pickup_recipient": "Quién recoge",
+      "pickup_id_card": "Carné de identidad",
+      "pickup_phone": "Teléfono de contacto",
+      "payment": "Pago",
+      "already_paid": "Ya está cobrado",
+      "already_paid_hint": "Marca esto solo si el dinero ya entró: por transferencia o en el mostrador.",
+      "payment_method": "Método de pago",
+      "payment_method_placeholder": "Elige uno…",
+      "reference": "Referencia del cobro",
+      "notes": "Notas",
+      "notes_placeholder": "Cualquier detalle que el cliente haya dado por teléfono…",
+      "submit": "Crear el pedido",
+      "submitting": "Creando…",
+      "created": "Pedido %{orderNumber} creado",
+      "no_stock": "No hay stock suficiente para algún producto",
+      "error": "No se pudo crear el pedido"
     }
   },
   "dashboard": {

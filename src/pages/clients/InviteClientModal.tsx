@@ -45,7 +45,17 @@ type InviteFormValues = z.infer<typeof inviteSchema>;
  * alguien que existe en el listado y no puede entrar en la tienda. Lo que se
  * hace es invitarlo, y su ficha aparece cuando activa la cuenta.
  */
-export default function InviteClientModal() {
+export default function InviteClientModal({
+  onClose,
+}: {
+  /**
+   * Qué pasa al cerrar. Por defecto vuelve al listado de clientes: es como se
+   * comporta montado en la ruta `/clients/create`. El alta de un pedido lo
+   * sustituye por «cerrar nada más este diálogo», para poder invitar a un
+   * cliente sin perder el pedido que ya se llevaba escrito.
+   */
+  onClose?: () => void;
+} = {}) {
   const navigate = useNavigate();
   const translate = useTranslate();
   const dataProvider = useDataProvider() as ExtendedDataProvider;
@@ -59,10 +69,12 @@ export default function InviteClientModal() {
     defaultValues: { firstName: "", lastName: "", email: "" },
   });
 
-  const onClose = () => {
-    refresh();
-    navigate("/clients");
-  };
+  const cerrar =
+    onClose ??
+    (() => {
+      refresh();
+      navigate("/clients");
+    });
 
   const onSubmit = async (values: InviteFormValues) => {
     try {
@@ -75,7 +87,7 @@ export default function InviteClientModal() {
             email: data.email,
           }),
         );
-        onClose();
+        cerrar();
         return;
       }
 
@@ -105,7 +117,7 @@ export default function InviteClientModal() {
   const t = (key: string, fallback: string) => translate(key, { _: fallback });
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && cerrar()}>
       <FormDialogContent className="sm:max-w-xl p-0 gap-0 overflow-hidden">
         {resultado ? (
           <div className="flex flex-col">
@@ -130,7 +142,7 @@ export default function InviteClientModal() {
                 {resultado.url}
               </code>
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={onClose}>
+                <Button type="button" variant="outline" onClick={cerrar}>
                   {t("ra.action.close", "Cerrar")}
                 </Button>
                 <Button type="button" onClick={copiarEnlace}>
@@ -225,7 +237,7 @@ export default function InviteClientModal() {
                   )}
                 </p>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={onClose}>
+                  <Button type="button" variant="outline" onClick={cerrar}>
                     {t("ra.action.cancel", "Cancelar")}
                   </Button>
                   <Button type="submit" disabled={form.formState.isSubmitting}>

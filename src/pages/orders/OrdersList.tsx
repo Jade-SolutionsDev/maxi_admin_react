@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ResourceContextProvider,
   useRecordContext,
@@ -15,7 +16,10 @@ import {
   SelectInput,
   TextInput,
 } from "@/components/admin";
+import { RequireAccess } from "@/components/auth/RequireAccess";
+import { Button } from "@/components/ui/button";
 import type { OrderStatus, OrderPaymentStatus } from "@/providers/dataProvider";
+import { CrearPedidoDialog } from "./CrearPedidoDialog";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import { ExportOrdersButton } from "./ExportOrdersButton";
 import { PaymentMethodFilter } from "./PaymentMethodFilter";
@@ -103,6 +107,7 @@ const TotalCell = () => {
 
 export default function OrdersList() {
   const translate = useTranslate();
+  const [crearAbierto, setCrearAbierto] = useState(false);
   const orderFilters = [
     <SearchInput
       source="q"
@@ -143,6 +148,11 @@ export default function OrdersList() {
         filters={orderFilters}
         actions={
           <div className="flex items-center gap-2">
+            <RequireAccess resource="orders" action="create">
+              <Button onClick={() => setCrearAbierto(true)}>
+                {translate("orders.create.button", { _: "Crear pedido" })}
+              </Button>
+            </RequireAccess>
             <ExportOrdersButton />
             <RefreshButton />
           </div>
@@ -186,6 +196,7 @@ export default function OrdersList() {
           </DataTable.Col>
         </DataTable>
       </List>
+      <CrearPedidoDialog open={crearAbierto} onOpenChange={setCrearAbierto} />
     </ResourceContextProvider>
   );
 }

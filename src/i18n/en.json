@@ -902,6 +902,7 @@
       "refundHint": "Contact the customer and refund this order."
     },
     "fulfillment": {
+      "delivery": "Home delivery",
       "pickup": "Pickup in store",
       "between": "Between"
     },
@@ -1071,6 +1072,40 @@
       "no_recipients": "Type at least one email or pick a role",
       "empty_role": "Role %{rol} has nobody",
       "skipped": "%{nombre} (%{rol}): %{motivo}"
+    },
+    "create": {
+      "button": "Create order",
+      "title": "Create an order for a customer",
+      "subtitle": "For customers who buy over WhatsApp or by phone.",
+      "client": "Customer",
+      "client_missing": "No account? Invite them",
+      "client_search_placeholder": "Search by name, email, or phone…",
+      "client_no_results": "No customer matches those details.",
+      "client_change": "Change",
+      "lines": "Items",
+      "fulfillment": "Delivery",
+      "delivery_municipality": "Municipality",
+      "delivery_municipality_default": "Use the customer's saved municipality",
+      "delivery_street": "Street",
+      "delivery_between": "Between streets",
+      "delivery_reference": "Landmark",
+      "delivery_phone": "Contact phone",
+      "pickup_recipient": "Who is picking up",
+      "pickup_id_card": "ID card",
+      "pickup_phone": "Contact phone",
+      "payment": "Payment",
+      "already_paid": "Already paid",
+      "already_paid_hint": "Check this only if the money is already in: by transfer or at the counter.",
+      "payment_method": "Payment method",
+      "payment_method_placeholder": "Choose one…",
+      "reference": "Payment reference",
+      "notes": "Notes",
+      "notes_placeholder": "Any detail the customer gave over the phone…",
+      "submit": "Create the order",
+      "submitting": "Creating…",
+      "created": "Order %{orderNumber} created",
+      "no_stock": "Not enough stock for one of the products",
+      "error": "Could not create the order"
     }
   },
   "dashboard": {
