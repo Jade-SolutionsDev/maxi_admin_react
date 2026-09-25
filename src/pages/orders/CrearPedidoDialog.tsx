@@ -227,6 +227,11 @@ export function CrearPedidoDialog({
   const { data: provincias } = useGetList<ProvinciaResumen>(
     "provinces",
     {
+      // Sin `all: true` solo llegan las provincias con cobertura activa —
+      // mismo patrón que `municipalities` y que ya usa
+      // `stock-locations/CoverageSelector.tsx`. Sin esto, el sufijo de
+      // provincia del selector de municipio no aparecía casi nunca.
+      filter: { all: true },
       pagination: { page: 1, perPage: 50 },
       sort: { field: "name", order: "ASC" },
     },
@@ -420,25 +425,34 @@ export function CrearPedidoDialog({
       onOpenChange(false);
     },
     onError: (error: unknown) => {
-      // Un 409 no es siempre "sin stock" —también salta si el cliente está
-      // desactivado—, así que se enseña el mensaje real de la API en vez de
-      // sustituirlo por uno propio. El de stock trae además un detalle por
-      // línea (`"Producto": only N available`): sin esto, en un pedido de
-      // varios productos no se sabe cuál falla.
+      const status = (error as { status?: number })?.status;
       const detalles = (
         error as {
           body?: { error?: { details?: { message: string }[] } };
         }
       )?.body?.error?.details;
-      const base = backendMessage(
-        error,
-        t("orders.create.error", "No se pudo crear el pedido"),
+
+      // El 409 con detalle por línea es el de falta de stock — se detecta
+      // por la FORMA (trae `details`), no por el texto en inglés que manda
+      // la API para ese caso (lo comparte con el checkout de la tienda, y no
+      // se toca aquí: podría estar traducido allí el día de mañana). Se
+      // acota a 409 a propósito: un 400 de validación también puede traer
+      // `details` —uno por campo—, y ahí `backendMessage` ya los junta en el
+      // mensaje principal; sumarlos aparte los repetiría dos veces.
+      if (status === 409 && detalles && detalles.length > 0) {
+        notify(
+          `${t("orders.create.no_stock", "No hay stock suficiente para algún producto")}: ${detalles.map((d) => d.message).join("; ")}`,
+          { type: "error" },
+        );
+        return;
+      }
+
+      // Cualquier otro caso —incluido el 409 sin detalle, que es el del
+      // cliente desactivado— ya viene en español desde la API.
+      notify(
+        backendMessage(error, t("orders.create.error", "No se pudo crear el pedido")),
+        { type: "error" },
       );
-      const mensaje =
-        detalles && detalles.length > 0
-          ? `${base}: ${detalles.map((d) => d.message).join("; ")}`
-          : base;
-      notify(mensaje, { type: "error" });
     },
   });
 
@@ -448,6 +462,46 @@ export function CrearPedidoDialog({
     tieneEntregaValida &&
     tieneCobroValido &&
     !crear.isPending;
+
+  // Con seis campos obligatorios repartidos entre dos ramas (domicilio y
+  // recogida) más el cliente, los productos y el método de cobro, un botón
+  // gris solo no dice nada. No hace falta validación por campo ni
+  // asteriscos — basta con poder leer de un vistazo qué falta.
+  const faltantes: string[] = [];
+  if (!cliente) faltantes.push(t("orders.create.missing_client", "el cliente"));
+  if (lines.length === 0) faltantes.push(t("orders.create.missing_lines", "algún producto"));
+  if (cliente && !municipioId) {
+    faltantes.push(t("orders.create.missing_municipality", "el municipio"));
+  } else if (cliente && municipioId && opciones && !sinNadaQueOfrecer) {
+    if (tipoEntregaEfectivo === "delivery") {
+      if (!entrega.calle.trim())
+        faltantes.push(t("orders.create.missing_street", "la calle"));
+      if (!entrega.nombreRecibe.trim())
+        faltantes.push(
+          t("orders.create.missing_recipient_name", "el nombre de quien recibe"),
+        );
+      if (!entrega.telefono.trim())
+        faltantes.push(
+          t("orders.create.missing_recipient_phone", "el teléfono de quien recibe"),
+        );
+    } else {
+      if (!entrega.quienRecoge.trim())
+        faltantes.push(
+          t("orders.create.missing_pickup_name", "el nombre de quien recoge"),
+        );
+      if (!carnetValido(entrega.carnet))
+        faltantes.push(
+          t("orders.create.missing_pickup_id_card", "el carné de quien recoge"),
+        );
+      if (!entrega.telefonoRecoge.trim())
+        faltantes.push(
+          t("orders.create.missing_pickup_phone", "el teléfono de quien recoge"),
+        );
+    }
+  }
+  if (yaCobrado && !metodoCobro) {
+    faltantes.push(t("orders.create.missing_payment_method", "el método de pago"));
+  }
 
   const cambiarApertura = (next: boolean) => {
     if (!next) reiniciar();
@@ -747,6 +801,7 @@ export function CrearPedidoDialog({
                             <Input
                               id="entrega-telefono"
                               value={entrega.telefono}
+                              maxLength={20}
                               onChange={(e) =>
                                 setEntrega((prev) => ({
                                   ...prev,
@@ -765,6 +820,7 @@ export function CrearPedidoDialog({
                             <Input
                               id="entrega-nombre-recibe"
                               value={entrega.nombreRecibe}
+                              maxLength={150}
                               onChange={(e) =>
                                 setEntrega((prev) => ({
                                   ...prev,
@@ -802,6 +858,7 @@ export function CrearPedidoDialog({
                               <Input
                                 id="recogida-nombre"
                                 value={entrega.quienRecoge}
+                                maxLength={150}
                                 onChange={(e) =>
                                   setEntrega((prev) => ({
                                     ...prev,
@@ -841,6 +898,7 @@ export function CrearPedidoDialog({
                               <Input
                                 id="recogida-telefono"
                                 value={entrega.telefonoRecoge}
+                                maxLength={20}
                                 onChange={(e) =>
                                   setEntrega((prev) => ({
                                     ...prev,
@@ -866,7 +924,12 @@ export function CrearPedidoDialog({
                   <label className="flex items-start gap-2 text-sm">
                     <Checkbox
                       checked={yaCobrado}
-                      disabled={!tieneMetodosDisponibles}
+                      // Deshabilitada solo para MARCARLA sin métodos
+                      // disponibles; si ya estaba marcada (un refetch que
+                      // falla después, por ejemplo), se puede seguir
+                      // desmarcando — si no, quien la marcó queda en un
+                      // callejón sin salida: ni crea el pedido ni la quita.
+                      disabled={!tieneMetodosDisponibles && !yaCobrado}
                       onCheckedChange={(v) => setYaCobrado(v === true)}
                       className="mt-0.5"
                     />
@@ -923,6 +986,7 @@ export function CrearPedidoDialog({
                         <Input
                           id="cobro-referencia"
                           value={referenciaCobro}
+                          maxLength={120}
                           onChange={(e) => setReferenciaCobro(e.target.value)}
                         />
                       </div>
@@ -948,6 +1012,14 @@ export function CrearPedidoDialog({
               />
             </div>
           </div>
+
+          {!puedeCrear && !crear.isPending && faltantes.length > 0 && (
+            <p className="text-right text-xs text-muted-foreground">
+              {t("orders.create.missing_summary", "Falta: %{items}", {
+                items: faltantes.join(", "),
+              })}
+            </p>
+          )}
 
           <DialogFooter>
             <Button

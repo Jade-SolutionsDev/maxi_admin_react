@@ -1119,7 +1119,19 @@
       "submit": "Crear el pedido",
       "submitting": "Creando…",
       "created": "Pedido %{orderNumber} creado",
-      "error": "No se pudo crear el pedido"
+      "no_stock": "No hay stock suficiente para algún producto",
+      "error": "No se pudo crear el pedido",
+      "missing_summary": "Falta: %{items}",
+      "missing_client": "el cliente",
+      "missing_lines": "algún producto",
+      "missing_municipality": "el municipio",
+      "missing_street": "la calle",
+      "missing_recipient_name": "el nombre de quien recibe",
+      "missing_recipient_phone": "el teléfono de quien recibe",
+      "missing_pickup_name": "el nombre de quien recoge",
+      "missing_pickup_id_card": "el carné de quien recoge",
+      "missing_pickup_phone": "el teléfono de quien recoge",
+      "missing_payment_method": "el método de pago"
     }
   },
   "dashboard": {

@@ -1115,7 +1115,19 @@
       "submit": "Create the order",
       "submitting": "Creating…",
       "created": "Order %{orderNumber} created",
-      "error": "Could not create the order"
+      "no_stock": "Not enough stock for one of the products",
+      "error": "Could not create the order",
+      "missing_summary": "Missing: %{items}",
+      "missing_client": "the customer",
+      "missing_lines": "at least one product",
+      "missing_municipality": "the municipality",
+      "missing_street": "the street",
+      "missing_recipient_name": "the recipient's name",
+      "missing_recipient_phone": "the recipient's phone",
+      "missing_pickup_name": "the name of who is picking up",
+      "missing_pickup_id_card": "the ID card of who is picking up",
+      "missing_pickup_phone": "the phone of who is picking up",
+      "missing_payment_method": "the payment method"
     }
   },
   "dashboard": {
