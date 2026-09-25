@@ -55,6 +55,9 @@ interface MetodoDePagoResumen {
   id: string;
   code: string;
   label: string;
+  enabled: boolean;
+  /** Credenciales presentes en este entorno; si falta, la API no admite cobrar con él. */
+  configured: boolean;
 }
 
 type TipoEntrega = "delivery" | "pickup";
@@ -251,12 +254,21 @@ export function CrearPedidoDialog({
     },
     { enabled: open },
   );
+  // El catálogo trae también los métodos apagados o sin credenciales
+  // configuradas; el servidor solo acepta cobrar con los que están
+  // `enabled` Y `configured` — ofrecer los demás es un 400 en inglés
+  // garantizado, después de rellenar el formulario entero.
+  const metodosCobrables = (metodosDePago ?? []).filter(
+    (m) => m.enabled && m.configured,
+  );
   // GET /payment-methods es solo de ADMIN/SUPER_ADMIN; el permiso de cobros
   // (`orders:update-payment-status`) se puede conceder a cualquier rol. Sin
   // esto, a un empleado con el permiso pero sin ser admin se le queda el
-  // desplegable mudo y sin explicación.
+  // desplegable mudo y sin explicación. Igual se queda mudo, con el mismo
+  // motivo en pantalla, si el catálogo cargó bien pero no queda ningún
+  // método cobrable tras filtrar.
   const tieneMetodosDisponibles =
-    !cargandoMetodos && !errorMetodos && (metodosDePago ?? []).length > 0;
+    !cargandoMetodos && !errorMetodos && metodosCobrables.length > 0;
 
   // Mismo cálculo que ve la tienda para esa zona: opciones de entrega con su
   // tarifa y puntos de recogida. Solo se pide con cliente elegido y municipio
@@ -341,6 +353,22 @@ export function CrearPedidoDialog({
   // de verdad se pudo cargar.
   const tieneCobroValido =
     !yaCobrado || (!!metodoCobro && tieneMetodosDisponibles);
+
+  // El caso de uso literal de esta pantalla es "el cliente está al teléfono
+  // preguntando cuánto es": mismo cálculo que enseña `OrderItemsEditor` para
+  // un pedido ya existente (subtotal de líneas + tarifa de la entrega
+  // elegida). Sin municipio u opción de entrega resueltos, la tarifa es 0 —
+  // no hay nada más honesto que mostrar todavía.
+  const subtotal = round(
+    lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
+  );
+  const tarifaEntrega =
+    tipoEntregaEfectivo === "delivery"
+      ? (opciones?.deliveryOptions.find(
+          (o) => o.id === deliveryOptionIdEfectivo,
+        )?.fee ?? 0)
+      : 0;
+  const total = round(subtotal + tarifaEntrega);
 
   const crear = useMutation({
     mutationFn: async () => {
@@ -429,7 +457,11 @@ export function CrearPedidoDialog({
       const status = (error as { status?: number })?.status;
       const detalles = (
         error as {
-          body?: { error?: { details?: { message: string }[] } };
+          body?: {
+            error?: {
+              details?: { field: string | null; message: string; available?: number }[];
+            };
+          };
         }
       )?.body?.error?.details;
 
@@ -441,8 +473,24 @@ export function CrearPedidoDialog({
       // `details` —uno por campo—, y ahí `backendMessage` ya los junta en el
       // mensaje principal; sumarlos aparte los repetiría dos veces.
       if (status === 409 && detalles && detalles.length > 0) {
+        // El `message` de cada detalle lo escribe la API en inglés
+        // ("Malta 355ml": only 2 available"); no se enseña tal cual. `field`
+        // es el `productId`, y las líneas de este formulario ya tienen su
+        // nombre — con eso se arma la frase entera en español. Si algún
+        // `field` no casa con ninguna línea (no debería pasar, pero un id
+        // suelto no debe perderse el aviso), ese detalle cae al `message`
+        // de la API como se hacía antes de este cambio.
+        const partes = detalles.map((d) => {
+          const linea = lines.find((l) => l.productId === d.field);
+          if (!linea || typeof d.available !== "number") return d.message;
+          return translate("orders.create.no_stock_line", {
+            _: 'De "%{name}" solo queda %{smart_count} |||| De "%{name}" solo quedan %{smart_count}',
+            name: linea.name,
+            smart_count: d.available,
+          });
+        });
         notify(
-          `${t("orders.create.no_stock", "No hay stock suficiente para algún producto")}: ${detalles.map((d) => d.message).join("; ")}`,
+          `${t("orders.create.no_stock", "No hay stock suficiente para algún producto")}: ${partes.join("; ")}`,
           { type: "error" },
         );
         return;
@@ -917,6 +965,25 @@ export function CrearPedidoDialog({
               )}
             </div>
 
+            {/* Total */}
+            <div className="space-y-3">
+              <Label>{t("orders.create.summary", "Resumen")}</Label>
+              <div className="space-y-1 rounded-md border border-border p-3 text-sm">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>{t("orders.fields.subtotal", "Subtotal")}</span>
+                  <span className="tabular-nums">{money(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>{t("orders.fields.deliveryFee", "Envío")}</span>
+                  <span className="tabular-nums">{money(tarifaEntrega)}</span>
+                </div>
+                <div className="flex justify-between font-semibold text-foreground">
+                  <span>{t("orders.fields.total", "Total")}</span>
+                  <span className="tabular-nums">{money(total)}</span>
+                </div>
+              </div>
+            </div>
+
             {/* Pago */}
             <div className="space-y-3">
               <Label>{t("orders.create.payment", "Pago")}</Label>
@@ -973,7 +1040,7 @@ export function CrearPedidoDialog({
                           <option value="">
                             {t("orders.create.payment_method_placeholder", "Elige uno…")}
                           </option>
-                          {(metodosDePago ?? []).map((m) => (
+                          {metodosCobrables.map((m) => (
                             <option key={m.id} value={m.code}>
                               {m.label}
                             </option>

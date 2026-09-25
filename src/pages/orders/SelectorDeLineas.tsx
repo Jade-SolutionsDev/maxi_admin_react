@@ -68,10 +68,17 @@ export function SelectorDeLineas({
 
   // Catálogo para añadir productos. Se consulta solo cuando hay búsqueda: la
   // lista entera no cabe y tampoco ayuda.
+  //
+  // `isActive: true` se aplica en las dos pantallas que comparten este
+  // buscador, sin volverlo configurable: un producto retirado no se puede
+  // vender ni en un pedido nuevo ni al corregir uno existente, la API lo
+  // rechaza igual en ambos casos, y las líneas que YA estaban en un pedido
+  // (`lines`, que no pasa por esta búsqueda) se siguen viendo aunque el
+  // producto se haya retirado después.
   const { data: found } = useGetList(
     "products",
     {
-      filter: { q: search },
+      filter: { q: search, isActive: true },
       pagination: { page: 1, perPage: 8 },
       sort: { field: "name", order: "ASC" },
     },
