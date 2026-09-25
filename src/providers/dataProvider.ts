@@ -20,6 +20,20 @@ export interface InviteClientPayload {
   lastName?: string;
 }
 
+export interface CreateOrderForClientPayload {
+  clientId: string;
+  items: OrderLinePayload[];
+  fulfillmentType?: "delivery" | "pickup";
+  deliveryOptionId?: string;
+  pickupAddressId?: string;
+  deliveryAddress?: Record<string, unknown>;
+  deliveryMunicipalityId?: string;
+  contact?: { recipientName: string; idCard: string; contactPhone: string };
+  paymentMethod?: string;
+  customerNotes?: string;
+  cobro?: { paymentMethod: string; reference?: string };
+}
+
 export interface ClientInvitationResult {
   email: string;
   invitationId: string;
@@ -232,6 +246,9 @@ export interface ExtendedDataProvider extends DataProvider {
     id: string,
     body: { items: OrderLinePayload[]; reason: string },
   ) => Promise<{ data: unknown }>;
+  createOrderForClient: (
+    payload: CreateOrderForClientPayload,
+  ) => Promise<{ data: { id: string; orderNumber: string } }>;
   /** Todos los intentos de pago del pedido, del más reciente al más antiguo. */
   getPaymentAttempts: (id: string) => Promise<{ data: PaymentAttempt[] }>;
   /** Quita un intento no completado (superadmin), con motivo. */
@@ -735,6 +752,23 @@ export const dataProvider: DataProvider = {
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) as ClientInvitationResult };
+  },
+
+  /**
+   * Un pedido que hacemos nosotros en nombre del cliente: quien compra por
+   * WhatsApp o por teléfono.
+   *
+   * No es `create('orders', …)`: ra-core mandaría el recurso entero, y este
+   * endpoint recibe lo que se pide, no un pedido ya montado.
+   */
+  async createOrderForClient(payload: CreateOrderForClientPayload) {
+    const { json } = await httpClient(`${API_URL}/orders`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return {
+      data: unwrapOne(json) as { id: string; orderNumber: string },
+    };
   },
 
   async revokeInvitation(id: string) {
