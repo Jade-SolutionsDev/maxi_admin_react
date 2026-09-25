@@ -91,7 +91,6 @@ const ESTADO_INICIAL_ENTREGA = {
   referencia: "",
   telefono: "",
   nombreRecibe: "",
-  carnetEntrega: "",
   quienRecoge: "",
   carnet: "",
   telefonoRecoge: "",
@@ -300,18 +299,23 @@ export function CrearPedidoDialog({
 
   // Datos de quien recibe, completos de verdad — nunca cadenas vacías que
   // luego la API rechaza con un mensaje en inglés y en jerga de campo JSON.
-  // En entrega a domicilio se manda `contact` igual que en recogida (es lo
-  // que hace la tienda: `dto.contact ?? address`, y su dirección siempre
-  // trae destinatario), y `contact.idCard` lo exige la API con un carné
-  // cubano válido — por eso el carné es obligatorio también a domicilio,
-  // aunque el pedido en sí no lo use para nada más que identificar a quien
-  // firma al recibir.
+  //
+  // En entrega a domicilio, el destinatario viaja DENTRO de `deliveryAddress`
+  // (`recipientName` / `contactPhone`), no en un `contact` aparte: es
+  // exactamente lo que hace el checkout de la tienda con la dirección
+  // guardada del cliente (`snapshotAddress` + `dto.contact ?? address` en
+  // `orders.service.ts`). Por eso el carné **no** es obligatorio a
+  // domicilio: la tienda nunca lo pide para entregar
+  // (`CreateClientAddressDto.idCard` es opcional), y exigirlo aquí sería
+  // pedirle a quien compra por teléfono un dato que a nadie más se le pide —
+  // la propia divergencia entre panel y tienda que esta pantalla existe para
+  // evitar. En recogida sí sigue siendo obligatorio: ahí no hay dirección de
+  // la que sacarlo y la API lo exige dentro de `contact`.
   const entregaDatosCompletos =
     tipoEntregaEfectivo === "delivery"
       ? entrega.calle.trim().length > 0 &&
         entrega.telefono.trim().length > 0 &&
-        entrega.nombreRecibe.trim().length > 0 &&
-        carnetValido(entrega.carnetEntrega)
+        entrega.nombreRecibe.trim().length > 0
       : entrega.quienRecoge.trim().length > 0 &&
         entrega.telefonoRecoge.trim().length > 0 &&
         carnetValido(entrega.carnet);
@@ -362,10 +366,16 @@ export function CrearPedidoDialog({
       if (tipoEntregaEfectivo === "delivery") {
         payload.deliveryOptionId = deliveryOptionIdEfectivo;
         const municipio = (municipios ?? []).find((m) => m.id === municipioId);
+        // El destinatario va DENTRO de la dirección, no en `contact`: es lo
+        // que hace el checkout de la tienda (`snapshotAddress` +
+        // `dto.contact ?? address`), y no manda `contact` para una entrega —
+        // así que este pedido tampoco puede exigir de más solo por nacer en
+        // el panel.
         payload.deliveryAddress = {
           street: entrega.calle.trim(),
           betweenStreets: entrega.entreCalles.trim() || null,
           reference: entrega.referencia.trim() || null,
+          recipientName: entrega.nombreRecibe.trim(),
           contactPhone: entrega.telefono.trim(),
           // Con el id, la API compara la dirección contra el municipio del
           // pedido y rechaza la contradicción; sin él, se salta esa
@@ -375,11 +385,6 @@ export function CrearPedidoDialog({
           municipalityId: municipioId,
           municipalityName: municipio?.name ?? null,
           provinceName: municipio ? (provinciaPorId.get(municipio.provinceId) ?? null) : null,
-        };
-        payload.contact = {
-          recipientName: entrega.nombreRecibe.trim(),
-          idCard: entrega.carnetEntrega.trim(),
-          contactPhone: entrega.telefono.trim(),
         };
       } else {
         payload.pickupAddressId = pickupAddressIdEfectivo;
@@ -767,24 +772,6 @@ export function CrearPedidoDialog({
                                 }))
                               }
                             />
-                          </div>
-                          <div className="space-y-1.5">
-                            <Label htmlFor="entrega-carnet" className="text-xs">
-                              {t("orders.create.pickup_id_card", "Carné de identidad")}
-                            </Label>
-                            <Input
-                              id="entrega-carnet"
-                              value={entrega.carnetEntrega}
-                              onChange={(e) =>
-                                setEntrega((prev) => ({
-                                  ...prev,
-                                  carnetEntrega: e.target.value,
-                                }))
-                              }
-                            />
-                            <p className="text-xs text-muted-foreground">
-                              {t("orders.create.id_card_hint", "Son 11 dígitos.")}
-                            </p>
                           </div>
                         </div>
                       ) : (
