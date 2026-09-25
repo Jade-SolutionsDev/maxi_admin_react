@@ -7,7 +7,7 @@ import {
   Heading,
 } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { required, useTranslate } from "ra-core";
+import { maxLength, required, useTranslate } from "ra-core";
 import {
   AutocompleteInput,
   BooleanInput,
@@ -16,6 +16,12 @@ import {
   ResourceFormModal,
   TextInput,
 } from "@/components/admin";
+import { CharacterCountHint } from "@/components/admin/character-count-hint";
+
+// Mirror of the API's DTO/column limits (cms-faq.dto.ts); the server rejects
+// anything longer, so the form has to say so before the request leaves.
+const QUESTION_MAX = 300;
+const LINK_LABEL_MAX = 120;
 
 const sanitizeQuestion = (data: Record<string, unknown>) => ({
   categoryId: data.categoryId,
@@ -82,9 +88,18 @@ export function CmsFaqQuestionFormModal({
       <TextInput
         source="question"
         label={translate("cms-faq.fields.question")}
-        validate={required()}
+        validate={[
+          required(),
+          maxLength(QUESTION_MAX, "shared.validation.max_length"),
+        ]}
         icon={<Heading />}
-        helperText="cms-faq.question.question_hint"
+        helperText={
+          <CharacterCountHint
+            source="question"
+            max={QUESTION_MAX}
+            hint="cms-faq.question.question_hint"
+          />
+        }
       />
       <TextInput
         source="answer"
@@ -99,8 +114,15 @@ export function CmsFaqQuestionFormModal({
         <TextInput
           source="linkLabel"
           label={translate("cms-faq.fields.linkLabel")}
+          validate={maxLength(LINK_LABEL_MAX, "shared.validation.max_length")}
           icon={<ExternalLink />}
-          helperText="cms-faq.question.link_label_hint"
+          helperText={
+            <CharacterCountHint
+              source="linkLabel"
+              max={LINK_LABEL_MAX}
+              hint="cms-faq.question.link_label_hint"
+            />
+          }
         />
         <TextInput
           source="linkHref"

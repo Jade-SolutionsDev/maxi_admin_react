@@ -368,6 +368,10 @@
       "note_title_edit": "Important",
       "required_note": "Fields marked with * are required.",
       "edit_note": "Changes are reflected on the platform once you save."
+    },
+    "validation": {
+      "max_length": "Cannot exceed %{max} characters.",
+      "character_count": "%{count} of %{max} characters"
     }
   },
   "app": {

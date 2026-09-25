@@ -1,12 +1,16 @@
 import { AlignLeft, ArrowUpDown, FolderTree } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { required, useTranslate } from "ra-core";
+import { maxLength, required, useTranslate } from "ra-core";
 import {
   BooleanInput,
   NumberInput,
   ResourceFormModal,
   TextInput,
 } from "@/components/admin";
+import { CharacterCountHint } from "@/components/admin/character-count-hint";
+
+// Mirror of the API's DTO/column limit (cms-faq.dto.ts).
+const TITLE_MAX = 160;
 
 const sanitizeCategory = (data: Record<string, unknown>) => ({
   title: data.title,
@@ -51,9 +55,18 @@ export function CmsFaqCategoryFormModal({
       <TextInput
         source="title"
         label={translate("list.fields.title")}
-        validate={required()}
+        validate={[
+          required(),
+          maxLength(TITLE_MAX, "shared.validation.max_length"),
+        ]}
         icon={<AlignLeft />}
-        helperText="cms-faq.category.title_hint"
+        helperText={
+          <CharacterCountHint
+            source="title"
+            max={TITLE_MAX}
+            hint="cms-faq.category.title_hint"
+          />
+        }
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <NumberInput

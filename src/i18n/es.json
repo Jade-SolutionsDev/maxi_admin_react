@@ -370,6 +370,10 @@
       "required_note": "Los campos marcados con * son requeridos.",
       "edit_note": "Los cambios se reflejarán en la plataforma una vez que guardes la información.",
       "invalid": "Revisa los campos marcados: falta algo por completar."
+    },
+    "validation": {
+      "max_length": "No puede superar los %{max} caracteres.",
+      "character_count": "%{count} de %{max} caracteres"
     }
   },
   "app": {
