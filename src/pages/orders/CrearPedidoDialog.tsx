@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Phone, Search } from "lucide-react";
 import {
   useCanAccess,
@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type {
   CreateOrderForClientPayload,
   ExtendedDataProvider,
+  FulfillmentOptions,
 } from "@/providers/dataProvider";
 import InviteClientModal from "../clients/InviteClientModal";
 import { backendMessage } from "../users/errors";
@@ -36,6 +37,7 @@ interface ClienteResumen {
   firstName: string | null;
   lastName: string | null;
   email: string | null;
+  defaultMunicipalityId: string | null;
 }
 
 interface MunicipioResumen {
@@ -58,14 +60,19 @@ type TipoEntrega = "delivery" | "pickup";
 const claseSelect =
   "h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+// El selector de líneas tiene el suyo para lo que enseña; este es el de esta
+// pantalla para la tarifa de cada forma de entrega.
+const money = (value: number) =>
+  new Intl.NumberFormat("es-CU", { style: "currency", currency: "USD" }).format(
+    value,
+  );
+
 const nombreCliente = (c: ClienteResumen) =>
   [c.firstName, c.lastName].filter(Boolean).join(" ").trim() ||
   c.email ||
   c.id;
 
 const ESTADO_INICIAL_ENTREGA = {
-  tipo: "delivery" as TipoEntrega,
-  municipioId: "",
   calle: "",
   entreCalles: "",
   referencia: "",
@@ -118,6 +125,16 @@ export function CrearPedidoDialog({
 
   const [lines, setLines] = useState<EditableLine[]>([]);
 
+  // El municipio manda la consulta de qué se puede ofrecer (GET /fulfillment
+  // la exige); se prellena con el del cliente si tiene uno guardado, pero
+  // queda editable — quien atiende el teléfono puede estar pidiendo la
+  // entrega a otra parte.
+  const [municipioId, setMunicipioId] = useState("");
+  const [tipoEntrega, setTipoEntrega] = useState<TipoEntrega>("delivery");
+  // Se mandan siempre explícitos: el fallback de la API a "la única opción"
+  // deja de servir en cuanto la zona tiene dos o más.
+  const [deliveryOptionId, setDeliveryOptionId] = useState("");
+  const [pickupAddressId, setPickupAddressId] = useState("");
   const [entrega, setEntrega] = useState(ESTADO_INICIAL_ENTREGA);
 
   const [yaCobrado, setYaCobrado] = useState(false);
@@ -131,6 +148,10 @@ export function CrearPedidoDialog({
     setBusquedaCliente("");
     setInvitando(false);
     setLines([]);
+    setMunicipioId("");
+    setTipoEntrega("delivery");
+    setDeliveryOptionId("");
+    setPickupAddressId("");
     setEntrega(ESTADO_INICIAL_ENTREGA);
     setYaCobrado(false);
     setMetodoCobro("");
@@ -162,9 +183,60 @@ export function CrearPedidoDialog({
     },
   );
 
+  // Mismo cálculo que ve la tienda para esa zona: opciones de entrega con su
+  // tarifa y puntos de recogida. Solo se pide con cliente elegido y municipio
+  // resuelto — sin municipio la API responde 400.
+  const opcionesQuery = useQuery({
+    queryKey: ["fulfillment-options", municipioId],
+    queryFn: () =>
+      dataProvider.getFulfillmentOptions(municipioId).then((r) => r.data),
+    enabled: cliente !== null && municipioId.trim().length > 0,
+  });
+  const opciones: FulfillmentOptions | undefined = opcionesQuery.data;
+
+  // Lo elegido, reconciliado con lo que de verdad hay en esta zona — como
+  // valor derivado en el propio render, no en un efecto: un efecto que solo
+  // sincroniza estado a partir de otro estado es del tipo que React pide
+  // evitar (dispara un re-render extra en cascada). Si el tipo o la opción de
+  // antes ya no están en la lista (cliente nuevo, municipio nuevo), se cae al
+  // primero disponible; nunca vacío, nunca el fallback de la API.
+  const tieneDelivery = (opciones?.deliveryOptions.length ?? 0) > 0;
+  const tienePickup =
+    !!opciones?.pickupEnabled && opciones.pickupPoints.length > 0;
+  const tipoEntregaEfectivo: TipoEntrega =
+    tipoEntrega === "delivery" && tieneDelivery
+      ? "delivery"
+      : tipoEntrega === "pickup" && tienePickup
+        ? "pickup"
+        : tieneDelivery
+          ? "delivery"
+          : "pickup";
+  const deliveryOptionIdEfectivo = opciones?.deliveryOptions.some(
+    (o) => o.id === deliveryOptionId,
+  )
+    ? deliveryOptionId
+    : (opciones?.deliveryOptions[0]?.id ?? "");
+  const pickupAddressIdEfectivo = opciones?.pickupPoints.some(
+    (p) => p.id === pickupAddressId,
+  )
+    ? pickupAddressId
+    : (opciones?.pickupPoints[0]?.id ?? "");
+
+  // Hace falta una entrega elegida de verdad: con la zona resuelta y sin
+  // "unavailableMessage", y con el id concreto de la opción o del punto — el
+  // fallback de la API a "la única opción" no vale apoyo, y mandar vacío es
+  // un 400 seguro.
+  const tieneEntregaValida =
+    !!opciones &&
+    !opciones.unavailableMessage &&
+    (tipoEntregaEfectivo === "delivery"
+      ? !!deliveryOptionIdEfectivo
+      : !!pickupAddressIdEfectivo);
+
   const crear = useMutation({
     mutationFn: async () => {
       if (!cliente) throw new Error("Falta el cliente");
+      if (!tieneEntregaValida) throw new Error("Falta elegir la entrega");
 
       const payload: CreateOrderForClientPayload = {
         clientId: cliente.id,
@@ -173,12 +245,13 @@ export function CrearPedidoDialog({
           quantity: line.quantity,
           unitPrice: line.unitPrice,
         })),
-        fulfillmentType: entrega.tipo,
+        fulfillmentType: tipoEntregaEfectivo,
+        deliveryMunicipalityId: municipioId,
         customerNotes: notas.trim() || undefined,
       };
 
-      if (entrega.tipo === "delivery") {
-        payload.deliveryMunicipalityId = entrega.municipioId || undefined;
+      if (tipoEntregaEfectivo === "delivery") {
+        payload.deliveryOptionId = deliveryOptionIdEfectivo;
         const direccion: Record<string, unknown> = {};
         if (entrega.calle.trim()) direccion.street = entrega.calle.trim();
         if (entrega.entreCalles.trim())
@@ -191,6 +264,7 @@ export function CrearPedidoDialog({
           payload.deliveryAddress = direccion;
         }
       } else {
+        payload.pickupAddressId = pickupAddressIdEfectivo;
         payload.contact = {
           recipientName: entrega.quienRecoge.trim(),
           idCard: entrega.carnet.trim(),
@@ -238,7 +312,11 @@ export function CrearPedidoDialog({
     },
   });
 
-  const puedeCrear = cliente !== null && lines.length > 0 && !crear.isPending;
+  const puedeCrear =
+    cliente !== null &&
+    lines.length > 0 &&
+    tieneEntregaValida &&
+    !crear.isPending;
 
   const cambiarApertura = (next: boolean) => {
     if (!next) reiniciar();
@@ -272,7 +350,12 @@ export function CrearPedidoDialog({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => setCliente(null)}
+                    onClick={() => {
+                      setCliente(null);
+                      // El municipio venía prellenado de este cliente; con
+                      // otro no tiene por qué seguir siendo el mismo.
+                      setMunicipioId("");
+                    }}
                   >
                     {t("orders.create.client_change", "Cambiar")}
                   </Button>
@@ -310,6 +393,10 @@ export function CrearPedidoDialog({
                               onClick={() => {
                                 setCliente({ id: c.id, label: nombreCliente(c) });
                                 setBusquedaCliente("");
+                                // Prellenado, no impuesto: se puede cambiar en
+                                // el selector de abajo si la entrega es a otra
+                                // parte esta vez.
+                                setMunicipioId(c.defaultMunicipalityId ?? "");
                               }}
                             >
                               <span className="font-medium text-foreground">
@@ -346,45 +433,30 @@ export function CrearPedidoDialog({
             {/* Entrega */}
             <div className="space-y-3">
               <Label>{t("orders.create.fulfillment", "Entrega")}</Label>
-              <select
-                className={claseSelect}
-                value={entrega.tipo}
-                onChange={(e) =>
-                  setEntrega((prev) => ({
-                    ...prev,
-                    tipo: e.target.value as TipoEntrega,
-                  }))
-                }
-              >
-                <option value="delivery">
-                  {t("orders.fulfillment.delivery", "A domicilio")}
-                </option>
-                <option value="pickup">
-                  {t("orders.fulfillment.pickup", "Recogida en tienda")}
-                </option>
-              </select>
 
-              {entrega.tipo === "delivery" ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="space-y-1.5 sm:col-span-2">
+              {!cliente ? (
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "orders.create.fulfillment_needs_client",
+                    "Elige un cliente para ver las opciones de entrega.",
+                  )}
+                </p>
+              ) : (
+                <>
+                  <div className="space-y-1.5">
                     <Label htmlFor="entrega-municipio" className="text-xs">
                       {t("orders.create.delivery_municipality", "Municipio")}
                     </Label>
                     <select
                       id="entrega-municipio"
                       className={claseSelect}
-                      value={entrega.municipioId}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({
-                          ...prev,
-                          municipioId: e.target.value,
-                        }))
-                      }
+                      value={municipioId}
+                      onChange={(e) => setMunicipioId(e.target.value)}
                     >
                       <option value="">
                         {t(
-                          "orders.create.delivery_municipality_default",
-                          "Usar el municipio guardado del cliente",
+                          "orders.create.delivery_municipality_placeholder",
+                          "Elige un municipio…",
                         )}
                       </option>
                       {(municipios ?? []).map((m) => (
@@ -394,106 +466,223 @@ export function CrearPedidoDialog({
                       ))}
                     </select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="entrega-calle" className="text-xs">
-                      {t("orders.create.delivery_street", "Calle")}
-                    </Label>
-                    <Input
-                      id="entrega-calle"
-                      value={entrega.calle}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({ ...prev, calle: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="entrega-entre" className="text-xs">
-                      {t("orders.create.delivery_between", "Entre calles")}
-                    </Label>
-                    <Input
-                      id="entrega-entre"
-                      value={entrega.entreCalles}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({
-                          ...prev,
-                          entreCalles: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="entrega-referencia" className="text-xs">
-                      {t("orders.create.delivery_reference", "Punto de referencia")}
-                    </Label>
-                    <Input
-                      id="entrega-referencia"
-                      value={entrega.referencia}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({
-                          ...prev,
-                          referencia: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="entrega-telefono" className="text-xs">
-                      {t("orders.create.delivery_phone", "Teléfono de contacto")}
-                    </Label>
-                    <Input
-                      id="entrega-telefono"
-                      value={entrega.telefono}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({ ...prev, telefono: e.target.value }))
-                      }
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="recogida-nombre" className="text-xs">
-                      {t("orders.create.pickup_recipient", "Quién recoge")}
-                    </Label>
-                    <Input
-                      id="recogida-nombre"
-                      value={entrega.quienRecoge}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({
-                          ...prev,
-                          quienRecoge: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="recogida-carnet" className="text-xs">
-                      {t("orders.create.pickup_id_card", "Carné de identidad")}
-                    </Label>
-                    <Input
-                      id="recogida-carnet"
-                      value={entrega.carnet}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({ ...prev, carnet: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="recogida-telefono" className="text-xs">
-                      {t("orders.create.pickup_phone", "Teléfono de contacto")}
-                    </Label>
-                    <Input
-                      id="recogida-telefono"
-                      value={entrega.telefonoRecoge}
-                      onChange={(e) =>
-                        setEntrega((prev) => ({
-                          ...prev,
-                          telefonoRecoge: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
+
+                  {!municipioId ? (
+                    <p className="text-sm text-muted-foreground">
+                      {t(
+                        "orders.create.fulfillment_needs_municipality",
+                        "Elige un municipio para ver qué se le puede ofrecer.",
+                      )}
+                    </p>
+                  ) : opcionesQuery.isPending ? (
+                    <p className="text-sm text-muted-foreground">
+                      {t(
+                        "orders.create.fulfillment_loading",
+                        "Consultando qué se puede ofrecer…",
+                      )}
+                    </p>
+                  ) : opcionesQuery.isError ? (
+                    <p className="text-sm text-destructive">
+                      {t(
+                        "orders.create.fulfillment_error",
+                        "No se pudo consultar las opciones de entrega.",
+                      )}
+                    </p>
+                  ) : opciones?.unavailableMessage ? (
+                    // Mensaje de la API tal cual: es el mismo texto que vería
+                    // el cliente en la tienda para esta zona.
+                    <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                      {opciones.unavailableMessage}
+                    </p>
+                  ) : opciones ? (
+                    <>
+                      <select
+                        className={claseSelect}
+                        value={tipoEntregaEfectivo}
+                        onChange={(e) =>
+                          setTipoEntrega(e.target.value as TipoEntrega)
+                        }
+                      >
+                        {opciones.deliveryOptions.length > 0 && (
+                          <option value="delivery">
+                            {t("orders.fulfillment.delivery", "A domicilio")}
+                          </option>
+                        )}
+                        {opciones.pickupEnabled &&
+                          opciones.pickupPoints.length > 0 && (
+                            <option value="pickup">
+                              {t(
+                                "orders.fulfillment.pickup",
+                                "Recogida en tienda",
+                              )}
+                            </option>
+                          )}
+                      </select>
+
+                      {tipoEntregaEfectivo === "delivery" ? (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="space-y-1.5 sm:col-span-2">
+                            <Label htmlFor="entrega-opcion" className="text-xs">
+                              {t("orders.create.delivery_option", "Forma de entrega")}
+                            </Label>
+                            <select
+                              id="entrega-opcion"
+                              className={claseSelect}
+                              value={deliveryOptionIdEfectivo}
+                              onChange={(e) => setDeliveryOptionId(e.target.value)}
+                            >
+                              {opciones.deliveryOptions.map((o) => (
+                                <option key={o.id} value={o.id}>
+                                  {o.label} — {money(o.fee)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-calle" className="text-xs">
+                              {t("orders.create.delivery_street", "Calle")}
+                            </Label>
+                            <Input
+                              id="entrega-calle"
+                              value={entrega.calle}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  calle: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-entre" className="text-xs">
+                              {t("orders.create.delivery_between", "Entre calles")}
+                            </Label>
+                            <Input
+                              id="entrega-entre"
+                              value={entrega.entreCalles}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  entreCalles: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-referencia" className="text-xs">
+                              {t(
+                                "orders.create.delivery_reference",
+                                "Punto de referencia",
+                              )}
+                            </Label>
+                            <Input
+                              id="entrega-referencia"
+                              value={entrega.referencia}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  referencia: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="entrega-telefono" className="text-xs">
+                              {t(
+                                "orders.create.delivery_phone",
+                                "Teléfono de contacto",
+                              )}
+                            </Label>
+                            <Input
+                              id="entrega-telefono"
+                              value={entrega.telefono}
+                              onChange={(e) =>
+                                setEntrega((prev) => ({
+                                  ...prev,
+                                  telefono: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="recogida-punto" className="text-xs">
+                              {t("orders.create.pickup_point", "Punto de recogida")}
+                            </Label>
+                            <select
+                              id="recogida-punto"
+                              className={claseSelect}
+                              value={pickupAddressIdEfectivo}
+                              onChange={(e) => setPickupAddressId(e.target.value)}
+                            >
+                              {opciones.pickupPoints.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.locationName}
+                                  {p.label ? ` — ${p.label}` : ""} ({p.address})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="recogida-nombre" className="text-xs">
+                                {t("orders.create.pickup_recipient", "Quién recoge")}
+                              </Label>
+                              <Input
+                                id="recogida-nombre"
+                                value={entrega.quienRecoge}
+                                onChange={(e) =>
+                                  setEntrega((prev) => ({
+                                    ...prev,
+                                    quienRecoge: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="recogida-carnet" className="text-xs">
+                                {t(
+                                  "orders.create.pickup_id_card",
+                                  "Carné de identidad",
+                                )}
+                              </Label>
+                              <Input
+                                id="recogida-carnet"
+                                value={entrega.carnet}
+                                onChange={(e) =>
+                                  setEntrega((prev) => ({
+                                    ...prev,
+                                    carnet: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label htmlFor="recogida-telefono" className="text-xs">
+                                {t(
+                                  "orders.create.pickup_phone",
+                                  "Teléfono de contacto",
+                                )}
+                              </Label>
+                              <Input
+                                id="recogida-telefono"
+                                value={entrega.telefonoRecoge}
+                                onChange={(e) =>
+                                  setEntrega((prev) => ({
+                                    ...prev,
+                                    telefonoRecoge: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : null}
+                </>
               )}
             </div>
 

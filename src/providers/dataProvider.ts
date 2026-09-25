@@ -34,6 +34,39 @@ export interface CreateOrderForClientPayload {
   cobro?: { paymentMethod: string; reference?: string };
 }
 
+/** Una opción de entrega a domicilio, con lo que cuesta y lo que promete. */
+export interface FulfillmentDeliveryOption {
+  id: string;
+  label: string;
+  description: string | null;
+  fee: number;
+  promiseDays: number | null;
+}
+
+/** Un punto de recogida en un almacén. */
+export interface FulfillmentPickupPoint {
+  id: string;
+  locationId: string;
+  locationName: string;
+  label: string | null;
+  address: string;
+}
+
+/**
+ * Lo que se puede ofrecer en una zona: mismo cálculo y mismo DTO que ve la
+ * tienda (`GET /storefront/fulfillment`), servido aquí por `GET /fulfillment`
+ * porque esa ruta exige un token de cliente que el panel no tiene — ver el
+ * comentario de `FulfillmentController` en la API.
+ */
+export interface FulfillmentOptions {
+  deliveryOptions: FulfillmentDeliveryOption[];
+  pickupPoints: FulfillmentPickupPoint[];
+  pickupEnabled: boolean;
+  pickupPromiseDays: number | null;
+  /** Si no es null, la zona no admite nada: hay que decirlo y no dejar crear. */
+  unavailableMessage: string | null;
+}
+
 export interface ClientInvitationResult {
   email: string;
   invitationId: string;
@@ -249,6 +282,13 @@ export interface ExtendedDataProvider extends DataProvider {
   createOrderForClient: (
     payload: CreateOrderForClientPayload,
   ) => Promise<{ data: { id: string; orderNumber: string } }>;
+  /**
+   * Opciones de entrega y recogida para una zona, para el alta de pedidos
+   * desde el panel — mismo cálculo que ve la tienda, homólogo de backoffice.
+   */
+  getFulfillmentOptions: (
+    municipalityId: string,
+  ) => Promise<{ data: FulfillmentOptions }>;
   /** Todos los intentos de pago del pedido, del más reciente al más antiguo. */
   getPaymentAttempts: (id: string) => Promise<{ data: PaymentAttempt[] }>;
   /** Quita un intento no completado (superadmin), con motivo. */
@@ -769,6 +809,19 @@ export const dataProvider: DataProvider = {
     return {
       data: unwrapOne(json) as { id: string; orderNumber: string },
     };
+  },
+
+  /**
+   * Qué se le puede ofrecer a un cliente en su municipio: mismo cálculo y
+   * mismo DTO que consulta la tienda, homólogo de backoffice porque esa ruta
+   * exige un token de cliente que el panel no tiene. El municipio es
+   * obligatorio — sin él la API responde 400.
+   */
+  async getFulfillmentOptions(municipalityId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/fulfillment${toQueryString({ municipalityId })}`,
+    );
+    return { data: unwrapOne(json) as FulfillmentOptions };
   },
 
   async revokeInvitation(id: string) {
