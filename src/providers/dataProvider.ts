@@ -1,5 +1,6 @@
-import { DataProvider, fetchUtils } from "ra-core";
+import { DataProvider, HttpError, fetchUtils } from "ra-core";
 import { getApiToken } from "../lib/clerk/clerkRefs";
+import { backendMessage } from "@/pages/users/errors";
 import { resetIdentityCache } from "./authProvider";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
@@ -455,7 +456,22 @@ async function httpClient(url: string, options: fetchUtils.Options = {}) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  return fetchUtils.fetchJson(url, options);
+  try {
+    return await fetchUtils.fetchJson(url, options);
+  } catch (error) {
+    // The API wraps failures as `{ error: { message } }`, and `fetchJson` only
+    // reads the top-level `message`, so every ra-core toast (create/edit/delete)
+    // came out blank: "Error" with no reason. Validation errors ("La pregunta
+    // no puede superar los 300 caracteres") were the loudest case.
+    if (error instanceof HttpError) {
+      throw new HttpError(
+        backendMessage(error, error.message),
+        error.status,
+        error.body,
+      );
+    }
+    throw error;
+  }
 }
 
 function toQueryString(filter: Record<string, unknown>): string {

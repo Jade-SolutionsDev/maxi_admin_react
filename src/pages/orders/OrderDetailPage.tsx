@@ -103,6 +103,15 @@ interface OrderRecord {
   deliveryFee: number;
   total: number;
   deliveryAddress: Record<string, unknown> | null;
+  /**
+   * Quién recibe el pedido, congelado al comprar. En una recogida es el único
+   * sitio donde vive ese dato: no hay dirección de la que sacarlo.
+   */
+  contactSnapshot: {
+    recipientName?: string | null;
+    idCard?: string | null;
+    contactPhone?: string | null;
+  } | null;
   fulfillmentType: "delivery" | "pickup";
   deliveryOptionLabel: string | null;
   pickupAddress: {
@@ -135,6 +144,41 @@ interface OrderRecord {
 
 const text = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
+
+/**
+/**
+ * Quién retira o recibe el pedido.
+ *
+ * Va dentro de la entrega y no en una tarjeta aparte porque es donde hace
+ * falta: en el mostrador se lee junto al punto de recogida, para identificar a
+ * quien se lleva la mercancía. Los pedidos anteriores a MxH-0104 no lo tienen,
+ * así que el bloque desaparece en vez de enseñar guiones.
+ */
+function Beneficiario({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  const contacto = order.contactSnapshot;
+
+  const nombre = text(contacto?.recipientName);
+  const carnet = text(contacto?.idCard);
+  const telefono = text(contacto?.contactPhone);
+
+  if (!nombre && !carnet && !telefono) return null;
+
+  return (
+    <dl className="mb-3 space-y-1 border-b border-border pb-3 text-sm text-muted-foreground">
+      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {translate("orders.recipient.title", { _: "Recibe" })}
+      </dt>
+      {nombre && <dd className="font-medium text-foreground">{nombre}</dd>}
+      {carnet && (
+        <dd>
+          {translate("orders.recipient.id_card", { _: "Carnet" })}: {carnet}
+        </dd>
+      )}
+      {telefono && <dd>{telefono}</dd>}
+    </dl>
+  );
+}
 
 /**
  * Where the order goes, in words. The raw snapshot carries ids the shop floor
@@ -851,6 +895,7 @@ export default function OrderDetailPage() {
             <MapPin size={16} />
             {translate("orders.sections.delivery", { _: "Entrega" })}
           </h2>
+          <Beneficiario order={order} />
           <DeliveryDetails order={order} />
           <CompromisoDeEntrega order={order} />
         </section>
