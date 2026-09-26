@@ -909,6 +909,10 @@
       "pickup": "Pickup in store",
       "between": "Between"
     },
+    "recipient": {
+      "title": "Recipient",
+      "id_card": "ID card"
+    },
     "transfer": {
       "title": "This order needs a transfer between storages",
       "description": "Pickup at %{pickup}: there are products reserved at %{others}. Coordinate the transfer so the order is complete when the customer arrives.",

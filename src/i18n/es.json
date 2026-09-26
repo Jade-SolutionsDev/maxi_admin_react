@@ -912,6 +912,10 @@
       "pickup": "Recogida en tienda",
       "between": "Entre"
     },
+    "recipient": {
+      "title": "Recibe",
+      "id_card": "Carnet"
+    },
     "transfer": {
       "title": "Este pedido necesita un traslado entre almacenes",
       "description": "Recogida en %{pickup}: hay productos reservados en %{others}. Coordina el traslado para que el pedido esté completo cuando el cliente llegue.",
