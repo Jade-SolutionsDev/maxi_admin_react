@@ -9,16 +9,20 @@ import {
   useRefresh,
   useTranslate,
 } from "ra-core";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
-  Ban,
   ArrowRightLeft,
+  Ban,
+  CalendarClock,
   CreditCard,
+  FastForward,
+  FileDown,
   Loader2,
   MapPin,
+  Pencil,
   RotateCcw,
   ShoppingCart,
   StickyNote,
@@ -44,6 +48,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import type {
@@ -53,12 +59,24 @@ import type {
 } from "@/providers/dataProvider";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
 import {
-  GROCER_TARGETS,
+  STAFF_TARGETS,
   money,
+  ORDER_STATUSES,
   type OrderPayment,
   PAYMENT_STATUSES,
   STATUS_TRANSITIONS,
 } from "./orderStatus";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { OrderCorrectionCard } from "./OrderCorrectionCard";
+import { OrderItemsEditor } from "./OrderItemsEditor";
+import { OrderHistorySection } from "./OrderHistorySection";
+import { OrderRefundsCard } from "./OrderRefundsCard";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
 
 interface OrderItemRow {
@@ -71,8 +89,7 @@ interface OrderItemRow {
 }
 
 type CancellationReason =
-  | "payment_not_received"
-  | "paid_after_expiry_out_of_stock";
+  "payment_not_received" | "paid_after_expiry_out_of_stock";
 
 interface OrderRecord {
   id: string;
@@ -86,6 +103,15 @@ interface OrderRecord {
   deliveryFee: number;
   total: number;
   deliveryAddress: Record<string, unknown> | null;
+  /**
+   * Quién recibe el pedido, congelado al comprar. En una recogida es el único
+   * sitio donde vive ese dato: no hay dirección de la que sacarlo.
+   */
+  contactSnapshot: {
+    recipientName?: string | null;
+    idCard?: string | null;
+    contactPhone?: string | null;
+  } | null;
   fulfillmentType: "delivery" | "pickup";
   deliveryOptionLabel: string | null;
   pickupAddress: {
@@ -97,6 +123,11 @@ interface OrderRecord {
   cancellationReason: CancellationReason | null;
   /** Set when an admin brought the order back from cancelled to pending. */
   reinstatedAt?: string | null;
+  /** Días hábiles prometidos al comprar. */
+  promiseDays?: number | null;
+  /** Hasta cuándo está comprometida la entrega; se sella con el pago. */
+  promisedAt?: string | null;
+  deliveredAt?: string | null;
   needsTransfer?: boolean;
   pickupLocationId?: string | null;
   pendingTransfers?: {
@@ -113,6 +144,41 @@ interface OrderRecord {
 
 const text = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
+
+/**
+/**
+ * Quién retira o recibe el pedido.
+ *
+ * Va dentro de la entrega y no en una tarjeta aparte porque es donde hace
+ * falta: en el mostrador se lee junto al punto de recogida, para identificar a
+ * quien se lleva la mercancía. Los pedidos anteriores a MxH-0104 no lo tienen,
+ * así que el bloque desaparece en vez de enseñar guiones.
+ */
+function Beneficiario({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  const contacto = order.contactSnapshot;
+
+  const nombre = text(contacto?.recipientName);
+  const carnet = text(contacto?.idCard);
+  const telefono = text(contacto?.contactPhone);
+
+  if (!nombre && !carnet && !telefono) return null;
+
+  return (
+    <dl className="mb-3 space-y-1 border-b border-border pb-3 text-sm text-muted-foreground">
+      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {translate("orders.recipient.title", { _: "Recibe" })}
+      </dt>
+      {nombre && <dd className="font-medium text-foreground">{nombre}</dd>}
+      {carnet && (
+        <dd>
+          {translate("orders.recipient.id_card", { _: "Carnet" })}: {carnet}
+        </dd>
+      )}
+      {telefono && <dd>{telefono}</dd>}
+    </dl>
+  );
+}
 
 /**
  * Where the order goes, in words. The raw snapshot carries ids the shop floor
@@ -223,7 +289,9 @@ function TransferAlert({ order }: { order: OrderRecord }) {
   const pickupName = order.pickupAddress?.locationName ?? "";
   const groups = order.pendingTransfers ?? [];
 
-  const prepareTransfer = (group: NonNullable<OrderRecord["pendingTransfers"]>[number]) => {
+  const prepareTransfer = (
+    group: NonNullable<OrderRecord["pendingTransfers"]>[number],
+  ) => {
     const params = new URLSearchParams({
       type: "TRANSFER",
       target: order.pickupLocationId ?? "",
@@ -288,9 +356,133 @@ function TransferAlert({ order }: { order: OrderRecord }) {
 
 /** Pending confirmation dialog state: which change is being confirmed. */
 type PendingAction =
-  | { kind: "status"; value: OrderStatus }
+  | { kind: "status"; value: OrderStatus; direct?: boolean }
   | { kind: "payment"; value: OrderPaymentStatus }
   | { kind: "reinstate" };
+
+const FORWARD_CHAIN: OrderStatus[] = ORDER_STATUSES.filter(
+  (s) => s !== "cancelled",
+);
+
+/**
+ * Descarga el comprobante del pedido. El PDF lo compone la API: aquí solo se
+ * pide y se guarda, para que el documento sea idéntico venga de donde venga.
+ */
+function ExportarPdfButton({ orderId }: { orderId: string }) {
+  const translate = useTranslate();
+  const notify = useNotify();
+  const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const [descargando, setDescargando] = useState(false);
+
+  const descargar = async () => {
+    setDescargando(true);
+    try {
+      const { blob, filename } = await dataProvider.downloadOrderPdf(orderId);
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = filename;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      notify(
+        error instanceof Error
+          ? error.message
+          : translate("orders.actions.pdf_error", {
+              _: "No se pudo generar el PDF",
+            }),
+        { type: "error" },
+      );
+    } finally {
+      setDescargando(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => void descargar()}
+      disabled={descargando}
+    >
+      {descargando ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <FileDown size={16} />
+      )}
+      {translate("orders.actions.export_pdf", { _: "Exportar a PDF" })}
+    </Button>
+  );
+}
+
+/**
+ * Hasta cuándo está comprometido el pedido, y si se cumplió.
+ *
+ * La fecha se sella con el pago, así que un pedido sin cobrar enseña el plazo
+ * pactado pero todavía no una fecha: no hay desde cuándo contar.
+ */
+function CompromisoDeEntrega({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  if (!order.promiseDays && !order.promisedAt) {
+    return null;
+  }
+
+  const comprometido = order.promisedAt ? new Date(order.promisedAt) : null;
+  const entregado = order.deliveredAt ? new Date(order.deliveredAt) : null;
+  const aTiempo = comprometido && entregado ? entregado <= comprometido : null;
+  const vencido =
+    comprometido && !entregado && new Date() > comprometido ? true : false;
+
+  const fecha = (valor: Date) =>
+    valor.toLocaleDateString("es-CU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+  return (
+    <div className="mt-3 border-t border-border pt-3 text-sm">
+      {comprometido ? (
+        <p className="flex flex-wrap items-center gap-2">
+          <CalendarClock size={14} className="text-muted-foreground" />
+          <span className="text-muted-foreground">
+            {translate("orders.promise.committed", {
+              _: "Comprometido para el",
+            })}
+          </span>
+          <span className="font-medium text-foreground">
+            {fecha(comprometido)}
+          </span>
+          {aTiempo === true && (
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-700 dark:text-emerald-400">
+              {translate("orders.promise.on_time", { _: "Entregado a tiempo" })}
+            </span>
+          )}
+          {aTiempo === false && (
+            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-400">
+              {translate("orders.promise.late", { _: "Entregado tarde" })}
+            </span>
+          )}
+          {aTiempo === null && vencido && (
+            <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+              {translate("orders.promise.overdue", { _: "Plazo vencido" })}
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="flex items-center gap-2 text-muted-foreground">
+          <CalendarClock size={14} />
+          {translate("orders.promise.pending_payment", {
+            _: "Plazo de %{days} días hábiles; la fecha se fija cuando entre el pago.",
+            days: order.promiseDays ?? 0,
+          })}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -299,15 +491,21 @@ export default function OrderDetailPage() {
   const notify = useNotify();
   const refresh = useRefresh();
   const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const queryClient = useQueryClient();
   const { data: identity } = useGetIdentity();
-  const isManager = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
-  );
+  const isManager = MANAGER_ROLES.includes((identity?.role as Role) ?? "STAFF");
+  const isSuperAdmin = identity?.role === "SUPER_ADMIN";
   // The customer link only renders when the actor may open /clients
-  // (admin-only resource — GROCER gets plain text).
+  // (admin-only resource — staff get plain text).
   const { canAccess: canViewClient } = useCanAccess({
     resource: "clients",
     action: "read",
+  });
+  // Direct jumps are a grantable permission (admins pass via the manager
+  // bypass inside canAccess).
+  const { canAccess: canDirectJump } = useCanAccess({
+    resource: "orders",
+    action: "update-status-direct",
   });
 
   const {
@@ -317,6 +515,11 @@ export default function OrderDetailPage() {
   } = useGetOne<OrderRecord & { id: string }>("orders", { id: id as string });
 
   const [pending, setPending] = useState<PendingAction | null>(null);
+  const [editingItems, setEditingItems] = useState(false);
+  // Quién se lleva el pedido. Solo se pregunta al entregar: en una recogida
+  // casi nunca es el comprador, y de esa fecha cuelga el plazo para reclamar.
+  const [pickupName, setPickupName] = useState("");
+  const [pickupIdCard, setPickupIdCard] = useState("");
 
   const mutation = useMutation({
     mutationFn: (action: PendingAction) => {
@@ -324,11 +527,26 @@ export default function OrderDetailPage() {
         return dataProvider.reinstateOrder(id as string);
       }
       return action.kind === "status"
-        ? dataProvider.updateOrderStatus(id as string, action.value)
+        ? dataProvider.updateOrderStatus(
+            id as string,
+            action.value,
+            action.direct ?? false,
+            action.value === "delivered" && pickupName.trim()
+              ? {
+                  name: pickupName.trim(),
+                  idCard: pickupIdCard.trim() || undefined,
+                }
+              : undefined,
+          )
         : dataProvider.updateOrderPaymentStatus(id as string, action.value);
     },
     onSuccess: () => {
       setPending(null);
+      setPickupName("");
+      setPickupIdCard("");
+      void queryClient.invalidateQueries({
+        queryKey: ["orders", id as string, "events"],
+      });
       notify("orders.actions.updated", {
         type: "success",
         messageArgs: { _: "Pedido actualizado" },
@@ -356,9 +574,9 @@ export default function OrderDetailPage() {
     );
   }
 
-  // Legal next statuses for this order, restricted for non-managers (GROCER).
+  // Legal next statuses for this order, restricted for non-managers.
   const targets = STATUS_TRANSITIONS[order.status].filter(
-    (t) => isManager || GROCER_TARGETS.includes(t),
+    (t) => isManager || STAFF_TARGETS.includes(t),
   );
 
   // «Restablecer orden»: managers only, and only for a cancelled order that
@@ -367,6 +585,13 @@ export default function OrderDetailPage() {
     isManager &&
     order.status === "cancelled" &&
     order.cancellationReason !== "paid_after_expiry_out_of_stock";
+
+  // Direct jumps skip the chain: forward statuses beyond the immediate next
+  // step (cancel already has its own button). Permission-gated — the
+  // step-by-step buttons stay the safe path for everyone else.
+  const chainIndex = FORWARD_CHAIN.indexOf(order.status);
+  const directTargets =
+    canDirectJump && chainIndex >= 0 ? FORWARD_CHAIN.slice(chainIndex + 2) : [];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -402,6 +627,7 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ExportarPdfButton orderId={order.id} />
           <OrderStatusBadge status={order.status} />
           <PaymentStatusBadge status={order.paymentStatus} />
         </div>
@@ -457,6 +683,40 @@ export default function OrderDetailPage() {
             {translate(`orders.actions.set_${target}`, { _: target })}
           </Button>
         ))}
+        {directTargets.length > 0 && (
+          <Select
+            value=""
+            disabled={mutation.isPending}
+            onValueChange={(value) =>
+              setPending({
+                kind: "status",
+                value: value as OrderStatus,
+                direct: true,
+              })
+            }
+          >
+            <SelectTrigger
+              className="w-auto gap-2"
+              aria-label={translate("orders.actions.direct_label", {
+                _: "Cambiar estado directamente",
+              })}
+            >
+              <FastForward className="h-4 w-4" />
+              <SelectValue
+                placeholder={translate("orders.actions.direct_placeholder", {
+                  _: "Saltar a estado…",
+                })}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {directTargets.map((target) => (
+                <SelectItem key={target} value={target}>
+                  {translate(`orders.status.${target}`, { _: target })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {isManager &&
           PAYMENT_STATUSES.filter((p) => p !== order.paymentStatus).map(
             (target) => (
@@ -477,11 +737,59 @@ export default function OrderDetailPage() {
         )}
       </div>
 
+      {isSuperAdmin && (
+        <OrderCorrectionCard
+          key={`${order.status}/${order.paymentStatus}`}
+          orderId={order.id}
+          status={order.status}
+          paymentStatus={order.paymentStatus}
+        />
+      )}
+
+      <OrderRefundsCard
+        key={`refunds/${order.paymentStatus}`}
+        orderId={order.id}
+        paymentStatus={order.paymentStatus}
+      />
+
       {/* Items */}
       <section className="mb-6 rounded-lg border border-border">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-foreground">
-          {translate("orders.sections.items", { _: "Productos" })}
-        </h2>
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
+          <h2 className="text-sm font-semibold text-foreground">
+            {translate("orders.sections.items", { _: "Productos" })}
+          </h2>
+          {isSuperAdmin && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setEditingItems(true)}
+            >
+              <Pencil className="mr-1 h-3.5 w-3.5" />
+              {translate("orders.items_editor.open", {
+                _: "Corregir productos",
+              })}
+            </Button>
+          )}
+        </div>
+        {isSuperAdmin && (
+          <OrderItemsEditor
+            key={`${order.updatedAt}/${(order.items ?? []).length}`}
+            orderId={order.id}
+            status={order.status}
+            paymentStatus={order.paymentStatus}
+            deliveryFee={Number(order.deliveryFee)}
+            currentTotal={Number(order.total)}
+            items={(order.items ?? []).map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              quantity: item.quantity,
+              unitPrice: Number(item.unitPrice),
+            }))}
+            open={editingItems}
+            onOpenChange={setEditingItems}
+          />
+        )}
         <Table>
           <TableHeader>
             <TableRow>
@@ -535,7 +843,9 @@ export default function OrderDetailPage() {
         </Table>
         <div className="space-y-1 border-t border-border px-4 py-3 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>{translate("orders.fields.subtotal", { _: "Subtotal" })}</span>
+            <span>
+              {translate("orders.fields.subtotal", { _: "Subtotal" })}
+            </span>
             <span className="tabular-nums">{money(order.subtotal)}</span>
           </div>
           <div className="flex justify-between text-muted-foreground">
@@ -585,7 +895,9 @@ export default function OrderDetailPage() {
             <MapPin size={16} />
             {translate("orders.sections.delivery", { _: "Entrega" })}
           </h2>
+          <Beneficiario order={order} />
           <DeliveryDetails order={order} />
+          <CompromisoDeEntrega order={order} />
         </section>
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -597,6 +909,8 @@ export default function OrderDetailPage() {
           </p>
         </section>
       </div>
+
+      <OrderHistorySection orderId={order.id} />
 
       {/* Confirm dialog */}
       <AlertDialog
@@ -616,13 +930,15 @@ export default function OrderDetailPage() {
             <AlertDialogDescription className="text-center sm:text-left">
               {pending?.kind === "reinstate" &&
                 translate("orders.actions.confirm_reinstate_description", {
-                  _: "El pedido volverá a \"Pendiente\" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?",
+                  _: 'El pedido volverá a "Pendiente" y se apartará de nuevo su stock. El estado del pago no cambia y el plazo de pago vuelve a empezar: si no se paga a tiempo, se cancelará otra vez. ¿Continuar?',
                 })}
               {pending &&
                 pending.kind !== "reinstate" &&
                 translate(
                   pending.kind === "status"
-                    ? "orders.actions.confirm_status_description"
+                    ? pending.direct
+                      ? "orders.actions.confirm_direct_description"
+                      : "orders.actions.confirm_status_description"
                     : "orders.actions.confirm_payment_description",
                   {
                     _: "¿Aplicar el cambio a %{value}?",
@@ -635,6 +951,42 @@ export default function OrderDetailPage() {
                   },
                 )}
             </AlertDialogDescription>
+            {pending?.kind === "status" && pending.value === "delivered" && (
+              <div className="space-y-3 pt-1 text-left">
+                <p className="text-sm text-muted-foreground">
+                  {translate("orders.actions.delivered_hint", {
+                    _: "Anota a quién se le entrega. Desde esta fecha cuentan las 48 horas para reclamar.",
+                  })}
+                </p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pickup-name">
+                    {translate("orders.actions.picked_up_by", {
+                      _: "Quién retira",
+                    })}
+                  </Label>
+                  <Input
+                    id="pickup-name"
+                    value={pickupName}
+                    onChange={(e) => setPickupName(e.target.value)}
+                    placeholder={translate("orders.actions.picked_up_by", {
+                      _: "Quién retira",
+                    })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pickup-id">
+                    {translate("orders.actions.picked_up_id", {
+                      _: "Carné de identidad",
+                    })}
+                  </Label>
+                  <Input
+                    id="pickup-id"
+                    value={pickupIdCard}
+                    onChange={(e) => setPickupIdCard(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-end">
             <AlertDialogCancel disabled={mutation.isPending}>

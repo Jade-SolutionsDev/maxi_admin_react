@@ -42,9 +42,7 @@ import {
 import { cn } from "@/lib/utils";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 
-const roleFilters = [
-  <SearchInput source="q" alwaysOn />,
-];
+const roleFilters = [<SearchInput source="q" alwaysOn />];
 
 const RoleActions = () => (
   <div className="flex items-center gap-2">
@@ -106,6 +104,26 @@ const RoleEditButton = () => {
   );
 };
 
+/**
+ * La descripción de un rol puede ser un párrafo. En la tabla se recorta a una
+ * línea y el texto completo queda en el `title`, para no romper la cuadrícula.
+ */
+const RoleDescriptionCell = () => {
+  const record = useRecordContext<{ description?: string | null }>();
+  const description = record?.description?.trim();
+  if (!description) {
+    return <span className="text-muted-foreground">—</span>;
+  }
+  return (
+    <span
+      className="block max-w-[320px] truncate text-muted-foreground"
+      title={description}
+    >
+      {description}
+    </span>
+  );
+};
+
 const RoleDeleteButton = () => {
   const record = useRecordContext();
   const resource = useResourceContext();
@@ -148,7 +166,12 @@ const RoleDeleteButton = () => {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-destructive hover:bg-destructive/10"
-              onClick={() => setOpen(true)}
+              onClick={(e) => {
+                // La fila navega al detalle; sin esto el clic sube y el
+                // diálogo de borrado no llega a verse.
+                e.stopPropagation();
+                setOpen(true);
+              }}
               aria-label={translate("shared.actions.delete", { _: "Delete" })}
             >
               <Trash2 size={16} />
@@ -206,10 +229,7 @@ export default function RoleList() {
   const { data: identity, isPending } = useGetIdentity();
 
   // RBAC management is admin-only. Backend also enforces this (@Roles).
-  if (
-    !isPending &&
-    !MANAGER_ROLES.includes(identity?.role as Role)
-  ) {
+  if (!isPending && !MANAGER_ROLES.includes(identity?.role as Role)) {
     return (
       <div className="p-6 text-muted-foreground">
         {translate("roles.admin_only")}
@@ -231,11 +251,9 @@ export default function RoleList() {
           label="list.fields.firstName"
           cellClassName="min-w-[180px] font-medium"
         />
-        <DataTable.Col
-          source="description"
-          label="list.fields.description"
-          disableSort
-        />
+        <DataTable.Col label="list.fields.description" disableSort>
+          <RoleDescriptionCell />
+        </DataTable.Col>
         <DataTable.Col label="roles.fields.type" disableSort>
           <RoleTypeCell />
         </DataTable.Col>

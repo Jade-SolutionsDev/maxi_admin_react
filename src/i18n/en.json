@@ -113,7 +113,12 @@
       "name_plural": "Nomenclators"
     },
     "delivery-options": {
-      "name": "Delivery options"
+      "name": "Delivery options",
+      "name_plural": "Delivery options"
+    },
+    "payment-methods": {
+      "name": "Payment method",
+      "name_plural": "Payment methods"
     }
   },
   "list": {
@@ -183,8 +188,8 @@
     "roles": {
       "SUPER_ADMIN": "Super admin",
       "ADMIN": "Administrator",
-      "GROCER": "Grocer",
-      "KARDIST": "Kardist"
+      "STAFF": "Staff",
+      "none": "No roles"
     },
     "actions": {
       "add": "Invite user",
@@ -226,7 +231,10 @@
       "delete_confirm_description_no_restore": "Are you sure you want to delete %{name}?",
       "update_success": "User updated",
       "change_password": "Change password",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "staff_roles": "Employee roles",
+      "staff_roles_hint": "Choose the roles that define what this employee can do. You can change them later.",
+      "staff_roles_required": "Choose at least one role for the employee."
     },
     "password": {
       "title": "Change password",
@@ -360,6 +368,10 @@
       "note_title_edit": "Important",
       "required_note": "Fields marked with * are required.",
       "edit_note": "Changes are reflected on the platform once you save."
+    },
+    "validation": {
+      "max_length": "Cannot exceed %{max} characters.",
+      "character_count": "%{count} of %{max} characters"
     }
   },
   "app": {
@@ -375,7 +387,7 @@
       "usuarios": "Users",
       "clientes": "Clients",
       "reportes": "Reports",
-      "configuracion": "Settings",
+      "rolesPermisos": "Roles & permissions",
       "soon": "Coming soon",
       "cmsPages": "Pages",
       "cmsBanners": "Banners",
@@ -399,7 +411,8 @@
       "contactoMensajes": "Messages",
       "contactoPlantillas": "Templates",
       "nomencladores": "Nomenclators",
-      "entregas": "Delivery"
+      "entregas": "Delivery",
+      "devoluciones": "Refunds"
     },
     "user": {
       "profile": "Profile"
@@ -454,14 +467,37 @@
       "products": "Products",
       "categories": "Categories",
       "departments": "Departments",
-      "stock-locations": "Warehouses"
+      "stock-locations": "Warehouses",
+      "inventory": "Inventory",
+      "orders": "Orders",
+      "clients": "Clients",
+      "contact": "Contact (messages & templates)",
+      "cms-pages": "CMS — Pages",
+      "cms-banners": "CMS — Banners",
+      "cms-services": "CMS — Services",
+      "cms-staff": "CMS — Staff",
+      "cms-settings": "CMS — Site settings",
+      "nomenclators": "Nomenclators",
+      "delivery-options": "Delivery options",
+      "fulfillment-settings": "Fulfillment settings",
+      "payment-methods": "Payment methods",
+      "dashboard": "Dashboard (KPIs)",
+      "uploads": "Image uploads"
     },
     "actions": {
       "list": "List",
       "read": "View",
       "create": "Create",
       "update": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "view-all": "View all",
+      "reply": "Reply",
+      "update-status": "Change status",
+      "update-payment-status": "Change payment",
+      "aggregate": "Global view",
+      "history": "History",
+      "create-operation": "Operations",
+      "view": "View"
     }
   },
   "roles": {
@@ -478,7 +514,9 @@
     "matrix": {
       "title": "Permissions by module",
       "module": "Module",
-      "toggle_all": "Toggle all"
+      "toggle_all": "Toggle all",
+      "lectura_implicada": "Required to work in this module: without list access the module never shows in the menu.",
+      "al_menos_uno": "Tick at least one permission: a role with no access is useless."
     },
     "actions": {
       "manage_user_roles": "Manage roles"
@@ -638,8 +676,8 @@
       "info_hint": "Warehouse name and availability.",
       "coverage": "Coverage area",
       "coverage_hint": "Select the provinces and municipalities this warehouse serves.",
-      "grocers": "Managers",
-      "grocers_hint": "GROCER users who can manage this warehouse.",
+      "grocers": "Assigned users",
+      "grocers_hint": "Users with storage permissions who can work in this warehouse.",
       "pickupAddresses": "Pickup addresses",
       "pickupAddresses_hint": "Places where customers can pick up their orders."
     },
@@ -661,7 +699,7 @@
       "required": "Select at least one coverage area."
     },
     "grocers": {
-      "empty": "No GROCER users available."
+      "empty": "No users with storage permissions to assign."
     },
     "status": {
       "active": "Active",
@@ -769,6 +807,7 @@
     }
   },
   "orders": {
+    "search_placeholder": "Search by order, customer, email, or phone",
     "fields": {
       "orderNumber": "Number",
       "client": "Customer",
@@ -817,7 +856,18 @@
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
       "mark_refunded": "Refund",
-      "view_customer": "View customer"
+      "view_customer": "View customer",
+      "direct_label": "Set status directly",
+      "direct_placeholder": "Jump to status…",
+      "confirm_direct_description": "You are about to skip the intermediate steps and set the order to \"%{value}\". Stock is adjusted as if each step had run. Continue?",
+      "delivered_hint": "Record who collects it. The 48-hour claim window starts from this date.",
+      "picked_up_by": "Collected by",
+      "picked_up_id": "ID card",
+      "export_pdf": "Export to PDF",
+      "pdf_error": "Could not generate the PDF",
+      "report": "Export to PDF",
+      "report_loading": "Generating…",
+      "report_error": "Could not generate the report"
     },
     "payment": {
       "provider": "Provider",
@@ -856,8 +906,13 @@
       "refundHint": "Contact the customer and refund this order."
     },
     "fulfillment": {
+      "delivery": "Home delivery",
       "pickup": "Pickup in store",
       "between": "Between"
+    },
+    "recipient": {
+      "title": "Recipient",
+      "id_card": "ID card"
     },
     "transfer": {
       "title": "This order needs a transfer between storages",
@@ -866,14 +921,243 @@
       "note": "Transfer for order %{number}",
       "at_storage": "at %{name}",
       "prepare": "Prepare transfer"
+    },
+    "history": {
+      "title": "History",
+      "empty": "No recorded activity. History is kept since this feature was enabled; older orders have none.",
+      "error": "Could not load the history.",
+      "via": "via %{provider}",
+      "reference": "ref. %{reference}",
+      "direct": "direct jump",
+      "actor": {
+        "system": "System",
+        "admin": "Staff",
+        "client": "Customer"
+      },
+      "kind": {
+        "created": "Order placed",
+        "status_changed": "Status changed",
+        "payment_status_changed": "Payment changed",
+        "payment_attempt": "Payment attempt",
+        "proof_submitted": "Proof submitted",
+        "reinstated": "Order reinstated",
+        "expired": "Expired unpaid",
+        "payment_attempt_removed": "Payment attempt removed",
+        "items_changed": "Lines corrected",
+        "total_changed": "Total recalculated"
+      },
+      "correction": "correction",
+      "line_added": "Added %{name} × %{quantity}",
+      "line_removed": "Removed %{name} (%{quantity})",
+      "line_quantity": "%{name}: %{from} → %{to} units",
+      "line_price": "%{name}: price %{from} → %{to}",
+      "paid_more": "The order was paid: %{diff} left to collect.",
+      "paid_less": "The order was paid: %{diff} to refund."
+    },
+    "correction": {
+      "title": "Correct status (super admin)",
+      "hint": "Any status, in any direction. Stock adjusts itself: leaving cancelled re-reserves; entering it releases; moving to confirmed or beyond commits; moving back restocks. If the order ends pending and unpaid, the payment window restarts. Everything lands in the history with your name and the reason.",
+      "status": "Order status",
+      "payment": "Payment status",
+      "current": "current",
+      "reason": "Reason (required)",
+      "reason_placeholder": "For example: the customer paid by transfer and it was marked by mistake",
+      "reason_short": "Write at least five characters.",
+      "reason_first": "Write the reason above.",
+      "apply": "Apply correction",
+      "reset": "Discard",
+      "applied": "Correction applied",
+      "attempts": "Payment attempts",
+      "no_attempts": "No payment attempts.",
+      "remove": "Remove",
+      "attempt_removed": "Payment attempt removed",
+      "succeeded_locked": "A succeeded charge is never removed: refund it.",
+      "confirm_title": "Apply correction",
+      "confirm_description": "Order: %{from} → %{to}. Payment: %{pfrom} → %{pto}. Stock will adjust accordingly. Continue?",
+      "confirm_remove_title": "Remove payment attempt",
+      "confirm_remove_description": "The attempt %{reference} (%{provider}) will be deleted and the order will stop showing it. Continue?"
+    },
+    "items_editor": {
+      "open": "Correct lines",
+      "title": "Correct the order's lines",
+      "add": "Add a product",
+      "add_placeholder": "Search by name…",
+      "no_results": "No product with that name.",
+      "new": "new",
+      "remove": "Remove from the order",
+      "less": "One less",
+      "more": "One more",
+      "empty": "An order cannot be left with no products. Add one or cancel the order.",
+      "summary": "Will be saved:",
+      "difference": "Before: %{before}. Difference: %{diff}.",
+      "paid_more": "This order is paid and the total goes up by %{diff}: collect that difference separately.",
+      "paid_less": "This order is paid and the total goes down by %{diff}: refund that difference.",
+      "reason_placeholder": "For example: the customer asked for two more units by phone",
+      "save": "Save changes",
+      "saved": "Order lines corrected",
+      "stock_cancelled": "The order is cancelled: no stock is held, so this does not touch the warehouse.",
+      "stock_pending": "The order is pending: what you add is held and what you remove is released.",
+      "stock_committed": "The order already left the warehouse: what you add is deducted and what you remove comes back in, with its inventory movement."
+    },
+    "refunds": {
+      "title": "Refunds",
+      "charged": "Charged",
+      "returned": "Refunded",
+      "committed": "Committed",
+      "refundable": "Refundable",
+      "amount": "Amount (USD)",
+      "amountHint": "Leave empty to refund everything left.",
+      "destination": "USDT address (BEP20)",
+      "destinationHint": "If you don't have it yet, we ask the customer by email.",
+      "providerRef": "Transaction reference",
+      "reason": "Reason (required)",
+      "request": "Log refund",
+      "requested": "Refund logged. The money has not left yet.",
+      "markPaid": "Confirm it was sent",
+      "completed": "Refund confirmed and the customer notified.",
+      "reject": "Reject",
+      "rejectedBecause": "Rejected:",
+      "bySystem": "The system",
+      "paidOn": "paid",
+      "confirmRequest": "Log this refund?",
+      "confirmRequestBody": "It commits",
+      "confirmRequestNote": "No money moves now: the order stays paid until you confirm the transfer.",
+      "confirmComplete": "Has the money left?",
+      "confirmCompleteBody": "This marks as refunded",
+      "confirmCompleteTail": "and emails the customer. Confirm only if you already made the transfer.",
+      "confirmReject": "Reject this refund?",
+      "confirmRejectNote": "It stays on file with its reason; nothing is deleted.",
+      "status": {
+        "requested": "Awaiting payout",
+        "completed": "Paid",
+        "rejected": "Rejected"
+      }
+    },
+    "promise": {
+      "committed": "Committed for",
+      "on_time": "Delivered on time",
+      "late": "Delivered late",
+      "overdue": "Past due",
+      "pending_payment": "Promise of %{days} working days; the date is set when payment arrives."
+    },
+    "filters": {
+      "from": "From",
+      "to": "To"
+    },
+    "report": {
+      "open": "Report",
+      "title": "Orders report",
+      "description": "Choose which orders to include. Empty fields filter nothing.",
+      "from": "Start date",
+      "to": "End date",
+      "status": "Order status",
+      "paymentStatus": "Payment status",
+      "paymentMethod": "Payment method",
+      "fulfillment": "Fulfillment",
+      "delivery": "Delivery",
+      "pickup": "Store pickup",
+      "pickupLocation": "Pickup point",
+      "groupBy": "Summary by",
+      "noGroup": "No summary",
+      "day": "Days",
+      "week": "Weeks",
+      "month": "Months",
+      "minTotal": "Amount from",
+      "maxTotal": "Amount to",
+      "all": "All",
+      "reset": "Clear",
+      "submit": "Generate PDF",
+      "loading": "Generating…",
+      "error": "Could not generate the report",
+      "send_title": "Send it by email (optional)",
+      "emails": "Emails, comma separated",
+      "roles": "Or to a whole role",
+      "roles_hint": "A role reaches every user in it who has an email, as the role stands at send time.",
+      "send": "Send by email",
+      "sending": "Sending…",
+      "sent": "Report sent to %{count} recipients",
+      "send_error": "Could not send the report",
+      "no_recipients": "Type at least one email or pick a role",
+      "empty_role": "Role %{rol} has nobody",
+      "skipped": "%{nombre} (%{rol}): %{motivo}"
+    },
+    "create": {
+      "button": "Create order",
+      "title": "Create an order for a customer",
+      "subtitle": "For customers who buy over WhatsApp or by phone.",
+      "client": "Customer",
+      "client_missing": "No account? Invite them: you'll be able to place their order once they activate it.",
+      "client_search_placeholder": "Search by name, email, or phone…",
+      "client_no_results": "No customer matches those details.",
+      "client_change": "Change",
+      "lines": "Items",
+      "fulfillment": "Delivery",
+      "fulfillment_type": "Delivery type",
+      "fulfillment_needs_client": "Choose a customer to see delivery options.",
+      "fulfillment_needs_municipality": "Choose a municipality to see what can be offered.",
+      "fulfillment_loading": "Checking what can be offered…",
+      "fulfillment_error": "Could not check delivery options.",
+      "fulfillment_unavailable_fallback": "This area does not offer delivery or in-store pickup.",
+      "delivery_municipality": "Municipality",
+      "delivery_municipality_placeholder": "Choose a municipality…",
+      "delivery_option": "Delivery method",
+      "delivery_street": "Street",
+      "delivery_between": "Between streets",
+      "delivery_reference": "Landmark",
+      "delivery_phone": "Contact phone",
+      "delivery_recipient": "Recipient's name",
+      "id_card_hint": "11 digits.",
+      "pickup_point": "Pickup point",
+      "pickup_recipient": "Who is picking up",
+      "pickup_id_card": "ID card",
+      "pickup_phone": "Contact phone",
+      "summary": "Summary",
+      "payment": "Payment",
+      "already_paid": "Already paid",
+      "already_paid_hint": "Check this only if the money is already in: by transfer or at the counter.",
+      "payment_methods_unavailable": "Could not load the payment methods catalog; you can't mark this order as paid.",
+      "payment_method": "Payment method",
+      "payment_method_placeholder": "Choose one…",
+      "reference": "Payment reference",
+      "notes": "Notes",
+      "notes_placeholder": "Any detail the customer gave over the phone…",
+      "submit": "Create the order",
+      "submitting": "Creating…",
+      "created": "Order %{orderNumber} created",
+      "no_stock": "Not enough stock for one of the products",
+      "no_stock_line": "Only %{smart_count} left of \"%{name}\" |||| Only %{smart_count} left of \"%{name}\"",
+      "error": "Could not create the order",
+      "missing_summary": "Missing: %{items}",
+      "missing_client": "the customer",
+      "missing_lines": "at least one product",
+      "missing_municipality": "the municipality",
+      "missing_street": "the street",
+      "missing_recipient_name": "the recipient's name",
+      "missing_recipient_phone": "the recipient's phone",
+      "missing_pickup_name": "the name of who is picking up",
+      "missing_pickup_id_card": "the ID card of who is picking up",
+      "missing_pickup_phone": "the phone of who is picking up",
+      "missing_payment_method": "the payment method"
     }
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Sales collected in the last %{days} days", "link": "View paid orders" },
-      "orders": { "subtitle": "Orders in the last %{days} days", "link": "View all orders" },
-      "products": { "subtitle": "Active products", "link": "View active products" },
-      "clients": { "subtitle": "New customers in %{days} days", "link": "View clients" }
+      "revenue": {
+        "subtitle": "Sales collected in the last %{days} days",
+        "link": "View paid orders"
+      },
+      "orders": {
+        "subtitle": "Orders in the last %{days} days",
+        "link": "View all orders"
+      },
+      "products": {
+        "subtitle": "Active products",
+        "link": "View active products"
+      },
+      "clients": {
+        "subtitle": "New customers in %{days} days",
+        "link": "View clients"
+      }
     },
     "trend": {
       "new": "New",
@@ -899,6 +1183,7 @@
     }
   },
   "clients": {
+    "search_placeholder": "Search by name, surname, email, or phone",
     "tabs": {
       "general": "General",
       "orders": "Orders"
@@ -910,6 +1195,26 @@
     "orders": {
       "empty_title": "No orders",
       "empty_hint": "This customer has not placed any orders yet."
+    },
+    "actions": {
+      "invite": "Invite customer",
+      "inviting": "Inviting…",
+      "invite_success": "Invitation sent to %{email}",
+      "invite_error": "Could not invite this customer",
+      "copy_link": "Copy link",
+      "link_copied": "Link copied"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email"
+    },
+    "invite": {
+      "title": "Invite a customer",
+      "help": "We create the account and email them to choose a password. They appear in the list once it is active.",
+      "footnote": "The customer picks the password: we never see it.",
+      "email_failed_title": "The account was invited, but the email did not go out",
+      "email_failed_help": "Send them this link. It is personal and single-use: with it they choose a password and get in."
     }
   },
   "cms-pages": {
@@ -1182,7 +1487,8 @@
     "history_empty": "Nobody has answered this message yet.",
     "sender_title": "Sender details",
     "view_client": "View client",
-    "anonymous_sender": "Sender without an account (anonymous form)."
+    "anonymous_sender": "Sender without an account (anonymous form).",
+    "body_required": "Write the reply or pick a template: that is what the history keeps."
   },
   "contact-templates": {
     "fields": {
@@ -1239,13 +1545,15 @@
       "label": "Name",
       "description": "Description",
       "fee": "Delivery fee",
-      "enabled": "Enabled"
+      "enabled": "Enabled",
+      "promiseDays": "Promise (working days)"
     },
     "form": {
       "note": "With no zones selected the option is offered everywhere.",
       "hints": {
         "fee": "Added to the order total. Leave it at 0 when delivery is free.",
-        "enabled": "Only enabled options appear at checkout."
+        "enabled": "Only enabled options appear at checkout.",
+        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
       }
     },
     "confirm": {
@@ -1272,6 +1580,11 @@
         "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
         "on_cta": "Enable",
         "off_cta": "Disable"
+      },
+      "promise_days": {
+        "label": "Days to have the order ready (working days)",
+        "empty": "No promise",
+        "hint": "Counted from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
       }
     },
     "support_message": {
@@ -1296,5 +1609,12 @@
       "sidebar_description": "Displays the mobile navigation menu.",
       "toggle_sidebar": "Toggle sidebar"
     }
+  },
+  "refunds": {
+    "title": "Refunds",
+    "pendingTotal": "Pending payout:",
+    "empty": "No refunds in this state.",
+    "outOfStock": "Paid with no stock left",
+    "requestedOn": "Logged"
   }
 }

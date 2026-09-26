@@ -1,7 +1,7 @@
 import {
   BadgeField,
   BooleanField,
-  ColumnsButton, DateField,
+  ColumnsButton, CreateButton, DateField,
   FilterButton,
   RefreshButton,
   SearchInput,
@@ -46,22 +46,10 @@ const ClientAvatar = () => {
   );
 };
 
-const clientFilters = [
-  <SearchInput source="q" alwaysOn />,
-  <SelectInput
-    label="list.fields.isActive"
-    source="isActive"
-    choices={[
-      { id: "true", name: "Yes" },
-      { id: "false", name: "No" },
-    ]}
-  />,
-];
-
 const ClientActions = () => (
   <div className="flex gap-2">
     <RefreshButton />
-    {/* <CreateButton /> */}
+    <CreateButton label="clients.actions.invite" />
     <ColumnsButton />
     <FilterButton variant="default" size="lg" />
   </div>
@@ -69,6 +57,23 @@ const ClientActions = () => (
 
 export const ClientList = () => {
   const translate = useTranslate();
+  const clientFilters = [
+    <SearchInput
+      source="q"
+      placeholder={translate("clients.search_placeholder", {
+        _: "Buscar por nombre, apellidos, correo o teléfono",
+      })}
+      alwaysOn
+    />,
+    <SelectInput
+      label="list.fields.isActive"
+      source="isActive"
+      choices={[
+        { id: "true", name: "Yes" },
+        { id: "false", name: "No" },
+      ]}
+    />,
+  ];
 
   return (
     <List

@@ -38,7 +38,7 @@ export default function StockLocationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: identity } = useGetIdentity();
   const isManager = MANAGER_ROLES.includes(
-    (identity?.role as Role) ?? "KARDIST",
+    (identity?.role as Role) ?? "STAFF",
   );
 
   return (
