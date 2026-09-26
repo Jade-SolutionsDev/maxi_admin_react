@@ -1,20 +1,93 @@
-import { DataProvider, fetchUtils } from 'ra-core';
-import { getApiToken } from '../lib/clerk/clerkRefs';
+import { DataProvider, HttpError, fetchUtils } from "ra-core";
+import { getApiToken } from "../lib/clerk/clerkRefs";
+import { backendMessage } from "@/pages/users/errors";
+import { resetIdentityCache } from "./authProvider";
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
 export interface InviteUserPayload {
   email: string;
   role: string;
+  /** Managed roles a STAFF invitee gets on registration (never for admins). */
+  roleIds?: string[];
   firstName?: string;
   lastName?: string;
   organizationId?: string;
+}
+
+export interface InviteClientPayload {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface CreateOrderForClientPayload {
+  clientId: string;
+  items: OrderLinePayload[];
+  fulfillmentType?: "delivery" | "pickup";
+  deliveryOptionId?: string;
+  pickupAddressId?: string;
+  deliveryAddress?: Record<string, unknown>;
+  deliveryMunicipalityId?: string;
+  contact?: { recipientName: string; idCard: string; contactPhone: string };
+  paymentMethod?: string;
+  customerNotes?: string;
+  cobro?: { paymentMethod: string; reference?: string };
+}
+
+/** Una opción de entrega a domicilio, con lo que cuesta y lo que promete. */
+export interface FulfillmentDeliveryOption {
+  id: string;
+  label: string;
+  description: string | null;
+  fee: number;
+  promiseDays: number | null;
+}
+
+/** Un punto de recogida en un almacén. */
+export interface FulfillmentPickupPoint {
+  id: string;
+  locationId: string;
+  locationName: string;
+  label: string | null;
+  address: string;
+}
+
+/**
+ * Lo que se puede ofrecer en una zona: mismo cálculo y mismo DTO que ve la
+ * tienda (`GET /storefront/fulfillment`), servido aquí por `GET /fulfillment`
+ * porque esa ruta exige un token de cliente que el panel no tiene — ver el
+ * comentario de `FulfillmentController` en la API.
+ */
+export interface FulfillmentOptions {
+  deliveryOptions: FulfillmentDeliveryOption[];
+  pickupPoints: FulfillmentPickupPoint[];
+  pickupEnabled: boolean;
+  pickupPromiseDays: number | null;
+  /** Si no es null, la zona no admite nada: hay que decirlo y no dejar crear. */
+  unavailableMessage: string | null;
+}
+
+export interface ClientInvitationResult {
+  email: string;
+  invitationId: string;
+  /** El enlace de activación: sirve para dárselo a mano si el correo no llegó. */
+  url: string;
+  emailSent: boolean;
 }
 
 export interface RoleSummary {
   id: string;
   name: string;
   description?: string | null;
+}
+
+export interface AssignableStorageUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  role: string;
 }
 
 export type InventoryOperationType = "IN" | "OUT" | "TRANSFER";
@@ -27,6 +100,93 @@ export interface ProductStockLocation {
   reservedQuantity: number;
   isActive: boolean;
   available: number;
+}
+
+export type OrderEventKind =
+  | "created"
+  | "status_changed"
+  | "payment_status_changed"
+  | "payment_attempt"
+  | "proof_submitted"
+  | "reinstated"
+  | "expired"
+  | "payment_attempt_removed"
+  | "items_changed"
+  | "total_changed"
+  | "delivered"
+  | "refund_requested"
+  | "refund_completed"
+  | "refund_rejected";
+
+/** Una línea del pedido tal como se manda a corregir. */
+export interface OrderLinePayload {
+  productId: string;
+  quantity: number;
+  /** Solo cuando se escribe a mano; si falta manda el precio ya guardado o el del catálogo. */
+  unitPrice?: number;
+}
+
+export interface OrderEvent {
+  id: string;
+  kind: OrderEventKind;
+  actorKind: "admin" | "client" | "system";
+  actorName: string | null;
+  field: string | null;
+  previousValue: string | null;
+  nextValue: string | null;
+  reason: string | null;
+  meta: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export type RefundStatus = "requested" | "completed" | "rejected";
+
+/** Una devolución de dinero. Varias por pedido cuando hay parciales. */
+export interface Refund {
+  id: string;
+  orderId: string;
+  orderNumber: string | null;
+  clientName: string | null;
+  clientEmail: string | null;
+  orderTotal: string | null;
+  /** Pagó tarde y ya no había mercancía: dinero dentro sin contrapartida. */
+  paidAfterExpiryOutOfStock: boolean;
+  amount: string;
+  currency: string;
+  status: RefundStatus;
+  method: "manual" | "gateway";
+  origin: string;
+  reason: string;
+  destination: string | null;
+  providerRef: string | null;
+  notes: string | null;
+  requestedByName: string | null;
+  requestedAt: string;
+  completedByName: string | null;
+  completedAt: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+}
+
+/** Cuánto se cobró de un pedido y cuánto queda por devolver. */
+export interface RefundSummary {
+  total: string;
+  refunded: string;
+  requested: string;
+  refundable: string;
+}
+
+/** Un intento de pago tal como lo lista GET /orders/:id/payment-attempts. */
+export interface PaymentAttempt {
+  id: string;
+  provider: string;
+  reference: string;
+  status: string;
+  amount: string | null;
+  currency: string | null;
+  customerReference: string | null;
+  receiptUrl: string | null;
+  createdAt: string;
 }
 
 export interface InventoryHistoryEvent {
@@ -67,16 +227,24 @@ export type OrderPaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
+  inviteClient: (
+    payload: InviteClientPayload,
+  ) => Promise<{ data: ClientInvitationResult }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
   getUserRoles: (userId: string) => Promise<{ data: RoleSummary[] }>;
+  /** Users an admin may assign to a storage (they hold a stock-locations grant). */
+  getAssignableStorageUsers: () => Promise<{ data: AssignableStorageUser[] }>;
   getFulfillmentSettings: () => Promise<{ data: FulfillmentSettings }>;
   updateFulfillmentSettings: (
     data: Partial<FulfillmentSettings>,
   ) => Promise<{ data: FulfillmentSettings }>;
-  setUserRoles: (userId: string, roleIds: string[]) => Promise<{ data: unknown }>;
+  setUserRoles: (
+    userId: string,
+    roleIds: string[],
+  ) => Promise<{ data: unknown }>;
   createInventoryOperation: (
     payload: CreateInventoryOperationPayload,
   ) => Promise<{ data: unknown }>;
@@ -96,10 +264,87 @@ export interface ExtendedDataProvider extends DataProvider {
   }) => Promise<{ data: DashboardTopProducts }>;
   /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
+  /** Historial del pedido, del más antiguo al más reciente. */
+  getOrderEvents: (id: string) => Promise<{ data: OrderEvent[] }>;
+  /** Corrección de superadmin: cualquier estado, con motivo. */
+  correctOrder: (
+    id: string,
+    body: {
+      status?: OrderStatus;
+      paymentStatus?: OrderPaymentStatus;
+      reason: string;
+    },
+  ) => Promise<{ data: unknown }>;
+  /** Corrección de superadmin: las líneas del pedido, tal como deben quedar. */
+  updateOrderItems: (
+    id: string,
+    body: { items: OrderLinePayload[]; reason: string },
+  ) => Promise<{ data: unknown }>;
+  createOrderForClient: (
+    payload: CreateOrderForClientPayload,
+  ) => Promise<{ data: { id: string; orderNumber: string } }>;
+  /**
+   * Opciones de entrega y recogida para una zona, para el alta de pedidos
+   * desde el panel — mismo cálculo que ve la tienda, homólogo de backoffice.
+   */
+  getFulfillmentOptions: (
+    municipalityId: string,
+  ) => Promise<{ data: FulfillmentOptions }>;
+  /** Todos los intentos de pago del pedido, del más reciente al más antiguo. */
+  getPaymentAttempts: (id: string) => Promise<{ data: PaymentAttempt[] }>;
+  /** Quita un intento no completado (superadmin), con motivo. */
+  removePaymentAttempt: (
+    id: string,
+    chargeId: string,
+    reason: string,
+  ) => Promise<{ data: unknown }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
+    direct?: boolean,
+    pickedUpBy?: { name: string; idCard?: string },
   ) => Promise<{ data: unknown }>;
+  /** Descarga el comprobante del pedido en PDF, tal como lo compone la API. */
+  downloadOrderPdf: (
+    orderId: string,
+  ) => Promise<{ blob: Blob; filename: string }>;
+  /** Reporte del listado en PDF, con los criterios del formulario. */
+  downloadOrdersReport: (
+    filtros: Record<string, unknown>,
+  ) => Promise<{ blob: Blob; filename: string }>;
+  /**
+   * Manda ese mismo reporte por correo. Los roles se resuelven en el servidor
+   * al enviar, así que aquí solo viajan sus identificadores.
+   */
+  sendOrdersReport: (cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) => Promise<{
+    enviados: string[];
+    fallidos: { email: string; motivo: string }[];
+    destinatarios: { email: string; nombre: string | null; motivo: string }[];
+    rolesVacios: string[];
+    sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
+  }>;
+  /** Devoluciones de un pedido, de la más reciente a la más antigua. */
+  getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
+  /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
+  getRefundSummary: (orderId: string) => Promise<{ data: RefundSummary }>;
+  /** Registra el compromiso de devolver. No mueve dinero. */
+  requestRefund: (
+    orderId: string,
+    body: { amount?: string; reason: string; destination?: string },
+  ) => Promise<{ data: Refund }>;
+  /** Confirma que el dinero salió: esto es lo que puede dejar el pedido reembolsado. */
+  completeRefund: (
+    refundId: string,
+    body: { destination?: string; providerRef?: string; notes?: string },
+  ) => Promise<{ data: Refund }>;
+  rejectRefund: (refundId: string, reason: string) => Promise<{ data: Refund }>;
+  /** La cola: lo que espera a que alguien mueva el dinero. */
+  getRefundQueue: (status?: RefundStatus) => Promise<{ data: Refund[] }>;
   updateOrderPaymentStatus: (
     id: string,
     paymentStatus: OrderPaymentStatus,
@@ -159,6 +404,8 @@ export interface DashboardTopProducts {
 export interface FulfillmentSettings {
   pickupEnabled: boolean;
   supportMessage: string;
+  /** Días hábiles hasta tener el pedido listo para recoger; null = sin plazo. */
+  pickupPromiseDays?: number | null;
   /** Pickup is on but no active storage has an address to collect from. */
   pickupEnabledWithoutAddresses: boolean;
 }
@@ -177,20 +424,20 @@ export interface SiteSettingsData {
 
 // Resources whose REST path differs from the react-admin resource name.
 const RESOURCE_PATHS: Record<string, string> = {
-  roles: 'permissions/roles',
+  roles: "permissions/roles",
   // The Inventory page lists stock aggregated by product across all storages.
-  inventory: 'inventory/aggregate',
+  inventory: "inventory/aggregate",
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
-  'storage-inventory': 'inventory',
-  'cms-pages': 'cms/pages',
-  'cms-banners': 'cms/banners',
-  'cms-services': 'cms/services',
-  'cms-staff': 'cms/staff',
-  'cms-faq-categories': 'cms/faq/categories',
-  'cms-faq-questions': 'cms/faq/questions',
-  'contact-messages': 'contact/messages',
-  'contact-templates': 'contact/templates',
-  'contact-motives': 'nomenclators',
+  "storage-inventory": "inventory",
+  "cms-pages": "cms/pages",
+  "cms-banners": "cms/banners",
+  "cms-services": "cms/services",
+  "cms-staff": "cms/staff",
+  "cms-faq-categories": "cms/faq/categories",
+  "cms-faq-questions": "cms/faq/questions",
+  "contact-messages": "contact/messages",
+  "contact-templates": "contact/templates",
+  "contact-motives": "nomenclators",
 };
 
 function resourcePath(resource: string): string {
@@ -201,26 +448,41 @@ async function httpClient(url: string, options: fetchUtils.Options = {}) {
   const token = await getApiToken();
 
   if (!options.headers) {
-    options.headers = new Headers({ Accept: 'application/json' });
+    options.headers = new Headers({ Accept: "application/json" });
   }
 
   const headers = options.headers as Headers;
   if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
-  return fetchUtils.fetchJson(url, options);
+  try {
+    return await fetchUtils.fetchJson(url, options);
+  } catch (error) {
+    // The API wraps failures as `{ error: { message } }`, and `fetchJson` only
+    // reads the top-level `message`, so every ra-core toast (create/edit/delete)
+    // came out blank: "Error" with no reason. Validation errors ("La pregunta
+    // no puede superar los 300 caracteres") were the loudest case.
+    if (error instanceof HttpError) {
+      throw new HttpError(
+        backendMessage(error, error.message),
+        error.status,
+        error.body,
+      );
+    }
+    throw error;
+  }
 }
 
 function toQueryString(filter: Record<string, unknown>): string {
   const params = new URLSearchParams();
   Object.entries(filter).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       params.set(key, String(value));
     }
   });
   const qs = params.toString();
-  return qs ? `?${qs}` : '';
+  return qs ? `?${qs}` : "";
 }
 
 /**
@@ -291,7 +553,9 @@ function sortRecords(
       String(av).trim() !== "" &&
       String(bv).trim() !== "";
     if (numeric) return (an - bn) * dir;
-    return String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir;
+    return (
+      String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir
+    );
   });
 }
 
@@ -303,7 +567,7 @@ function unwrapOne(json: unknown): unknown {
 export const dataProvider: DataProvider = {
   async getList(resource, params) {
     const { page, perPage } = params.pagination ?? { page: 1, perPage: 25 };
-    const { field, order } = params.sort ?? { field: 'id', order: 'ASC' };
+    const { field, order } = params.sort ?? { field: "id", order: "ASC" };
 
     const query = toQueryString({
       ...params.filter,
@@ -313,7 +577,9 @@ export const dataProvider: DataProvider = {
       sortOrder: order.toLowerCase(),
     });
 
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows, total, serverPaginated } = unwrapList(json);
 
     // Server already paged/sorted (e.g. users) → use as-is.
@@ -345,13 +611,17 @@ export const dataProvider: DataProvider = {
   },
 
   async getOne(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+    );
     return { data: unwrapOne(json) as never };
   },
 
   async getMany(resource, params) {
-    const query = toQueryString({ id: params.ids.join(',') });
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const query = toQueryString({ id: params.ids.join(",") });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows } = unwrapList(json);
     return { data: rows as never[] };
   },
@@ -361,14 +631,16 @@ export const dataProvider: DataProvider = {
       ...params.filter,
       [params.target]: params.id,
     });
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}${query}`);
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}${query}`,
+    );
     const { rows, total } = unwrapList(json);
     return { data: rows as never[], total };
   },
 
   async create(resource, params) {
     const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(params.data),
     });
     return { data: unwrapOne(json) as never };
@@ -377,12 +649,12 @@ export const dataProvider: DataProvider = {
   async update(resource, params) {
     // A managed role stores its editable fields and its permission matrix on two
     // separate endpoints — PATCH the fields, then bulk-set the permissions.
-    if (resource === 'roles') {
+    if (resource === "roles") {
       const data = params.data as Record<string, unknown>;
       const { json } = await httpClient(
         `${API_URL}/permissions/roles/${params.id}`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           body: JSON.stringify({
             name: data.name,
             description: data.description,
@@ -395,19 +667,25 @@ export const dataProvider: DataProvider = {
         const { json: permJson } = await httpClient(
           `${API_URL}/permissions/roles/${params.id}/permissions`,
           {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify({ permissionIds: data.permissionIds }),
           },
         );
         result = unwrapOne(permJson) ?? result;
       }
+      // Grants changed — refetch /auth/me so the acting admin's canAccess map
+      // stays current without a full reload.
+      resetIdentityCache();
       return { data: result as never };
     }
 
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(params.data),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(params.data),
+      },
+    );
     return { data: unwrapOne(json) as never };
   },
 
@@ -415,7 +693,7 @@ export const dataProvider: DataProvider = {
     await Promise.all(
       params.ids.map((id) =>
         httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
-          method: 'PATCH',
+          method: "PATCH",
           body: JSON.stringify(params.data),
         }),
       ),
@@ -424,9 +702,13 @@ export const dataProvider: DataProvider = {
   },
 
   async delete(resource, params) {
-    const { json } = await httpClient(`${API_URL}/${resourcePath(resource)}/${params.id}`, {
-      method: 'DELETE',
-    });
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${params.id}`,
+      {
+        method: "DELETE",
+      },
+    );
+    if (resource === "roles") resetIdentityCache();
     return { data: (unwrapOne(json) ?? params.previousData) as never };
   },
 
@@ -434,7 +716,7 @@ export const dataProvider: DataProvider = {
     await Promise.all(
       params.ids.map((id) =>
         httpClient(`${API_URL}/${resourcePath(resource)}/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         }),
       ),
     );
@@ -443,7 +725,7 @@ export const dataProvider: DataProvider = {
 
   async getSiteSettings() {
     const { json } = await httpClient(`${API_URL}/cms/settings`, {
-      method: 'GET',
+      method: "GET",
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
     return { data: payload.data };
@@ -453,31 +735,37 @@ export const dataProvider: DataProvider = {
     id: string,
     payload: { channel: string; templateId?: string; body?: string },
   ) {
-    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/replies`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/contact/messages/${id}/replies`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
     return { data: unwrapOne(json) };
   },
 
   async updateContactMessageStatus(id: string, status: string) {
-    const { json } = await httpClient(`${API_URL}/contact/messages/${id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status }),
-    });
+    const { json } = await httpClient(
+      `${API_URL}/contact/messages/${id}/status`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      },
+    );
     return { data: unwrapOne(json) };
   },
 
   async getContactConfig() {
     const { json } = await httpClient(`${API_URL}/contact/messages/config`, {
-      method: 'GET',
+      method: "GET",
     });
     return { data: unwrapOne(json) as { platformReplyEnabled: boolean } };
   },
 
   async updateSiteSettings(data: SiteSettingsData) {
     const { json } = await httpClient(`${API_URL}/cms/settings`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
@@ -486,14 +774,14 @@ export const dataProvider: DataProvider = {
 
   async getFulfillmentSettings() {
     const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
-      method: 'GET',
+      method: "GET",
     });
     return { data: unwrapOne(json) as FulfillmentSettings };
   },
 
   async updateFulfillmentSettings(data: Partial<FulfillmentSettings>) {
     const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
     return { data: unwrapOne(json) as FulfillmentSettings };
@@ -501,16 +789,61 @@ export const dataProvider: DataProvider = {
 
   async inviteUser(payload: InviteUserPayload) {
     const { json } = await httpClient(`${API_URL}/users/invite`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
   },
 
+  /**
+   * Alta de un cliente que compró por otro canal: crea su cuenta en la tienda
+   * y le manda el enlace para que elija contraseña.
+   *
+   * No es `create('clients', …)`: ese endpoint pide el `clerkId` de una cuenta
+   * que ya exista, y aquí justamente no existe todavía.
+   */
+  async inviteClient(payload: InviteClientPayload) {
+    const { json } = await httpClient(`${API_URL}/clients/invitations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return { data: unwrapOne(json) as ClientInvitationResult };
+  },
+
+  /**
+   * Un pedido que hacemos nosotros en nombre del cliente: quien compra por
+   * WhatsApp o por teléfono.
+   *
+   * No es `create('orders', …)`: ra-core mandaría el recurso entero, y este
+   * endpoint recibe lo que se pide, no un pedido ya montado.
+   */
+  async createOrderForClient(payload: CreateOrderForClientPayload) {
+    const { json } = await httpClient(`${API_URL}/orders`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return {
+      data: unwrapOne(json) as { id: string; orderNumber: string },
+    };
+  },
+
+  /**
+   * Qué se le puede ofrecer a un cliente en su municipio: mismo cálculo y
+   * mismo DTO que consulta la tienda, homólogo de backoffice porque esa ruta
+   * exige un token de cliente que el panel no tiene. El municipio es
+   * obligatorio — sin él la API responde 400.
+   */
+  async getFulfillmentOptions(municipalityId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/fulfillment${toQueryString({ municipalityId })}`,
+    );
+    return { data: unwrapOne(json) as FulfillmentOptions };
+  },
+
   async revokeInvitation(id: string) {
     const { json } = await httpClient(
       `${API_URL}/users/invitations/${id}/revoke`,
-      { method: 'POST' },
+      { method: "POST" },
     );
     return { data: unwrapOne(json) };
   },
@@ -518,21 +851,21 @@ export const dataProvider: DataProvider = {
   async resendInvitation(id: string) {
     const { json } = await httpClient(
       `${API_URL}/users/invitations/${id}/resend`,
-      { method: 'POST' },
+      { method: "POST" },
     );
     return { data: unwrapOne(json) };
   },
 
   async restoreUser(id: string) {
     const { json } = await httpClient(`${API_URL}/users/${id}/restore`, {
-      method: 'POST',
+      method: "POST",
     });
     return { data: unwrapOne(json) };
   },
 
   async setUserPassword(id: string, password: string) {
     await httpClient(`${API_URL}/users/${id}/password`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify({ password }),
     });
   },
@@ -545,17 +878,27 @@ export const dataProvider: DataProvider = {
     return { data: rows as RoleSummary[] };
   },
 
+  async getAssignableStorageUsers() {
+    const { json } = await httpClient(
+      `${API_URL}/stock-locations/assignable-users`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as AssignableStorageUser[] };
+  },
+
   async setUserRoles(userId: string, roleIds: string[]) {
     const { json } = await httpClient(
       `${API_URL}/permissions/users/${userId}/roles`,
-      { method: 'PUT', body: JSON.stringify({ roleIds }) },
+      { method: "PUT", body: JSON.stringify({ roleIds }) },
     );
+    // Assignments changed — refetch /auth/me on next access-check.
+    resetIdentityCache();
     return { data: unwrapOne(json) };
   },
 
   async createInventoryOperation(payload: CreateInventoryOperationPayload) {
     const { json } = await httpClient(`${API_URL}/inventory/operations`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
     });
     return { data: unwrapOne(json) };
@@ -602,17 +945,189 @@ export const dataProvider: DataProvider = {
     return { data: unwrapOne(json) as DashboardTopProducts };
   },
 
-  async updateOrderStatus(id: string, status: OrderStatus) {
+  async updateOrderStatus(
+    id: string,
+    status: OrderStatus,
+    direct = false,
+    pickedUpBy?: { name: string; idCard?: string },
+  ) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status }),
+      method: "PATCH",
+      body: JSON.stringify({
+        status,
+        ...(direct ? { direct } : {}),
+        ...(pickedUpBy ? { pickedUpBy } : {}),
+      }),
     });
     return { data: unwrapOne(json) };
   },
 
+  async downloadOrderPdf(orderId: string) {
+    // `fetchJson` da por hecho que la respuesta es JSON; un PDF no lo es, así
+    // que esta llamada va directa con el mismo token.
+    const token = await getApiToken();
+    const response = await fetch(`${API_URL}/orders/${orderId}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    if (!response.ok) {
+      throw new Error(`No se pudo generar el PDF (${response.status})`);
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filename =
+      /filename="([^"]+)"/.exec(disposition)?.[1] ?? `${orderId}.pdf`;
+    return { blob, filename };
+  },
+
+  /**
+   * El reporte de pedidos (MxH-0120). Recibe los criterios del formulario
+   * —filtros más `groupBy` para el resumen por periodos— y los manda tal cual;
+   * los vacíos no se envían, para que el servidor no los tome por un filtro.
+   */
+  async downloadOrdersReport(filtros: Record<string, unknown>) {
+    const token = await getApiToken();
+    const params = new URLSearchParams();
+    for (const [clave, valor] of Object.entries(filtros)) {
+      if (valor !== undefined && valor !== null && valor !== "") {
+        params.set(clave, String(valor));
+      }
+    }
+    const response = await fetch(
+      `${API_URL}/orders/report/pdf?${params.toString()}`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+    );
+    if (!response.ok) {
+      throw new Error(`No se pudo generar el reporte (${response.status})`);
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filename =
+      /filename="([^"]+)"/.exec(disposition)?.[1] ?? "pedidos.pdf";
+    return { blob, filename };
+  },
+
+  /**
+   * Manda el reporte por correo (MxH-0120). Los roles se resuelven en el
+   * servidor al enviar, así que aquí solo viajan sus identificadores.
+   */
+  async sendOrdersReport(cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) {
+    const { json } = await httpClient(`${API_URL}/orders/report/email`, {
+      method: "POST",
+      body: JSON.stringify(cuerpo),
+    });
+    return unwrapOne(json) as {
+      enviados: string[];
+      fallidos: { email: string; motivo: string }[];
+      destinatarios: { email: string; nombre: string | null; motivo: string }[];
+      rolesVacios: string[];
+      sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
+    };
+  },
+
+  async getRefunds(orderId: string) {
+    const { json } = await httpClient(`${API_URL}/orders/${orderId}/refunds`);
+    return { data: unwrapList(json).rows as Refund[] };
+  },
+
+  async getRefundSummary(orderId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${orderId}/refunds/summary`,
+    );
+    return { data: unwrapOne(json) as RefundSummary };
+  },
+
+  async requestRefund(
+    orderId: string,
+    body: { amount?: string; reason: string; destination?: string },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${orderId}/refunds`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async completeRefund(
+    refundId: string,
+    body: { destination?: string; providerRef?: string; notes?: string },
+  ) {
+    const { json } = await httpClient(
+      `${API_URL}/refunds/${refundId}/complete`,
+      { method: "POST", body: JSON.stringify(body) },
+    );
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async rejectRefund(refundId: string, reason: string) {
+    const { json } = await httpClient(`${API_URL}/refunds/${refundId}/reject`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    });
+    return { data: unwrapOne(json) as Refund };
+  },
+
+  async getRefundQueue(status?: RefundStatus) {
+    const query = status ? `?status=${status}` : "";
+    const { json } = await httpClient(`${API_URL}/refunds${query}`);
+    return { data: unwrapList(json).rows as Refund[] };
+  },
+
+  async correctOrder(
+    id: string,
+    body: {
+      status?: OrderStatus;
+      paymentStatus?: OrderPaymentStatus;
+      reason: string;
+    },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/correct`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async updateOrderItems(
+    id: string,
+    body: { items: OrderLinePayload[]; reason: string },
+  ) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/items`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async getPaymentAttempts(id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${id}/payment-attempts`,
+    );
+    const { rows } = unwrapList(json);
+    return { data: rows as PaymentAttempt[] };
+  },
+
+  async removePaymentAttempt(id: string, chargeId: string, reason: string) {
+    const { json } = await httpClient(
+      `${API_URL}/orders/${id}/payment-attempts/${chargeId}`,
+      { method: "DELETE", body: JSON.stringify({ reason }) },
+    );
+    return { data: unwrapOne(json) };
+  },
+
+  async getOrderEvents(id: string) {
+    const { json } = await httpClient(`${API_URL}/orders/${id}/events`);
+    const { rows } = unwrapList(json);
+    return { data: rows as OrderEvent[] };
+  },
+
   async reinstateOrder(id: string) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/reinstate`, {
-      method: 'POST',
+      method: "POST",
     });
     return { data: unwrapOne(json) };
   },
@@ -623,7 +1138,7 @@ export const dataProvider: DataProvider = {
   ) {
     const { json } = await httpClient(
       `${API_URL}/orders/${id}/payment-status`,
-      { method: 'PATCH', body: JSON.stringify({ paymentStatus }) },
+      { method: "PATCH", body: JSON.stringify({ paymentStatus }) },
     );
     return { data: unwrapOne(json) };
   },

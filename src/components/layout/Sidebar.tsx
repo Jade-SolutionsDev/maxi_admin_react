@@ -1,23 +1,25 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  ShoppingCart,
-  Package,
-  Building2,
-  Tags,
-  ClipboardList,
-  Warehouse,
-  Users,
-  UserRound,
+  Banknote,
   BarChart3,
-  Settings, LogOut,
-  User,
-  PanelsTopLeft,
+  Building2,
+  ClipboardList,
   CreditCard,
   Inbox,
+  LayoutDashboard,
   ListTree,
+  LogOut,
   NotebookPen,
+  Package,
+  PanelsTopLeft,
+  ShieldCheck,
+  ShoppingCart,
+  Tags,
   Truck,
+  User,
+  UserRound,
+  Users,
+  Warehouse,
 } from "lucide-react";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
 import { cn } from "@/lib/utils";
@@ -25,6 +27,7 @@ import { useEffect } from "react";
 import {
   Translate,
   useCanAccess,
+  useCanAccessResources,
   useGetIdentity,
   useGetList,
   useLogout,
@@ -106,7 +109,11 @@ interface NavGroup {
 const navGroups: NavGroup[] = [
   {
     items: [
-      { labelKey: "app.menu.panel", icon: <LayoutDashboard size={20} />, path: "/" },
+      {
+        labelKey: "app.menu.panel",
+        icon: <LayoutDashboard size={20} />,
+        path: "/",
+      },
     ],
   },
   {
@@ -117,6 +124,12 @@ const navGroups: NavGroup[] = [
         icon: <ShoppingCart size={20} />,
         path: "/orders",
         resource: "orders",
+      },
+      {
+        labelKey: "app.menu.devoluciones",
+        icon: <Banknote size={20} />,
+        path: "/refunds",
+        resource: "refunds",
       },
       {
         labelKey: "app.menu.metodos_pago",
@@ -218,10 +231,15 @@ const navGroups: NavGroup[] = [
         activePrefix: "/cms-",
         resource: "cms-pages",
       },
-      { labelKey: "app.menu.reportes", icon: <BarChart3 size={20} />, soon: true },
       {
-        labelKey: "app.menu.configuracion",
-        icon: <Settings size={20} />,
+        labelKey: "app.menu.reportes",
+        icon: <BarChart3 size={20} />,
+        soon: true,
+      },
+      // Direct entry: the old "Configuración" only ever held this page.
+      {
+        labelKey: "app.menu.rolesPermisos",
+        icon: <ShieldCheck size={20} />,
         path: "/roles",
         resource: "roles",
       },
@@ -232,8 +250,10 @@ const navGroups: NavGroup[] = [
 /** Notification-badge colours. Deliberately just two: brand green for a count
  *  or "new", red for "urgent". `dot` is the collapsed-rail indicator. */
 function badgePillClass(badge: SidebarBadge): string {
-  if (badge === "urgent") return "bg-destructive text-white uppercase tracking-wide";
-  if (badge === "new") return "bg-sidebar-primary text-white uppercase tracking-wide";
+  if (badge === "urgent")
+    return "bg-destructive text-white uppercase tracking-wide";
+  if (badge === "new")
+    return "bg-sidebar-primary text-white uppercase tracking-wide";
   return "bg-sidebar-primary text-white tabular-nums";
 }
 function badgeDotClass(badge: SidebarBadge): string {
@@ -308,6 +328,54 @@ function NavEntry({ item }: { item: NavItem }) {
         </SidebarMenuBadge>
       )}
     </SidebarMenuItem>
+  );
+}
+
+/**
+ * One sidebar group. A LABELED group renders only when at least one of its
+ * permission-gated items is visible — otherwise the whole thing (label,
+ * separator and any ungated "soon" teasers) disappears, so a user granted
+ * only, say, orders never sees empty section headers.
+ */
+function NavGroupSection({ group }: { group: (typeof navGroups)[number] }) {
+  const gatedResources = group.items
+    .map((item) => item.resource)
+    .filter((r): r is string => Boolean(r));
+  const { canAccess, isPending } = useCanAccessResources({
+    resources: gatedResources,
+    action: "list",
+  });
+
+  if (group.labelKey) {
+    // Same behavior as the per-item gate: render nothing while pending.
+    if (isPending) return null;
+    const anyVisible = gatedResources.some((r) => canAccess?.[r]);
+    if (!anyVisible) return null;
+  }
+
+  return (
+    <SidebarGroup className="py-1">
+      {group.labelKey && (
+        <>
+          {/* Collapsed rail: the label hides, so a thin separator keeps groups apart. */}
+          <SidebarSeparator className="mx-0 hidden group-data-[collapsible=icon]:block" />
+          <SidebarGroupLabel>
+            <Translate i18nKey={group.labelKey} />
+          </SidebarGroupLabel>
+        </>
+      )}
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map((item) =>
+            item.resource ? (
+              <GatedNavEntry key={item.labelKey} item={item} />
+            ) : (
+              <NavEntry key={item.labelKey} item={item} />
+            ),
+          )}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 }
 
@@ -417,28 +485,7 @@ export default function AppSidebar() {
       {/* Navigation */}
       <SidebarContent className="px-1 py-2">
         {navGroups.map((group, i) => (
-          <SidebarGroup key={group.labelKey ?? `group-${i}`} className="py-1">
-            {group.labelKey && (
-              <>
-                {/* Collapsed rail: the label hides, so a thin separator keeps groups apart. */}
-                <SidebarSeparator className="mx-0 hidden group-data-[collapsible=icon]:block" />
-                <SidebarGroupLabel>
-                  <Translate i18nKey={group.labelKey} />
-                </SidebarGroupLabel>
-              </>
-            )}
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) =>
-                  item.resource ? (
-                    <GatedNavEntry key={item.labelKey} item={item} />
-                  ) : (
-                    <NavEntry key={item.labelKey} item={item} />
-                  ),
-                )}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <NavGroupSection key={group.labelKey ?? `group-${i}`} group={group} />
         ))}
       </SidebarContent>
 

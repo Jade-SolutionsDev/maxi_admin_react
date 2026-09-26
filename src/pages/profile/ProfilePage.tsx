@@ -17,7 +17,7 @@ export default function ProfilePage() {
   const { data: identity } = useGetIdentity();
   const [tab, setTab] = useState<TabKey>("personal");
 
-  const isManager = MANAGER_ROLES.includes((identity?.role as Role) ?? "KARDIST");
+  const isManager = MANAGER_ROLES.includes((identity?.role as Role) ?? "STAFF");
 
   const tabs: { key: TabKey; label: string; icon: typeof UserIcon }[] = [
     { key: "personal", label: "profile.tabs.personal", icon: UserIcon },

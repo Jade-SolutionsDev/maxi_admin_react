@@ -1,6 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { required, useTranslate } from "ra-core";
-import { AlignLeft, ArrowUpDown, Coins, Heading, Truck } from "lucide-react";
+import {
+  AlignLeft,
+  ArrowUpDown,
+  CalendarClock,
+  Coins,
+  Heading,
+  Truck,
+} from "lucide-react";
 
 import {
   BooleanInput,
@@ -15,10 +22,18 @@ interface DeliveryOptionFormModalProps {
   mode: "create" | "edit";
 }
 
+// Ojo al tocar esto: arma el envío campo a campo, así que un campo nuevo en
+// el formulario que no se añada aquí se escribe, se guarda… y se pierde por
+// el camino sin decir nada. Pasó con el plazo.
 const sanitizeDeliveryOption = (data: Record<string, unknown>) => ({
   label: data.label,
   description: data.description ?? null,
   fee: Number(data.fee ?? 0),
+  // Vacío es «sin compromiso», no cero: cero días sería prometer hoy mismo.
+  promiseDays:
+    data.promiseDays === "" || data.promiseDays == null
+      ? null
+      : Number(data.promiseDays),
   sortOrder: Number(data.sortOrder ?? 0),
   enabled: data.enabled ?? false,
   zones: coverageToZones(
@@ -99,6 +114,17 @@ function DeliveryOptionFormFields() {
         step={0.01}
         icon={<Coins />}
         helperText="delivery-options.form.hints.fee"
+      />
+
+      <NumberInput
+        source="promiseDays"
+        label={translate("delivery-options.fields.promiseDays", {
+          _: "Plazo (días hábiles)",
+        })}
+        min={1}
+        max={60}
+        icon={<CalendarClock />}
+        helperText="delivery-options.form.hints.promiseDays"
       />
 
       <NumberInput

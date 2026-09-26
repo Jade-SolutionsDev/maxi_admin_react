@@ -1,5 +1,7 @@
+import { useState } from "react";
 import {
   ResourceContextProvider,
+  useCanAccess,
   useRecordContext,
   useTranslate,
 } from "ra-core";
@@ -13,31 +15,15 @@ import {
   RowNumberField,
   SearchInput,
   SelectInput,
+  TextInput,
 } from "@/components/admin";
+import { Button } from "@/components/ui/button";
 import type { OrderStatus, OrderPaymentStatus } from "@/providers/dataProvider";
+import { CrearPedidoDialog } from "./CrearPedidoDialog";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderBadges";
+import { ExportOrdersButton } from "./ExportOrdersButton";
 import { PaymentMethodFilter } from "./PaymentMethodFilter";
 import { money, ORDER_STATUSES, PAYMENT_STATUSES } from "./orderStatus";
-
-const orderFilters = [
-  <SearchInput source="q" alwaysOn />,
-  <SelectInput
-    source="status"
-    label="list.fields.status"
-    choices={ORDER_STATUSES.map((s) => ({ id: s, name: `orders.status.${s}` }))}
-    alwaysOn
-  />,
-  <SelectInput
-    source="paymentStatus"
-    label="orders.fields.paymentStatus"
-    choices={PAYMENT_STATUSES.map((s) => ({
-      id: s,
-      name: `orders.paymentStatus.${s}`,
-    }))}
-    alwaysOn
-  />,
-  <PaymentMethodFilter alwaysOn />,
-];
 
 /**
  * La pasarela del último intento. Un pedido puede no tener ninguno —uno de cada
@@ -119,13 +105,76 @@ const TotalCell = () => {
   return <span className="font-medium tabular-nums">{money(record.total)}</span>;
 };
 
+/**
+ * El botón de crear, oculto a quien no tenga el permiso.
+ *
+ * No es `<RequireAccess>`: ese componente es un guarda de ruta —a quien no
+ * tiene el permiso le pinta la página entera de «Acceso denegado»— y aquí es
+ * un botón dentro de una barra. Se usa `useCanAccess` directamente, igual que
+ * `GatedNavEntry` en el menú lateral: sin permiso, no se pinta nada.
+ */
+const BotonCrearPedido = ({ onClick }: { onClick: () => void }) => {
+  const translate = useTranslate();
+  const { canAccess, isPending } = useCanAccess({
+    resource: "orders",
+    action: "create",
+  });
+  if (isPending || !canAccess) return null;
+  return (
+    <Button onClick={onClick}>
+      {translate("orders.create.button", { _: "Crear pedido" })}
+    </Button>
+  );
+};
+
 export default function OrdersList() {
   const translate = useTranslate();
+  const [crearAbierto, setCrearAbierto] = useState(false);
+  const orderFilters = [
+    <SearchInput
+      source="q"
+      placeholder={translate("orders.search_placeholder", {
+        _: "Buscar por pedido, cliente, correo o teléfono",
+      })}
+      alwaysOn
+    />,
+    <SelectInput
+      source="status"
+      label="list.fields.status"
+      choices={ORDER_STATUSES.map((s) => ({
+        id: s,
+        name: `orders.status.${s}`,
+      }))}
+      alwaysOn
+    />,
+    <SelectInput
+      source="paymentStatus"
+      label="orders.fields.paymentStatus"
+      choices={PAYMENT_STATUSES.map((s) => ({
+        id: s,
+        name: `orders.paymentStatus.${s}`,
+      }))}
+      alwaysOn
+    />,
+    <PaymentMethodFilter alwaysOn />,
+    // El rango acota el reporte: sin él, «los de esta semana» obliga a contar
+    // en pantalla. Con `type="date"` para que salga el calendario del
+    // navegador; no hay un DateInput propio en los componentes del panel.
+    <TextInput source="from" label="orders.filters.from" type="date" />,
+    <TextInput source="to" label="orders.filters.to" type="date" />,
+  ];
+
   return (
     <ResourceContextProvider value="orders">
       <List
         filters={orderFilters}
-        actions={<RefreshButton />}
+        actions={
+          <div className="flex items-center gap-2">
+            <BotonCrearPedido onClick={() => setCrearAbierto(true)} />
+            <ExportOrdersButton />
+            <RefreshButton />
+          </div>
+        }
         title={translate("resources.orders.name_plural", { _: "Pedidos" })}
         sort={{ field: "createdAt", order: "DESC" }}
         perPage={10}
@@ -165,6 +214,7 @@ export default function OrdersList() {
           </DataTable.Col>
         </DataTable>
       </List>
+      <CrearPedidoDialog open={crearAbierto} onOpenChange={setCrearAbierto} />
     </ResourceContextProvider>
   );
 }

@@ -117,6 +117,23 @@ Then('ve la acción {string}', async ({ page }, nombre: string) => {
   await expect(page.getByText(nombre, { exact: true }).first()).toBeVisible();
 });
 
+/** Un botón de verdad (no un enlace), como el de crear un pedido desde el panel. */
+Then('ve el botón {string}', async ({ page }, nombre: string) => {
+  await expect(
+    page.getByRole('button', { name: nombre, exact: true }).first(),
+  ).toBeVisible({ timeout: 15_000 });
+});
+
+When('pulsa {string}', async ({ page }, nombre: string) => {
+  await page.getByRole('button', { name: nombre, exact: true }).first().click();
+});
+
+Then('el botón {string} está deshabilitado', async ({ page }, nombre: string) => {
+  await expect(
+    page.getByRole('button', { name: nombre, exact: true }).first(),
+  ).toBeDisabled({ timeout: 15_000 });
+});
+
 /** La tabla tarda: hay sesión, permisos y una petición de por medio. */
 async function esperarLaTabla(page: Page) {
   await page

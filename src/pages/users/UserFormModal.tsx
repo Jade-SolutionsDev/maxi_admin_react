@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   required,
   useDataProvider,
-  useGetList,
   useNotify,
   useRecordContext,
   useTranslate,
@@ -18,13 +17,10 @@ import {
   TextInput,
 } from "@/components/admin";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
-import type {
-  ExtendedDataProvider,
-  RoleSummary,
-} from "@/providers/dataProvider";
+import type { ExtendedDataProvider } from "@/providers/dataProvider";
 import { MANAGER_ROLES, type Role } from "@/providers/authProvider";
 import { roleChoices } from "./roleChoices";
+import { RolesChecklist } from "./RolesChecklist";
 import { backendMessage } from "./errors";
 
 /** Read-only display of the account email (email is immutable after creation). */
@@ -57,19 +53,8 @@ function UserRolesField({
 }) {
   const translate = useTranslate();
   const record = useRecordContext();
-  const { data: roles, isPending } = useGetList<RoleSummary>("roles", {
-    pagination: { page: 1, perPage: 1000 },
-    sort: { field: "name", order: "ASC" },
-  });
 
   const targetIsAdmin = MANAGER_ROLES.includes(record?.role as Role);
-
-  const toggle = (id: string) => {
-    if (roleIds === null) return;
-    onChange(
-      roleIds.includes(id) ? roleIds.filter((x) => x !== id) : [...roleIds, id],
-    );
-  };
 
   return (
     <div className="space-y-2">
@@ -87,40 +72,7 @@ function UserRolesField({
         </Alert>
       )}
 
-      {isPending || roleIds === null ? (
-        <p className="text-sm text-muted-foreground">
-          {translate("ra.page.loading", { _: "Loading…" })}
-        </p>
-      ) : (roles ?? []).length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          {translate("roles.assign_dialog.empty", { _: "No roles yet." })}
-        </p>
-      ) : (
-        <ul className="space-y-1 rounded-md border border-border p-1">
-          {(roles ?? []).map((role) => {
-            const id = String(role.id);
-            return (
-              <li key={id}>
-                <label className="flex items-start gap-3 rounded-md p-2 hover:bg-muted/50 cursor-pointer">
-                  <Checkbox
-                    checked={roleIds.includes(id)}
-                    onCheckedChange={() => toggle(id)}
-                    className="mt-0.5"
-                  />
-                  <span className="flex flex-col">
-                    <span className="text-sm font-medium">{role.name}</span>
-                    {role.description && (
-                      <span className="text-xs text-muted-foreground">
-                        {role.description}
-                      </span>
-                    )}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <RolesChecklist value={roleIds} onChange={onChange} />
     </div>
   );
 }

@@ -1,5 +1,10 @@
 import type { HTMLAttributes } from "react";
-import { genericMemo, useFieldValue, useTranslate } from "ra-core";
+import {
+  genericMemo,
+  useFieldValue,
+  useLocaleState,
+  useTranslate,
+} from "ra-core";
 
 import type { FieldProps } from "@/lib/field.type";
 
@@ -22,6 +27,17 @@ const DateFieldImpl = <
     ...rest
   } = inProps;
   const translate = useTranslate();
+  /**
+   * El idioma de la aplicacion, no el del navegador.
+   *
+   * `toLocaleString()` sin locale usa el del navegador, asi que en un
+   * equipo configurado en ingles el panel —que esta en espanol— escribia
+   * «9/10/2026, 8:33:48 AM»: mes primero y AM/PM. El valor era correcto;
+   * lo que estaba mal era la forma de escribirlo. Con `es` queda
+   * «10/9/2026, 8:33:48», dia primero y 24 horas.
+   */
+  const [localeApp] = useLocaleState();
+  const idioma = locales ?? localeApp;
 
   if (!showTime && !showDate) {
     throw new Error(
@@ -48,7 +64,7 @@ const DateFieldImpl = <
   if (date) {
     if (showTime && showDate) {
       dateString = toLocaleStringSupportsLocales
-        ? date.toLocaleString(locales, options)
+        ? date.toLocaleString(idioma, options)
         : date.toLocaleString();
     } else if (showDate) {
       // If input is a date string (e.g. '2022-02-15') without time and time zone,
@@ -60,11 +76,11 @@ const DateFieldImpl = <
           ? { timeZone: "UTC" }
           : undefined);
       dateString = toLocaleStringSupportsLocales
-        ? date.toLocaleDateString(locales, dateOptions)
+        ? date.toLocaleDateString(idioma, dateOptions)
         : date.toLocaleDateString();
     } else if (showTime) {
       dateString = toLocaleStringSupportsLocales
-        ? date.toLocaleTimeString(locales, options)
+        ? date.toLocaleTimeString(idioma, options)
         : date.toLocaleTimeString();
     }
   }

@@ -113,7 +113,12 @@
       "name_plural": "Nomencladores"
     },
     "delivery-options": {
-      "name": "Formas de entrega"
+      "name": "Formas de entrega",
+      "name_plural": "Formas de entrega"
+    },
+    "payment-methods": {
+      "name": "Método de pago",
+      "name_plural": "Métodos de pago"
     }
   },
   "list": {
@@ -183,8 +188,8 @@
     "roles": {
       "SUPER_ADMIN": "Súper administrador",
       "ADMIN": "Administrador",
-      "GROCER": "Almacenero",
-      "KARDIST": "Kardista"
+      "STAFF": "Empleado",
+      "none": "Sin roles"
     },
     "actions": {
       "add": "Invitar usuario",
@@ -226,7 +231,10 @@
       "delete_confirm_description_no_restore": "¿Seguro que quieres eliminar a %{name}?",
       "update_success": "Usuario actualizado",
       "change_password": "Cambiar contraseña",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "staff_roles": "Roles del empleado",
+      "staff_roles_hint": "Elige los roles que definen lo que este empleado puede hacer. Puedes cambiarlos luego.",
+      "staff_roles_required": "Elige al menos un rol para el empleado."
     },
     "password": {
       "title": "Cambiar contraseña",
@@ -362,6 +370,10 @@
       "required_note": "Los campos marcados con * son requeridos.",
       "edit_note": "Los cambios se reflejarán en la plataforma una vez que guardes la información.",
       "invalid": "Revisa los campos marcados: falta algo por completar."
+    },
+    "validation": {
+      "max_length": "No puede superar los %{max} caracteres.",
+      "character_count": "%{count} de %{max} caracteres"
     }
   },
   "app": {
@@ -377,7 +389,7 @@
       "usuarios": "Usuarios",
       "clientes": "Clientes",
       "reportes": "Reportes",
-      "configuracion": "Configuración",
+      "rolesPermisos": "Roles y permisos",
       "soon": "Próximamente",
       "cmsPages": "Páginas",
       "cmsBanners": "Banners",
@@ -401,7 +413,8 @@
       "contactoMensajes": "Mensajes",
       "contactoPlantillas": "Plantillas",
       "nomencladores": "Nomencladores",
-      "entregas": "Entregas"
+      "entregas": "Entregas",
+      "devoluciones": "Devoluciones"
     },
     "user": {
       "profile": "Perfil"
@@ -456,14 +469,37 @@
       "products": "Productos",
       "categories": "Categorías",
       "departments": "Departamentos",
-      "stock-locations": "Almacenes"
+      "stock-locations": "Almacenes",
+      "inventory": "Inventario",
+      "orders": "Pedidos",
+      "clients": "Clientes",
+      "contact": "Contacto (mensajes y plantillas)",
+      "cms-pages": "CMS — Páginas",
+      "cms-banners": "CMS — Banners",
+      "cms-services": "CMS — Servicios",
+      "cms-staff": "CMS — Equipo",
+      "cms-settings": "CMS — Ajustes del sitio",
+      "nomenclators": "Nomencladores",
+      "delivery-options": "Opciones de entrega",
+      "fulfillment-settings": "Ajustes de entrega",
+      "payment-methods": "Métodos de pago",
+      "dashboard": "Panel (indicadores)",
+      "uploads": "Subida de imágenes"
     },
     "actions": {
       "list": "Listar",
       "read": "Ver",
       "create": "Crear",
       "update": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "view-all": "Ver todos",
+      "reply": "Responder",
+      "update-status": "Cambiar estado",
+      "update-payment-status": "Cambiar pago",
+      "aggregate": "Vista global",
+      "history": "Historial",
+      "create-operation": "Operaciones",
+      "view": "Ver"
     }
   },
   "roles": {
@@ -480,7 +516,9 @@
     "matrix": {
       "title": "Permisos por módulo",
       "module": "Módulo",
-      "toggle_all": "Seleccionar todo"
+      "toggle_all": "Seleccionar todo",
+      "lectura_implicada": "Hace falta para trabajar en este módulo: sin poder verlo, el módulo no aparece en el menú.",
+      "al_menos_uno": "Marca al menos un permiso: un rol sin acceso a nada no sirve."
     },
     "actions": {
       "manage_user_roles": "Gestionar roles"
@@ -640,8 +678,8 @@
       "info_hint": "Nombre y disponibilidad del almacén.",
       "coverage": "Zona de compra",
       "coverage_hint": "Seleccione las provincias y municipios donde opera este almacén.",
-      "grocers": "Encargados",
-      "grocers_hint": "Usuarios GROCER que pueden gestionar este almacén.",
+      "grocers": "Usuarios asignados",
+      "grocers_hint": "Usuarios con permiso de almacenes que pueden trabajar en este almacén.",
       "pickupAddresses": "Direcciones de recogida",
       "pickupAddresses_hint": "Puntos donde los clientes pueden recoger sus pedidos."
     },
@@ -663,7 +701,7 @@
       "required": "Selecciona al menos una zona de compra."
     },
     "grocers": {
-      "empty": "No hay usuarios GROCER disponibles."
+      "empty": "No hay usuarios con permiso de almacenes para asignar."
     },
     "status": {
       "active": "Activo",
@@ -771,6 +809,7 @@
     }
   },
   "orders": {
+    "search_placeholder": "Buscar por pedido, cliente, correo o teléfono",
     "fields": {
       "orderNumber": "Número",
       "client": "Cliente",
@@ -820,7 +859,18 @@
       "mark_paid": "Marcar pagado",
       "mark_failed": "Pago fallido",
       "mark_refunded": "Reembolsar",
-      "view_customer": "Ver cliente"
+      "view_customer": "Ver cliente",
+      "direct_label": "Cambiar estado directamente",
+      "direct_placeholder": "Saltar a estado…",
+      "confirm_direct_description": "Vas a saltar los pasos intermedios y dejar el pedido en \"%{value}\". El stock se ajusta igual que si hubieras recorrido cada paso. ¿Continuar?",
+      "delivered_hint": "Anota a quién se le entrega. Desde esta fecha cuentan las 48 horas para reclamar.",
+      "picked_up_by": "Quién retira",
+      "picked_up_id": "Carné de identidad",
+      "export_pdf": "Exportar a PDF",
+      "pdf_error": "No se pudo generar el PDF",
+      "report": "Exportar a PDF",
+      "report_loading": "Generando…",
+      "report_error": "No se pudo generar el reporte"
     },
     "payment": {
       "provider": "Proveedor",
@@ -859,8 +909,13 @@
       "refundHint": "Contacta al cliente y reembolsa este pedido."
     },
     "fulfillment": {
+      "delivery": "A domicilio",
       "pickup": "Recogida en tienda",
       "between": "Entre"
+    },
+    "recipient": {
+      "title": "Recibe",
+      "id_card": "Carnet"
     },
     "transfer": {
       "title": "Este pedido necesita un traslado entre almacenes",
@@ -871,15 +926,242 @@
       "prepare": "Preparar traslado"
     },
     "filters": {
-      "withoutPaymentMethod": "Sin intento de pago"
+      "withoutPaymentMethod": "Sin intento de pago",
+      "from": "Desde",
+      "to": "Hasta"
+    },
+    "history": {
+      "title": "Historial",
+      "empty": "Sin movimientos registrados. El historial se guarda desde que se activó esta función; los pedidos anteriores no lo tienen.",
+      "error": "No se pudo cargar el historial.",
+      "via": "vía %{provider}",
+      "reference": "ref. %{reference}",
+      "direct": "salto directo",
+      "actor": {
+        "system": "Sistema",
+        "admin": "Administración",
+        "client": "Cliente"
+      },
+      "kind": {
+        "created": "Pedido creado",
+        "status_changed": "Cambio de estado",
+        "payment_status_changed": "Cambio de pago",
+        "payment_attempt": "Intento de pago",
+        "proof_submitted": "Comprobante enviado",
+        "reinstated": "Pedido restablecido",
+        "expired": "Caducado por falta de pago",
+        "payment_attempt_removed": "Intento de pago eliminado",
+        "items_changed": "Productos corregidos",
+        "total_changed": "Total recalculado"
+      },
+      "correction": "corrección",
+      "line_added": "Se añadió %{name} × %{quantity}",
+      "line_removed": "Se quitó %{name} (%{quantity})",
+      "line_quantity": "%{name}: %{from} → %{to} unidades",
+      "line_price": "%{name}: precio %{from} → %{to}",
+      "paid_more": "El pedido estaba pagado: quedan %{diff} por cobrar.",
+      "paid_less": "El pedido estaba pagado: hay que devolver %{diff}."
+    },
+    "correction": {
+      "title": "Corregir estado (superadministrador)",
+      "hint": "Cualquier estado, en cualquier dirección. El stock se ajusta solo: al salir de cancelado se vuelve a apartar; al entrar, se libera; al pasar de confirmado en adelante, se descuenta; al retroceder, vuelve al almacén. Si el pedido queda pendiente y sin pagar, el plazo de pago empieza de nuevo. Todo queda en el historial con tu nombre y el motivo.",
+      "status": "Estado del pedido",
+      "payment": "Estado del pago",
+      "current": "actual",
+      "reason": "Motivo (obligatorio)",
+      "reason_placeholder": "Por ejemplo: el cliente pagó por transferencia y se marcó por error",
+      "reason_short": "Escribe al menos cinco caracteres.",
+      "reason_first": "Escribe el motivo arriba.",
+      "apply": "Aplicar corrección",
+      "reset": "Descartar",
+      "applied": "Corrección aplicada",
+      "attempts": "Intentos de pago",
+      "no_attempts": "Sin intentos de pago.",
+      "remove": "Quitar",
+      "attempt_removed": "Intento de pago eliminado",
+      "succeeded_locked": "Un cobro con éxito no se quita: se reembolsa.",
+      "confirm_title": "Aplicar corrección",
+      "confirm_description": "Pedido: %{from} → %{to}. Pago: %{pfrom} → %{pto}. El stock se ajustará según el cambio. ¿Continuar?",
+      "confirm_remove_title": "Quitar intento de pago",
+      "confirm_remove_description": "Se elimina el intento %{reference} (%{provider}). El pedido dejará de mostrarlo. ¿Continuar?"
+    },
+    "items_editor": {
+      "open": "Corregir productos",
+      "title": "Corregir los productos del pedido",
+      "add": "Añadir un producto",
+      "add_placeholder": "Busca por nombre…",
+      "no_results": "Ningún producto con ese nombre.",
+      "new": "nuevo",
+      "remove": "Quitar del pedido",
+      "less": "Una menos",
+      "more": "Una más",
+      "empty": "Un pedido no puede quedarse sin productos. Añade alguno o cancela el pedido.",
+      "summary": "Se guardará:",
+      "difference": "Antes: %{before}. Diferencia: %{diff}.",
+      "paid_more": "Este pedido está pagado y el total sube %{diff}: hay que cobrar esa diferencia aparte.",
+      "paid_less": "Este pedido está pagado y el total baja %{diff}: hay que devolver esa diferencia al cliente.",
+      "reason_placeholder": "Por ejemplo: el cliente pidió dos unidades más por teléfono",
+      "save": "Guardar cambios",
+      "saved": "Productos del pedido corregidos",
+      "stock_cancelled": "El pedido está cancelado: no hay stock apartado, así que esto no toca el almacén.",
+      "stock_pending": "El pedido está pendiente: lo que subas se aparta del stock y lo que bajes se suelta.",
+      "stock_committed": "El pedido ya salió del almacén: lo que subas se descuenta y lo que bajes vuelve a entrar, con su movimiento de inventario."
+    },
+    "refunds": {
+      "title": "Devoluciones",
+      "charged": "Cobrado",
+      "returned": "Devuelto",
+      "committed": "Comprometido",
+      "refundable": "Se puede devolver",
+      "amount": "Importe (USD)",
+      "amountHint": "Vacío devuelve todo lo que queda.",
+      "destination": "Dirección USDT (BEP20)",
+      "destinationHint": "Si todavía no la tienes, se la pedimos al cliente por correo.",
+      "providerRef": "Referencia de la transacción",
+      "reason": "Motivo (obligatorio)",
+      "request": "Registrar devolución",
+      "requested": "Devolución registrada. El dinero no ha salido todavía.",
+      "markPaid": "Confirmar que salió",
+      "completed": "Devolución confirmada y avisado el cliente.",
+      "reject": "Rechazar",
+      "rejectedBecause": "Rechazada:",
+      "bySystem": "El sistema",
+      "paidOn": "pagada",
+      "confirmRequest": "¿Registrar esta devolución?",
+      "confirmRequestBody": "Queda comprometida por",
+      "confirmRequestNote": "El dinero no sale ahora: el pedido sigue cobrado hasta que confirmes el envío.",
+      "confirmComplete": "¿El dinero ya salió?",
+      "confirmCompleteBody": "Esto da por devueltos",
+      "confirmCompleteTail": "y avisa al cliente por correo. Confírmalo solo si ya hiciste la transferencia.",
+      "confirmReject": "¿Rechazar esta devolución?",
+      "confirmRejectNote": "Queda en la ficha con el motivo; no se borra.",
+      "status": {
+        "requested": "Esperando pago",
+        "completed": "Pagada",
+        "rejected": "Rechazada"
+      }
+    },
+    "promise": {
+      "committed": "Comprometido para el",
+      "on_time": "Entregado a tiempo",
+      "late": "Entregado tarde",
+      "overdue": "Plazo vencido",
+      "pending_payment": "Plazo de %{days} días hábiles; la fecha se fija cuando entre el pago."
+    },
+    "report": {
+      "open": "Reporte",
+      "title": "Reporte de pedidos",
+      "description": "Elige qué pedidos entran. Los campos que dejes vacíos no filtran nada.",
+      "from": "Fecha de inicio",
+      "to": "Fecha de fin",
+      "status": "Estado del pedido",
+      "paymentStatus": "Estado de pago",
+      "paymentMethod": "Método de pago",
+      "fulfillment": "Tipo de entrega",
+      "delivery": "A domicilio",
+      "pickup": "Recogida en tienda",
+      "pickupLocation": "Punto de recogida",
+      "groupBy": "Resumen por",
+      "noGroup": "Sin resumen",
+      "day": "Días",
+      "week": "Semanas",
+      "month": "Meses",
+      "minTotal": "Importe desde",
+      "maxTotal": "Importe hasta",
+      "all": "Todos",
+      "reset": "Limpiar",
+      "submit": "Generar PDF",
+      "loading": "Generando…",
+      "error": "No se pudo generar el reporte",
+      "send_title": "Mandarlo por correo (opcional)",
+      "emails": "Correos, separados por comas",
+      "roles": "O a todo un rol",
+      "roles_hint": "A un rol le llega a todos sus usuarios con correo, tal como esté el rol en el momento de enviarlo.",
+      "send": "Enviar por correo",
+      "sending": "Enviando…",
+      "sent": "Reporte enviado a %{count} destinatarios",
+      "send_error": "No se pudo enviar el reporte",
+      "no_recipients": "Escribe al menos un correo o elige un rol",
+      "empty_role": "El rol %{rol} no tiene a nadie",
+      "skipped": "%{nombre} (%{rol}): %{motivo}"
+    },
+    "create": {
+      "button": "Crear pedido",
+      "title": "Crear un pedido para un cliente",
+      "subtitle": "Para quien compra por WhatsApp o por teléfono.",
+      "client": "Cliente",
+      "client_missing": "¿No tiene cuenta? Invítalo: podrás hacerle el pedido cuando active la cuenta.",
+      "client_search_placeholder": "Busca por nombre, correo o teléfono…",
+      "client_no_results": "Ningún cliente con esos datos.",
+      "client_change": "Cambiar",
+      "lines": "Productos",
+      "fulfillment": "Entrega",
+      "fulfillment_type": "Tipo de entrega",
+      "fulfillment_needs_client": "Elige un cliente para ver las opciones de entrega.",
+      "fulfillment_needs_municipality": "Elige un municipio para ver qué se le puede ofrecer.",
+      "fulfillment_loading": "Consultando qué se puede ofrecer…",
+      "fulfillment_error": "No se pudo consultar las opciones de entrega.",
+      "fulfillment_unavailable_fallback": "Esta zona no admite entrega a domicilio ni recogida en tienda.",
+      "delivery_municipality": "Municipio",
+      "delivery_municipality_placeholder": "Elige un municipio…",
+      "delivery_option": "Forma de entrega",
+      "delivery_street": "Calle",
+      "delivery_between": "Entre calles",
+      "delivery_reference": "Punto de referencia",
+      "delivery_phone": "Teléfono de contacto",
+      "delivery_recipient": "Nombre de quien recibe",
+      "id_card_hint": "Son 11 dígitos.",
+      "pickup_point": "Punto de recogida",
+      "pickup_recipient": "Quién recoge",
+      "pickup_id_card": "Carné de identidad",
+      "pickup_phone": "Teléfono de contacto",
+      "summary": "Resumen",
+      "payment": "Pago",
+      "already_paid": "Ya está cobrado",
+      "already_paid_hint": "Marca esto solo si el dinero ya entró: por transferencia o en el mostrador.",
+      "payment_methods_unavailable": "No se pudo cargar el catálogo de métodos de pago; no puedes marcar este pedido como cobrado.",
+      "payment_method": "Método de pago",
+      "payment_method_placeholder": "Elige uno…",
+      "reference": "Referencia del cobro",
+      "notes": "Notas",
+      "notes_placeholder": "Cualquier detalle que el cliente haya dado por teléfono…",
+      "submit": "Crear el pedido",
+      "submitting": "Creando…",
+      "created": "Pedido %{orderNumber} creado",
+      "no_stock": "No hay stock suficiente para algún producto",
+      "no_stock_line": "De \"%{name}\" solo queda %{smart_count} |||| De \"%{name}\" solo quedan %{smart_count}",
+      "error": "No se pudo crear el pedido",
+      "missing_summary": "Falta: %{items}",
+      "missing_client": "el cliente",
+      "missing_lines": "algún producto",
+      "missing_municipality": "el municipio",
+      "missing_street": "la calle",
+      "missing_recipient_name": "el nombre de quien recibe",
+      "missing_recipient_phone": "el teléfono de quien recibe",
+      "missing_pickup_name": "el nombre de quien recoge",
+      "missing_pickup_id_card": "el carné de quien recoge",
+      "missing_pickup_phone": "el teléfono de quien recoge",
+      "missing_payment_method": "el método de pago"
     }
   },
   "dashboard": {
     "kpi": {
-      "revenue": { "subtitle": "Ventas cobradas en los últimos %{days} días", "link": "Ver pedidos pagados" },
-      "orders": { "subtitle": "Pedidos de los últimos %{days} días", "link": "Ver todos los pedidos" },
-      "products": { "subtitle": "Productos activos", "link": "Ver productos activos" },
-      "clients": { "subtitle": "Clientes nuevos en %{days} días", "link": "Ver clientes" }
+      "revenue": {
+        "subtitle": "Ventas cobradas en los últimos %{days} días",
+        "link": "Ver pedidos pagados"
+      },
+      "orders": {
+        "subtitle": "Pedidos de los últimos %{days} días",
+        "link": "Ver todos los pedidos"
+      },
+      "products": {
+        "subtitle": "Productos activos",
+        "link": "Ver productos activos"
+      },
+      "clients": {
+        "subtitle": "Clientes nuevos en %{days} días",
+        "link": "Ver clientes"
+      }
     },
     "trend": {
       "new": "Nuevo",
@@ -905,6 +1187,7 @@
     }
   },
   "clients": {
+    "search_placeholder": "Buscar por nombre, apellidos, correo o teléfono",
     "tabs": {
       "general": "Datos generales",
       "orders": "Pedidos"
@@ -916,6 +1199,26 @@
     "orders": {
       "empty_title": "Sin pedidos",
       "empty_hint": "Este cliente aún no ha realizado pedidos."
+    },
+    "actions": {
+      "invite": "Invitar cliente",
+      "inviting": "Invitando…",
+      "invite_success": "Invitación enviada a %{email}",
+      "invite_error": "No se pudo invitar a este cliente",
+      "copy_link": "Copiar enlace",
+      "link_copied": "Enlace copiado"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico"
+    },
+    "invite": {
+      "title": "Invitar a un cliente",
+      "help": "Le creamos la cuenta y le mandamos un correo para que elija su contraseña. Aparecerá en el listado cuando la active.",
+      "footnote": "La contraseña la elige el cliente: nosotros no la vemos.",
+      "email_failed_title": "La cuenta quedó invitada, pero el correo no salió",
+      "email_failed_help": "Pásale este enlace por WhatsApp. Es personal y sirve una sola vez: con él elige su contraseña y entra."
     }
   },
   "cms-pages": {
@@ -1188,7 +1491,8 @@
     "history_empty": "Todavía nadie respondió este mensaje.",
     "sender_title": "Datos del remitente",
     "view_client": "Ver cliente",
-    "anonymous_sender": "Remitente sin cuenta (formulario anónimo)."
+    "anonymous_sender": "Remitente sin cuenta (formulario anónimo).",
+    "body_required": "Escribe la respuesta o elige una plantilla: es lo que se guarda en el historial."
   },
   "contact-templates": {
     "fields": {
@@ -1245,13 +1549,15 @@
       "label": "Nombre",
       "description": "Descripción",
       "fee": "Costo de envío",
-      "enabled": "Activa"
+      "enabled": "Activa",
+      "promiseDays": "Plazo (días hábiles)"
     },
     "form": {
       "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
       "hints": {
         "fee": "Se suma al total del pedido. Déjalo en 0 si la entrega es gratis.",
-        "enabled": "Solo las formas activas aparecen al finalizar la compra."
+        "enabled": "Solo las formas activas aparecen al finalizar la compra.",
+        "promiseDays": "Días hábiles desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha."
       }
     },
     "confirm": {
@@ -1278,6 +1584,11 @@
         "off_desc": "Si no hay ninguna forma de entrega activa, los clientes no podrán completar ningún pedido.",
         "on_cta": "Activar",
         "off_cta": "Desactivar"
+      },
+      "promise_days": {
+        "label": "Plazo para tener el pedido listo (días hábiles)",
+        "empty": "Sin plazo",
+        "hint": "Se cuenta desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha."
       }
     },
     "support_message": {
@@ -1302,5 +1613,12 @@
       "sidebar_description": "Muestra el menú de navegación en el móvil.",
       "toggle_sidebar": "Mostrar u ocultar el menú lateral"
     }
+  },
+  "refunds": {
+    "title": "Devoluciones",
+    "pendingTotal": "Pendiente de pagar:",
+    "empty": "No hay devoluciones en este estado.",
+    "outOfStock": "Pagó y no había mercancía",
+    "requestedOn": "Registrada"
   }
 }

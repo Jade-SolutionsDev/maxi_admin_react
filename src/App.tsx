@@ -24,12 +24,14 @@ import InventoryList from "./pages/inventory/InventoryList";
 import InventoryDetailPage from "./pages/inventory/InventoryDetailPage";
 import OrdersList from "./pages/orders/OrdersList";
 import OrderDetailPage from "./pages/orders/OrderDetailPage";
+import RefundsQueuePage from "./pages/refunds/RefundsQueuePage";
 import ClientDetailPage from "./pages/clients/ClientDetailPage";
 import { i18nProvider } from "./providers/i18nProvider";
 import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
+import InviteClientModal from "./pages/clients/InviteClientModal";
 import UserCreate from "./pages/users/UserCreate";
 import UserDetailModal from "./pages/users/UserDetailModal";
 import ChangePasswordModal from "./pages/users/ChangePasswordModal";
@@ -329,6 +331,14 @@ const AdminApp = () => (
         }
       />
       <Route
+        path="/refunds"
+        element={
+          <RequireAccess resource="refunds">
+            <RefundsQueuePage />
+          </RequireAccess>
+        }
+      />
+      <Route
         path="/stock-locations"
         element={
           <RequireAccess resource="stock-locations">
@@ -363,10 +373,44 @@ const AdminApp = () => (
         }
       />
     </CustomRoutes>
-    <Resource name="clients" list={ClientList} />
+    {/* <Resource> does NOT consult canAccess — wrap every element, or a direct
+        URL renders the page for anyone (the API would still reject the data). */}
+    <Resource
+      name="clients"
+      list={
+        <RequireAccess resource="clients">
+          <ClientList />
+        </RequireAccess>
+      }
+      // Invitar, no crear: el alta de un cliente pasa por Clerk, y una fila
+      // sin cuenta sería alguien que sale en el listado y no puede entrar.
+      create={
+        <RequireAccess resource="clients" action="create">
+          <InviteClientModal />
+        </RequireAccess>
+      }
+    />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission
         matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
-    <Resource name="roles" {...roles} />
+    <Resource
+      name="roles"
+      {...roles}
+      list={
+        <RequireAccess resource="roles">
+          <roles.list />
+        </RequireAccess>
+      }
+      create={
+        <RequireAccess resource="roles" action="create">
+          <roles.create />
+        </RequireAccess>
+      }
+      edit={
+        <RequireAccess resource="roles" action="edit">
+          <roles.edit />
+        </RequireAccess>
+      }
+    />
     <Resource name="cms-faq-categories" recordRepresentation="title" />
     <Resource name="cms-faq-questions" recordRepresentation="question" />
     {/* users / departments / categories are handled via CustomRoutes above. */}

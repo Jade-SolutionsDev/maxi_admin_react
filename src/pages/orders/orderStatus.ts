@@ -11,8 +11,8 @@ export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   cancelled: [],
 };
 
-// Fulfillment targets a GROCER may set; confirm/cancel are manager-only.
-export const GROCER_TARGETS: OrderStatus[] = [
+// Fulfillment targets non-admin staff may set; confirm/cancel are manager-only.
+export const STAFF_TARGETS: OrderStatus[] = [
   "processing",
   "shipped",
   "delivered",
