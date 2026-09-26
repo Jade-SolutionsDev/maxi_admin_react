@@ -30,6 +30,7 @@ import LoginPage from "./pages/login/LoginPage";
 import Invitation from "./pages/invitation/InvitationPage";
 import { UsersLayout } from "./pages/users/UsersLayout";
 import UserEdit from "./pages/users/UserEdit";
+import InviteClientModal from "./pages/clients/InviteClientModal";
 import UserCreate from "./pages/users/UserCreate";
 import UserDetailModal from "./pages/users/UserDetailModal";
 import ChangePasswordModal from "./pages/users/ChangePasswordModal";
@@ -363,7 +364,17 @@ const AdminApp = () => (
         }
       />
     </CustomRoutes>
-    <Resource name="clients" list={ClientList} />
+    <Resource
+      name="clients"
+      list={ClientList}
+      // Invitar, no crear: el alta de un cliente pasa por Clerk, y una fila
+      // sin cuenta sería alguien que sale en el listado y no puede entrar.
+      create={
+        <RequireAccess resource="clients" action="create">
+          <InviteClientModal />
+        </RequireAccess>
+      }
+    />
     {/* Managed roles (Settings): full-page List/Create/Edit with the permission
         matrix. Reachable at /roles; the sidebar "Configuración" links here. */}
     <Resource name="roles" {...roles} />

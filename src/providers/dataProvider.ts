@@ -11,6 +11,20 @@ export interface InviteUserPayload {
   organizationId?: string;
 }
 
+export interface InviteClientPayload {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface ClientInvitationResult {
+  email: string;
+  invitationId: string;
+  /** El enlace de activación: sirve para dárselo a mano si el correo no llegó. */
+  url: string;
+  emailSent: boolean;
+}
+
 export interface RoleSummary {
   id: string;
   name: string;
@@ -67,6 +81,9 @@ export type OrderPaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface ExtendedDataProvider extends DataProvider {
   inviteUser: (payload: InviteUserPayload) => Promise<{ data: unknown }>;
+  inviteClient: (
+    payload: InviteClientPayload,
+  ) => Promise<{ data: ClientInvitationResult }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
@@ -96,6 +113,26 @@ export interface ExtendedDataProvider extends DataProvider {
   }) => Promise<{ data: DashboardTopProducts }>;
   /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
+  /** Reporte del listado en PDF, con los criterios del formulario. */
+  downloadOrdersReport: (
+    filtros: Record<string, unknown>,
+  ) => Promise<{ blob: Blob; filename: string }>;
+  /**
+   * Manda ese mismo reporte por correo. Los roles se resuelven en el servidor
+   * al enviar, así que aquí solo viajan sus identificadores.
+   */
+  sendOrdersReport: (cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) => Promise<{
+    enviados: string[];
+    fallidos: { email: string; motivo: string }[];
+    destinatarios: { email: string; nombre: string | null; motivo: string }[];
+    rolesVacios: string[];
+    sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
+  }>;
   updateOrderStatus: (
     id: string,
     status: OrderStatus,
@@ -507,6 +544,21 @@ export const dataProvider: DataProvider = {
     return { data: unwrapOne(json) };
   },
 
+  /**
+   * Alta de un cliente que compró por otro canal: crea su cuenta en la tienda
+   * y le manda el enlace para que elija contraseña.
+   *
+   * No es `create('clients', …)`: ese endpoint pide el `clerkId` de una cuenta
+   * que ya exista, y aquí justamente no existe todavía.
+   */
+  async inviteClient(payload: InviteClientPayload) {
+    const { json } = await httpClient(`${API_URL}/clients/invitations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return { data: unwrapOne(json) as ClientInvitationResult };
+  },
+
   async revokeInvitation(id: string) {
     const { json } = await httpClient(
       `${API_URL}/users/invitations/${id}/revoke`,
@@ -608,6 +660,56 @@ export const dataProvider: DataProvider = {
       body: JSON.stringify({ status }),
     });
     return { data: unwrapOne(json) };
+  },
+
+  /**
+   * El reporte de pedidos (MxH-0120). Recibe los criterios del formulario
+   * —filtros más `groupBy` para el resumen por periodos— y los manda tal cual;
+   * los vacíos no se envían, para que el servidor no los tome por un filtro.
+   */
+  async downloadOrdersReport(filtros: Record<string, unknown>) {
+    const token = await getApiToken();
+    const params = new URLSearchParams();
+    for (const [clave, valor] of Object.entries(filtros)) {
+      if (valor !== undefined && valor !== null && valor !== "") {
+        params.set(clave, String(valor));
+      }
+    }
+    const response = await fetch(
+      `${API_URL}/orders/report/pdf?${params.toString()}`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+    );
+    if (!response.ok) {
+      throw new Error(`No se pudo generar el reporte (${response.status})`);
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition") ?? "";
+    const filename =
+      /filename="([^"]+)"/.exec(disposition)?.[1] ?? "pedidos.pdf";
+    return { blob, filename };
+  },
+
+  /**
+   * Manda el reporte por correo (MxH-0120). Los roles se resuelven en el
+   * servidor al enviar, así que aquí solo viajan sus identificadores.
+   */
+  async sendOrdersReport(cuerpo: {
+    emails: string[];
+    roleIds: string[];
+    filtros: Record<string, unknown>;
+    groupBy?: string;
+  }) {
+    const { json } = await httpClient(`${API_URL}/orders/report/email`, {
+      method: "POST",
+      body: JSON.stringify(cuerpo),
+    });
+    return unwrapOne(json) as {
+      enviados: string[];
+      fallidos: { email: string; motivo: string }[];
+      destinatarios: { email: string; nombre: string | null; motivo: string }[];
+      rolesVacios: string[];
+      sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
+    };
   },
 
   async reinstateOrder(id: string) {

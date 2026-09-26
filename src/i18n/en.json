@@ -817,7 +817,51 @@
       "mark_paid": "Mark paid",
       "mark_failed": "Payment failed",
       "mark_refunded": "Refund",
-      "view_customer": "View customer"
+      "view_customer": "View customer",
+      "report": "Export to PDF",
+      "report_loading": "Generating…",
+      "report_error": "Could not generate the report"
+    },
+    "filters": {
+      "from": "From",
+      "to": "To"
+    },
+    "report": {
+      "open": "Report",
+      "title": "Orders report",
+      "description": "Choose which orders to include. Empty fields filter nothing.",
+      "from": "Start date",
+      "to": "End date",
+      "status": "Order status",
+      "paymentStatus": "Payment status",
+      "paymentMethod": "Payment method",
+      "fulfillment": "Fulfillment",
+      "delivery": "Delivery",
+      "pickup": "Store pickup",
+      "pickupLocation": "Pickup point",
+      "groupBy": "Summary by",
+      "noGroup": "No summary",
+      "day": "Days",
+      "week": "Weeks",
+      "month": "Months",
+      "minTotal": "Amount from",
+      "maxTotal": "Amount to",
+      "all": "All",
+      "reset": "Clear",
+      "submit": "Generate PDF",
+      "loading": "Generating…",
+      "error": "Could not generate the report",
+      "send_title": "Send it by email (optional)",
+      "emails": "Emails, comma separated",
+      "roles": "Or to a whole role",
+      "roles_hint": "A role reaches every user in it who has an email, as the role stands at send time.",
+      "send": "Send by email",
+      "sending": "Sending…",
+      "sent": "Report sent to %{count} recipients",
+      "send_error": "Could not send the report",
+      "no_recipients": "Type at least one email or pick a role",
+      "empty_role": "Role %{rol} has nobody",
+      "skipped": "%{nombre} (%{rol}): %{motivo}"
     },
     "payment": {
       "provider": "Provider",
@@ -910,6 +954,26 @@
     "orders": {
       "empty_title": "No orders",
       "empty_hint": "This customer has not placed any orders yet."
+    },
+    "actions": {
+      "invite": "Invite customer",
+      "inviting": "Inviting…",
+      "invite_success": "Invitation sent to %{email}",
+      "invite_error": "Could not invite this customer",
+      "copy_link": "Copy link",
+      "link_copied": "Link copied"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email"
+    },
+    "invite": {
+      "title": "Invite a customer",
+      "help": "We create the account and email them to choose a password. They appear in the list once it is active.",
+      "footnote": "The customer picks the password: we never see it.",
+      "email_failed_title": "The account was invited, but the email did not go out",
+      "email_failed_help": "Send them this link. It is personal and single-use: with it they choose a password and get in."
     }
   },
   "cms-pages": {

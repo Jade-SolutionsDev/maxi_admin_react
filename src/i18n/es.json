@@ -820,7 +820,10 @@
       "mark_paid": "Marcar pagado",
       "mark_failed": "Pago fallido",
       "mark_refunded": "Reembolsar",
-      "view_customer": "Ver cliente"
+      "view_customer": "Ver cliente",
+      "report": "Exportar a PDF",
+      "report_loading": "Generando…",
+      "report_error": "No se pudo generar el reporte"
     },
     "payment": {
       "provider": "Proveedor",
@@ -871,7 +874,46 @@
       "prepare": "Preparar traslado"
     },
     "filters": {
-      "withoutPaymentMethod": "Sin intento de pago"
+      "withoutPaymentMethod": "Sin intento de pago",
+      "from": "Desde",
+      "to": "Hasta"
+    },
+    "report": {
+      "open": "Reporte",
+      "title": "Reporte de pedidos",
+      "description": "Elige qué pedidos entran. Los campos que dejes vacíos no filtran nada.",
+      "from": "Fecha de inicio",
+      "to": "Fecha de fin",
+      "status": "Estado del pedido",
+      "paymentStatus": "Estado de pago",
+      "paymentMethod": "Método de pago",
+      "fulfillment": "Tipo de entrega",
+      "delivery": "A domicilio",
+      "pickup": "Recogida en tienda",
+      "pickupLocation": "Punto de recogida",
+      "groupBy": "Resumen por",
+      "noGroup": "Sin resumen",
+      "day": "Días",
+      "week": "Semanas",
+      "month": "Meses",
+      "minTotal": "Importe desde",
+      "maxTotal": "Importe hasta",
+      "all": "Todos",
+      "reset": "Limpiar",
+      "submit": "Generar PDF",
+      "loading": "Generando…",
+      "error": "No se pudo generar el reporte",
+      "send_title": "Mandarlo por correo (opcional)",
+      "emails": "Correos, separados por comas",
+      "roles": "O a todo un rol",
+      "roles_hint": "A un rol le llega a todos sus usuarios con correo, tal como esté el rol en el momento de enviarlo.",
+      "send": "Enviar por correo",
+      "sending": "Enviando…",
+      "sent": "Reporte enviado a %{count} destinatarios",
+      "send_error": "No se pudo enviar el reporte",
+      "no_recipients": "Escribe al menos un correo o elige un rol",
+      "empty_role": "El rol %{rol} no tiene a nadie",
+      "skipped": "%{nombre} (%{rol}): %{motivo}"
     }
   },
   "dashboard": {
@@ -916,6 +958,26 @@
     "orders": {
       "empty_title": "Sin pedidos",
       "empty_hint": "Este cliente aún no ha realizado pedidos."
+    },
+    "actions": {
+      "invite": "Invitar cliente",
+      "inviting": "Invitando…",
+      "invite_success": "Invitación enviada a %{email}",
+      "invite_error": "No se pudo invitar a este cliente",
+      "copy_link": "Copiar enlace",
+      "link_copied": "Enlace copiado"
+    },
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico"
+    },
+    "invite": {
+      "title": "Invitar a un cliente",
+      "help": "Le creamos la cuenta y le mandamos un correo para que elija su contraseña. Aparecerá en el listado cuando la active.",
+      "footnote": "La contraseña la elige el cliente: nosotros no la vemos.",
+      "email_failed_title": "La cuenta quedó invitada, pero el correo no salió",
+      "email_failed_help": "Pásale este enlace por WhatsApp. Es personal y sirve una sola vez: con él elige su contraseña y entra."
     }
   },
   "cms-pages": {
