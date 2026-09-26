@@ -1,0 +1,43 @@
+# Comprobaciones en cada propuesta de cambios.
+#
+# Capa 1 de la integración continua: compilar el panel, que es lo que atrapa
+# un error de tipos o un import roto antes de que llegue a staging.
+#
+# El linter va como aviso y no bloquea: la rama arrastra 64 avisos heredados
+# y bloquear con ellos dejaría el flujo en rojo desde el primer día, que es
+# como se mata un servidor de integración.
+name: Comprobaciones
+
+on:
+  pull_request:
+  push:
+    branches: [develop, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  comprobar:
+    name: Compilar el panel
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Instalar dependencias
+        run: yarn install --frozen-lockfile
+
+      - name: Compilar
+        # `tsc -b && vite build`: los tipos y el empaquetado en un solo paso.
+        run: yarn build
+
+      - name: Linter (informativo)
+        continue-on-error: true
+        run: yarn lint
