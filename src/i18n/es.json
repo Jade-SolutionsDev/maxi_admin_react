@@ -1420,7 +1420,8 @@
       "bank": "Transferencia",
       "qr": "Código QR",
       "link": "Enlace",
-      "crypto": "Cripto"
+      "crypto": "Cripto",
+      "cash": "Efectivo"
     },
     "form": {
       "create_title": "Nuevo método de pago",
@@ -1441,6 +1442,7 @@
       "memo": "Memo / Tag",
       "memo_hint": "Sólo si tu dirección lo pide: sin él el pago se traba.",
       "note": "Nota para el cliente",
+      "cash_note_hint": "Indica dónde y cuándo pagar, y que el pedido seguirá pendiente hasta el pago o una cancelación explícita.",
       "qr_image": "Imagen del QR",
       "qr_preview": "Vista previa del código QR",
       "qr_uploading": "Subiendo…",
