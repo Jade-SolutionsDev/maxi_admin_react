@@ -1416,7 +1416,8 @@
       "bank": "Bank transfer",
       "qr": "QR code",
       "link": "Link",
-      "crypto": "Crypto"
+      "crypto": "Crypto",
+      "cash": "Cash"
     },
     "form": {
       "create_title": "New payment method",
@@ -1437,6 +1438,7 @@
       "memo": "Memo / Tag",
       "memo_hint": "Only if your address needs one: without it the payment stalls.",
       "note": "Note for the customer",
+      "cash_note_hint": "Say where and when to pay, and that the order remains pending until payment or an explicit cancellation.",
       "qr_image": "QR image",
       "qr_preview": "QR code preview",
       "qr_uploading": "Uploading…",

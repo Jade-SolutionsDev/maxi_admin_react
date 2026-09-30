@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCreate, useNotify, useRefresh, useTranslate, useUpdate } from "ra-core";
-import { Bitcoin, Landmark, Link2, QrCode } from "lucide-react";
+import { Bitcoin, HandCoins, Landmark, Link2, QrCode } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +23,13 @@ import {
 } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 import type { PaymentMethodRecord } from "./PaymentMethodsPage";
-
-export type InstructionType = "bank" | "qr" | "link" | "crypto";
+import {
+  buildInstructions,
+  emptyPaymentMethodForm,
+  isPaymentMethodFormIncomplete,
+  type InstructionType,
+  type PaymentMethodFormState,
+} from "./payment-method-form";
 
 const TYPES: {
   value: InstructionType;
@@ -36,72 +41,8 @@ const TYPES: {
   { value: "qr", icon: QrCode, labelKey: "payment-methods.types.qr", fallback: "Código QR" },
   { value: "link", icon: Link2, labelKey: "payment-methods.types.link", fallback: "Enlace" },
   { value: "crypto", icon: Bitcoin, labelKey: "payment-methods.types.crypto", fallback: "Cripto" },
+  { value: "cash", icon: HandCoins, labelKey: "payment-methods.types.cash", fallback: "Efectivo" },
 ];
-
-interface FormState {
-  label: string;
-  description: string;
-  type: InstructionType;
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  cardNumber: string;
-  imageUrl: string;
-  url: string;
-  address: string;
-  network: string;
-  asset: string;
-  memo: string;
-  note: string;
-}
-
-const emptyForm = (method?: PaymentMethodRecord): FormState => {
-  const i = method?.instructions;
-  return {
-    label: method?.label ?? "",
-    description: method?.description ?? "",
-    type: (i?.type as InstructionType) ?? "bank",
-    bankName: (i?.bankName as string) ?? "",
-    accountHolder: (i?.accountHolder as string) ?? "",
-    accountNumber: (i?.accountNumber as string) ?? "",
-    cardNumber: (i?.cardNumber as string) ?? "",
-    imageUrl: (i?.imageUrl as string) ?? "",
-    url: (i?.url as string) ?? "",
-    address: (i?.address as string) ?? "",
-    network: (i?.network as string) ?? "",
-    asset: (i?.asset as string) ?? "",
-    memo: (i?.memo as string) ?? "",
-    note: (i?.note as string) ?? "",
-  };
-};
-
-const buildInstructions = (form: FormState) => {
-  const note = form.note.trim() || undefined;
-  switch (form.type) {
-    case "bank":
-      return {
-        type: "bank",
-        bankName: form.bankName.trim(),
-        accountHolder: form.accountHolder.trim() || undefined,
-        accountNumber: form.accountNumber.trim() || undefined,
-        cardNumber: form.cardNumber.trim() || undefined,
-        note,
-      };
-    case "qr":
-      return { type: "qr", imageUrl: form.imageUrl.trim(), note };
-    case "link":
-      return { type: "link", url: form.url.trim(), note };
-    case "crypto":
-      return {
-        type: "crypto",
-        address: form.address.trim(),
-        network: form.network.trim(),
-        asset: form.asset.trim() || undefined,
-        memo: form.memo.trim() || undefined,
-        note,
-      };
-  }
-};
 
 interface PaymentMethodFormDialogProps {
   open: boolean;
@@ -123,7 +64,9 @@ export function PaymentMethodFormDialog({
   const refresh = useRefresh();
   const [create, { isPending: creating }] = useCreate();
   const [update, { isPending: updating }] = useUpdate();
-  const [form, setForm] = useState<FormState>(() => emptyForm(method));
+  const [form, setForm] = useState<PaymentMethodFormState>(() =>
+    emptyPaymentMethodForm(method),
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -168,17 +111,10 @@ export function PaymentMethodFormDialog({
 
   const isEdit = Boolean(method);
   const isPending = creating || updating;
-  const set = (patch: Partial<FormState>) =>
+  const set = (patch: Partial<PaymentMethodFormState>) =>
     setForm((current) => ({ ...current, ...patch }));
 
-  const missing =
-    !form.label.trim() ||
-    (form.type === "bank" &&
-      (!form.bankName.trim() ||
-        (!form.accountNumber.trim() && !form.cardNumber.trim()))) ||
-    (form.type === "qr" && (!form.imageUrl.trim() || uploading)) ||
-    (form.type === "link" && !form.url.trim()) ||
-    (form.type === "crypto" && (!form.address.trim() || !form.network.trim()));
+  const missing = isPaymentMethodFormIncomplete(form, uploading);
 
   const onError = (error: unknown) => {
     const backendMessage = (error as { body?: { error?: { message?: string } } })
@@ -264,7 +200,7 @@ export function PaymentMethodFormDialog({
             <Label>
               {translate("payment-methods.form.type", { _: "Tipo de pago" })}
             </Label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
               {TYPES.map(({ value, icon: Icon, labelKey, fallback }) => (
                 <button
                   key={value}
@@ -426,6 +362,13 @@ export function PaymentMethodFormDialog({
               value={form.note}
               onChange={(event) => set({ note: event.target.value })}
             />
+            {form.type === "cash" && (
+              <p className="text-xs text-muted-foreground">
+                {translate("payment-methods.form.cash_note_hint", {
+                  _: "Indica dónde y cuándo pagar, y que el pedido seguirá pendiente hasta el pago o una cancelación explícita.",
+                })}
+              </p>
+            )}
           </div>
         </div>
 
