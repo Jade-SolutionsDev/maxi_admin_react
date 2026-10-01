@@ -1202,7 +1202,8 @@
     },
     "status": {
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "pending": "Pending"
     },
     "orders": {
       "empty_title": "No orders",
@@ -1214,7 +1215,13 @@
       "invite_success": "Invitation sent to %{email}",
       "invite_error": "Could not invite this customer",
       "copy_link": "Copy link",
-      "link_copied": "Link copied"
+      "link_copied": "Link copied",
+      "resend": "Resend invitation",
+      "resend_success": "Invitation resent",
+      "resend_error": "Could not resend the invitation",
+      "revoke": "Revoke invitation",
+      "revoke_success": "Invitation revoked",
+      "revoke_error": "Could not revoke the invitation"
     },
     "fields": {
       "firstName": "First name",
@@ -1227,6 +1234,16 @@
       "footnote": "The customer picks the password: we never see it.",
       "email_failed_title": "The account was invited, but the email did not go out",
       "email_failed_help": "Send them this link. It is personal and single-use: with it they choose a password and get in."
+    },
+    "confirm": {
+      "resend": {
+        "title": "Resend invitation",
+        "description": "Send the invitation to %{email} again? The previous link will stop working."
+      },
+      "revoke": {
+        "title": "Revoke invitation",
+        "description": "Revoke the invitation for %{email}? The link will stop working."
+      }
     }
   },
   "cms-pages": {

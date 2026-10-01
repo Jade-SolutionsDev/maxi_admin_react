@@ -233,6 +233,7 @@ export interface ExtendedDataProvider extends DataProvider {
     payload: InviteClientPayload,
   ) => Promise<{ data: ClientInvitationResult }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
+  revokeClientInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
@@ -938,6 +939,19 @@ export const dataProvider: DataProvider = {
       `${API_URL}/fulfillment${toQueryString({ municipalityId })}`,
     );
     return { data: unwrapOne(json) as FulfillmentOptions };
+  },
+
+  /**
+   * Retira la invitación de un cliente. El enlace deja de servir.
+   *
+   * Reenviar no necesita método propio: `inviteClient` con el mismo correo ya
+   * retira la invitación vieja antes de crear la nueva.
+   */
+  async revokeClientInvitation(id: string) {
+    const { json } = await httpClient(`${API_URL}/clients/invitations/${id}`, {
+      method: "DELETE",
+    });
+    return { data: json ?? null };
   },
 
   async revokeInvitation(id: string) {
