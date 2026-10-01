@@ -1292,14 +1292,14 @@
   "cms-banners": {
     "target": {
       "section_title": "Destino del banner",
-      "section_hint": "Enlazá el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
+      "section_hint": "Enlaza el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
       "detail_hint": "El slug se resuelve automáticamente y puede cambiar sin editar el banner.",
       "type_label": "Tipo de destino",
       "destination_label": "Destino",
       "none": "Sin destino",
       "none_hint": "El banner se mostrará sin enlace.",
-      "type_hint": "Elegí qué clase de contenido abrirá el banner.",
-      "destination_hint": "Podés asociar contenido inactivo para preparar una campaña.",
+      "type_hint": "Elige qué clase de contenido abrirá el banner.",
+      "destination_hint": "Puedes asociar contenido inactivo para preparar una campaña.",
       "search_placeholder": "Buscar por nombre",
       "available": "Disponible",
       "unavailable": "No disponible",
