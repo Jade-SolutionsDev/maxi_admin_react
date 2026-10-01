@@ -52,6 +52,7 @@ import CmsServiceCreate from "./pages/cms-services/CmsServiceCreate";
 import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
 import { CmsServiceDetailModal } from "./pages/cms-services/CmsServiceDetailModal";
 import { CmsSettingsPage } from "./pages/cms-settings/CmsSettingsPage";
+import { CmsHomePage } from "./pages/cms-home/CmsHomePage";
 import { PaymentMethodsPage } from "./pages/payment-methods/PaymentMethodsPage";
 import ContactMessagesList from "./pages/contact-messages/ContactMessagesList";
 import ContactMessageDetailPage from "./pages/contact-messages/ContactMessageDetailPage";
@@ -208,6 +209,14 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="cms-settings">
             <CmsSettingsPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/cms-home"
+        element={
+          <RequireAccess resource="cms-home">
+            <CmsHomePage />
           </RequireAccess>
         }
       />

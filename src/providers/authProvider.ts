@@ -72,6 +72,10 @@ const RESOURCE_RULES: Record<
     module: "cms-settings",
     actions: { list: "read", show: "read", edit: "update" },
   },
+  "cms-home": {
+    module: "cms-home",
+    actions: { list: "read", show: "read", edit: "update" },
+  },
   "fulfillment-settings": {
     module: "fulfillment-settings",
     actions: { list: "read", show: "read", edit: "update" },

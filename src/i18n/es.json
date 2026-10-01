@@ -100,6 +100,10 @@
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
     },
+    "cms-home": {
+      "name": "Portada",
+      "name_plural": "Portada"
+    },
     "contact-messages": {
       "name": "Mensaje",
       "name_plural": "Mensajes de contacto"
@@ -391,6 +395,7 @@
       "reportes": "Reportes",
       "rolesPermisos": "Roles y permisos",
       "soon": "Próximamente",
+      "cmsHome": "Portada",
       "cmsPages": "Páginas",
       "cmsBanners": "Banners",
       "cmsServices": "Servicios",
@@ -474,6 +479,7 @@
       "orders": "Pedidos",
       "clients": "Clientes",
       "contact": "Contacto (mensajes y plantillas)",
+      "cms-home": "CMS — Portada",
       "cms-pages": "CMS — Páginas",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Servicios",
@@ -492,6 +498,7 @@
       "create": "Crear",
       "update": "Editar",
       "delete": "Eliminar",
+      "publish": "Publicar",
       "view-all": "Ver todos",
       "reply": "Responder",
       "update-status": "Cambiar estado",
@@ -1405,6 +1412,74 @@
     },
     "actions": {
       "add_link": "Añadir enlace"
+    }
+  },
+  "cms-home": {
+    "subtitle": "Elige lo que ve primero quien entra a la tienda: banners, destacados y el orden de las secciones.",
+    "flow_hint": "Todo lo que cambies aquí y en Banners queda en borrador. La tienda no cambia hasta que publiques.",
+    "status": {
+      "pending": "Hay cambios sin publicar",
+      "up_to_date": "La tienda muestra la última versión",
+      "published": "Publicada el %{date} por %{name}",
+      "never_published": "La portada aún no se ha publicado.",
+      "draft_updated": "Último cambio del borrador: %{date} por %{name}",
+      "unsaved": "Guarda el borrador para verlo en la vista previa o publicarlo.",
+      "read_only": "Solo puedes consultar la portada. Pide permiso de edición para cambiarla."
+    },
+    "actions": {
+      "save": "Guardar borrador",
+      "discard": "Descartar cambios",
+      "preview": "Vista previa",
+      "publish": "Publicar",
+      "publish_confirm_title": "¿Publicar la portada?",
+      "publish_confirm_description": "Los clientes verán el borrador actual, con sus banners, en cuanto confirmes.",
+      "move_up": "Subir %{name}",
+      "move_down": "Bajar %{name}",
+      "remove": "Quitar %{name}"
+    },
+    "notify": {
+      "saved": "Borrador guardado",
+      "published": "Portada publicada",
+      "preview_blocked": "El navegador bloqueó la pestaña de la vista previa. Permite las ventanas emergentes e inténtalo de nuevo."
+    },
+    "sections": {
+      "title": "Orden de las secciones",
+      "hint": "Usa las flechas para cambiar el orden. Las secciones ocultas no aparecen en la tienda.",
+      "visible": "Visible",
+      "banners_link": "Editar banners",
+      "names": {
+        "hero": "Banners",
+        "departments": "Departamentos",
+        "featured-products": "Productos destacados",
+        "services": "Nuestros servicios",
+        "on-sale-products": "Productos en oferta",
+        "categories": "Categorías",
+        "recent-products": "Productos más recientes"
+      }
+    },
+    "featured": {
+      "products_title": "Productos destacados",
+      "products_hint": "Elige y ordena hasta %{max} productos. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "departments_title": "Departamentos destacados",
+      "departments_hint": "Elige y ordena los departamentos del carrusel. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "empty": "Sin selección: se usan los destacados del catálogo.",
+      "add_product": "Añadir producto",
+      "add_department": "Añadir departamento",
+      "search": "Buscar por nombre",
+      "no_results": "Sin resultados",
+      "unknown": "Ya no existe en el catálogo",
+      "limit": "Llegaste al máximo de %{max}."
+    },
+    "history": {
+      "title": "Historial de cambios",
+      "empty": "Todavía no hay cambios registrados.",
+      "actions": {
+        "banner-created": "creó el banner «%{subject}»",
+        "banner-updated": "editó el banner «%{subject}»",
+        "banner-deleted": "eliminó el banner «%{subject}»",
+        "layout-updated": "guardó el borrador de la portada",
+        "published": "publicó la portada"
+      }
     }
   },
   "payment-methods": {

@@ -2,6 +2,7 @@ import { DataProvider, HttpError, fetchUtils } from "ra-core";
 import { getApiToken } from "../lib/clerk/clerkRefs";
 import { backendMessage } from "@/pages/users/errors";
 import { resetIdentityCache } from "./authProvider";
+import type { HomeLayout } from "@/pages/cms-home/home-layout";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
@@ -362,6 +363,40 @@ export interface ExtendedDataProvider extends DataProvider {
   updateSiteSettings: (
     data: SiteSettingsData,
   ) => Promise<{ data: SiteSettingsData }>;
+  getCmsHome: () => Promise<{ data: CmsHomeState }>;
+  updateCmsHomeLayout: (layout: HomeLayout) => Promise<{ data: CmsHomeState }>;
+  publishCmsHome: () => Promise<{ data: CmsHomeState }>;
+  createCmsHomePreview: () => Promise<{
+    data: { url: string; expiresAt: string };
+  }>;
+  getCmsHomeChanges: () => Promise<{ data: CmsHomeChange[] }>;
+}
+
+/** Mirror of the API's CmsHomeEditorStateDto (GET /cms/home). */
+export interface CmsHomeState {
+  layout: HomeLayout;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  publishedAt: string | null;
+  publishedBy: string | null;
+  /** The draft (layout + active banners) differs from what the store shows. */
+  hasUnpublishedChanges: boolean;
+}
+
+export type CmsHomeChangeAction =
+  | "banner-created"
+  | "banner-updated"
+  | "banner-deleted"
+  | "layout-updated"
+  | "published";
+
+/** Mirror of the API's CmsHomeChangeResponseDto (GET /cms/home/changes). */
+export interface CmsHomeChange {
+  id: string;
+  action: CmsHomeChangeAction;
+  subject: string | null;
+  actorName: string;
+  createdAt: string;
 }
 
 /** Mirror of the API's DashboardMetricDto — one figure over two adjacent windows. */
@@ -770,6 +805,40 @@ export const dataProvider: DataProvider = {
     });
     const payload = unwrapOne(json) as { data: SiteSettingsData };
     return { data: payload.data };
+  },
+
+  async getCmsHome() {
+    const { json } = await httpClient(`${API_URL}/cms/home`, { method: "GET" });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async updateCmsHomeLayout(layout: HomeLayout) {
+    const { json } = await httpClient(`${API_URL}/cms/home`, {
+      method: "PATCH",
+      body: JSON.stringify(layout),
+    });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async publishCmsHome() {
+    const { json } = await httpClient(`${API_URL}/cms/home/publish`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async createCmsHomePreview() {
+    const { json } = await httpClient(`${API_URL}/cms/home/preview`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as { url: string; expiresAt: string } };
+  },
+
+  async getCmsHomeChanges() {
+    const { json } = await httpClient(`${API_URL}/cms/home/changes`, {
+      method: "GET",
+    });
+    return { data: unwrapOne(json) as CmsHomeChange[] };
   },
 
   async getFulfillmentSettings() {
