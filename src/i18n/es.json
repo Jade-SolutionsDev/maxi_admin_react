@@ -100,6 +100,10 @@
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
     },
+    "cms-home": {
+      "name": "Portada",
+      "name_plural": "Portada"
+    },
     "contact-messages": {
       "name": "Mensaje",
       "name_plural": "Mensajes de contacto"
@@ -391,6 +395,7 @@
       "reportes": "Reportes",
       "rolesPermisos": "Roles y permisos",
       "soon": "Próximamente",
+      "cmsHome": "Portada",
       "cmsPages": "Páginas",
       "cmsBanners": "Banners",
       "cmsServices": "Servicios",
@@ -474,6 +479,7 @@
       "orders": "Pedidos",
       "clients": "Clientes",
       "contact": "Contacto (mensajes y plantillas)",
+      "cms-home": "CMS — Portada",
       "cms-pages": "CMS — Páginas",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Servicios",
@@ -492,6 +498,7 @@
       "create": "Crear",
       "update": "Editar",
       "delete": "Eliminar",
+      "publish": "Publicar",
       "view-all": "Ver todos",
       "reply": "Responder",
       "update-status": "Cambiar estado",
@@ -1292,14 +1299,14 @@
   "cms-banners": {
     "target": {
       "section_title": "Destino del banner",
-      "section_hint": "Enlazá el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
+      "section_hint": "Enlaza el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
       "detail_hint": "El slug se resuelve automáticamente y puede cambiar sin editar el banner.",
       "type_label": "Tipo de destino",
       "destination_label": "Destino",
       "none": "Sin destino",
       "none_hint": "El banner se mostrará sin enlace.",
-      "type_hint": "Elegí qué clase de contenido abrirá el banner.",
-      "destination_hint": "Podés asociar contenido inactivo para preparar una campaña.",
+      "type_hint": "Elige qué clase de contenido abrirá el banner.",
+      "destination_hint": "Puedes asociar contenido inactivo para preparar una campaña.",
       "search_placeholder": "Buscar por nombre",
       "available": "Disponible",
       "unavailable": "No disponible",
@@ -1313,7 +1320,13 @@
     "form": {
       "create_subtitle": "Añade un slide al carrusel principal de la tienda.",
       "edit_subtitle": "Edita el slide del carrusel.",
-      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente.",
+      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente. La tienda no cambia hasta que publiques la portada.",
+      "text_title": "Texto sobre la imagen",
+      "text_hint": "Opcional. Déjalo vacío si la imagen ya trae el texto.",
+      "fields": {
+        "title": "Titular",
+        "subtitle": "Subtítulo"
+      },
       "images_title": "Imágenes",
       "images_hint": "Una variante por dispositivo. Respeta las proporciones recomendadas para evitar recortes.",
       "variants": {
@@ -1324,10 +1337,14 @@
       "dimensions": "Dimensiones detectadas: %{width} x %{height} px",
       "dimensions_pending": "Sube una imagen para detectar sus dimensiones.",
       "placeholders": {
-        "alt": "Promociones de la semana"
+        "alt": "Promociones de la semana",
+        "title": "Todo para el hogar",
+        "subtitle": "Hasta 20 % menos esta semana"
       },
       "hints": {
         "alt": "Descripción accesible del banner (lectores de pantalla y SEO).",
+        "title": "Frase corta y grande, hasta 80 caracteres.",
+        "subtitle": "Una línea de apoyo, hasta 160 caracteres.",
         "sortOrder": "Orden del slide en el carrusel (menor primero).",
         "isActive": "Inactivo: el slide no se muestra en la tienda."
       }
@@ -1405,6 +1422,74 @@
     },
     "actions": {
       "add_link": "Añadir enlace"
+    }
+  },
+  "cms-home": {
+    "subtitle": "Elige lo que ve primero quien entra a la tienda: banners, destacados y el orden de las secciones.",
+    "flow_hint": "Todo lo que cambies aquí y en Banners queda en borrador. La tienda no cambia hasta que publiques.",
+    "status": {
+      "pending": "Hay cambios sin publicar",
+      "up_to_date": "La tienda muestra la última versión",
+      "published": "Publicada el %{date} por %{name}",
+      "never_published": "La portada aún no se ha publicado.",
+      "draft_updated": "Último cambio del borrador: %{date} por %{name}",
+      "unsaved": "Guarda el borrador para verlo en la vista previa o publicarlo.",
+      "read_only": "Solo puedes consultar la portada. Pide permiso de edición para cambiarla."
+    },
+    "actions": {
+      "save": "Guardar borrador",
+      "discard": "Descartar cambios",
+      "preview": "Vista previa",
+      "publish": "Publicar",
+      "publish_confirm_title": "¿Publicar la portada?",
+      "publish_confirm_description": "Los clientes verán el borrador actual, con sus banners, en cuanto confirmes.",
+      "move_up": "Subir %{name}",
+      "move_down": "Bajar %{name}",
+      "remove": "Quitar %{name}"
+    },
+    "notify": {
+      "saved": "Borrador guardado",
+      "published": "Portada publicada",
+      "preview_blocked": "El navegador bloqueó la pestaña de la vista previa. Permite las ventanas emergentes e inténtalo de nuevo."
+    },
+    "sections": {
+      "title": "Orden de las secciones",
+      "hint": "Usa las flechas para cambiar el orden. Las secciones ocultas no aparecen en la tienda.",
+      "visible": "Visible",
+      "banners_link": "Editar banners",
+      "names": {
+        "hero": "Banners",
+        "departments": "Departamentos",
+        "featured-products": "Productos destacados",
+        "services": "Nuestros servicios",
+        "on-sale-products": "Productos en oferta",
+        "categories": "Categorías",
+        "recent-products": "Productos más recientes"
+      }
+    },
+    "featured": {
+      "products_title": "Productos destacados",
+      "products_hint": "Elige y ordena hasta %{max} productos. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "departments_title": "Departamentos destacados",
+      "departments_hint": "Elige y ordena los departamentos del carrusel. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "empty": "Sin selección: se usan los destacados del catálogo.",
+      "add_product": "Añadir producto",
+      "add_department": "Añadir departamento",
+      "search": "Buscar por nombre",
+      "no_results": "Sin resultados",
+      "unknown": "Ya no existe en el catálogo",
+      "limit": "Llegaste al máximo de %{max}."
+    },
+    "history": {
+      "title": "Historial de cambios",
+      "empty": "Todavía no hay cambios registrados.",
+      "actions": {
+        "banner-created": "creó el banner «%{subject}»",
+        "banner-updated": "editó el banner «%{subject}»",
+        "banner-deleted": "eliminó el banner «%{subject}»",
+        "layout-updated": "guardó el borrador de la portada",
+        "published": "publicó la portada"
+      }
     }
   },
   "payment-methods": {

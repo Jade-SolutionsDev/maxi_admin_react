@@ -100,6 +100,10 @@
       "name": "Site settings",
       "name_plural": "Site settings"
     },
+    "cms-home": {
+      "name": "Home page",
+      "name_plural": "Home page"
+    },
     "contact-messages": {
       "name": "Message",
       "name_plural": "Contact messages"
@@ -389,6 +393,7 @@
       "reportes": "Reports",
       "rolesPermisos": "Roles & permissions",
       "soon": "Coming soon",
+      "cmsHome": "Home page",
       "cmsPages": "Pages",
       "cmsBanners": "Banners",
       "cmsServices": "Services",
@@ -472,6 +477,7 @@
       "orders": "Orders",
       "clients": "Clients",
       "contact": "Contact (messages & templates)",
+      "cms-home": "CMS — Home page",
       "cms-pages": "CMS — Pages",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Services",
@@ -490,6 +496,7 @@
       "create": "Create",
       "update": "Edit",
       "delete": "Delete",
+      "publish": "Publish",
       "view-all": "View all",
       "reply": "Reply",
       "update-status": "Change status",
@@ -1309,7 +1316,13 @@
     "form": {
       "create_subtitle": "Add a slide to the storefront hero carousel.",
       "edit_subtitle": "Edit the carousel slide.",
-      "note": "Upload the three variants; dimensions are detected automatically.",
+      "note": "Upload the three variants; dimensions are detected automatically. The storefront does not change until you publish the home page.",
+      "text_title": "Text over the image",
+      "text_hint": "Optional. Leave it empty when the artwork already carries the text.",
+      "fields": {
+        "title": "Headline",
+        "subtitle": "Subtitle"
+      },
       "images_title": "Images",
       "images_hint": "One variant per device. Keep the recommended aspect ratios to avoid cropping.",
       "variants": {
@@ -1320,10 +1333,14 @@
       "dimensions": "Detected dimensions: %{width} x %{height} px",
       "dimensions_pending": "Upload an image to detect its dimensions.",
       "placeholders": {
-        "alt": "Weekly promotions"
+        "alt": "Weekly promotions",
+        "title": "Everything for your home",
+        "subtitle": "Up to 20% off this week"
       },
       "hints": {
         "alt": "Accessible description of the banner (screen readers and SEO).",
+        "title": "Short, large phrase, up to 80 characters.",
+        "subtitle": "One supporting line, up to 160 characters.",
         "sortOrder": "Slide order in the carousel (lowest first).",
         "isActive": "Inactive: the slide is not shown on the storefront."
       }
@@ -1401,6 +1418,74 @@
     },
     "actions": {
       "add_link": "Add link"
+    }
+  },
+  "cms-home": {
+    "subtitle": "Choose what shoppers see first: banners, featured items and the order of the sections.",
+    "flow_hint": "Everything you change here and in Banners stays as a draft. The storefront does not change until you publish.",
+    "status": {
+      "pending": "There are unpublished changes",
+      "up_to_date": "The storefront shows the latest version",
+      "published": "Published on %{date} by %{name}",
+      "never_published": "The home page has not been published yet.",
+      "draft_updated": "Last draft change: %{date} by %{name}",
+      "unsaved": "Save the draft to preview or publish it.",
+      "read_only": "You can only view the home page. Ask for edit permission to change it."
+    },
+    "actions": {
+      "save": "Save draft",
+      "discard": "Discard changes",
+      "preview": "Preview",
+      "publish": "Publish",
+      "publish_confirm_title": "Publish the home page?",
+      "publish_confirm_description": "Customers will see the current draft, banners included, as soon as you confirm.",
+      "move_up": "Move %{name} up",
+      "move_down": "Move %{name} down",
+      "remove": "Remove %{name}"
+    },
+    "notify": {
+      "saved": "Draft saved",
+      "published": "Home page published",
+      "preview_blocked": "The browser blocked the preview tab. Allow pop-ups and try again."
+    },
+    "sections": {
+      "title": "Section order",
+      "hint": "Use the arrows to reorder. Hidden sections do not appear on the storefront.",
+      "visible": "Visible",
+      "banners_link": "Edit banners",
+      "names": {
+        "hero": "Banners",
+        "departments": "Departments",
+        "featured-products": "Featured products",
+        "services": "Our services",
+        "on-sale-products": "Products on sale",
+        "categories": "Categories",
+        "recent-products": "Newest products"
+      }
+    },
+    "featured": {
+      "products_title": "Featured products",
+      "products_hint": "Pick and order up to %{max} products. With no selection, the products flagged as featured in the catalog are shown.",
+      "departments_title": "Featured departments",
+      "departments_hint": "Pick and order the carousel departments. With no selection, the departments flagged as featured in the catalog are shown.",
+      "empty": "No selection: the catalog's featured items are used.",
+      "add_product": "Add product",
+      "add_department": "Add department",
+      "search": "Search by name",
+      "no_results": "No results",
+      "unknown": "No longer in the catalog",
+      "limit": "You reached the maximum of %{max}."
+    },
+    "history": {
+      "title": "Change history",
+      "empty": "No changes recorded yet.",
+      "actions": {
+        "banner-created": "created the banner “%{subject}”",
+        "banner-updated": "edited the banner “%{subject}”",
+        "banner-deleted": "deleted the banner “%{subject}”",
+        "layout-updated": "saved the home page draft",
+        "published": "published the home page"
+      }
     }
   },
   "payment-methods": {
