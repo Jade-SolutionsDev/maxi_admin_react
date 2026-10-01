@@ -1,46 +1,23 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useTranslate } from "ra-core";
-import {
-  FileText,
-  GalleryHorizontalEnd,
-  HandHeart,
-  CircleHelp,
-  Settings2,
-  UsersRound,
-} from "lucide-react";
+import { useCanAccessResources, useTranslate } from "ra-core";
 import { cn } from "@/lib/utils";
-
-const tabs = [
-  { labelKey: "app.menu.cmsPages", path: "/cms-pages", icon: FileText },
-  {
-    labelKey: "app.menu.cmsBanners",
-    path: "/cms-banners",
-    icon: GalleryHorizontalEnd,
-  },
-  { labelKey: "app.menu.cmsServices", path: "/cms-services", icon: HandHeart },
-  { labelKey: "app.menu.cmsStaff", path: "/cms-staff", icon: UsersRound },
-  {
-    labelKey: "app.menu.cmsFaq",
-    path: "/cms-faq-categories",
-    activePrefixes: ["/cms-faq-categories", "/cms-faq-questions"],
-    icon: CircleHelp,
-  },
-  {
-    labelKey: "app.menu.cmsSettings",
-    path: "/cms-settings",
-    icon: Settings2,
-  },
-];
+import { CMS_TABS } from "./cms-tabs";
 
 /**
- * Shared tab strip for the CMS section: one sidebar entry, five routed tabs.
- * Same visual pattern as the ProfilePage tab strip, but navigation-driven so
- * every tab stays deep-linkable.
+ * Shared tab strip for the CMS section: one sidebar entry, several routed
+ * tabs. Same visual pattern as the ProfilePage tab strip, but
+ * navigation-driven so every tab stays deep-linkable. Tabs the user may not
+ * open are left out instead of leading to an access-denied page.
  */
 export function CmsTabsNav() {
   const translate = useTranslate();
   const location = useLocation();
   const navigate = useNavigate();
+  const { canAccess } = useCanAccessResources({
+    resources: CMS_TABS.map((tab) => tab.resource),
+    action: "list",
+  });
+  const tabs = CMS_TABS.filter((tab) => canAccess?.[tab.resource]);
 
   return (
     <div
