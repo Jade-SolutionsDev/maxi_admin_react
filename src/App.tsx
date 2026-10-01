@@ -291,6 +291,23 @@ const AdminApp = () => (
         <Route path="create" element={<DeliveryOptionCreate />} />
         <Route path="edit/:id" element={<DeliveryOptionEdit />} />
       </Route>
+      {/*
+        «Invitar cliente» se declara AQUÍ y no solo en el `create` del
+        <Resource>, aunque parezca duplicado. React Router ordena por
+        especificidad, no por orden de declaración: la ruta de abajo
+        (`/clients/:id`) gana a la del recurso (`/clients/*`), así que
+        /clients/create montaba la ficha de un cliente llamado «create» y la
+        API respondía 500. El botón llevaba sin abrir nada desde que se puso,
+        el 24-sep-2026. Una ruta estática sí le gana a `/clients/:id`.
+      */}
+      <Route
+        path="/clients/create"
+        element={
+          <RequireAccess resource="clients" action="create">
+            <InviteClientModal />
+          </RequireAccess>
+        }
+      />
       <Route
         path="/clients/:id"
         element={
