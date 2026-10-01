@@ -1316,7 +1316,13 @@
     "form": {
       "create_subtitle": "Add a slide to the storefront hero carousel.",
       "edit_subtitle": "Edit the carousel slide.",
-      "note": "Upload the three variants; dimensions are detected automatically.",
+      "note": "Upload the three variants; dimensions are detected automatically. The storefront does not change until you publish the home page.",
+      "text_title": "Text over the image",
+      "text_hint": "Optional. Leave it empty when the artwork already carries the text.",
+      "fields": {
+        "title": "Headline",
+        "subtitle": "Subtitle"
+      },
       "images_title": "Images",
       "images_hint": "One variant per device. Keep the recommended aspect ratios to avoid cropping.",
       "variants": {
@@ -1327,10 +1333,14 @@
       "dimensions": "Detected dimensions: %{width} x %{height} px",
       "dimensions_pending": "Upload an image to detect its dimensions.",
       "placeholders": {
-        "alt": "Weekly promotions"
+        "alt": "Weekly promotions",
+        "title": "Everything for your home",
+        "subtitle": "Up to 20% off this week"
       },
       "hints": {
         "alt": "Accessible description of the banner (screen readers and SEO).",
+        "title": "Short, large phrase, up to 80 characters.",
+        "subtitle": "One supporting line, up to 160 characters.",
         "sortOrder": "Slide order in the carousel (lowest first).",
         "isActive": "Inactive: the slide is not shown on the storefront."
       }

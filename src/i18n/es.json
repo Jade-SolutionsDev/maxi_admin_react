@@ -1320,7 +1320,13 @@
     "form": {
       "create_subtitle": "Añade un slide al carrusel principal de la tienda.",
       "edit_subtitle": "Edita el slide del carrusel.",
-      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente.",
+      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente. La tienda no cambia hasta que publiques la portada.",
+      "text_title": "Texto sobre la imagen",
+      "text_hint": "Opcional. Déjalo vacío si la imagen ya trae el texto.",
+      "fields": {
+        "title": "Titular",
+        "subtitle": "Subtítulo"
+      },
       "images_title": "Imágenes",
       "images_hint": "Una variante por dispositivo. Respeta las proporciones recomendadas para evitar recortes.",
       "variants": {
@@ -1331,10 +1337,14 @@
       "dimensions": "Dimensiones detectadas: %{width} x %{height} px",
       "dimensions_pending": "Sube una imagen para detectar sus dimensiones.",
       "placeholders": {
-        "alt": "Promociones de la semana"
+        "alt": "Promociones de la semana",
+        "title": "Todo para el hogar",
+        "subtitle": "Hasta 20 % menos esta semana"
       },
       "hints": {
         "alt": "Descripción accesible del banner (lectores de pantalla y SEO).",
+        "title": "Frase corta y grande, hasta 80 caracteres.",
+        "subtitle": "Una línea de apoyo, hasta 160 caracteres.",
         "sortOrder": "Orden del slide en el carrusel (menor primero).",
         "isActive": "Inactivo: el slide no se muestra en la tienda."
       }
