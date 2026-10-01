@@ -123,6 +123,10 @@
     "payment-methods": {
       "name": "Payment method",
       "name_plural": "Payment methods"
+    },
+    "cms-home-notices": {
+      "name": "Notice",
+      "name_plural": "Home notices"
     }
   },
   "list": {
@@ -417,7 +421,8 @@
       "contactoPlantillas": "Templates",
       "nomencladores": "Nomenclators",
       "entregas": "Delivery",
-      "devoluciones": "Refunds"
+      "devoluciones": "Refunds",
+      "cmsHomeNotices": "Notices"
     },
     "user": {
       "profile": "Profile"
@@ -478,7 +483,7 @@
       "clients": "Clients",
       "contact": "Contact (messages & templates)",
       "cms-home": "CMS — Home page",
-      "cms-pages": "CMS — Pages",
+      "cms-pages": "CMS — Texts (pages and notices)",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Services",
       "cms-staff": "CMS — Staff",
@@ -1226,25 +1231,30 @@
   },
   "cms-pages": {
     "form": {
-      "create_subtitle": "Create an informational storefront page.",
-      "edit_subtitle": "Edit the page content.",
-      "note": "Published at /paginas/[slug]; the slug is derived from the title.",
+      "create_subtitle": "Create an informational or legal storefront page.",
+      "edit_subtitle": "Edit the page draft.",
+      "note": "Saving keeps the page as a draft: the store does not change until you publish it from its detail.",
       "placeholders": {
         "title": "Privacy policy",
-        "content": "Write the content in Markdown…"
+        "content": "## What data we keep\n\n- Your name and phone, to deliver the order.\n- Your address…"
       },
       "hints": {
         "title": "Visible page title and slug source.",
-        "content": "Markdown: ## headings, - lists, **bold**, [links](https://…).",
         "sortOrder": "Order in page listings (lowest first).",
-        "isActive": "Inactive: no longer served by the storefront (404)."
+        "isActive": "Inactive: hidden from the store even when published."
       }
     },
     "mandatory": {
-      "title": "Mandatory pages missing",
-      "description": "The storefront links these pages by slug (footer and About us). Create them to avoid broken links:",
-      "create_label": "Create the %{title} page"
-    }
+      "title": "Some mandatory pages are not on the store",
+      "description": "The storefront links these pages by slug (footer, About us and Contact). Create or publish them to avoid broken links:",
+      "create_label": "Create the %{title} page",
+      "open_label": "Open the %{title} page to publish it"
+    },
+    "publication": {
+      "inactive": "It is inactive: even if you publish it, the store will not show it.",
+      "publish_confirm_description": "The store will show this draft as soon as you publish it. The previous version stays in the history with its date and author."
+    },
+    "delete_confirm_description": "Delete “%{name}”? It disappears from the store; its version history is kept."
   },
   "cms-faq": {
     "tabs": {
@@ -1703,5 +1713,86 @@
     "empty": "No refunds in this state.",
     "outOfStock": "Paid with no stock left",
     "requestedOn": "Logged"
+  },
+  "cms-home-notices": {
+    "form": {
+      "create_subtitle": "Write a temporary notice for the store home.",
+      "edit_subtitle": "Edit the notice draft.",
+      "note": "Saving keeps the notice as a draft: the home does not change until you publish it from its detail.",
+      "placeholders": {
+        "title": "Closed on October 10",
+        "content": "No deliveries that day. Orders are delivered from **October 11**."
+      },
+      "hints": {
+        "title": "Shown in bold above the notice text.",
+        "startsAt": "Empty: shown as soon as you publish it.",
+        "endsAt": "Empty: shown until you deactivate it.",
+        "sortOrder": "Order among notices (lowest first).",
+        "isActive": "Inactive: hidden from the home even when published."
+      }
+    },
+    "fields": {
+      "startsAt": "Show from",
+      "endsAt": "Show until",
+      "schedule": "Dates"
+    },
+    "schedule": {
+      "live": "Visible on schedule",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "range": "From %{from} to %{to}",
+      "from": "From %{from}",
+      "until": "Until %{to}",
+      "always": "No dates: shown while active"
+    },
+    "publication": {
+      "inactive": "It is inactive: even if you publish it, the home will not show it.",
+      "publish_confirm_description": "The home will show this notice on the dates you chose. The previous version stays in the history."
+    },
+    "delete_confirm_description": "Delete the notice “%{name}”? It disappears from the home; its history is kept."
+  },
+  "cms-texts": {
+    "fields": {
+      "publication": "Publication"
+    },
+    "status": {
+      "unpublished": "Unpublished",
+      "published": "Published",
+      "pending-changes": "Unpublished changes"
+    },
+    "draft": "Draft",
+    "actions": {
+      "edit_draft": "Edit draft"
+    },
+    "form": {
+      "draft_title": "Saved as a draft",
+      "markdown_hint": "Write in Markdown: ## heading, ### subheading, - list, 1. numbered list, **bold**, *italic*, [link text](https://… or /contacto)."
+    },
+    "notify": {
+      "draft_saved": "Draft saved. Publish it when it is ready.",
+      "published": "Published. The store now shows the new version."
+    },
+    "publication": {
+      "title": "Publication",
+      "published": "On the store since %{date}, published by %{name} (version %{version}).",
+      "never_published": "Not on the store yet. Publish it when the text is ready.",
+      "draft_updated": "Last draft change: %{date} by %{name}.",
+      "pending": "The draft has changes the store does not show yet.",
+      "empty": "The draft is empty: write the text before publishing it.",
+      "read_only": "Only the web manager or an administrator can publish it.",
+      "publish": "Publish",
+      "publish_confirm_title": "Publish this text?"
+    },
+    "history": {
+      "title": "Version history",
+      "empty": "No version has been published yet.",
+      "version": "Version %{version}",
+      "by": "%{date} · %{name}",
+      "current": "On the store",
+      "lookup_label": "What did it say on a date?",
+      "lookup_hint": "Pick the date and time of a purchase to see the version that was published.",
+      "lookup_result": "On %{date} the store showed version %{version}, published on %{published} by %{name}.",
+      "lookup_none": "On that date this text had not been published yet."
+    }
   }
 }

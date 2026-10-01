@@ -65,6 +65,8 @@ const RESOURCE_RULES: Record<
   "delivery-options": { module: "delivery-options" },
   clients: { module: "clients" },
   "cms-pages": { module: "cms-pages" },
+  // Home notices are store texts too: same draft/publish module as pages.
+  "cms-home-notices": { module: "cms-pages" },
   "cms-banners": { module: "cms-banners" },
   "cms-services": { module: "cms-services" },
   "cms-staff": { module: "cms-staff" },

@@ -123,6 +123,10 @@
     "payment-methods": {
       "name": "Método de pago",
       "name_plural": "Métodos de pago"
+    },
+    "cms-home-notices": {
+      "name": "Aviso",
+      "name_plural": "Avisos de portada"
     }
   },
   "list": {
@@ -419,7 +423,8 @@
       "contactoPlantillas": "Plantillas",
       "nomencladores": "Nomencladores",
       "entregas": "Entregas",
-      "devoluciones": "Devoluciones"
+      "devoluciones": "Devoluciones",
+      "cmsHomeNotices": "Avisos"
     },
     "user": {
       "profile": "Perfil"
@@ -480,7 +485,7 @@
       "clients": "Clientes",
       "contact": "Contacto (mensajes y plantillas)",
       "cms-home": "CMS — Portada",
-      "cms-pages": "CMS — Páginas",
+      "cms-pages": "CMS — Textos (páginas y avisos)",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Servicios",
       "cms-staff": "CMS — Equipo",
@@ -1230,25 +1235,30 @@
   },
   "cms-pages": {
     "form": {
-      "create_subtitle": "Crea una página informativa para la tienda.",
-      "edit_subtitle": "Edita el contenido de la página.",
-      "note": "La página se publica en /paginas/[slug]; el slug se genera desde el título.",
+      "create_subtitle": "Crea una página informativa o legal para la tienda.",
+      "edit_subtitle": "Edita el borrador de la página.",
+      "note": "Guardar deja la página en borrador: la tienda no cambia hasta que la publiques desde su detalle.",
       "placeholders": {
         "title": "Política de privacidad",
-        "content": "Escribe el contenido en Markdown…"
+        "content": "## Qué datos guardamos\n\n- Tu nombre y tu teléfono, para entregar el pedido.\n- Tu dirección…"
       },
       "hints": {
         "title": "Título visible de la página y origen del slug.",
-        "content": "Markdown: ## títulos, listas con -, **negrita**, [enlaces](https://…).",
         "sortOrder": "Orden en listados de páginas (menor primero).",
-        "isActive": "Inactiva: deja de mostrarse en la tienda (404)."
+        "isActive": "Desactivada: deja de mostrarse en la tienda aunque esté publicada."
       }
     },
     "mandatory": {
-      "title": "Faltan páginas obligatorias",
-      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Créalas para no dejar enlaces rotos:",
-      "create_label": "Crear la página %{title}"
-    }
+      "title": "Hay páginas obligatorias que la tienda no muestra",
+      "description": "La tienda enlaza estas páginas por su slug (pie de página, Sobre nosotros y Contacto). Créalas o publícalas para no dejar enlaces rotos:",
+      "create_label": "Crear la página %{title}",
+      "open_label": "Abrir la página %{title} para publicarla"
+    },
+    "publication": {
+      "inactive": "Está desactivada: aunque la publiques, la tienda no la mostrará.",
+      "publish_confirm_description": "La tienda mostrará este borrador en cuanto lo publiques. La versión anterior queda guardada en el historial con su fecha y su autor."
+    },
+    "delete_confirm_description": "¿Seguro que quieres eliminar «%{name}»? Deja de verse en la tienda; su historial de versiones se conserva."
   },
   "cms-faq": {
     "tabs": {
@@ -1707,5 +1717,86 @@
     "empty": "No hay devoluciones en este estado.",
     "outOfStock": "Pagó y no había mercancía",
     "requestedOn": "Registrada"
+  },
+  "cms-home-notices": {
+    "form": {
+      "create_subtitle": "Escribe un aviso temporal para la portada de la tienda.",
+      "edit_subtitle": "Edita el borrador del aviso.",
+      "note": "Guardar deja el aviso en borrador: la portada no cambia hasta que lo publiques desde su detalle.",
+      "placeholders": {
+        "title": "Cerrado el 10 de octubre",
+        "content": "Ese día no hacemos entregas. Los pedidos se entregan a partir del **11 de octubre**."
+      },
+      "hints": {
+        "title": "Se muestra en negrita encima del texto del aviso.",
+        "startsAt": "Vacío: se muestra en cuanto lo publiques.",
+        "endsAt": "Vacío: se muestra hasta que lo desactives.",
+        "sortOrder": "Orden entre avisos (menor primero).",
+        "isActive": "Desactivado: deja de mostrarse en la portada aunque esté publicado."
+      }
+    },
+    "fields": {
+      "startsAt": "Mostrar desde",
+      "endsAt": "Mostrar hasta",
+      "schedule": "Fechas"
+    },
+    "schedule": {
+      "live": "Visible en su horario",
+      "scheduled": "Programado",
+      "ended": "Terminado",
+      "range": "Del %{from} al %{to}",
+      "from": "Desde el %{from}",
+      "until": "Hasta el %{to}",
+      "always": "Sin fechas: se ve mientras esté activo"
+    },
+    "publication": {
+      "inactive": "Está desactivado: aunque lo publiques, la portada no lo mostrará.",
+      "publish_confirm_description": "La portada mostrará este aviso en las fechas que elegiste. La versión anterior queda guardada en el historial."
+    },
+    "delete_confirm_description": "¿Seguro que quieres eliminar el aviso «%{name}»? Deja de verse en la portada; su historial se conserva."
+  },
+  "cms-texts": {
+    "fields": {
+      "publication": "Publicación"
+    },
+    "status": {
+      "unpublished": "Sin publicar",
+      "published": "Publicado",
+      "pending-changes": "Cambios sin publicar"
+    },
+    "draft": "Borrador",
+    "actions": {
+      "edit_draft": "Editar borrador"
+    },
+    "form": {
+      "draft_title": "Se guarda como borrador",
+      "markdown_hint": "Escribe en Markdown: ## título, ### subtítulo, - lista, 1. lista numerada, **negrita**, *cursiva*, [texto del enlace](https://… o /contacto)."
+    },
+    "notify": {
+      "draft_saved": "Borrador guardado. Publícalo cuando esté listo.",
+      "published": "Publicado. La tienda ya muestra la nueva versión."
+    },
+    "publication": {
+      "title": "Publicación",
+      "published": "En la tienda desde el %{date}, publicado por %{name} (versión %{version}).",
+      "never_published": "Aún no está en la tienda. Publícalo cuando el texto esté listo.",
+      "draft_updated": "Último cambio del borrador: %{date} por %{name}.",
+      "pending": "El borrador tiene cambios que la tienda todavía no muestra.",
+      "empty": "El borrador está vacío: escribe el texto antes de publicarlo.",
+      "read_only": "Solo el responsable de la web o un administrador puede publicarlo.",
+      "publish": "Publicar",
+      "publish_confirm_title": "¿Publicar este texto?"
+    },
+    "history": {
+      "title": "Historial de versiones",
+      "empty": "Todavía no se ha publicado ninguna versión.",
+      "version": "Versión %{version}",
+      "by": "%{date} · %{name}",
+      "current": "En la tienda",
+      "lookup_label": "¿Qué decía en una fecha?",
+      "lookup_hint": "Elige la fecha y hora de una compra para ver la versión que estaba publicada.",
+      "lookup_result": "El %{date} la tienda mostraba la versión %{version}, publicada el %{published} por %{name}.",
+      "lookup_none": "En esa fecha este texto aún no se había publicado."
+    }
   }
 }

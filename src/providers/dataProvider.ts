@@ -3,6 +3,7 @@ import { getApiToken } from "../lib/clerk/clerkRefs";
 import { backendMessage } from "@/pages/users/errors";
 import { resetIdentityCache } from "./authProvider";
 import type { HomeLayout } from "@/pages/cms-home/home-layout";
+import type { CmsText, CmsTextVersion } from "@/pages/cms-pages/cms-text";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
@@ -370,7 +371,20 @@ export interface ExtendedDataProvider extends DataProvider {
     data: { url: string; expiresAt: string };
   }>;
   getCmsHomeChanges: () => Promise<{ data: CmsHomeChange[] }>;
+  /** Puts a text's draft on the store as a new version. */
+  publishCmsText: (
+    resource: CmsTextResource,
+    id: string,
+  ) => Promise<{ data: CmsText }>;
+  /** Every published version of a text, newest first. */
+  getCmsTextVersions: (
+    resource: CmsTextResource,
+    id: string,
+  ) => Promise<{ data: CmsTextVersion[] }>;
 }
+
+/** Resources backed by store texts (draft + published versions). */
+export type CmsTextResource = "cms-pages" | "cms-home-notices";
 
 /** Mirror of the API's CmsHomeEditorStateDto (GET /cms/home). */
 export interface CmsHomeState {
@@ -465,6 +479,7 @@ const RESOURCE_PATHS: Record<string, string> = {
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
   "storage-inventory": "inventory",
   "cms-pages": "cms/pages",
+  "cms-home-notices": "cms/home-notices",
   "cms-banners": "cms/banners",
   "cms-services": "cms/services",
   "cms-staff": "cms/staff",
@@ -839,6 +854,22 @@ export const dataProvider: DataProvider = {
       method: "GET",
     });
     return { data: unwrapOne(json) as CmsHomeChange[] };
+  },
+
+  async publishCmsText(resource: CmsTextResource, id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${id}/publish`,
+      { method: "POST" },
+    );
+    return { data: unwrapOne(json) as CmsText };
+  },
+
+  async getCmsTextVersions(resource: CmsTextResource, id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${id}/versions`,
+      { method: "GET" },
+    );
+    return { data: unwrapOne(json) as CmsTextVersion[] };
   },
 
   async getFulfillmentSettings() {

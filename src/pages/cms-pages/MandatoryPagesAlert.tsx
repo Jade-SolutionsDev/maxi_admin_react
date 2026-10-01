@@ -4,10 +4,11 @@ import { TriangleAlert } from "lucide-react";
 import { MANDATORY_PAGES } from "./mandatory-pages";
 
 /**
- * Warns when a page the storefront links to by slug has no active row
- * (deleted or deactivated). Each missing page is a link that opens the
+ * Warns when a page the storefront links to by slug is not on the store:
+ * missing, deactivated or never published. A missing page links to the
  * create form with the canonical title/slug prefilled, so recreating it
- * lands on the exact slug the rest of the site references.
+ * lands on the exact slug the rest of the site references; an existing one
+ * links to its detail, where it is published.
  */
 export function MandatoryPagesAlert() {
   const translate = useTranslate();
@@ -18,10 +19,11 @@ export function MandatoryPagesAlert() {
 
   if (!pages) return null;
 
-  const missing = MANDATORY_PAGES.filter(
-    (mandatory) =>
-      !pages.some((page) => page.slug === mandatory.slug && page.isActive),
-  );
+  const missing = MANDATORY_PAGES.flatMap((mandatory) => {
+    const page = pages.find((candidate) => candidate.slug === mandatory.slug);
+    if (page?.isActive && page.published) return [];
+    return [{ ...mandatory, id: page?.id as string | undefined }];
+  });
 
   if (missing.length === 0) return null;
 
@@ -41,11 +43,18 @@ export function MandatoryPagesAlert() {
         {missing.map((page) => (
           <li key={page.slug}>
             <Link
-              to={`/cms-pages/create?title=${encodeURIComponent(page.title)}&slug=${encodeURIComponent(page.slug)}`}
+              to={
+                page.id
+                  ? `/cms-pages/${page.id}`
+                  : `/cms-pages/create?title=${encodeURIComponent(page.title)}&slug=${encodeURIComponent(page.slug)}`
+              }
               className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/40 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={translate("cms-pages.mandatory.create_label", {
-                title: page.title,
-              })}
+              aria-label={translate(
+                page.id
+                  ? "cms-pages.mandatory.open_label"
+                  : "cms-pages.mandatory.create_label",
+                { title: page.title },
+              )}
             >
               {page.title}
             </Link>
