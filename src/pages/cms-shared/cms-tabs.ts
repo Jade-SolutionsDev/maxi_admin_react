@@ -4,6 +4,7 @@ import {
   GalleryHorizontalEnd,
   HandHeart,
   LayoutTemplate,
+  Megaphone,
   Settings2,
   UsersRound,
   type LucideIcon,
@@ -40,6 +41,12 @@ export const CMS_TABS: CmsTab[] = [
     path: "/cms-pages",
     resource: "cms-pages",
     icon: FileText,
+  },
+  {
+    labelKey: "app.menu.cmsHomeNotices",
+    path: "/cms-home-notices",
+    resource: "cms-home-notices",
+    icon: Megaphone,
   },
   {
     labelKey: "app.menu.cmsServices",

@@ -47,6 +47,10 @@ import { CmsPagesLayout } from "./pages/cms-pages/CmsPagesLayout";
 import CmsPageCreate from "./pages/cms-pages/CmsPageCreate";
 import CmsPageEdit from "./pages/cms-pages/CmsPageEdit";
 import { CmsPageDetailModal } from "./pages/cms-pages/CmsPageDetailModal";
+import { CmsHomeNoticesLayout } from "./pages/cms-home-notices/CmsHomeNoticesLayout";
+import CmsHomeNoticeCreate from "./pages/cms-home-notices/CmsHomeNoticeCreate";
+import CmsHomeNoticeEdit from "./pages/cms-home-notices/CmsHomeNoticeEdit";
+import { CmsHomeNoticeDetailModal } from "./pages/cms-home-notices/CmsHomeNoticeDetailModal";
 import { CmsServicesLayout } from "./pages/cms-services/CmsServicesLayout";
 import CmsServiceCreate from "./pages/cms-services/CmsServiceCreate";
 import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
@@ -167,6 +171,18 @@ const AdminApp = () => (
         <Route path="create" element={<CmsPageCreate />} />
         <Route path="edit/:id" element={<CmsPageEdit />} />
         <Route path=":id" element={<CmsPageDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-home-notices/*"
+        element={
+          <RequireAccess resource="cms-home-notices">
+            <CmsHomeNoticesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsHomeNoticeCreate />} />
+        <Route path="edit/:id" element={<CmsHomeNoticeEdit />} />
+        <Route path=":id" element={<CmsHomeNoticeDetailModal />} />
       </Route>
       <Route
         path="/cms-banners/*"
