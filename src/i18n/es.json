@@ -1159,6 +1159,12 @@
       "missing_pickup_id_card": "el carné de quien recoge",
       "missing_pickup_phone": "el teléfono de quien recoge",
       "missing_payment_method": "el método de pago"
+    },
+    "tracking": {
+      "label": "Seguimiento para el cliente",
+      "copy": "Copiar enlace",
+      "copied": "Enlace copiado",
+      "copy_failed": "No se pudo copiar el enlace"
     }
   },
   "dashboard": {
