@@ -1,16 +1,19 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { required, useTranslate } from "ra-core";
+import { maxLength, required, useTranslate } from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
 import type { ReactNode } from "react";
 import {
+  AlignLeft,
   ArrowUpDown,
   Captions,
   GalleryHorizontalEnd,
+  Heading,
   Image as ImageIcon,
   Monitor,
   Smartphone,
   Tablet,
+  Type,
 } from "lucide-react";
 
 import {
@@ -33,6 +36,9 @@ interface CmsBannerFormModalProps {
 
 type BannerVariant = "desktop" | "tablet" | "mobile";
 
+const asOptionalText = (value: unknown) =>
+  typeof value === "string" && value.trim() ? value.trim() : null;
+
 const asAsset = (value: unknown) => {
   const asset = (value ?? {}) as {
     src?: string;
@@ -53,6 +59,8 @@ const sanitizeCmsBanner = (
   const previousTarget = toCmsBannerTargetPayload(options?.previousData?.target);
   const payload = {
     alt: data.alt,
+    title: asOptionalText(data.title),
+    subtitle: asOptionalText(data.subtitle),
     desktop: asAsset(data.desktop),
     tablet: asAsset(data.tablet),
     mobile: asAsset(data.mobile),
@@ -182,6 +190,36 @@ function CmsBannerFormFields({ mode }: { mode: "create" | "edit" }) {
         placeholder={translate("cms-banners.form.placeholders.alt", { _: "" })}
         helperText="cms-banners.form.hints.alt"
       />
+
+      <FormSection
+        icon={<Type />}
+        title={translate("cms-banners.form.text_title")}
+        subtitle={translate("cms-banners.form.text_hint")}
+        className="border-t pt-5"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextInput
+            source="title"
+            label={translate("cms-banners.form.fields.title")}
+            validate={maxLength(80)}
+            icon={<Heading />}
+            placeholder={translate("cms-banners.form.placeholders.title", {
+              _: "",
+            })}
+            helperText="cms-banners.form.hints.title"
+          />
+          <TextInput
+            source="subtitle"
+            label={translate("cms-banners.form.fields.subtitle")}
+            validate={maxLength(160)}
+            icon={<AlignLeft />}
+            placeholder={translate("cms-banners.form.placeholders.subtitle", {
+              _: "",
+            })}
+            helperText="cms-banners.form.hints.subtitle"
+          />
+        </div>
+      </FormSection>
 
       <CmsBannerTargetInput />
 

@@ -47,11 +47,16 @@ import { CmsPagesLayout } from "./pages/cms-pages/CmsPagesLayout";
 import CmsPageCreate from "./pages/cms-pages/CmsPageCreate";
 import CmsPageEdit from "./pages/cms-pages/CmsPageEdit";
 import { CmsPageDetailModal } from "./pages/cms-pages/CmsPageDetailModal";
+import { CmsHomeNoticesLayout } from "./pages/cms-home-notices/CmsHomeNoticesLayout";
+import CmsHomeNoticeCreate from "./pages/cms-home-notices/CmsHomeNoticeCreate";
+import CmsHomeNoticeEdit from "./pages/cms-home-notices/CmsHomeNoticeEdit";
+import { CmsHomeNoticeDetailModal } from "./pages/cms-home-notices/CmsHomeNoticeDetailModal";
 import { CmsServicesLayout } from "./pages/cms-services/CmsServicesLayout";
 import CmsServiceCreate from "./pages/cms-services/CmsServiceCreate";
 import CmsServiceEdit from "./pages/cms-services/CmsServiceEdit";
 import { CmsServiceDetailModal } from "./pages/cms-services/CmsServiceDetailModal";
 import { CmsSettingsPage } from "./pages/cms-settings/CmsSettingsPage";
+import { CmsHomePage } from "./pages/cms-home/CmsHomePage";
 import { PaymentMethodsPage } from "./pages/payment-methods/PaymentMethodsPage";
 import ContactMessagesList from "./pages/contact-messages/ContactMessagesList";
 import ContactMessageDetailPage from "./pages/contact-messages/ContactMessageDetailPage";
@@ -168,6 +173,18 @@ const AdminApp = () => (
         <Route path=":id" element={<CmsPageDetailModal />} />
       </Route>
       <Route
+        path="/cms-home-notices/*"
+        element={
+          <RequireAccess resource="cms-home-notices">
+            <CmsHomeNoticesLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsHomeNoticeCreate />} />
+        <Route path="edit/:id" element={<CmsHomeNoticeEdit />} />
+        <Route path=":id" element={<CmsHomeNoticeDetailModal />} />
+      </Route>
+      <Route
         path="/cms-banners/*"
         element={
           <RequireAccess resource="cms-banners">
@@ -208,6 +225,14 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="cms-settings">
             <CmsSettingsPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/cms-home"
+        element={
+          <RequireAccess resource="cms-home">
+            <CmsHomePage />
           </RequireAccess>
         }
       />
@@ -266,6 +291,23 @@ const AdminApp = () => (
         <Route path="create" element={<DeliveryOptionCreate />} />
         <Route path="edit/:id" element={<DeliveryOptionEdit />} />
       </Route>
+      {/*
+        «Invitar cliente» se declara AQUÍ y no solo en el `create` del
+        <Resource>, aunque parezca duplicado. React Router ordena por
+        especificidad, no por orden de declaración: la ruta de abajo
+        (`/clients/:id`) gana a la del recurso (`/clients/*`), así que
+        /clients/create montaba la ficha de un cliente llamado «create» y la
+        API respondía 500. El botón llevaba sin abrir nada desde que se puso,
+        el 24-sep-2026. Una ruta estática sí le gana a `/clients/:id`.
+      */}
+      <Route
+        path="/clients/create"
+        element={
+          <RequireAccess resource="clients" action="create">
+            <InviteClientModal />
+          </RequireAccess>
+        }
+      />
       <Route
         path="/clients/:id"
         element={

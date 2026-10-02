@@ -22,6 +22,8 @@ import {
   Sparkles,
   Tags,
   Trash2,
+  Store,
+  Package,
 } from "lucide-react";
 import { ConfirmActionButton } from "@/components/admin/confirm-action-button";
 import { DateField } from "@/components/admin/date-field";
@@ -166,6 +168,42 @@ export function TaxonomyDetailModal() {
                 ? translate("shared.status.active", { _: "Active" })
                 : translate("shared.status.inactive", { _: "Inactive" })}
             </DetailField>
+            {/*
+              Lo que de verdad importa de una categoría: si el cliente la ve.
+              Estar «activa» no basta —la tienda oculta las que no tienen
+              productos disponibles—, y hasta ahora el panel no lo decía.
+              El cálculo viene del backend; aquí solo se pinta.
+            */}
+            {!isDepartment && record.visibleInStore !== undefined && (
+              <>
+                <DetailField
+                  label={translate("categories.fields.visibility", {
+                    _: "En la tienda",
+                  })}
+                  icon={<Store />}
+                >
+                  {record.visibleInStore
+                    ? translate("categories.visibility.visible", {
+                        _: "La ven los clientes",
+                      })
+                    : translate("categories.visibility.hidden", {
+                        _: "No la ven los clientes",
+                      })}
+                </DetailField>
+                <DetailField
+                  label={translate("categories.fields.products", {
+                    _: "Productos",
+                  })}
+                  icon={<Package />}
+                >
+                  {translate("categories.products_summary", {
+                    total: record.productsCount ?? 0,
+                    disponibles: record.availableProductsCount ?? 0,
+                    _: `${record.productsCount ?? 0} asociados · ${record.availableProductsCount ?? 0} disponibles`,
+                  })}
+                </DetailField>
+              </>
+            )}
           </div>
 
           <DetailTextBlock

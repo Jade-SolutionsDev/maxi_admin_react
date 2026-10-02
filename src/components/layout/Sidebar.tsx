@@ -23,6 +23,11 @@ import {
 } from "lucide-react";
 import LogoDark from "@/assets/maxi_habana_logo_dark.png";
 import { cn } from "@/lib/utils";
+import { CMS_TABS } from "@/pages/cms-shared/cms-tabs";
+import {
+  firstAccessibleDestination,
+  type NavDestination,
+} from "./nav-destination";
 import { useEffect } from "react";
 import {
   Translate,
@@ -96,6 +101,9 @@ interface NavItem {
   /** Resource this entry maps to; the item is hidden unless the user can list
    *  it (canAccess). Omit for non-resource entries (dashboard, "coming soon"). */
   resource?: string;
+  /** Tabbed sections: the entry shows when ANY destination is listable and
+   *  opens the first one that is (replaces `path` + `resource`). */
+  destinations?: NavDestination[];
   /** Not yet built — rendered disabled with a "coming soon" hint. */
   soon?: boolean;
 }
@@ -227,9 +235,11 @@ const navGroups: NavGroup[] = [
       {
         labelKey: "app.menu.cms",
         icon: <PanelsTopLeft size={20} />,
-        path: "/cms-pages",
         activePrefix: "/cms-",
-        resource: "cms-pages",
+        destinations: CMS_TABS.map(({ resource, path }) => ({
+          resource,
+          path,
+        })),
       },
       {
         labelKey: "app.menu.reportes",
@@ -338,9 +348,13 @@ function NavEntry({ item }: { item: NavItem }) {
  * only, say, orders never sees empty section headers.
  */
 function NavGroupSection({ group }: { group: (typeof navGroups)[number] }) {
-  const gatedResources = group.items
-    .map((item) => item.resource)
-    .filter((r): r is string => Boolean(r));
+  const gatedResources = group.items.flatMap((item) =>
+    item.destinations
+      ? item.destinations.map((destination) => destination.resource)
+      : item.resource
+        ? [item.resource]
+        : [],
+  );
   const { canAccess, isPending } = useCanAccessResources({
     resources: gatedResources,
     action: "list",
@@ -367,7 +381,9 @@ function NavGroupSection({ group }: { group: (typeof navGroups)[number] }) {
       <SidebarGroupContent>
         <SidebarMenu>
           {group.items.map((item) =>
-            item.resource ? (
+            item.destinations ? (
+              <FirstAccessibleNavEntry key={item.labelKey} item={item} />
+            ) : item.resource ? (
               <GatedNavEntry key={item.labelKey} item={item} />
             ) : (
               <NavEntry key={item.labelKey} item={item} />
@@ -387,6 +403,18 @@ function GatedNavEntry({ item }: { item: NavItem }) {
   });
   if (isPending || !canAccess) return null;
   return <NavEntry item={item} />;
+}
+
+/** Tabbed-section entry: opens the first tab the user can list, if any. */
+function FirstAccessibleNavEntry({ item }: { item: NavItem }) {
+  const destinations = item.destinations ?? [];
+  const { canAccess, isPending } = useCanAccessResources({
+    resources: destinations.map((destination) => destination.resource),
+    action: "list",
+  });
+  const destination = firstAccessibleDestination(destinations, canAccess);
+  if (isPending || !destination) return null;
+  return <NavEntry item={{ ...item, path: destination.path }} />;
 }
 
 /**

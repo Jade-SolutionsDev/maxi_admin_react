@@ -100,6 +100,10 @@
       "name": "Site settings",
       "name_plural": "Site settings"
     },
+    "cms-home": {
+      "name": "Home page",
+      "name_plural": "Home page"
+    },
     "contact-messages": {
       "name": "Message",
       "name_plural": "Contact messages"
@@ -119,6 +123,10 @@
     "payment-methods": {
       "name": "Payment method",
       "name_plural": "Payment methods"
+    },
+    "cms-home-notices": {
+      "name": "Notice",
+      "name_plural": "Home notices"
     }
   },
   "list": {
@@ -389,6 +397,7 @@
       "reportes": "Reports",
       "rolesPermisos": "Roles & permissions",
       "soon": "Coming soon",
+      "cmsHome": "Home page",
       "cmsPages": "Pages",
       "cmsBanners": "Banners",
       "cmsServices": "Services",
@@ -412,7 +421,8 @@
       "contactoPlantillas": "Templates",
       "nomencladores": "Nomenclators",
       "entregas": "Delivery",
-      "devoluciones": "Refunds"
+      "devoluciones": "Refunds",
+      "cmsHomeNotices": "Notices"
     },
     "user": {
       "profile": "Profile"
@@ -472,7 +482,8 @@
       "orders": "Orders",
       "clients": "Clients",
       "contact": "Contact (messages & templates)",
-      "cms-pages": "CMS — Pages",
+      "cms-home": "CMS — Home page",
+      "cms-pages": "CMS — Texts (pages and notices)",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Services",
       "cms-staff": "CMS — Staff",
@@ -490,6 +501,7 @@
       "create": "Create",
       "update": "Edit",
       "delete": "Delete",
+      "publish": "Publish",
       "view-all": "View all",
       "reply": "Reply",
       "update-status": "Change status",
@@ -758,9 +770,6 @@
     }
   },
   "departments": {
-    "errors": {
-      "delete_conflict": "Cannot delete: the department still has categories."
-    },
     "form": {
       "create_subtitle": "Fill in the information to create a new department.",
       "edit_subtitle": "Update the department information.",
@@ -782,9 +791,6 @@
     }
   },
   "categories": {
-    "errors": {
-      "delete_conflict": "Cannot delete: the category still has products."
-    },
     "form": {
       "create_subtitle": "Fill in the information to create a new category.",
       "edit_subtitle": "Update the category information.",
@@ -804,7 +810,18 @@
         "name": "Enter the category name...",
         "description": "Write a short description of the category (optional)..."
       }
-    }
+    },
+    "fields": {
+      "visibility": "In the storefront",
+      "products": "Products"
+    },
+    "visibility": {
+      "visible": "Customers can see it",
+      "hidden": "Customers cannot see it",
+      "reason_inactive": "It is disabled",
+      "reason_empty": "It has no available products"
+    },
+    "products_summary": "%{total} linked · %{disponibles} available"
   },
   "orders": {
     "search_placeholder": "Search by order, customer, email, or phone",
@@ -1138,6 +1155,12 @@
       "missing_pickup_id_card": "the ID card of who is picking up",
       "missing_pickup_phone": "the phone of who is picking up",
       "missing_payment_method": "the payment method"
+    },
+    "tracking": {
+      "label": "Customer tracking link",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "copy_failed": "Could not copy the link"
     }
   },
   "dashboard": {
@@ -1190,7 +1213,8 @@
     },
     "status": {
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "pending": "Pending"
     },
     "orders": {
       "empty_title": "No orders",
@@ -1202,7 +1226,13 @@
       "invite_success": "Invitation sent to %{email}",
       "invite_error": "Could not invite this customer",
       "copy_link": "Copy link",
-      "link_copied": "Link copied"
+      "link_copied": "Link copied",
+      "resend": "Resend invitation",
+      "resend_success": "Invitation resent",
+      "resend_error": "Could not resend the invitation",
+      "revoke": "Revoke invitation",
+      "revoke_success": "Invitation revoked",
+      "revoke_error": "Could not revoke the invitation"
     },
     "fields": {
       "firstName": "First name",
@@ -1215,29 +1245,44 @@
       "footnote": "The customer picks the password: we never see it.",
       "email_failed_title": "The account was invited, but the email did not go out",
       "email_failed_help": "Send them this link. It is personal and single-use: with it they choose a password and get in."
+    },
+    "confirm": {
+      "resend": {
+        "title": "Resend invitation",
+        "description": "Send the invitation to %{email} again? The previous link will stop working."
+      },
+      "revoke": {
+        "title": "Revoke invitation",
+        "description": "Revoke the invitation for %{email}? The link will stop working."
+      }
     }
   },
   "cms-pages": {
     "form": {
-      "create_subtitle": "Create an informational storefront page.",
-      "edit_subtitle": "Edit the page content.",
-      "note": "Published at /paginas/[slug]; the slug is derived from the title.",
+      "create_subtitle": "Create an informational or legal storefront page.",
+      "edit_subtitle": "Edit the page draft.",
+      "note": "Saving keeps the page as a draft: the store does not change until you publish it from its detail.",
       "placeholders": {
         "title": "Privacy policy",
-        "content": "Write the content in Markdown…"
+        "content": "## What data we keep\n\n- Your name and phone, to deliver the order.\n- Your address…"
       },
       "hints": {
         "title": "Visible page title and slug source.",
-        "content": "Markdown: ## headings, - lists, **bold**, [links](https://…).",
         "sortOrder": "Order in page listings (lowest first).",
-        "isActive": "Inactive: no longer served by the storefront (404)."
+        "isActive": "Inactive: hidden from the store even when published."
       }
     },
     "mandatory": {
-      "title": "Mandatory pages missing",
-      "description": "The storefront links these pages by slug (footer and About us). Create them to avoid broken links:",
-      "create_label": "Create the %{title} page"
-    }
+      "title": "Some mandatory pages are not on the store",
+      "description": "The storefront links these pages by slug (footer, About us and Contact). Create or publish them to avoid broken links:",
+      "create_label": "Create the %{title} page",
+      "open_label": "Open the %{title} page to publish it"
+    },
+    "publication": {
+      "inactive": "It is inactive: even if you publish it, the store will not show it.",
+      "publish_confirm_description": "The store will show this draft as soon as you publish it. The previous version stays in the history with its date and author."
+    },
+    "delete_confirm_description": "Delete “%{name}”? It disappears from the store; its version history is kept."
   },
   "cms-faq": {
     "tabs": {
@@ -1309,7 +1354,13 @@
     "form": {
       "create_subtitle": "Add a slide to the storefront hero carousel.",
       "edit_subtitle": "Edit the carousel slide.",
-      "note": "Upload the three variants; dimensions are detected automatically.",
+      "note": "Upload the three variants; dimensions are detected automatically. The storefront does not change until you publish the home page.",
+      "text_title": "Text over the image",
+      "text_hint": "Optional. Leave it empty when the artwork already carries the text.",
+      "fields": {
+        "title": "Headline",
+        "subtitle": "Subtitle"
+      },
       "images_title": "Images",
       "images_hint": "One variant per device. Keep the recommended aspect ratios to avoid cropping.",
       "variants": {
@@ -1320,10 +1371,14 @@
       "dimensions": "Detected dimensions: %{width} x %{height} px",
       "dimensions_pending": "Upload an image to detect its dimensions.",
       "placeholders": {
-        "alt": "Weekly promotions"
+        "alt": "Weekly promotions",
+        "title": "Everything for your home",
+        "subtitle": "Up to 20% off this week"
       },
       "hints": {
         "alt": "Accessible description of the banner (screen readers and SEO).",
+        "title": "Short, large phrase, up to 80 characters.",
+        "subtitle": "One supporting line, up to 160 characters.",
         "sortOrder": "Slide order in the carousel (lowest first).",
         "isActive": "Inactive: the slide is not shown on the storefront."
       }
@@ -1403,6 +1458,74 @@
       "add_link": "Add link"
     }
   },
+  "cms-home": {
+    "subtitle": "Choose what shoppers see first: banners, featured items and the order of the sections.",
+    "flow_hint": "Everything you change here and in Banners stays as a draft. The storefront does not change until you publish.",
+    "status": {
+      "pending": "There are unpublished changes",
+      "up_to_date": "The storefront shows the latest version",
+      "published": "Published on %{date} by %{name}",
+      "never_published": "The home page has not been published yet.",
+      "draft_updated": "Last draft change: %{date} by %{name}",
+      "unsaved": "Save the draft to preview or publish it.",
+      "read_only": "You can only view the home page. Ask for edit permission to change it."
+    },
+    "actions": {
+      "save": "Save draft",
+      "discard": "Discard changes",
+      "preview": "Preview",
+      "publish": "Publish",
+      "publish_confirm_title": "Publish the home page?",
+      "publish_confirm_description": "Customers will see the current draft, banners included, as soon as you confirm.",
+      "move_up": "Move %{name} up",
+      "move_down": "Move %{name} down",
+      "remove": "Remove %{name}"
+    },
+    "notify": {
+      "saved": "Draft saved",
+      "published": "Home page published",
+      "preview_blocked": "The browser blocked the preview tab. Allow pop-ups and try again."
+    },
+    "sections": {
+      "title": "Section order",
+      "hint": "Use the arrows to reorder. Hidden sections do not appear on the storefront.",
+      "visible": "Visible",
+      "banners_link": "Edit banners",
+      "names": {
+        "hero": "Banners",
+        "departments": "Departments",
+        "featured-products": "Featured products",
+        "services": "Our services",
+        "on-sale-products": "Products on sale",
+        "categories": "Categories",
+        "recent-products": "Newest products"
+      }
+    },
+    "featured": {
+      "products_title": "Featured products",
+      "products_hint": "Pick and order up to %{max} products. With no selection, the products flagged as featured in the catalog are shown.",
+      "departments_title": "Featured departments",
+      "departments_hint": "Pick and order the carousel departments. With no selection, the departments flagged as featured in the catalog are shown.",
+      "empty": "No selection: the catalog's featured items are used.",
+      "add_product": "Add product",
+      "add_department": "Add department",
+      "search": "Search by name",
+      "no_results": "No results",
+      "unknown": "No longer in the catalog",
+      "limit": "You reached the maximum of %{max}."
+    },
+    "history": {
+      "title": "Change history",
+      "empty": "No changes recorded yet.",
+      "actions": {
+        "banner-created": "created the banner “%{subject}”",
+        "banner-updated": "edited the banner “%{subject}”",
+        "banner-deleted": "deleted the banner “%{subject}”",
+        "layout-updated": "saved the home page draft",
+        "published": "published the home page"
+      }
+    }
+  },
   "payment-methods": {
     "title": "Payment methods",
     "subtitle": "Choose which gateways customers can use at checkout.",
@@ -1416,7 +1539,8 @@
       "bank": "Bank transfer",
       "qr": "QR code",
       "link": "Link",
-      "crypto": "Crypto"
+      "crypto": "Crypto",
+      "cash": "Cash"
     },
     "form": {
       "create_title": "New payment method",
@@ -1437,6 +1561,7 @@
       "memo": "Memo / Tag",
       "memo_hint": "Only if your address needs one: without it the payment stalls.",
       "note": "Note for the customer",
+      "cash_note_hint": "Say where and when to pay, and that the order remains pending until payment or an explicit cancellation.",
       "qr_image": "QR image",
       "qr_preview": "QR code preview",
       "qr_uploading": "Uploading…",
@@ -1616,5 +1741,86 @@
     "empty": "No refunds in this state.",
     "outOfStock": "Paid with no stock left",
     "requestedOn": "Logged"
+  },
+  "cms-home-notices": {
+    "form": {
+      "create_subtitle": "Write a temporary notice for the store home.",
+      "edit_subtitle": "Edit the notice draft.",
+      "note": "Saving keeps the notice as a draft: the home does not change until you publish it from its detail.",
+      "placeholders": {
+        "title": "Closed on October 10",
+        "content": "No deliveries that day. Orders are delivered from **October 11**."
+      },
+      "hints": {
+        "title": "Shown in bold above the notice text.",
+        "startsAt": "Empty: shown as soon as you publish it.",
+        "endsAt": "Empty: shown until you deactivate it.",
+        "sortOrder": "Order among notices (lowest first).",
+        "isActive": "Inactive: hidden from the home even when published."
+      }
+    },
+    "fields": {
+      "startsAt": "Show from",
+      "endsAt": "Show until",
+      "schedule": "Dates"
+    },
+    "schedule": {
+      "live": "Visible on schedule",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "range": "From %{from} to %{to}",
+      "from": "From %{from}",
+      "until": "Until %{to}",
+      "always": "No dates: shown while active"
+    },
+    "publication": {
+      "inactive": "It is inactive: even if you publish it, the home will not show it.",
+      "publish_confirm_description": "The home will show this notice on the dates you chose. The previous version stays in the history."
+    },
+    "delete_confirm_description": "Delete the notice “%{name}”? It disappears from the home; its history is kept."
+  },
+  "cms-texts": {
+    "fields": {
+      "publication": "Publication"
+    },
+    "status": {
+      "unpublished": "Unpublished",
+      "published": "Published",
+      "pending-changes": "Unpublished changes"
+    },
+    "draft": "Draft",
+    "actions": {
+      "edit_draft": "Edit draft"
+    },
+    "form": {
+      "draft_title": "Saved as a draft",
+      "markdown_hint": "Write in Markdown: ## heading, ### subheading, - list, 1. numbered list, **bold**, *italic*, [link text](https://… or /contacto)."
+    },
+    "notify": {
+      "draft_saved": "Draft saved. Publish it when it is ready.",
+      "published": "Published. The store now shows the new version."
+    },
+    "publication": {
+      "title": "Publication",
+      "published": "On the store since %{date}, published by %{name} (version %{version}).",
+      "never_published": "Not on the store yet. Publish it when the text is ready.",
+      "draft_updated": "Last draft change: %{date} by %{name}.",
+      "pending": "The draft has changes the store does not show yet.",
+      "empty": "The draft is empty: write the text before publishing it.",
+      "read_only": "Only the web manager or an administrator can publish it.",
+      "publish": "Publish",
+      "publish_confirm_title": "Publish this text?"
+    },
+    "history": {
+      "title": "Version history",
+      "empty": "No version has been published yet.",
+      "version": "Version %{version}",
+      "by": "%{date} · %{name}",
+      "current": "On the store",
+      "lookup_label": "What did it say on a date?",
+      "lookup_hint": "Pick the date and time of a purchase to see the version that was published.",
+      "lookup_result": "On %{date} the store showed version %{version}, published on %{published} by %{name}.",
+      "lookup_none": "On that date this text had not been published yet."
+    }
   }
 }

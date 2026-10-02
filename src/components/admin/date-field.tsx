@@ -8,6 +8,27 @@ import {
 
 import type { FieldProps } from "@/lib/field.type";
 
+/**
+ * Zona y reloj con los que se pintan todas las fechas del panel.
+ *
+ * **Se fija la zona a propósito, en vez de usar la del equipo de cada uno.**
+ * El negocio ocurre en Cuba: el almacén abre allí, los pedidos se recogen
+ * allí y los plazos de custodia se cuentan allí. Si cada persona viera su
+ * hora local, dos empleados mirando el mismo pedido leerían horas distintas
+ * y no podrían hablar entre ellos. Pasó el 28-sep-2026: un equipo en UTC
+ * enseñaba «6:10» donde en el mostrador eran las 14:10.
+ *
+ * **Por nombre, no por desfase.** Cuba cambia de hora dos veces al año
+ * (UTC-4 en verano, UTC-5 en invierno). Con `America/Havana` el ajuste es
+ * automático; con un «-4» escrito a mano, cada noviembre todas las horas del
+ * panel se equivocarían en una y nadie lo relacionaría con esto.
+ *
+ * **Reloj de 24 horas**, porque un equipo configurado en 12 escribía «6:10»
+ * sin el «p. m.», que se lee como las seis de la mañana.
+ */
+const ZONA_DEL_NEGOCIO = 'America/Havana';
+const RELOJ_24H = false; // valor de `hour12`
+
 const DateFieldImpl = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   RecordType extends Record<string, any> = Record<string, any>,
@@ -60,27 +81,35 @@ const DateFieldImpl = <
 
   const date = transform(value);
 
+  // Quien llama puede sobrescribirlos; si no dice nada, manda el negocio.
+  const opcionesConZona: Intl.DateTimeFormatOptions = {
+    timeZone: ZONA_DEL_NEGOCIO,
+    hour12: RELOJ_24H,
+    ...options,
+  };
+
   let dateString = "";
   if (date) {
     if (showTime && showDate) {
       dateString = toLocaleStringSupportsLocales
-        ? date.toLocaleString(idioma, options)
+        ? date.toLocaleString(idioma, opcionesConZona)
         : date.toLocaleString();
     } else if (showDate) {
       // If input is a date string (e.g. '2022-02-15') without time and time zone,
       // force timezone to UTC to fix issue with people in negative time zones
       // who may see a different date when calling toLocaleDateString().
+      // Una fecha sin hora ni zona («2022-02-15») se interpreta en UTC a
+      // propósito: convertirla a La Habana la correría al día anterior.
       const dateOptions =
-        options ??
-        (typeof value === "string" && value.length <= 10
-          ? { timeZone: "UTC" }
-          : undefined);
+        typeof value === "string" && value.length <= 10
+          ? { timeZone: "UTC", ...options }
+          : opcionesConZona;
       dateString = toLocaleStringSupportsLocales
         ? date.toLocaleDateString(idioma, dateOptions)
         : date.toLocaleDateString();
     } else if (showTime) {
       dateString = toLocaleStringSupportsLocales
-        ? date.toLocaleTimeString(idioma, options)
+        ? date.toLocaleTimeString(idioma, opcionesConZona)
         : date.toLocaleTimeString();
     }
   }
