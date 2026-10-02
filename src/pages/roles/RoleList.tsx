@@ -104,26 +104,6 @@ const RoleEditButton = () => {
   );
 };
 
-/**
- * La descripción de un rol puede ser un párrafo. En la tabla se recorta a una
- * línea y el texto completo queda en el `title`, para no romper la cuadrícula.
- */
-const RoleDescriptionCell = () => {
-  const record = useRecordContext<{ description?: string | null }>();
-  const description = record?.description?.trim();
-  if (!description) {
-    return <span className="text-muted-foreground">—</span>;
-  }
-  return (
-    <span
-      className="block max-w-[320px] truncate text-muted-foreground"
-      title={description}
-    >
-      {description}
-    </span>
-  );
-};
-
 const RoleDeleteButton = () => {
   const record = useRecordContext();
   const resource = useResourceContext();
@@ -251,9 +231,6 @@ export default function RoleList() {
           label="list.fields.firstName"
           cellClassName="min-w-[180px] font-medium"
         />
-        <DataTable.Col label="list.fields.description" disableSort>
-          <RoleDescriptionCell />
-        </DataTable.Col>
         <DataTable.Col label="roles.fields.type" disableSort>
           <RoleTypeCell />
         </DataTable.Col>
