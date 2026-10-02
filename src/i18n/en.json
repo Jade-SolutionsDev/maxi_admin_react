@@ -770,9 +770,6 @@
     }
   },
   "departments": {
-    "errors": {
-      "delete_conflict": "Cannot delete: the department still has categories."
-    },
     "form": {
       "create_subtitle": "Fill in the information to create a new department.",
       "edit_subtitle": "Update the department information.",
@@ -794,9 +791,6 @@
     }
   },
   "categories": {
-    "errors": {
-      "delete_conflict": "Cannot delete: the category still has products."
-    },
     "form": {
       "create_subtitle": "Fill in the information to create a new category.",
       "edit_subtitle": "Update the category information.",
@@ -816,7 +810,18 @@
         "name": "Enter the category name...",
         "description": "Write a short description of the category (optional)..."
       }
-    }
+    },
+    "fields": {
+      "visibility": "In the storefront",
+      "products": "Products"
+    },
+    "visibility": {
+      "visible": "Customers can see it",
+      "hidden": "Customers cannot see it",
+      "reason_inactive": "It is disabled",
+      "reason_empty": "It has no available products"
+    },
+    "products_summary": "%{total} linked · %{disponibles} available"
   },
   "orders": {
     "search_placeholder": "Search by order, customer, email, or phone",

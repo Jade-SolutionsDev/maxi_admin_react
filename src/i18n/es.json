@@ -772,9 +772,6 @@
     }
   },
   "departments": {
-    "errors": {
-      "delete_conflict": "No se puede eliminar: el departamento tiene categorías asociadas."
-    },
     "form": {
       "create_subtitle": "Completa la información para crear un nuevo departamento.",
       "edit_subtitle": "Actualiza la información del departamento.",
@@ -796,9 +793,6 @@
     }
   },
   "categories": {
-    "errors": {
-      "delete_conflict": "No se puede eliminar: la categoría tiene productos asociados."
-    },
     "form": {
       "create_subtitle": "Completa la información para crear una nueva categoría.",
       "edit_subtitle": "Actualiza la información de la categoría.",
@@ -818,7 +812,18 @@
         "name": "Ingresa el nombre de la categoría...",
         "description": "Escribe una descripción breve de la categoría (opcional)..."
       }
-    }
+    },
+    "fields": {
+      "visibility": "En la tienda",
+      "products": "Productos"
+    },
+    "visibility": {
+      "visible": "La ven los clientes",
+      "hidden": "No la ven los clientes",
+      "reason_inactive": "Está desactivada",
+      "reason_empty": "No tiene productos disponibles"
+    },
+    "products_summary": "%{total} asociados · %{disponibles} disponibles"
   },
   "orders": {
     "search_placeholder": "Buscar por pedido, cliente, correo o teléfono",
