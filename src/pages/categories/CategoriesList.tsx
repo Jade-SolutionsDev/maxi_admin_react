@@ -1,7 +1,6 @@
-import { useCanAccess, useTranslate } from "ra-core";
+import { useCanAccess, useRecordContext, useTranslate } from "ra-core";
 
 import {
-  BooleanField,
   ColumnsButton,
   CreateButton,
   DataTable,
@@ -44,6 +43,59 @@ const CategoryActions = () => {
       <ColumnsButton />
       <FilterButton variant="outline" size="lg" />
     </div>
+  );
+};
+
+/**
+ * El estado tal como lo vive el cliente, no solo el interruptor del panel.
+ *
+ * Una categoría activa puede no verse en la tienda: las consultas públicas
+ * ocultan las que no tienen productos disponibles. Antes aquí ponía «Activo» y
+ * nadie podía saber cuáles estaban fuera, ni por qué. El cálculo lo hace el
+ * backend (`visibleInStore`); esta celda lo pinta y añade el motivo, que es lo
+ * accionable: desactivada se arregla con un clic, sin productos no.
+ */
+const EstadoDeLaCategoria = () => {
+  const record = useRecordContext();
+  const translate = useTranslate();
+  if (!record) return null;
+
+  // Rutas que no calculan los conteos: se enseña lo de siempre.
+  if (record.visibleInStore === undefined) {
+    return (
+      <span className="text-sm">
+        {record.isActive
+          ? translate("users.status.active", { _: "Activo" })
+          : translate("users.status.inactive", { _: "Inactivo" })}
+      </span>
+    );
+  }
+
+  if (record.visibleInStore) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+        {translate("categories.visibility.visible", {
+          _: "La ven los clientes",
+        })}
+      </span>
+    );
+  }
+
+  const motivo = record.isActive
+    ? translate("categories.visibility.reason_empty", {
+        _: "No tiene productos disponibles",
+      })
+    : translate("categories.visibility.reason_inactive", {
+        _: "Está desactivada",
+      });
+
+  return (
+    <span
+      className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+      title={motivo}
+    >
+      {motivo}
+    </span>
   );
 };
 
@@ -98,11 +150,7 @@ export default function CategoriesList() {
           disableSort
         />
         <DataTable.Col source="isActive" label="list.fields.status" disableSort>
-          <BooleanField
-            valueLabelFalse="users.status.inactive"
-            valueLabelTrue="users.status.active"
-            source="isActive"
-          />
+          <EstadoDeLaCategoria />
         </DataTable.Col>
         <DataTable.Col label="list.fields.createdAt" source="createdAt">
           <DateField source="createdAt" />
