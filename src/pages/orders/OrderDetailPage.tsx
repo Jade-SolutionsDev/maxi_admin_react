@@ -27,6 +27,7 @@ import {
   ShoppingCart,
   StickyNote,
   UserRound,
+  Copy,
 } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -92,6 +93,8 @@ type CancellationReason =
   "payment_not_received" | "paid_after_expiry_out_of_stock";
 
 interface OrderRecord {
+  /** Enlace público del seguimiento, ya montado por la API (MxH-0059). */
+  trackingUrl?: string | null;
   id: string;
   orderNumber: string | null;
   clientId: string;
@@ -423,6 +426,60 @@ function ExportarPdfButton({ orderId }: { orderId: string }) {
  * La fecha se sella con el pago, así que un pedido sin cobrar enseña el plazo
  * pactado pero todavía no una fecha: no hay desde cuándo contar.
  */
+/**
+ * El enlace público del seguimiento, con un botón para copiarlo.
+ *
+ * Es lo que pidió Merly el 1-oct: poder mandárselo a un cliente. El enlace
+ * llega montado desde la API (`trackingUrl`), porque el panel no sabe cuál es
+ * la dirección pública de la tienda. Si no viene, no se pinta nada: antes eso
+ * que un botón que copie una dirección a medias.
+ *
+ * El botón lleva texto visible, no solo un icono: el comentario pedía «un
+ * nombre intuitivo», y un icono suelto no lo es para quien no lo conoce.
+ */
+function EnlaceDeSeguimiento({ order }: { order: OrderRecord }) {
+  const translate = useTranslate();
+  const notify = useNotify();
+  const url = order.trackingUrl as string | null | undefined;
+  if (!url) return null;
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      notify("orders.tracking.copied", {
+        type: "info",
+        messageArgs: { _: "Enlace copiado" },
+      });
+    } catch {
+      notify("orders.tracking.copy_failed", {
+        type: "error",
+        messageArgs: { _: "No se pudo copiar el enlace" },
+      });
+    }
+  };
+
+  return (
+    <div className="mt-3 border-t border-border pt-3">
+      <p className="text-xs font-medium text-muted-foreground">
+        {translate("orders.tracking.label", {
+          _: "Seguimiento para el cliente",
+        })}
+      </p>
+      <p className="mt-1 break-all text-xs text-muted-foreground">{url}</p>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="mt-2 gap-2"
+        onClick={copiar}
+      >
+        <Copy size={14} />
+        {translate("orders.tracking.copy", { _: "Copiar enlace" })}
+      </Button>
+    </div>
+  );
+}
+
 function CompromisoDeEntrega({ order }: { order: OrderRecord }) {
   const translate = useTranslate();
   if (!order.promiseDays && !order.promisedAt) {
@@ -898,6 +955,7 @@ export default function OrderDetailPage() {
           <Beneficiario order={order} />
           <DeliveryDetails order={order} />
           <CompromisoDeEntrega order={order} />
+          <EnlaceDeSeguimiento order={order} />
         </section>
         <section className="rounded-lg border border-border p-4">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
