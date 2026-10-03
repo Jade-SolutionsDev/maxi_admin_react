@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useDataProvider, useTranslate } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -114,11 +115,14 @@ export function OperationHistoryTab({
           e.type === "TRANSFER" && e.targetLocationName
             ? `${e.locationName ?? "?"} → ${e.targetLocationName}`
             : (e.locationName ?? "");
-        const who = e.actorName
-          ? e.actorName
-          : e.orderId
-            ? `${translate("inventory.history.order", { _: "Pedido" })} #${e.orderId.slice(0, 8)}`
-            : null;
+        // Quién movió el stock: una persona, o el pedido que lo provocó. El
+        // pedido se enseña con SU número —el que sale en todas las demás
+        // pantallas— y lleva a su detalle, que es lo que pedía MxH-0083. Si el
+        // pedido ya no está, queda el texto sin enlace: el movimiento ocurrió.
+        const etiquetaPedido = e.orderId
+          ? `${translate("inventory.history.order", { _: "Pedido" })} ${e.orderNumber ?? `#${e.orderId.slice(0, 8)}`}`
+          : null;
+        const who = e.actorName ?? etiquetaPedido;
         return (
           <li key={i} className="flex items-start gap-3 px-4 py-3">
             <div className={cn("mt-0.5 shrink-0", meta.tone)}>
@@ -146,7 +150,19 @@ export function OperationHistoryTab({
               </div>
               <div className="text-xs text-muted-foreground">
                 {place}
-                {who ? ` · ${who}` : ""}
+                {e.orderId && !e.actorName ? (
+                  <>
+                    {place ? " · " : ""}
+                    <Link
+                      to={`/orders/${e.orderId}`}
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      {etiquetaPedido}
+                    </Link>
+                  </>
+                ) : (
+                  who ? ` · ${who}` : ""
+                )}
               </div>
               {e.note ? (
                 <p className="mt-0.5 text-xs italic text-muted-foreground">
