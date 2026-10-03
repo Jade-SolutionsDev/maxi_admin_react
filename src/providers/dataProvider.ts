@@ -205,6 +205,8 @@ export interface InventoryHistoryEvent {
   actorId: string | null;
   actorName: string | null;
   orderId: string | null;
+  /** `ORD-2026xxxx`: lo que se enseña. El `orderId` es para enlazar. */
+  orderNumber: string | null;
   createdAt: string;
 }
 
