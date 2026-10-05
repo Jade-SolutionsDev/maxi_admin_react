@@ -1449,17 +1449,22 @@
       "email": "Correo",
       "phone": "Teléfono",
       "heading": "Encabezado",
-      "subheading": "Subtítulo"
+      "subheading": "Subtítulo",
+      "social": "Redes sociales",
+      "socialLabel": "Nombre",
+      "socialUrl": "Dirección"
     },
     "hints": {
       "blurb": "Párrafo bajo el logo del pie de página.",
       "copyright": "Línea inferior del pie de página.",
       "legalLinks": "Elige una página activa (Contenido → Páginas); el enlace usa su slug.",
       "email": "Correo de contacto mostrado en el pie y en Contacto.",
-      "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
+      "phone": "Teléfono mostrado en el encabezado, pie y Contacto.",
+      "social": "Salen en el pie de la tienda, en Contacto y en todos los correos. La dirección tiene que empezar por https://"
     },
     "actions": {
-      "add_link": "Añadir enlace"
+      "add_link": "Añadir enlace",
+      "add_social": "Añadir red"
     }
   },
   "cms-home": {

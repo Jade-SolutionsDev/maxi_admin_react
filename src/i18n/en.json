@@ -1445,17 +1445,22 @@
       "email": "Email",
       "phone": "Phone",
       "heading": "Heading",
-      "subheading": "Subheading"
+      "subheading": "Subheading",
+      "social": "Social networks",
+      "socialLabel": "Name",
+      "socialUrl": "Address"
     },
     "hints": {
       "blurb": "Paragraph under the footer logo.",
       "copyright": "Bottom line of the footer.",
       "legalLinks": "Pick an active page (Content → Pages); the link uses its slug.",
       "email": "Contact email shown in the footer and Contact page.",
-      "phone": "Phone shown in the header, footer and Contact page."
+      "phone": "Phone shown in the header, footer and Contact page.",
+      "social": "Shown in the storefront footer, on Contact and in every email. The address must start with https://"
     },
     "actions": {
-      "add_link": "Add link"
+      "add_link": "Add link",
+      "add_social": "Add network"
     }
   },
   "cms-home": {
