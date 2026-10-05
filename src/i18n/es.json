@@ -100,6 +100,10 @@
       "name": "Ajustes del sitio",
       "name_plural": "Ajustes del sitio"
     },
+    "cms-home": {
+      "name": "Portada",
+      "name_plural": "Portada"
+    },
     "contact-messages": {
       "name": "Mensaje",
       "name_plural": "Mensajes de contacto"
@@ -119,6 +123,10 @@
     "payment-methods": {
       "name": "Método de pago",
       "name_plural": "Métodos de pago"
+    },
+    "cms-home-notices": {
+      "name": "Aviso",
+      "name_plural": "Avisos de portada"
     }
   },
   "list": {
@@ -391,6 +399,7 @@
       "reportes": "Reportes",
       "rolesPermisos": "Roles y permisos",
       "soon": "Próximamente",
+      "cmsHome": "Portada",
       "cmsPages": "Páginas",
       "cmsBanners": "Banners",
       "cmsServices": "Servicios",
@@ -414,7 +423,8 @@
       "contactoPlantillas": "Plantillas",
       "nomencladores": "Nomencladores",
       "entregas": "Entregas",
-      "devoluciones": "Devoluciones"
+      "devoluciones": "Devoluciones",
+      "cmsHomeNotices": "Avisos"
     },
     "user": {
       "profile": "Perfil"
@@ -474,7 +484,8 @@
       "orders": "Pedidos",
       "clients": "Clientes",
       "contact": "Contacto (mensajes y plantillas)",
-      "cms-pages": "CMS — Páginas",
+      "cms-home": "CMS — Portada",
+      "cms-pages": "CMS — Textos (páginas y avisos)",
       "cms-banners": "CMS — Banners",
       "cms-services": "CMS — Servicios",
       "cms-staff": "CMS — Equipo",
@@ -492,6 +503,7 @@
       "create": "Crear",
       "update": "Editar",
       "delete": "Eliminar",
+      "publish": "Publicar",
       "view-all": "Ver todos",
       "reply": "Responder",
       "update-status": "Cambiar estado",
@@ -760,9 +772,6 @@
     }
   },
   "departments": {
-    "errors": {
-      "delete_conflict": "No se puede eliminar: el departamento tiene categorías asociadas."
-    },
     "form": {
       "create_subtitle": "Completa la información para crear un nuevo departamento.",
       "edit_subtitle": "Actualiza la información del departamento.",
@@ -784,9 +793,6 @@
     }
   },
   "categories": {
-    "errors": {
-      "delete_conflict": "No se puede eliminar: la categoría tiene productos asociados."
-    },
     "form": {
       "create_subtitle": "Completa la información para crear una nueva categoría.",
       "edit_subtitle": "Actualiza la información de la categoría.",
@@ -806,7 +812,18 @@
         "name": "Ingresa el nombre de la categoría...",
         "description": "Escribe una descripción breve de la categoría (opcional)..."
       }
-    }
+    },
+    "fields": {
+      "visibility": "En la tienda",
+      "products": "Productos"
+    },
+    "visibility": {
+      "visible": "La ven los clientes",
+      "hidden": "No la ven los clientes",
+      "reason_inactive": "Está desactivada",
+      "reason_empty": "No tiene productos disponibles"
+    },
+    "products_summary": "%{total} asociados · %{disponibles} disponibles"
   },
   "orders": {
     "search_placeholder": "Buscar por pedido, cliente, correo o teléfono",
@@ -1142,6 +1159,12 @@
       "missing_pickup_id_card": "el carné de quien recoge",
       "missing_pickup_phone": "el teléfono de quien recoge",
       "missing_payment_method": "el método de pago"
+    },
+    "tracking": {
+      "label": "Seguimiento para el cliente",
+      "copy": "Copiar enlace",
+      "copied": "Enlace copiado",
+      "copy_failed": "No se pudo copiar el enlace"
     }
   },
   "dashboard": {
@@ -1194,7 +1217,8 @@
     },
     "status": {
       "active": "Activo",
-      "inactive": "Inactivo"
+      "inactive": "Inactivo",
+      "pending": "Pendiente"
     },
     "orders": {
       "empty_title": "Sin pedidos",
@@ -1206,7 +1230,13 @@
       "invite_success": "Invitación enviada a %{email}",
       "invite_error": "No se pudo invitar a este cliente",
       "copy_link": "Copiar enlace",
-      "link_copied": "Enlace copiado"
+      "link_copied": "Enlace copiado",
+      "resend": "Reenviar invitación",
+      "resend_success": "Invitación reenviada",
+      "resend_error": "No se pudo reenviar la invitación",
+      "revoke": "Retirar invitación",
+      "revoke_success": "Invitación retirada",
+      "revoke_error": "No se pudo retirar la invitación"
     },
     "fields": {
       "firstName": "Nombre",
@@ -1219,29 +1249,44 @@
       "footnote": "La contraseña la elige el cliente: nosotros no la vemos.",
       "email_failed_title": "La cuenta quedó invitada, pero el correo no salió",
       "email_failed_help": "Pásale este enlace por WhatsApp. Es personal y sirve una sola vez: con él elige su contraseña y entra."
+    },
+    "confirm": {
+      "resend": {
+        "title": "Reenviar invitación",
+        "description": "¿Mandar otra vez la invitación a %{email}? El enlace anterior dejará de servir."
+      },
+      "revoke": {
+        "title": "Retirar invitación",
+        "description": "¿Retirar la invitación de %{email}? El enlace dejará de servir."
+      }
     }
   },
   "cms-pages": {
     "form": {
-      "create_subtitle": "Crea una página informativa para la tienda.",
-      "edit_subtitle": "Edita el contenido de la página.",
-      "note": "La página se publica en /paginas/[slug]; el slug se genera desde el título.",
+      "create_subtitle": "Crea una página informativa o legal para la tienda.",
+      "edit_subtitle": "Edita el borrador de la página.",
+      "note": "Guardar deja la página en borrador: la tienda no cambia hasta que la publiques desde su detalle.",
       "placeholders": {
         "title": "Política de privacidad",
-        "content": "Escribe el contenido en Markdown…"
+        "content": "## Qué datos guardamos\n\n- Tu nombre y tu teléfono, para entregar el pedido.\n- Tu dirección…"
       },
       "hints": {
         "title": "Título visible de la página y origen del slug.",
-        "content": "Markdown: ## títulos, listas con -, **negrita**, [enlaces](https://…).",
         "sortOrder": "Orden en listados de páginas (menor primero).",
-        "isActive": "Inactiva: deja de mostrarse en la tienda (404)."
+        "isActive": "Desactivada: deja de mostrarse en la tienda aunque esté publicada."
       }
     },
     "mandatory": {
-      "title": "Faltan páginas obligatorias",
-      "description": "La tienda enlaza estas páginas por su slug (pie de página y Sobre nosotros). Créalas para no dejar enlaces rotos:",
-      "create_label": "Crear la página %{title}"
-    }
+      "title": "Hay páginas obligatorias que la tienda no muestra",
+      "description": "La tienda enlaza estas páginas por su slug (pie de página, Sobre nosotros y Contacto). Créalas o publícalas para no dejar enlaces rotos:",
+      "create_label": "Crear la página %{title}",
+      "open_label": "Abrir la página %{title} para publicarla"
+    },
+    "publication": {
+      "inactive": "Está desactivada: aunque la publiques, la tienda no la mostrará.",
+      "publish_confirm_description": "La tienda mostrará este borrador en cuanto lo publiques. La versión anterior queda guardada en el historial con su fecha y su autor."
+    },
+    "delete_confirm_description": "¿Seguro que quieres eliminar «%{name}»? Deja de verse en la tienda; su historial de versiones se conserva."
   },
   "cms-faq": {
     "tabs": {
@@ -1292,14 +1337,14 @@
   "cms-banners": {
     "target": {
       "section_title": "Destino del banner",
-      "section_hint": "Enlazá el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
+      "section_hint": "Enlaza el slide a un departamento, una categoría o un producto. El enlace usa su identificador estable, no el slug.",
       "detail_hint": "El slug se resuelve automáticamente y puede cambiar sin editar el banner.",
       "type_label": "Tipo de destino",
       "destination_label": "Destino",
       "none": "Sin destino",
       "none_hint": "El banner se mostrará sin enlace.",
-      "type_hint": "Elegí qué clase de contenido abrirá el banner.",
-      "destination_hint": "Podés asociar contenido inactivo para preparar una campaña.",
+      "type_hint": "Elige qué clase de contenido abrirá el banner.",
+      "destination_hint": "Puedes asociar contenido inactivo para preparar una campaña.",
       "search_placeholder": "Buscar por nombre",
       "available": "Disponible",
       "unavailable": "No disponible",
@@ -1313,7 +1358,13 @@
     "form": {
       "create_subtitle": "Añade un slide al carrusel principal de la tienda.",
       "edit_subtitle": "Edita el slide del carrusel.",
-      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente.",
+      "note": "Sube las tres variantes; las dimensiones se detectan automáticamente. La tienda no cambia hasta que publiques la portada.",
+      "text_title": "Texto sobre la imagen",
+      "text_hint": "Opcional. Déjalo vacío si la imagen ya trae el texto.",
+      "fields": {
+        "title": "Titular",
+        "subtitle": "Subtítulo"
+      },
       "images_title": "Imágenes",
       "images_hint": "Una variante por dispositivo. Respeta las proporciones recomendadas para evitar recortes.",
       "variants": {
@@ -1324,10 +1375,14 @@
       "dimensions": "Dimensiones detectadas: %{width} x %{height} px",
       "dimensions_pending": "Sube una imagen para detectar sus dimensiones.",
       "placeholders": {
-        "alt": "Promociones de la semana"
+        "alt": "Promociones de la semana",
+        "title": "Todo para el hogar",
+        "subtitle": "Hasta 20 % menos esta semana"
       },
       "hints": {
         "alt": "Descripción accesible del banner (lectores de pantalla y SEO).",
+        "title": "Frase corta y grande, hasta 80 caracteres.",
+        "subtitle": "Una línea de apoyo, hasta 160 caracteres.",
         "sortOrder": "Orden del slide en el carrusel (menor primero).",
         "isActive": "Inactivo: el slide no se muestra en la tienda."
       }
@@ -1394,17 +1449,90 @@
       "email": "Correo",
       "phone": "Teléfono",
       "heading": "Encabezado",
-      "subheading": "Subtítulo"
+      "subheading": "Subtítulo",
+      "social": "Redes sociales",
+      "socialLabel": "Nombre",
+      "socialUrl": "Dirección"
     },
     "hints": {
       "blurb": "Párrafo bajo el logo del pie de página.",
       "copyright": "Línea inferior del pie de página.",
       "legalLinks": "Elige una página activa (Contenido → Páginas); el enlace usa su slug.",
       "email": "Correo de contacto mostrado en el pie y en Contacto.",
-      "phone": "Teléfono mostrado en el encabezado, pie y Contacto."
+      "phone": "Teléfono mostrado en el encabezado, pie y Contacto.",
+      "social": "Salen en el pie de la tienda, en Contacto y en todos los correos. La dirección tiene que empezar por https://"
     },
     "actions": {
-      "add_link": "Añadir enlace"
+      "add_link": "Añadir enlace",
+      "add_social": "Añadir red"
+    }
+  },
+  "cms-home": {
+    "subtitle": "Elige lo que ve primero quien entra a la tienda: banners, destacados y el orden de las secciones.",
+    "flow_hint": "Todo lo que cambies aquí y en Banners queda en borrador. La tienda no cambia hasta que publiques.",
+    "status": {
+      "pending": "Hay cambios sin publicar",
+      "up_to_date": "La tienda muestra la última versión",
+      "published": "Publicada el %{date} por %{name}",
+      "never_published": "La portada aún no se ha publicado.",
+      "draft_updated": "Último cambio del borrador: %{date} por %{name}",
+      "unsaved": "Guarda el borrador para verlo en la vista previa o publicarlo.",
+      "read_only": "Solo puedes consultar la portada. Pide permiso de edición para cambiarla."
+    },
+    "actions": {
+      "save": "Guardar borrador",
+      "discard": "Descartar cambios",
+      "preview": "Vista previa",
+      "publish": "Publicar",
+      "publish_confirm_title": "¿Publicar la portada?",
+      "publish_confirm_description": "Los clientes verán el borrador actual, con sus banners, en cuanto confirmes.",
+      "move_up": "Subir %{name}",
+      "move_down": "Bajar %{name}",
+      "remove": "Quitar %{name}"
+    },
+    "notify": {
+      "saved": "Borrador guardado",
+      "published": "Portada publicada",
+      "preview_blocked": "El navegador bloqueó la pestaña de la vista previa. Permite las ventanas emergentes e inténtalo de nuevo."
+    },
+    "sections": {
+      "title": "Orden de las secciones",
+      "hint": "Usa las flechas para cambiar el orden. Las secciones ocultas no aparecen en la tienda.",
+      "visible": "Visible",
+      "banners_link": "Editar banners",
+      "names": {
+        "hero": "Banners",
+        "departments": "Departamentos",
+        "featured-products": "Productos destacados",
+        "services": "Nuestros servicios",
+        "on-sale-products": "Productos en oferta",
+        "categories": "Categorías",
+        "recent-products": "Productos más recientes"
+      }
+    },
+    "featured": {
+      "products_title": "Productos destacados",
+      "products_hint": "Elige y ordena hasta %{max} productos. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "departments_title": "Departamentos destacados",
+      "departments_hint": "Elige y ordena los departamentos del carrusel. Si no eliges ninguno, se muestran los marcados como destacados en el catálogo.",
+      "empty": "Sin selección: se usan los destacados del catálogo.",
+      "add_product": "Añadir producto",
+      "add_department": "Añadir departamento",
+      "search": "Buscar por nombre",
+      "no_results": "Sin resultados",
+      "unknown": "Ya no existe en el catálogo",
+      "limit": "Llegaste al máximo de %{max}."
+    },
+    "history": {
+      "title": "Historial de cambios",
+      "empty": "Todavía no hay cambios registrados.",
+      "actions": {
+        "banner-created": "creó el banner «%{subject}»",
+        "banner-updated": "editó el banner «%{subject}»",
+        "banner-deleted": "eliminó el banner «%{subject}»",
+        "layout-updated": "guardó el borrador de la portada",
+        "published": "publicó la portada"
+      }
     }
   },
   "payment-methods": {
@@ -1420,7 +1548,8 @@
       "bank": "Transferencia",
       "qr": "Código QR",
       "link": "Enlace",
-      "crypto": "Cripto"
+      "crypto": "Cripto",
+      "cash": "Efectivo"
     },
     "form": {
       "create_title": "Nuevo método de pago",
@@ -1441,6 +1570,7 @@
       "memo": "Memo / Tag",
       "memo_hint": "Sólo si tu dirección lo pide: sin él el pago se traba.",
       "note": "Nota para el cliente",
+      "cash_note_hint": "Indica dónde y cuándo pagar, y que el pedido seguirá pendiente hasta el pago o una cancelación explícita.",
       "qr_image": "Imagen del QR",
       "qr_preview": "Vista previa del código QR",
       "qr_uploading": "Subiendo…",
@@ -1620,5 +1750,86 @@
     "empty": "No hay devoluciones en este estado.",
     "outOfStock": "Pagó y no había mercancía",
     "requestedOn": "Registrada"
+  },
+  "cms-home-notices": {
+    "form": {
+      "create_subtitle": "Escribe un aviso temporal para la portada de la tienda.",
+      "edit_subtitle": "Edita el borrador del aviso.",
+      "note": "Guardar deja el aviso en borrador: la portada no cambia hasta que lo publiques desde su detalle.",
+      "placeholders": {
+        "title": "Cerrado el 10 de octubre",
+        "content": "Ese día no hacemos entregas. Los pedidos se entregan a partir del **11 de octubre**."
+      },
+      "hints": {
+        "title": "Se muestra en negrita encima del texto del aviso.",
+        "startsAt": "Vacío: se muestra en cuanto lo publiques.",
+        "endsAt": "Vacío: se muestra hasta que lo desactives.",
+        "sortOrder": "Orden entre avisos (menor primero).",
+        "isActive": "Desactivado: deja de mostrarse en la portada aunque esté publicado."
+      }
+    },
+    "fields": {
+      "startsAt": "Mostrar desde",
+      "endsAt": "Mostrar hasta",
+      "schedule": "Fechas"
+    },
+    "schedule": {
+      "live": "Visible en su horario",
+      "scheduled": "Programado",
+      "ended": "Terminado",
+      "range": "Del %{from} al %{to}",
+      "from": "Desde el %{from}",
+      "until": "Hasta el %{to}",
+      "always": "Sin fechas: se ve mientras esté activo"
+    },
+    "publication": {
+      "inactive": "Está desactivado: aunque lo publiques, la portada no lo mostrará.",
+      "publish_confirm_description": "La portada mostrará este aviso en las fechas que elegiste. La versión anterior queda guardada en el historial."
+    },
+    "delete_confirm_description": "¿Seguro que quieres eliminar el aviso «%{name}»? Deja de verse en la portada; su historial se conserva."
+  },
+  "cms-texts": {
+    "fields": {
+      "publication": "Publicación"
+    },
+    "status": {
+      "unpublished": "Sin publicar",
+      "published": "Publicado",
+      "pending-changes": "Cambios sin publicar"
+    },
+    "draft": "Borrador",
+    "actions": {
+      "edit_draft": "Editar borrador"
+    },
+    "form": {
+      "draft_title": "Se guarda como borrador",
+      "markdown_hint": "Escribe en Markdown: ## título, ### subtítulo, - lista, 1. lista numerada, **negrita**, *cursiva*, [texto del enlace](https://… o /contacto)."
+    },
+    "notify": {
+      "draft_saved": "Borrador guardado. Publícalo cuando esté listo.",
+      "published": "Publicado. La tienda ya muestra la nueva versión."
+    },
+    "publication": {
+      "title": "Publicación",
+      "published": "En la tienda desde el %{date}, publicado por %{name} (versión %{version}).",
+      "never_published": "Aún no está en la tienda. Publícalo cuando el texto esté listo.",
+      "draft_updated": "Último cambio del borrador: %{date} por %{name}.",
+      "pending": "El borrador tiene cambios que la tienda todavía no muestra.",
+      "empty": "El borrador está vacío: escribe el texto antes de publicarlo.",
+      "read_only": "Solo el responsable de la web o un administrador puede publicarlo.",
+      "publish": "Publicar",
+      "publish_confirm_title": "¿Publicar este texto?"
+    },
+    "history": {
+      "title": "Historial de versiones",
+      "empty": "Todavía no se ha publicado ninguna versión.",
+      "version": "Versión %{version}",
+      "by": "%{date} · %{name}",
+      "current": "En la tienda",
+      "lookup_label": "¿Qué decía en una fecha?",
+      "lookup_hint": "Elige la fecha y hora de una compra para ver la versión que estaba publicada.",
+      "lookup_result": "El %{date} la tienda mostraba la versión %{version}, publicada el %{published} por %{name}.",
+      "lookup_none": "En esa fecha este texto aún no se había publicado."
+    }
   }
 }

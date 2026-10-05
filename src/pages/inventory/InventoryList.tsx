@@ -136,7 +136,14 @@ export default function InventoryList() {
         >
           <ReferenceField source="categoryId" reference="categories" />
         </DataTable.Col>
-        <DataTable.Col source="measureUnit" label="list.fields.measureUnit" />
+        {/*
+          Las tres cifras juntas y antes que lo accesorio. Con una pantalla
+          normal, «Disponible» se salía de la tabla y «Reservado» quedaba
+          cortada: lo único que se veía entero era «Existencia», que es
+          justamente el número que NO cambia cuando entra un pedido —sube el
+          reservado y baja el disponible—. Quien mira el listado concluía que
+          el almacén no se entera de las ventas.
+        */}
         <DataTable.NumberCol source="real" label="list.fields.real" />
         <DataTable.NumberCol source="reserved" label="list.fields.reserved" />
         <DataTable.Col
@@ -145,6 +152,7 @@ export default function InventoryList() {
           cellClassName="text-right tabular-nums"
           render={AvailableCell}
         />
+        <DataTable.Col source="measureUnit" label="list.fields.measureUnit" />
         <DataTable.NumberCol source="storageCount" label="list.fields.storages" />
       </DataTable>
     </List>

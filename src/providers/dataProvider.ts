@@ -2,6 +2,8 @@ import { DataProvider, HttpError, fetchUtils } from "ra-core";
 import { getApiToken } from "../lib/clerk/clerkRefs";
 import { backendMessage } from "@/pages/users/errors";
 import { resetIdentityCache } from "./authProvider";
+import type { HomeLayout } from "@/pages/cms-home/home-layout";
+import type { CmsText, CmsTextVersion } from "@/pages/cms-pages/cms-text";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
@@ -203,6 +205,8 @@ export interface InventoryHistoryEvent {
   actorId: string | null;
   actorName: string | null;
   orderId: string | null;
+  /** `ORD-2026xxxx`: lo que se enseña. El `orderId` es para enlazar. */
+  orderNumber: string | null;
   createdAt: string;
 }
 
@@ -231,6 +235,7 @@ export interface ExtendedDataProvider extends DataProvider {
     payload: InviteClientPayload,
   ) => Promise<{ data: ClientInvitationResult }>;
   revokeInvitation: (id: string) => Promise<{ data: unknown }>;
+  revokeClientInvitation: (id: string) => Promise<{ data: unknown }>;
   resendInvitation: (id: string) => Promise<{ data: unknown }>;
   restoreUser: (id: string) => Promise<{ data: unknown }>;
   setUserPassword: (id: string, password: string) => Promise<void>;
@@ -362,6 +367,53 @@ export interface ExtendedDataProvider extends DataProvider {
   updateSiteSettings: (
     data: SiteSettingsData,
   ) => Promise<{ data: SiteSettingsData }>;
+  getCmsHome: () => Promise<{ data: CmsHomeState }>;
+  updateCmsHomeLayout: (layout: HomeLayout) => Promise<{ data: CmsHomeState }>;
+  publishCmsHome: () => Promise<{ data: CmsHomeState }>;
+  createCmsHomePreview: () => Promise<{
+    data: { url: string; expiresAt: string };
+  }>;
+  getCmsHomeChanges: () => Promise<{ data: CmsHomeChange[] }>;
+  /** Puts a text's draft on the store as a new version. */
+  publishCmsText: (
+    resource: CmsTextResource,
+    id: string,
+  ) => Promise<{ data: CmsText }>;
+  /** Every published version of a text, newest first. */
+  getCmsTextVersions: (
+    resource: CmsTextResource,
+    id: string,
+  ) => Promise<{ data: CmsTextVersion[] }>;
+}
+
+/** Resources backed by store texts (draft + published versions). */
+export type CmsTextResource = "cms-pages" | "cms-home-notices";
+
+/** Mirror of the API's CmsHomeEditorStateDto (GET /cms/home). */
+export interface CmsHomeState {
+  layout: HomeLayout;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  publishedAt: string | null;
+  publishedBy: string | null;
+  /** The draft (layout + active banners) differs from what the store shows. */
+  hasUnpublishedChanges: boolean;
+}
+
+export type CmsHomeChangeAction =
+  | "banner-created"
+  | "banner-updated"
+  | "banner-deleted"
+  | "layout-updated"
+  | "published";
+
+/** Mirror of the API's CmsHomeChangeResponseDto (GET /cms/home/changes). */
+export interface CmsHomeChange {
+  id: string;
+  action: CmsHomeChangeAction;
+  subject: string | null;
+  actorName: string;
+  createdAt: string;
 }
 
 /** Mirror of the API's DashboardMetricDto — one figure over two adjacent windows. */
@@ -430,6 +482,7 @@ const RESOURCE_PATHS: Record<string, string> = {
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
   "storage-inventory": "inventory",
   "cms-pages": "cms/pages",
+  "cms-home-notices": "cms/home-notices",
   "cms-banners": "cms/banners",
   "cms-services": "cms/services",
   "cms-staff": "cms/staff",
@@ -772,6 +825,56 @@ export const dataProvider: DataProvider = {
     return { data: payload.data };
   },
 
+  async getCmsHome() {
+    const { json } = await httpClient(`${API_URL}/cms/home`, { method: "GET" });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async updateCmsHomeLayout(layout: HomeLayout) {
+    const { json } = await httpClient(`${API_URL}/cms/home`, {
+      method: "PATCH",
+      body: JSON.stringify(layout),
+    });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async publishCmsHome() {
+    const { json } = await httpClient(`${API_URL}/cms/home/publish`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as CmsHomeState };
+  },
+
+  async createCmsHomePreview() {
+    const { json } = await httpClient(`${API_URL}/cms/home/preview`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as { url: string; expiresAt: string } };
+  },
+
+  async getCmsHomeChanges() {
+    const { json } = await httpClient(`${API_URL}/cms/home/changes`, {
+      method: "GET",
+    });
+    return { data: unwrapOne(json) as CmsHomeChange[] };
+  },
+
+  async publishCmsText(resource: CmsTextResource, id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${id}/publish`,
+      { method: "POST" },
+    );
+    return { data: unwrapOne(json) as CmsText };
+  },
+
+  async getCmsTextVersions(resource: CmsTextResource, id: string) {
+    const { json } = await httpClient(
+      `${API_URL}/${resourcePath(resource)}/${id}/versions`,
+      { method: "GET" },
+    );
+    return { data: unwrapOne(json) as CmsTextVersion[] };
+  },
+
   async getFulfillmentSettings() {
     const { json } = await httpClient(`${API_URL}/fulfillment-settings`, {
       method: "GET",
@@ -838,6 +941,19 @@ export const dataProvider: DataProvider = {
       `${API_URL}/fulfillment${toQueryString({ municipalityId })}`,
     );
     return { data: unwrapOne(json) as FulfillmentOptions };
+  },
+
+  /**
+   * Retira la invitación de un cliente. El enlace deja de servir.
+   *
+   * Reenviar no necesita método propio: `inviteClient` con el mismo correo ya
+   * retira la invitación vieja antes de crear la nueva.
+   */
+  async revokeClientInvitation(id: string) {
+    const { json } = await httpClient(`${API_URL}/clients/invitations/${id}`, {
+      method: "DELETE",
+    });
+    return { data: json ?? null };
   },
 
   async revokeInvitation(id: string) {
