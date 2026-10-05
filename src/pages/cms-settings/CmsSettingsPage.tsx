@@ -136,6 +136,7 @@ export function CmsSettingsPage() {
               helperText="cms-settings.hints.copyright"
             />
             <LegalLinksInput />
+            <RedesSocialesInput />
           </FormSection>
 
           <FormSection
@@ -231,6 +232,81 @@ export function CmsSettingsPage() {
  * typed by hand: pages own their slugs (auto-generated from the title), so
  * the link target is picked from the ACTIVE pages list.
  */
+/**
+ * Las redes de la tienda. Salen en el pie, en la página de contacto y en el
+ * pie de los ocho correos, y hasta MxH-0119 estaban escritas en código en DOS
+ * repos: cambiar un perfil obligaba a tocar los dos y publicar los dos.
+ *
+ * Es una lista y no dos campos fijos para que añadir un TikTok no sea un
+ * cambio de código. El nombre es lo que se lee: no se guarda icono, porque
+ * tanto la tienda como los correos las pintan como texto — un PNG en el pie de
+ * un correo es una imagen más de las que el gestor bloquea, y entonces no
+ * queda ni el enlace.
+ */
+function RedesSocialesInput() {
+  const translate = useTranslate();
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "social",
+  });
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium text-foreground">
+        {translate("cms-settings.fields.social", { _: "Redes sociales" })}
+      </p>
+      {fields.map((field, index) => (
+        <div key={field.id} className="flex items-start gap-2">
+          <div className="grid flex-1 gap-2 sm:grid-cols-2">
+            <TextInput
+              source={`social.${index}.label`}
+              label={translate("cms-settings.fields.socialLabel", {
+                _: "Nombre",
+              })}
+              validate={required()}
+              helperText={false}
+            />
+            <TextInput
+              source={`social.${index}.url`}
+              label={translate("cms-settings.fields.socialUrl", {
+                _: "Dirección",
+              })}
+              validate={required()}
+              helperText={false}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="mt-7 shrink-0 text-destructive"
+            aria-label={translate("shared.actions.delete", { _: "Delete" })}
+            onClick={() => remove(index)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="self-start"
+        onClick={() => append({ label: "", url: "" })}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        {translate("cms-settings.actions.add_social", { _: "Añadir red" })}
+      </Button>
+      <p className="text-xs text-muted-foreground">
+        {translate("cms-settings.hints.social", {
+          _: "Salen en el pie de la tienda, en Contacto y en todos los correos. La dirección tiene que empezar por https://",
+        })}
+      </p>
+    </div>
+  );
+}
+
 function LegalLinksInput() {
   const translate = useTranslate();
   const { control } = useFormContext();
