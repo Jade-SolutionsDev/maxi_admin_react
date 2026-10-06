@@ -701,6 +701,7 @@
       "empty": "No pickup addresses.",
       "label": "Label (optional)",
       "address": "Address",
+      "hours": "Opening hours (optional) — e.g. 9:00 am to 3:00 pm, Monday to Friday",
       "add": "Add address"
     },
     "coverage": {
