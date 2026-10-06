@@ -703,6 +703,7 @@
       "empty": "No hay direcciones de recogida.",
       "label": "Etiqueta (opcional)",
       "address": "Dirección",
+      "hours": "Horario (opcional) — ej. 9:00 am a 3:00 pm, de lunes a viernes",
       "add": "Agregar dirección"
     },
     "coverage": {
