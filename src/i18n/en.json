@@ -1672,6 +1672,7 @@
     "everywhere": "Available everywhere",
     "zone_count": "%{smart_count} zone |||| %{smart_count} zones",
     "free": "Free",
+    "promise_days_badge": "%{smart_count} business day |||| %{smart_count} business days",
     "fields": {
       "label": "Name",
       "description": "Description",
