@@ -1676,6 +1676,7 @@
     "everywhere": "Disponible en todo el país",
     "zone_count": "%{smart_count} zona |||| %{smart_count} zonas",
     "free": "Gratis",
+    "promise_days_badge": "%{smart_count} día hábil |||| %{smart_count} días hábiles",
     "fields": {
       "label": "Nombre",
       "description": "Descripción",

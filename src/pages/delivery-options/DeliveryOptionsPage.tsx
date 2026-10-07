@@ -20,6 +20,8 @@ export interface DeliveryOptionRecord {
   label: string;
   description: string | null;
   fee: number;
+  /** Días hábiles que promete esta opción. `null` = no se promete fecha. */
+  promiseDays: number | null;
   sortOrder: number;
   enabled: boolean;
   zones: DeliveryZone[];
@@ -102,6 +104,14 @@ export function DeliveryOptionsPage() {
                           ? option.fee.toFixed(2)
                           : translate("delivery-options.free", { _: "Free" })}
                       </Badge>
+                      {option.promiseDays != null && option.promiseDays > 0 && (
+                        <Badge variant="secondary">
+                          {translate("delivery-options.promise_days_badge", {
+                            smart_count: option.promiseDays,
+                            _: `${option.promiseDays} días hábiles`,
+                          })}
+                        </Badge>
+                      )}
                     </p>
                     {option.description && (
                       <p className="text-sm text-muted-foreground">
