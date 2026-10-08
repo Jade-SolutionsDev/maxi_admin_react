@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSignIn, useUser } from '@clerk/react';
 import { useTranslate } from 'ra-core';
 import { getErrorMessage } from './clerkErrors';
+import { tomarMensajeSinAcceso } from '@/lib/acceso-al-panel';
 
 export type Step = 'credentials' | 'verify' | 'forgot' | 'reset';
 export type CodeStrategy = 'email_code' | 'phone_code';
@@ -26,7 +27,14 @@ export function useSignInFlow() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  /**
+   * MxH-0158: quien no está dado de alta, o tiene la cuenta desactivada, pasa
+   * el acceso de Clerk —su cuenta existe de verdad— y lo rechaza la API.
+   * Volvía aquí sin una palabra, así que parecía que la contraseña estaba mal
+   * y se volvía a intentar. El motivo lo dejó escrito el authProvider antes de
+   * cerrar la sesión, y entra como el error de partida de la pantalla.
+   */
+  const [error, setError] = useState(() => tomarMensajeSinAcceso() ?? '');
   const [isLoading, setIsLoading] = useState(false);
 
   // Client Trust (new-device verification) state.
@@ -45,6 +53,7 @@ export function useSignInFlow() {
       navigate('/', { replace: true });
     }
   }, [isSignedIn, navigate]);
+
 
   /** Wraps a submit handler with shared error/loading bookkeeping. */
   const submit = (fn: () => Promise<void>) => async (e: React.FormEvent) => {
