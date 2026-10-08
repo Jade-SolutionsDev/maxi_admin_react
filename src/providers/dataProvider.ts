@@ -458,6 +458,11 @@ export interface FulfillmentSettings {
   supportMessage: string;
   /** Días hábiles hasta tener el pedido listo para recoger; null = sin plazo. */
   pickupPromiseDays?: number | null;
+  /**
+   * Subtotal en USD a partir del cual el envío sale gratis, o `null` si no hay
+   * promoción. Entra y sale en dólares; la API lo guarda en céntimos.
+   */
+  freeDeliveryThreshold: number | null;
   /** Pickup is on but no active storage has an address to collect from. */
   pickupEnabledWithoutAddresses: boolean;
   /**
