@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useSignIn, useUser } from '@clerk/react';
 import { useTranslate } from 'ra-core';
 import { getErrorMessage } from './clerkErrors';
-import { tomarMensajeSinAcceso } from '@/lib/acceso-al-panel';
+import {
+  leerMensajeSinAcceso,
+  olvidarMensajeSinAcceso,
+} from '@/lib/acceso-al-panel';
 
 export type Step = 'credentials' | 'verify' | 'forgot' | 'reset';
 export type CodeStrategy = 'email_code' | 'phone_code';
@@ -34,7 +37,7 @@ export function useSignInFlow() {
    * y se volvía a intentar. El motivo lo dejó escrito el authProvider antes de
    * cerrar la sesión, y entra como el error de partida de la pantalla.
    */
-  const [error, setError] = useState(() => tomarMensajeSinAcceso() ?? '');
+  const [error, setError] = useState(() => leerMensajeSinAcceso() ?? '');
   const [isLoading, setIsLoading] = useState(false);
 
   // Client Trust (new-device verification) state.
@@ -58,6 +61,8 @@ export function useSignInFlow() {
   /** Wraps a submit handler with shared error/loading bookkeeping. */
   const submit = (fn: () => Promise<void>) => async (e: React.FormEvent) => {
     e.preventDefault();
+    // Al volver a intentarlo, el aviso del intento anterior deja de valer.
+    olvidarMensajeSinAcceso();
     setError('');
     setIsLoading(true);
     try {
