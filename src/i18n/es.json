@@ -1170,6 +1170,9 @@
       "copy": "Copiar enlace",
       "copied": "Enlace copiado",
       "copy_failed": "No se pudo copiar el enlace"
+    },
+    "paid_pending": {
+      "notice": "Cobrado y pendiente de confirmar. El stock sigue apartado para este pedido y se compromete al confirmarlo: un cobro no confirma el pedido solo, tampoco cuando viene de la pasarela."
     }
   },
   "dashboard": {

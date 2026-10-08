@@ -23,6 +23,7 @@ import {
   Loader2,
   MapPin,
   Pencil,
+  Info,
   RotateCcw,
   ShoppingCart,
   StickyNote,
@@ -704,6 +705,21 @@ export default function OrderDetailPage() {
           {translate("orders.reinstated.notice", {
             _: "Restablecida el %{date}. El plazo de pago volvió a empezar; si no se paga a tiempo, se cancelará de nuevo.",
             date: new Date(order.reinstatedAt).toLocaleString(),
+          })}
+        </p>
+      )}
+
+      {/* Cobrar no confirma. QA lo leyó como un defecto en MxH-0111 —«al marcar
+          pagado el stock no se descuenta si no das a confirmar»— porque la
+          pantalla no lo decía en ninguna parte. Es a propósito y vale igual
+          para la pasarela: `propagateToOrder` pone el pago en «pagado» y no
+          toca el estado del pedido, así que confirmar sigue siendo un acto de
+          una persona. En staging hay 7 pedidos esperando justo aquí. */}
+      {order.status === "pending" && order.paymentStatus === "paid" && (
+        <p className="mb-6 flex items-start gap-2 text-sm text-muted-foreground">
+          <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          {translate("orders.paid_pending.notice", {
+            _: "Cobrado y pendiente de confirmar. El stock sigue apartado para este pedido y se compromete al confirmarlo: un cobro no confirma el pedido solo, tampoco cuando viene de la pasarela.",
           })}
         </p>
       )}
