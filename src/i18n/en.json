@@ -885,7 +885,8 @@
       "pdf_error": "Could not generate the PDF",
       "report": "Export to PDF",
       "report_loading": "Generating…",
-      "report_error": "Could not generate the report"
+      "report_error": "Could not generate the report",
+      "picked_up_id_invalid": "The ID number must be 11 digits."
     },
     "payment": {
       "provider": "Provider",

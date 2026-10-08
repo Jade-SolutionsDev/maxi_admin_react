@@ -34,6 +34,25 @@ export const PAYMENT_STATUSES: OrderPaymentStatus[] = [
   "refunded",
 ];
 
+/**
+ * Espeja PAYMENT_TRANSITIONS del servidor (`orders.service.ts`): liquidar o
+ * fallar un pago pendiente, reintentar uno fallido, reembolsar uno cobrado.
+ * **Un cobro con éxito no se puede deshacer**, solo reembolsar.
+ *
+ * Sin esto el detalle ofrecía todos los estados menos el actual, así que en un
+ * pedido pagado salían «Pago pendiente» y «Pago fallido» y al pulsarlos la API
+ * respondía 409 con un mensaje en inglés. QA lo reportó en MxH-0111.
+ */
+export const PAYMENT_TRANSITIONS: Record<
+  OrderPaymentStatus,
+  OrderPaymentStatus[]
+> = {
+  pending: ["paid", "failed"],
+  failed: ["paid", "pending"],
+  paid: ["refunded"],
+  refunded: [],
+};
+
 /** Tailwind classes per status for the badge chips. */
 export const STATUS_CLASSES: Record<OrderStatus, string> = {
   pending: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
