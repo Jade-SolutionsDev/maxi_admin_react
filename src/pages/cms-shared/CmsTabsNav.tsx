@@ -22,7 +22,7 @@ export function CmsTabsNav() {
   return (
     <div
       role="tablist"
-      aria-label={translate("app.menu.cms", { _: "CMS" })}
+      aria-label={translate("app.menu.cms", { _: "Sitio web" })}
       className="mb-4 flex gap-1 overflow-x-auto border-b border-border px-4 pt-4"
     >
       {tabs.map(({ labelKey, path, activePrefixes, icon: Icon }) => {
