@@ -191,7 +191,8 @@
       "inactive": "Inactive",
       "pending": "Awaiting approval",
       "status": "Status",
-      "show_deleted": "Show deleted"
+      "show_deleted": "Show deleted",
+      "role_staff": "Staff (any role)"
     },
     "roles": {
       "SUPER_ADMIN": "Super admin",
@@ -541,7 +542,9 @@
       "save": "Save",
       "saved": "Roles updated",
       "error": "Could not update roles"
-    }
+    },
+    "base": "Base",
+    "base_hint": "Ships with the platform. It can be edited and renamed like any other role."
   },
   "invitation": {
     "brand_tagline": "Provider Panel",

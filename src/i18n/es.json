@@ -191,7 +191,8 @@
       "inactive": "Inactivos",
       "pending": "Por aprobar",
       "status": "Estado",
-      "show_deleted": "Mostrar eliminados"
+      "show_deleted": "Mostrar eliminados",
+      "role_staff": "Empleado (cualquier rol)"
     },
     "roles": {
       "SUPER_ADMIN": "Súper administrador",
@@ -543,7 +544,9 @@
       "save": "Guardar",
       "saved": "Roles actualizados",
       "error": "No se pudieron actualizar los roles"
-    }
+    },
+    "base": "Base",
+    "base_hint": "Rol que viene con la plataforma. Se puede editar y renombrar como cualquier otro."
   },
   "invitation": {
     "brand_tagline": "Panel de Proveedores",
