@@ -32,7 +32,6 @@ export function esMotivoSinAcceso(code: unknown): code is MotivoSinAcceso {
  * el aviso pero no se rompe el acceso.
  */
 export function guardarMotivo(motivo: MotivoSinAcceso): void {
-  leido = undefined;
   try {
     sessionStorage.setItem(CLAVE, motivo);
   } catch {
@@ -41,28 +40,28 @@ export function guardarMotivo(motivo: MotivoSinAcceso): void {
 }
 
 /**
- * Lo ya leído en esta carga. React puede pedir el valor inicial de un estado
- * dos veces —StrictMode lo hace en desarrollo—, y sin esto la segunda llamada
- * se encontraría el aviso ya consumido y la pantalla saldría muda. Se olvida
- * en cuanto se guarda un motivo nuevo, para que un segundo intento fallido sí
- * enseñe el suyo.
+ * Lo lee **sin borrarlo**, y esto es lo importante: cerrar la sesión de Clerk
+ * recarga la página entera. Medido en staging, el motivo se guardaba a los
+ * 598 ms y desaparecía 200 ms después — la pantalla de acceso lo leía, lo
+ * consumía, y la recarga que venía detrás se llevaba por delante ese render.
+ * El aviso se escribía y no lo veía nadie.
+ *
+ * Se olvida cuando la persona vuelve a intentar entrar, que es cuando deja de
+ * tener sentido enseñarlo.
  */
-let leido: string | null | undefined;
-
-/** Lo devuelve una sola vez: un aviso viejo no debe reaparecer al día siguiente. */
-export function tomarMensajeSinAcceso(): string | null {
-  if (leido !== undefined) return leido;
+export function leerMensajeSinAcceso(): string | null {
   try {
     const motivo = sessionStorage.getItem(CLAVE);
-    if (!esMotivoSinAcceso(motivo)) {
-      leido = null;
-      return null;
-    }
-    sessionStorage.removeItem(CLAVE);
-    leido = MENSAJES[motivo];
-    return leido;
+    return esMotivoSinAcceso(motivo) ? MENSAJES[motivo] : null;
   } catch {
-    leido = null;
     return null;
+  }
+}
+
+export function olvidarMensajeSinAcceso(): void {
+  try {
+    sessionStorage.removeItem(CLAVE);
+  } catch {
+    // Si no se puede borrar tampoco se pudo guardar: no hay nada que olvidar.
   }
 }
