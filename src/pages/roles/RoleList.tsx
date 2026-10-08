@@ -53,15 +53,28 @@ const RoleActions = () => (
   </div>
 );
 
+/**
+ * Tres clases de rol, no dos. Los semilla («Almacenero — base» y compañía)
+ * llevan `systemKey` y se pueden editar, así que no son «del sistema», pero
+ * tampoco los creó nadie aquí: la columna los llamaba «Personalizado» igual
+ * que a los demás y la única pista era el sufijo «— base» pegado al nombre.
+ * QA lo señaló en MxH-0103.
+ */
 const RoleTypeCell = () => {
   const record = useRecordContext();
   const translate = useTranslate();
   if (!record) return null;
-  return record.isSystem ? (
-    <Badge variant="secondary">{translate("roles.system")}</Badge>
-  ) : (
-    <Badge variant="outline">{translate("roles.custom")}</Badge>
-  );
+  if (record.isSystem) {
+    return <Badge variant="secondary">{translate("roles.system")}</Badge>;
+  }
+  if (record.systemKey) {
+    return (
+      <Badge variant="secondary" title={translate("roles.base_hint")}>
+        {translate("roles.base")}
+      </Badge>
+    );
+  }
+  return <Badge variant="outline">{translate("roles.custom")}</Badge>;
 };
 
 const RolePermissionsCountCell = () => {
