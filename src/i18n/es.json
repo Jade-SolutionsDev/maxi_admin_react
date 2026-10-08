@@ -888,7 +888,8 @@
       "pdf_error": "No se pudo generar el PDF",
       "report": "Exportar a PDF",
       "report_loading": "Generando…",
-      "report_error": "No se pudo generar el reporte"
+      "report_error": "No se pudo generar el reporte",
+      "picked_up_id_invalid": "El carné debe tener 11 dígitos."
     },
     "payment": {
       "provider": "Proveedor",

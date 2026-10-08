@@ -64,16 +64,15 @@ import {
   money,
   ORDER_STATUSES,
   type OrderPayment,
-  PAYMENT_STATUSES,
+  PAYMENT_TRANSITIONS,
   STATUS_TRANSITIONS,
 } from "./orderStatus";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { OrderCorrectionCard } from "./OrderCorrectionCard";
 import { OrderItemsEditor } from "./OrderItemsEditor";
 import { OrderHistorySection } from "./OrderHistorySection";
@@ -577,6 +576,9 @@ export default function OrderDetailPage() {
   // casi nunca es el comprador, y de esa fecha cuelga el plazo para reclamar.
   const [pickupName, setPickupName] = useState("");
   const [pickupIdCard, setPickupIdCard] = useState("");
+  /** Anotar el carné es opcional; anotarlo a medias, no. */
+  const carneIncompleto =
+    pickupIdCard.length > 0 && pickupIdCard.length !== 11;
 
   const mutation = useMutation({
     mutationFn: (action: PendingAction) => {
@@ -740,42 +742,50 @@ export default function OrderDetailPage() {
             {translate(`orders.actions.set_${target}`, { _: target })}
           </Button>
         ))}
+        {/* Menú, no <Select>. Radix bloquea el `pointer-events` del body
+            mientras un Select está abierto y lo restaura al cerrarse; si el
+            diálogo de confirmación se abre en ese hueco, al cerrarlo restaura
+            el valor de entonces («none») y la página queda muerta hasta
+            recargar. QA lo reportó en MxH-0111.
+
+            Medido en staging: el diálogo solo no congela y el selector solo
+            tampoco, solo la combinación, y el «none» se reescribe un segundo
+            después de cerrar el diálogo. `DropdownMenu modal={false}` —el
+            patrón que ya usan el menú de idioma y el de tema— no toca el body,
+            así que la carrera desaparece de raíz. */}
         {directTargets.length > 0 && (
-          <Select
-            value=""
-            disabled={mutation.isPending}
-            onValueChange={(value) =>
-              setPending({
-                kind: "status",
-                value: value as OrderStatus,
-                direct: true,
-              })
-            }
-          >
-            <SelectTrigger
-              className="w-auto gap-2"
-              aria-label={translate("orders.actions.direct_label", {
-                _: "Cambiar estado directamente",
-              })}
-            >
-              <FastForward className="h-4 w-4" />
-              <SelectValue
-                placeholder={translate("orders.actions.direct_placeholder", {
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={mutation.isPending}
+                aria-label={translate("orders.actions.direct_label", {
+                  _: "Cambiar estado directamente",
+                })}
+              >
+                <FastForward className="mr-2 h-4 w-4" />
+                {translate("orders.actions.direct_placeholder", {
                   _: "Saltar a estado…",
                 })}
-              />
-            </SelectTrigger>
-            <SelectContent>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
               {directTargets.map((target) => (
-                <SelectItem key={target} value={target}>
+                <DropdownMenuItem
+                  key={target}
+                  onSelect={() =>
+                    setPending({ kind: "status", value: target, direct: true })
+                  }
+                >
                   {translate(`orders.status.${target}`, { _: target })}
-                </SelectItem>
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
         {isManager &&
-          PAYMENT_STATUSES.filter((p) => p !== order.paymentStatus).map(
+          PAYMENT_TRANSITIONS[order.paymentStatus].map(
             (target) => (
               <Button
                 key={target}
@@ -1037,11 +1047,33 @@ export default function OrderDetailPage() {
                       _: "Carné de identidad",
                     })}
                   </Label>
+                  {/* Solo dígitos y como mucho 11: el carné cubano es
+                      AAMMDD + 5. Antes aceptaba letras y cualquier largo
+                      (MxH-0111). Quién es el dueño de la regla: la API, con
+                      `@IsCubanIdCard()`, que además comprueba que la fecha
+                      exista; aquí se ataja lo que se teclea para no mandar un
+                      409 por algo que se ve a simple vista. */}
                   <Input
                     id="pickup-id"
                     value={pickupIdCard}
-                    onChange={(e) => setPickupIdCard(e.target.value)}
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={11}
+                    placeholder="85042312345"
+                    aria-invalid={carneIncompleto || undefined}
+                    onChange={(e) =>
+                      setPickupIdCard(
+                        e.target.value.replace(/\D/g, "").slice(0, 11),
+                      )
+                    }
                   />
+                  {carneIncompleto && (
+                    <p className="text-xs text-destructive">
+                      {translate("orders.actions.picked_up_id_invalid", {
+                        _: "El carné debe tener 11 dígitos.",
+                      })}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -1051,7 +1083,7 @@ export default function OrderDetailPage() {
               {translate("shared.actions.cancel", { _: "Cancelar" })}
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || carneIncompleto}
               className={cn(
                 pending?.kind === "status" &&
                   pending.value === "cancelled" &&
