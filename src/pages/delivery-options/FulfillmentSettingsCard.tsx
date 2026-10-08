@@ -29,6 +29,26 @@ import type {
  * nothing. Warns about the one configuration that silently strands them:
  * pickup on with no storage address anywhere.
  */
+/**
+ * Los primeros por su nombre y el resto contados. Son hasta 63 municipios: la
+ * lista entera no se lee y lo que hace falta saber es cuáles mirar primero.
+ */
+const MUNICIPIOS_VISIBLES = 8;
+
+function listaDeMunicipios(
+  municipios: { id: string; name: string }[],
+  translate: ReturnType<typeof useTranslate>,
+) {
+  const nombres = municipios.map((m) => m.name);
+  if (nombres.length <= MUNICIPIOS_VISIBLES) return nombres.join(", ");
+  const resto = nombres.length - MUNICIPIOS_VISIBLES;
+  return translate("fulfillment.sin_despacho.y_mas", {
+    lista: nombres.slice(0, MUNICIPIOS_VISIBLES).join(", "),
+    smart_count: resto,
+    _: "%{lista} y %{smart_count} más",
+  });
+}
+
 export function FulfillmentSettingsCard() {
   const translate = useTranslate();
   const notify = useNotify();
@@ -172,6 +192,34 @@ export function FulfillmentSettingsCard() {
             _: "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything.",
           })}
         </p>
+      )}
+
+      {data.municipalitiesWithoutFulfillment?.length > 0 && (
+        <div className="flex items-start gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
+          <AlertTriangle
+            className="mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          <div className="flex flex-col gap-1">
+            <p className="font-medium">
+              {translate("fulfillment.sin_despacho.titulo", {
+                smart_count: data.municipalitiesWithoutFulfillment.length,
+                _: "%{smart_count} municipio(s) con productos a la venta y ninguna forma de recibirlos",
+              })}
+            </p>
+            <p>
+              {translate("fulfillment.sin_despacho.detalle", {
+                _: "La tienda les enseña el catálogo porque un almacén activo los cubre, y al finalizar la compra no encuentran ni mostrador ni entrega. Activa la recogida, añade un mostrador o crea una opción de entrega que llegue a estas zonas:",
+              })}
+            </p>
+            <p className="text-pretty">
+              {listaDeMunicipios(
+                data.municipalitiesWithoutFulfillment,
+                translate,
+              )}
+            </p>
+          </div>
+        </div>
       )}
 
       <div className="flex flex-col gap-2">

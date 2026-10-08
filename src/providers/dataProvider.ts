@@ -460,6 +460,12 @@ export interface FulfillmentSettings {
   pickupPromiseDays?: number | null;
   /** Pickup is on but no active storage has an address to collect from. */
   pickupEnabledWithoutAddresses: boolean;
+  /**
+   * Municipios que el catálogo da por vendibles y a los que no llega nada: un
+   * almacén activo los cubre, pero en el checkout no hay ni mostrador ni
+   * entrega que alcance esa zona.
+   */
+  municipalitiesWithoutFulfillment: { id: string; name: string }[];
 }
 
 /** Mirror of the API's SiteSettingsData (cms/settings singleton document). */
