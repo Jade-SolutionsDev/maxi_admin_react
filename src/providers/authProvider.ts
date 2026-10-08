@@ -1,5 +1,10 @@
 import { AuthProvider } from "ra-core";
 import { getApiToken, clerkSignOut } from "../lib/clerk/clerkRefs";
+import {
+  esMotivoSinAcceso,
+  guardarMotivo,
+  type MotivoSinAcceso,
+} from "../lib/acceso-al-panel";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
 
@@ -114,8 +119,20 @@ async function api(path: string, init: RequestInit = {}) {
   });
 
   if (!response.ok) {
-    const err = new Error(response.statusText) as Error & { status?: number };
+    const err = new Error(response.statusText) as Error & {
+      status?: number;
+      code?: string;
+    };
     err.status = response.status;
+    // El código dice *por qué* se rechaza, y de eso depende qué se le enseña a
+    // la persona: «pide que te den de alta» no es lo mismo que «vuelve a
+    // entrar» (MxH-0158). Si el cuerpo no se puede leer, se queda sin código y
+    // todo sigue como antes.
+    err.code = await response
+      .clone()
+      .json()
+      .then((cuerpo) => (cuerpo as { error?: { code?: string } })?.error?.code)
+      .catch(() => undefined);
     throw err;
   }
 
@@ -156,6 +173,12 @@ async function loadIdentity(): Promise<Identity> {
   return identityCache;
 }
 
+/** El motivo que manda la API, si es uno de los que la persona puede resolver. */
+function motivoSinAcceso(error: unknown): MotivoSinAcceso | null {
+  const code = (error as { code?: unknown })?.code;
+  return esMotivoSinAcceso(code) ? code : null;
+}
+
 export const authProvider: AuthProvider = {
   // Clerk provides its own sign-in UI; this method is intentionally a no-op.
   async login() {
@@ -169,15 +192,47 @@ export const authProvider: AuthProvider = {
     return Promise.resolve();
   },
 
+  /**
+   * Tener token de Clerk no es tener acceso al panel: la cuenta puede existir
+   * y no estar dada de alta, o estar desactivada. Antes solo se miraba el
+   * token, así que esas dos personas entraban, la aplicación fallaba por
+   * dentro y volvían al acceso sin saber por qué (MxH-0158).
+   *
+   * La identidad está cacheada, así que esto es una llamada la primera vez y
+   * ninguna después.
+   */
   async checkAuth() {
     const token = await getApiToken();
     if (!token) {
       return Promise.reject(new Error("Not authenticated"));
     }
+
+    try {
+      await loadIdentity();
+    } catch (error) {
+      const motivo = motivoSinAcceso(error);
+      if (!motivo) {
+        // Un fallo de red o un 500 no son una cuenta sin acceso: a nadie se le
+        // cierra la sesión por eso.
+        return Promise.resolve();
+      }
+      guardarMotivo(motivo);
+      await clerkSignOut();
+      return Promise.reject(new Error(motivo));
+    }
+
     return Promise.resolve();
   },
 
   async checkError(error) {
+    // Una cuenta que dejan sin acceso mientras la usa: se le dice lo mismo que
+    // si lo intentara ahora, y no se la devuelve al acceso en blanco.
+    const motivo = motivoSinAcceso(error);
+    if (motivo) {
+      guardarMotivo(motivo);
+      return Promise.reject();
+    }
+
     if (
       error &&
       typeof error === "object" &&
