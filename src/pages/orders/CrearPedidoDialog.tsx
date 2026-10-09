@@ -739,7 +739,7 @@ export function CrearPedidoDialog({
                       {opciones?.unavailableMessage ||
                         t(
                           "orders.create.fulfillment_unavailable_fallback",
-                          "Esta zona no admite entrega a domicilio ni recogida en el local.",
+                          "Esta zona no admite entrega a domicilio ni recogida en la tienda.",
                         )}
                     </p>
                   ) : opciones ? (
@@ -766,7 +766,7 @@ export function CrearPedidoDialog({
                               <option value="pickup">
                                 {t(
                                   "orders.fulfillment.pickup",
-                                  "Recogida en el local",
+                                  "Recogida en la tienda",
                                 )}
                               </option>
                             )}

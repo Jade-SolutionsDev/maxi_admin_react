@@ -115,7 +115,7 @@ export function FulfillmentSettingsCard() {
         <Store className="size-5 text-muted-foreground" aria-hidden="true" />
         <div>
           <h2 className="text-base font-semibold">
-            {translate("fulfillment.pickup.title", { _: "Pickup at our location" })}
+            {translate("fulfillment.pickup.title", { _: "Pickup at the store" })}
           </h2>
           <p className="text-sm text-muted-foreground">
             {translate("fulfillment.pickup.subtitle", { _: "" })}
