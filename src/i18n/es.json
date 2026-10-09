@@ -1689,14 +1689,16 @@
       "description": "Descripción",
       "fee": "Costo de envío",
       "enabled": "Activa",
-      "promiseDays": "Plazo (días hábiles)"
+      "promiseDays": "Plazo (días hábiles)",
+      "freeDeliveryThreshold": "Envío gratis a partir de (USD)"
     },
     "form": {
       "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
       "hints": {
         "fee": "Se suma al total del pedido. Déjalo en 0 si la entrega es gratis.",
         "enabled": "Solo las formas activas aparecen al finalizar la compra.",
-        "promiseDays": "Días hábiles desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha."
+        "promiseDays": "Días hábiles desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha.",
+        "freeDeliveryThreshold": "Subtotal de productos desde el que esta entrega no se cobra, sin contar el envío. Vacío: se cobra siempre."
       }
     },
     "confirm": {
