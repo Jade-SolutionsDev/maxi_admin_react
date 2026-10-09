@@ -321,7 +321,7 @@ export const ReportDialog = ({
                 {t("orders.report.delivery", "A domicilio")}
               </option>
               <option value="pickup">
-                {t("orders.report.pickup", "Recogida en tienda")}
+                {t("orders.report.pickup", "Recogida en el local")}
               </option>
             </select>
           </Campo>

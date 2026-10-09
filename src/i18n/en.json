@@ -929,7 +929,7 @@
     },
     "fulfillment": {
       "delivery": "Home delivery",
-      "pickup": "Pickup in store",
+      "pickup": "Pickup at our location",
       "between": "Between"
     },
     "recipient": {
@@ -1710,14 +1710,14 @@
   },
   "fulfillment": {
     "pickup": {
-      "title": "Pickup in store",
+      "title": "Pickup at our location",
       "subtitle": "Let customers collect their order at a storage.",
       "toggle": "Let customers collect their orders",
       "no_addresses": "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything.",
       "confirm": {
-        "on_title": "Allow pickup in store?",
+        "on_title": "Allow pickup at our location?",
         "on_desc": "Customers will be able to collect their order at a storage that has a pickup address.",
-        "off_title": "Disable pickup in store?",
+        "off_title": "Disable pickup at our location?",
         "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
         "on_cta": "Enable",
         "off_cta": "Disable"
