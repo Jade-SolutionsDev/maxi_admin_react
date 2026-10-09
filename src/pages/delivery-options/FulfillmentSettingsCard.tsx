@@ -56,8 +56,6 @@ export function FulfillmentSettingsCard() {
   const [data, setData] = useState<FulfillmentSettings | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState("");
-  // Importe a partir del cual el envío deja de cobrarse. Vacío = sin promoción.
-  const [umbralEnvioGratis, setUmbralEnvioGratis] = useState("");
   // Días hábiles hasta tener el pedido listo para recoger. Vacío = sin
   // compromiso, que es lo honesto mientras no se quiera prometer nada.
   const [plazoRecogida, setPlazoRecogida] = useState("");
@@ -78,11 +76,6 @@ export function FulfillmentSettingsCard() {
             ? String(settings.pickupPromiseDays)
             : "",
         );
-        setUmbralEnvioGratis(
-          settings.freeDeliveryThreshold != null
-            ? String(settings.freeDeliveryThreshold)
-            : "",
-        );
       })
       .catch(() => {
         if (!cancelled) notify("shared.actions.error", { type: "error" });
@@ -101,11 +94,6 @@ export function FulfillmentSettingsCard() {
       setPlazoRecogida(
         result.data.pickupPromiseDays != null
           ? String(result.data.pickupPromiseDays)
-          : "",
-      );
-      setUmbralEnvioGratis(
-        result.data.freeDeliveryThreshold != null
-          ? String(result.data.freeDeliveryThreshold)
           : "",
       );
       notify("fulfillment.saved", { type: "info", _: "Changes saved" });
@@ -277,53 +265,6 @@ export function FulfillmentSettingsCard() {
         <p className="text-sm text-muted-foreground">
           {translate("fulfillment.pickup.promise_days.hint", {
             _: "Se cuenta desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha.",
-          })}
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium" htmlFor="freeDeliveryThreshold">
-          {translate("fulfillment.free_delivery.label", {
-            _: "Envío gratis a partir de (USD)",
-          })}
-        </label>
-        <div className="flex items-start gap-2">
-          <Input
-            id="freeDeliveryThreshold"
-            type="number"
-            min={0.01}
-            step={0.01}
-            className="w-32"
-            value={umbralEnvioGratis}
-            onChange={(event) => setUmbralEnvioGratis(event.target.value)}
-            placeholder={translate("fulfillment.free_delivery.empty", {
-              _: "Sin promoción",
-            })}
-          />
-          <Button
-            type="button"
-            size="sm"
-            disabled={
-              isPending ||
-              umbralEnvioGratis ===
-                (data.freeDeliveryThreshold != null
-                  ? String(data.freeDeliveryThreshold)
-                  : "")
-            }
-            onClick={() =>
-              void save({
-                freeDeliveryThreshold: umbralEnvioGratis.trim()
-                  ? Number(umbralEnvioGratis)
-                  : null,
-              })
-            }
-          >
-            {translate("shared.actions.save", { _: "Save" })}
-          </Button>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {translate("fulfillment.free_delivery.hint", {
-            _: "Se compara con el subtotal de productos, sin contar el envío. Vacío: el envío se cobra siempre.",
           })}
         </p>
       </div>

@@ -1685,14 +1685,16 @@
       "description": "Description",
       "fee": "Delivery fee",
       "enabled": "Enabled",
-      "promiseDays": "Promise (working days)"
+      "promiseDays": "Promise (working days)",
+      "freeDeliveryThreshold": "Free delivery from (USD)"
     },
     "form": {
       "note": "With no zones selected the option is offered everywhere.",
       "hints": {
         "fee": "Added to the order total. Leave it at 0 when delivery is free.",
         "enabled": "Only enabled options appear at checkout.",
-        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
+        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date.",
+        "freeDeliveryThreshold": "Product subtotal from which this delivery is not charged, shipping excluded. Empty: always charged."
       }
     },
     "confirm": {
