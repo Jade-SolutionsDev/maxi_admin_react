@@ -200,7 +200,7 @@ function DeliveryDetails({ order }: { order: OrderRecord }) {
         {text(pickup.label) && <dd>{text(pickup.label)}</dd>}
         <dd>{text(pickup.address)}</dd>
         <dd className="pt-1">
-          {translate("orders.fulfillment.pickup", { _: "Recogida en el local" })}
+          {translate("orders.fulfillment.pickup", { _: "Recogida en la tienda" })}
         </dd>
         {(order.reservationStorages?.length ?? 0) > 1 && (
           <dd>

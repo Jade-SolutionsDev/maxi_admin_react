@@ -122,7 +122,7 @@ When(
 
 When('cambia el interruptor de recoger en tienda', async ({ page }) => {
   const interruptor = page.getByRole('switch', {
-    name: /recoger pedidos en tienda/i,
+    name: /recoger pedidos en la tienda/i,
   });
   await interruptor.waitFor({ state: 'visible', timeout: 30_000 });
   estadoPrevioRecogida = await interruptor.getAttribute('aria-checked');
@@ -192,7 +192,7 @@ Then(
 
 Then('el interruptor de recoger en tienda queda cambiado', async ({ page }) => {
   const interruptor = page.getByRole('switch', {
-    name: /recoger pedidos en tienda/i,
+    name: /recoger pedidos en la tienda/i,
   });
   await expect(interruptor).not.toHaveAttribute(
     'aria-checked',
