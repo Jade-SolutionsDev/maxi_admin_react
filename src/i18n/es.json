@@ -425,7 +425,8 @@
       "nomencladores": "Nomencladores",
       "entregas": "Entregas",
       "devoluciones": "Devoluciones",
-      "cmsHomeNotices": "Avisos"
+      "cmsHomeNotices": "Avisos",
+      "cobros": "Cobros"
     },
     "user": {
       "profile": "Perfil"
@@ -496,7 +497,8 @@
       "fulfillment-settings": "Ajustes de entrega",
       "payment-methods": "Métodos de pago",
       "dashboard": "Panel (indicadores)",
-      "uploads": "Subida de imágenes"
+      "uploads": "Subida de imágenes",
+      "payments": "Cobros de la tienda"
     },
     "actions": {
       "list": "Listar",
@@ -1852,6 +1854,40 @@
       "lookup_hint": "Elige la fecha y hora de una compra para ver la versión que estaba publicada.",
       "lookup_result": "El %{date} la tienda mostraba la versión %{version}, publicada el %{published} por %{name}.",
       "lookup_none": "En esa fecha este texto aún no se había publicado."
+    }
+  },
+  "collections": {
+    "title": "Cobros de la tienda",
+    "export": "Exportar la página",
+    "from": "Desde",
+    "to": "Hasta",
+    "status": "Estado",
+    "origin": "Origen",
+    "method": "Método",
+    "any": "Todos",
+    "date": "Fecha",
+    "order": "Pedido",
+    "client": "Cliente",
+    "amount": "Importe",
+    "unreconciled": "Sin cobro registrado",
+    "empty_title": "Sin cobros",
+    "empty_hint": "No hay pedidos con actividad de pago en este periodo.",
+    "showing": "%{mostradas} de %{total}",
+    "statuses": {
+      "cobrado": "Cobrado",
+      "pendiente": "Pendiente",
+      "reembolsado": "Reembolsado"
+    },
+    "origins": {
+      "pasarela": "Pasarela",
+      "manual": "A mano"
+    },
+    "totals": {
+      "collected": "Cobrado",
+      "pending": "Pendiente",
+      "refunded": "Reembolsado",
+      "unreconciled": "Sin cobro registrado",
+      "unreconciled_count": "%{smart_count} pedido |||| %{smart_count} pedidos"
     }
   }
 }

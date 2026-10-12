@@ -199,6 +199,55 @@ export interface ClientBeneficiaries {
   ordersWithoutRecipient: number;
 }
 
+/** MxH-0063 · Una línea de la pantalla de cobros: un pedido con actividad de pago. */
+export type CollectionStatus = "cobrado" | "pendiente" | "reembolsado";
+export type CollectionOrigin = "pasarela" | "manual";
+
+export interface CollectionRow {
+  orderId: string;
+  orderNumber: string | null;
+  clientId: string | null;
+  clientName: string | null;
+  date: string;
+  amount: string;
+  method: string | null;
+  status: CollectionStatus;
+  origin: CollectionOrigin;
+  /**
+   * El pedido está dado por cobrado y **no hay ningún cobro con éxito
+   * detrás**. No es lo mismo que `origin: "manual"`: un método manual bien
+   * registrado deja su fila. Esto marca el descuadre.
+   */
+  unreconciled: boolean;
+  reference: string | null;
+}
+
+export interface CollectionTotals {
+  collected: string;
+  pending: string;
+  refunded: string;
+  unreconciledCount: number;
+  unreconciledAmount: string;
+}
+
+export interface CollectionsPage {
+  rows: CollectionRow[];
+  totals: CollectionTotals;
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface CollectionsFilters {
+  from?: string;
+  to?: string;
+  status?: CollectionStatus;
+  origin?: CollectionOrigin;
+  method?: string;
+  page?: number;
+  limit?: number;
+}
+
 /** Un intento de pago tal como lo lista GET /orders/:id/payment-attempts. */
 export interface PaymentAttempt {
   id: string;
@@ -355,6 +404,10 @@ export interface ExtendedDataProvider extends DataProvider {
     sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
   }>;
   /** Devoluciones de un pedido, de la más reciente a la más antigua. */
+  /** MxH-0063 · El dinero que entró, conciliado contra los cobros registrados. */
+  getCollections: (
+    filters: CollectionsFilters,
+  ) => Promise<{ data: CollectionsPage }>;
   /** A quién le manda pedidos un cliente, sacado de su historial. */
   getClientBeneficiaries: (
     clientId: string,
@@ -1174,6 +1227,18 @@ export const dataProvider: DataProvider = {
       rolesVacios: string[];
       sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
     };
+  },
+
+  async getCollections(filters: CollectionsFilters) {
+    const params = new URLSearchParams();
+    for (const [clave, valor] of Object.entries(filters)) {
+      if (valor !== undefined && valor !== "") params.set(clave, String(valor));
+    }
+    const query = params.toString();
+    const { json } = await httpClient(
+      `${API_URL}/payments/collections${query ? `?${query}` : ""}`,
+    );
+    return { data: unwrapOne(json) as CollectionsPage };
   },
 
   async getClientBeneficiaries(clientId: string) {
