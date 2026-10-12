@@ -28,6 +28,9 @@ const MODULOS_DE_APOYO: Record<string, readonly string[]> = {
   inventory: ["categories", "departments", "stock-locations"],
   "cms-banners": ["products", "categories", "departments"],
   "cms-home": ["products", "departments", "cms-banners"],
+  // La pantalla de cobros enseña el número de pedido y el nombre del cliente,
+  // y enlaza a las dos fichas. Sin estas lecturas saldría con huecos.
+  payments: ["orders", "clients"],
 };
 
 // Preferred column order; any action the API returns that isn't listed here is
@@ -71,6 +74,7 @@ const MODULE_ORDER = [
   "delivery-options",
   "fulfillment-settings",
   "payment-methods",
+  "payments",
   "dashboard",
   "uploads",
 ];

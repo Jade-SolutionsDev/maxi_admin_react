@@ -423,7 +423,8 @@
       "nomencladores": "Nomenclators",
       "entregas": "Delivery",
       "devoluciones": "Refunds",
-      "cmsHomeNotices": "Notices"
+      "cmsHomeNotices": "Notices",
+      "cobros": "Collections"
     },
     "user": {
       "profile": "Profile"
@@ -494,7 +495,8 @@
       "fulfillment-settings": "Fulfillment settings",
       "payment-methods": "Payment methods",
       "dashboard": "Dashboard (KPIs)",
-      "uploads": "Image uploads"
+      "uploads": "Image uploads",
+      "payments": "Store collections"
     },
     "actions": {
       "list": "List",
@@ -1848,6 +1850,40 @@
       "lookup_hint": "Pick the date and time of a purchase to see the version that was published.",
       "lookup_result": "On %{date} the store showed version %{version}, published on %{published} by %{name}.",
       "lookup_none": "On that date this text had not been published yet."
+    }
+  },
+  "collections": {
+    "title": "Store collections",
+    "export": "Export this page",
+    "from": "From",
+    "to": "To",
+    "status": "Status",
+    "origin": "Origin",
+    "method": "Method",
+    "any": "All",
+    "date": "Date",
+    "order": "Order",
+    "client": "Customer",
+    "amount": "Amount",
+    "unreconciled": "No charge on record",
+    "empty_title": "No collections",
+    "empty_hint": "No orders with payment activity in this period.",
+    "showing": "%{mostradas} of %{total}",
+    "statuses": {
+      "cobrado": "Collected",
+      "pendiente": "Pending",
+      "reembolsado": "Refunded"
+    },
+    "origins": {
+      "pasarela": "Gateway",
+      "manual": "By hand"
+    },
+    "totals": {
+      "collected": "Collected",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "unreconciled": "No charge on record",
+      "unreconciled_count": "%{smart_count} order |||| %{smart_count} orders"
     }
   }
 }

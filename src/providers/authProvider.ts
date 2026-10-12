@@ -98,6 +98,9 @@ const RESOURCE_RULES: Record<
   // the per-storage rows live under "storage-inventory".
   inventory: { module: "inventory", actions: { list: "aggregate" } },
   "storage-inventory": { module: "inventory" },
+  // MxH-0063. Solo `list`: la pantalla cuenta el dinero, no lo mueve. Cobrar
+  // sigue siendo `orders:update-payment-status`.
+  collections: { module: "payments", actions: { list: "list" } },
   "dashboard-stats": {
     module: "dashboard",
     actions: { list: "view", read: "view", show: "view" },
