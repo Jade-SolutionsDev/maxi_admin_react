@@ -1221,7 +1221,8 @@
     "search_placeholder": "Buscar por nombre, apellidos, correo o teléfono",
     "tabs": {
       "general": "Datos generales",
-      "orders": "Pedidos"
+      "orders": "Pedidos",
+      "beneficiaries": "Beneficiarios"
     },
     "status": {
       "active": "Activo",
@@ -1267,6 +1268,16 @@
         "title": "Retirar invitación",
         "description": "¿Retirar la invitación de %{email}? El enlace dejará de servir."
       }
+    },
+    "beneficiaries": {
+      "name": "Nombre",
+      "idCard": "Carné",
+      "times": "Pedidos",
+      "last": "Último",
+      "same_phone": "Mismo teléfono que el cliente",
+      "empty_title": "Sin beneficiarios",
+      "empty_hint": "Ninguno de sus pedidos guarda a quién se entregaba.",
+      "missing": "%{smart_count} pedido de este cliente no guarda a quién se entregaba, así que no sale aquí. |||| %{smart_count} pedidos de este cliente no guardan a quién se entregaba, así que no salen aquí."
     }
   },
   "cms-pages": {

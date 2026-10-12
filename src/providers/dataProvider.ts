@@ -178,6 +178,27 @@ export interface RefundSummary {
   refundable: string;
 }
 
+/** Una persona a la que un cliente le ha mandado pedidos. */
+export interface Beneficiary {
+  name: string;
+  idCard: string | null;
+  phone: string | null;
+  timesReceived: number;
+  lastOrderAt: string;
+  /**
+   * El teléfono coincide con el del cliente. No afirma «es el propio cliente»
+   * —eso no se puede saber: el cliente no guarda carné y su nombre viene de
+   * Clerk— sino el único hecho medible.
+   */
+  samePhoneAsClient: boolean;
+}
+
+export interface ClientBeneficiaries {
+  beneficiaries: Beneficiary[];
+  /** Pedidos del cliente que no guardan a quién se entregaba (los anteriores a MxH-0104). */
+  ordersWithoutRecipient: number;
+}
+
 /** Un intento de pago tal como lo lista GET /orders/:id/payment-attempts. */
 export interface PaymentAttempt {
   id: string;
@@ -334,6 +355,10 @@ export interface ExtendedDataProvider extends DataProvider {
     sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
   }>;
   /** Devoluciones de un pedido, de la más reciente a la más antigua. */
+  /** A quién le manda pedidos un cliente, sacado de su historial. */
+  getClientBeneficiaries: (
+    clientId: string,
+  ) => Promise<{ data: ClientBeneficiaries }>;
   getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
   /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
   getRefundSummary: (orderId: string) => Promise<{ data: RefundSummary }>;
@@ -1149,6 +1174,13 @@ export const dataProvider: DataProvider = {
       rolesVacios: string[];
       sinCorreo: { nombre: string | null; rol: string; motivo: string }[];
     };
+  },
+
+  async getClientBeneficiaries(clientId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/clients/${clientId}/beneficiaries`,
+    );
+    return { data: unwrapOne(json) as ClientBeneficiaries };
   },
 
   async getRefunds(orderId: string) {
