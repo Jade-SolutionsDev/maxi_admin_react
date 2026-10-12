@@ -1217,7 +1217,8 @@
     "search_placeholder": "Search by name, surname, email, or phone",
     "tabs": {
       "general": "General",
-      "orders": "Orders"
+      "orders": "Orders",
+      "beneficiaries": "Recipients"
     },
     "status": {
       "active": "Active",
@@ -1263,6 +1264,16 @@
         "title": "Revoke invitation",
         "description": "Revoke the invitation for %{email}? The link will stop working."
       }
+    },
+    "beneficiaries": {
+      "name": "Name",
+      "idCard": "ID card",
+      "times": "Orders",
+      "last": "Last",
+      "same_phone": "Same phone as the customer",
+      "empty_title": "No recipients",
+      "empty_hint": "None of their orders records who it was delivered to.",
+      "missing": "%{smart_count} of this customer’s orders does not record who it was delivered to, so it is not listed here. |||| %{smart_count} of this customer’s orders do not record who they were delivered to, so they are not listed here."
     }
   },
   "cms-pages": {
