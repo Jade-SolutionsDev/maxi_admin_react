@@ -261,12 +261,14 @@ export function CrearPedidoDialog({
   const metodosCobrables = (metodosDePago ?? []).filter(
     (m) => m.enabled && m.configured,
   );
-  // GET /payment-methods es solo de ADMIN/SUPER_ADMIN; el permiso de cobros
-  // (`orders:update-payment-status`) se puede conceder a cualquier rol. Sin
-  // esto, a un empleado con el permiso pero sin ser admin se le queda el
-  // desplegable mudo y sin explicación. Igual se queda mudo, con el mismo
-  // motivo en pantalla, si el catálogo cargó bien pero no queda ningún
-  // método cobrable tras filtrar.
+  // El desplegable se queda mudo si el catálogo no cargó, o si cargó bien y no
+  // queda ningún método cobrable tras filtrar. En los dos casos se dice el
+  // motivo en pantalla en vez de dejar un hueco.
+  //
+  // Hasta MxH-0133 el primer caso era seguro para un empleado: GET
+  // /payment-methods era solo de ADMIN/SUPER_ADMIN mientras el permiso de
+  // cobros se concede a cualquier rol. Ya se concede con `orders:list`, pero
+  // el aviso se queda: un 403 no es la única forma de que el catálogo falle.
   const tieneMetodosDisponibles =
     !cargandoMetodos && !errorMetodos && metodosCobrables.length > 0;
 
@@ -1015,8 +1017,8 @@ export function CrearPedidoDialog({
                   </label>
 
                   {!cargandoMetodos && !tieneMetodosDisponibles && (
-                    // GET /payment-methods es solo de ADMIN/SUPER_ADMIN; el
-                    // permiso de cobros se puede tener sin serlo.
+                    // El catálogo no cargó o no trae nada cobrable; sin él
+                    // no se puede elegir con qué se cobró.
                     <p className="text-xs text-destructive">
                       {t(
                         "orders.create.payment_methods_unavailable",
