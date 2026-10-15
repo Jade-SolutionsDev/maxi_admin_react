@@ -1697,6 +1697,7 @@
     "zone_count": "%{smart_count} zona |||| %{smart_count} zonas",
     "free": "Gratis",
     "promise_days_badge": "%{smart_count} día hábil |||| %{smart_count} días hábiles",
+    "free_from_badge": "Gratis desde $%{amount}",
     "fields": {
       "label": "Nombre",
       "description": "Descripción",
