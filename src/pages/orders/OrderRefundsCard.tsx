@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDataProvider, useNotify, useRefresh, useTranslate } from "ra-core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Banknote, Check, X } from "lucide-react";
+import { AlertTriangle, Banknote, Check, Loader2, X } from "lucide-react";
 
 import {
   AlertDialog,
@@ -361,12 +361,23 @@ export function OrderRefundsCard({
                 <AlertDialogCancel>
                   {translate("ra.action.cancel", { _: "Cancelar" })}
                 </AlertDialogCancel>
+                {/* El botón de fuera ya estaba protegido con `busy`; este,
+                    el de confirmar, no, así que se podía pulsar tantas veces
+                    como aguantara el dedo y cada clic era una devolución. El
+                    8-oct-2026 pasó en producción: se cayó la conexión, el
+                    aviso se quedó puesto, tres clics y tres devoluciones —120
+                    USD comprometidos sobre un pedido de 60. La API también lo
+                    impide ahora, que es donde de verdad se garantiza; esto
+                    evita además mandar las tres. */}
                 <AlertDialogAction
+                  disabled={busy}
                   onClick={(e) => {
                     e.preventDefault();
+                    if (busy) return;
                     request.mutate();
                   }}
                 >
+                  {busy && <Loader2 className="mr-2 size-4 animate-spin" />}
                   {translate("orders.refunds.request", {
                     _: "Registrar devolución",
                   })}

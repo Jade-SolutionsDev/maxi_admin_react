@@ -191,7 +191,8 @@
       "inactive": "Inactive",
       "pending": "Awaiting approval",
       "status": "Status",
-      "show_deleted": "Show deleted"
+      "show_deleted": "Show deleted",
+      "role_staff": "Staff (any role)"
     },
     "roles": {
       "SUPER_ADMIN": "Super admin",
@@ -403,8 +404,8 @@
       "cmsServices": "Services",
       "cmsStaff": "Staff",
       "cmsFaq": "Frequently asked questions",
-      "cmsSettings": "Website",
-      "cms": "CMS",
+      "cmsSettings": "Site settings",
+      "cms": "Website",
       "metodos_pago": "Payment methods",
       "group": {
         "ventas": "Sales",
@@ -422,7 +423,8 @@
       "nomencladores": "Nomenclators",
       "entregas": "Delivery",
       "devoluciones": "Refunds",
-      "cmsHomeNotices": "Notices"
+      "cmsHomeNotices": "Notices",
+      "cobros": "Collections"
     },
     "user": {
       "profile": "Profile"
@@ -482,18 +484,19 @@
       "orders": "Orders",
       "clients": "Clients",
       "contact": "Contact (messages & templates)",
-      "cms-home": "CMS — Home page",
-      "cms-pages": "CMS — Texts (pages and notices)",
-      "cms-banners": "CMS — Banners",
-      "cms-services": "CMS — Services",
-      "cms-staff": "CMS — Staff",
-      "cms-settings": "CMS — Site settings",
+      "cms-home": "Website — Home page",
+      "cms-pages": "Website — Texts (pages and notices)",
+      "cms-banners": "Website — Banners",
+      "cms-services": "Website — Services",
+      "cms-staff": "Website — Staff",
+      "cms-settings": "Website — Site settings",
       "nomenclators": "Nomenclators",
       "delivery-options": "Delivery options",
       "fulfillment-settings": "Fulfillment settings",
       "payment-methods": "Payment methods",
       "dashboard": "Dashboard (KPIs)",
-      "uploads": "Image uploads"
+      "uploads": "Image uploads",
+      "payments": "Store collections"
     },
     "actions": {
       "list": "List",
@@ -541,7 +544,9 @@
       "save": "Save",
       "saved": "Roles updated",
       "error": "Could not update roles"
-    }
+    },
+    "base": "Base",
+    "base_hint": "Ships with the platform. It can be edited and renamed like any other role."
   },
   "invitation": {
     "brand_tagline": "Provider Panel",
@@ -701,6 +706,7 @@
       "empty": "No pickup addresses.",
       "label": "Label (optional)",
       "address": "Address",
+      "hours": "Opening hours (optional) — e.g. 9:00 am to 3:00 pm, Monday to Friday",
       "add": "Add address"
     },
     "coverage": {
@@ -884,7 +890,8 @@
       "pdf_error": "Could not generate the PDF",
       "report": "Export to PDF",
       "report_loading": "Generating…",
-      "report_error": "Could not generate the report"
+      "report_error": "Could not generate the report",
+      "picked_up_id_invalid": "The ID number must be 11 digits."
     },
     "payment": {
       "provider": "Provider",
@@ -924,7 +931,7 @@
     },
     "fulfillment": {
       "delivery": "Home delivery",
-      "pickup": "Pickup in store",
+      "pickup": "Pickup at the store",
       "between": "Between"
     },
     "recipient": {
@@ -1161,6 +1168,9 @@
       "copy": "Copy link",
       "copied": "Link copied",
       "copy_failed": "Could not copy the link"
+    },
+    "paid_pending": {
+      "notice": "Paid and awaiting confirmation. Stock stays held for this order and is committed when you confirm it: a payment never confirms an order on its own, not even from the gateway."
     }
   },
   "dashboard": {
@@ -1209,7 +1219,8 @@
     "search_placeholder": "Search by name, surname, email, or phone",
     "tabs": {
       "general": "General",
-      "orders": "Orders"
+      "orders": "Orders",
+      "beneficiaries": "Recipients"
     },
     "status": {
       "active": "Active",
@@ -1255,6 +1266,16 @@
         "title": "Revoke invitation",
         "description": "Revoke the invitation for %{email}? The link will stop working."
       }
+    },
+    "beneficiaries": {
+      "name": "Name",
+      "idCard": "ID card",
+      "times": "Orders",
+      "last": "Last",
+      "same_phone": "Same phone as the customer",
+      "empty_title": "No recipients",
+      "empty_hint": "None of their orders records who it was delivered to.",
+      "missing": "%{smart_count} of this customer’s orders does not record who it was delivered to, so it is not listed here. |||| %{smart_count} of this customer’s orders do not record who they were delivered to, so they are not listed here."
     }
   },
   "cms-pages": {
@@ -1671,19 +1692,23 @@
     "everywhere": "Available everywhere",
     "zone_count": "%{smart_count} zone |||| %{smart_count} zones",
     "free": "Free",
+    "promise_days_badge": "%{smart_count} business day |||| %{smart_count} business days",
+    "free_from_badge": "Free from $%{amount}",
     "fields": {
       "label": "Name",
       "description": "Description",
       "fee": "Delivery fee",
       "enabled": "Enabled",
-      "promiseDays": "Promise (working days)"
+      "promiseDays": "Promise (working days)",
+      "freeDeliveryThreshold": "Free delivery from (USD)"
     },
     "form": {
       "note": "With no zones selected the option is offered everywhere.",
       "hints": {
         "fee": "Added to the order total. Leave it at 0 when delivery is free.",
         "enabled": "Only enabled options appear at checkout.",
-        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date."
+        "promiseDays": "Working days from payment, Monday to Saturday, holidays excluded. Empty: no promised date.",
+        "freeDeliveryThreshold": "Product subtotal from which this delivery is not charged, shipping excluded. Empty: always charged."
       }
     },
     "confirm": {
@@ -1699,14 +1724,14 @@
   },
   "fulfillment": {
     "pickup": {
-      "title": "Pickup in store",
+      "title": "Pickup at the store",
       "subtitle": "Let customers collect their order at a storage.",
       "toggle": "Let customers collect their orders",
       "no_addresses": "Pickup is on, but no active storage has a pickup address. Customers cannot choose anything.",
       "confirm": {
-        "on_title": "Allow pickup in store?",
+        "on_title": "Allow pickup at the store?",
         "on_desc": "Customers will be able to collect their order at a storage that has a pickup address.",
-        "off_title": "Disable pickup in store?",
+        "off_title": "Disable pickup at the store?",
         "off_desc": "With no delivery option enabled, customers will not be able to complete any order.",
         "on_cta": "Enable",
         "off_cta": "Disable"
@@ -1826,6 +1851,40 @@
       "lookup_hint": "Pick the date and time of a purchase to see the version that was published.",
       "lookup_result": "On %{date} the store showed version %{version}, published on %{published} by %{name}.",
       "lookup_none": "On that date this text had not been published yet."
+    }
+  },
+  "collections": {
+    "title": "Store collections",
+    "export": "Export this page",
+    "from": "From",
+    "to": "To",
+    "status": "Status",
+    "origin": "Origin",
+    "method": "Method",
+    "any": "All",
+    "date": "Date",
+    "order": "Order",
+    "client": "Customer",
+    "amount": "Amount",
+    "unreconciled": "No charge on record",
+    "empty_title": "No collections",
+    "empty_hint": "No orders with payment activity in this period.",
+    "showing": "%{mostradas} of %{total}",
+    "statuses": {
+      "cobrado": "Collected",
+      "pendiente": "Pending",
+      "reembolsado": "Refunded"
+    },
+    "origins": {
+      "pasarela": "Gateway",
+      "manual": "By hand"
+    },
+    "totals": {
+      "collected": "Collected",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "unreconciled": "No charge on record",
+      "unreconciled_count": "%{smart_count} order |||| %{smart_count} orders"
     }
   }
 }

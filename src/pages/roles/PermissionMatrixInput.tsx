@@ -13,6 +13,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 /** Las dos acciones que solo miran; el resto es trabajar sobre el módulo. */
 const LECTURAS = ["list", "read"];
 
+/**
+ * Espeja `MODULOS_DE_APOYO` de `permissions.service.ts`: las listas que el
+ * panel consulta para pintar los filtros y formularios de otro módulo.
+ *
+ * La API ya las concede al guardar, así que el rol funciona de todos modos;
+ * esto es para que la matriz lo enseñe **antes** de guardar en vez de que
+ * aparezcan solas al volver a abrir el rol. QA dio con el síntoma al revés en
+ * MxH-0103: dio todos los permisos de productos y los filtros no le servían.
+ */
+const MODULOS_DE_APOYO: Record<string, readonly string[]> = {
+  products: ["categories", "departments"],
+  categories: ["departments"],
+  inventory: ["categories", "departments", "stock-locations"],
+  "cms-banners": ["products", "categories", "departments"],
+  "cms-home": ["products", "departments", "cms-banners"],
+  // La pantalla de cobros enseña el número de pedido y el nombre del cliente,
+  // y enlaza a las dos fichas. Sin estas lecturas saldría con huecos.
+  payments: ["orders", "clients"],
+};
+
 // Preferred column order; any action the API returns that isn't listed here is
 // appended, so a new backend action renders without a frontend change (its
 // label falls back to the raw key until i18n catches up).
@@ -54,6 +74,7 @@ const MODULE_ORDER = [
   "delivery-options",
   "fulfillment-settings",
   "payment-methods",
+  "payments",
   "dashboard",
   "uploads",
 ];
@@ -142,8 +163,16 @@ export function PermissionMatrixInput({
           .filter((p) => p && !LECTURAS.includes(p.action))
           .map((p) => p!.module),
       );
-      const lecturas = [...modulosQueTrabajan].flatMap((module) =>
-        LECTURAS.map((action) => byModuleAction.get(`${module}:${action}`)),
+      // Cualquier módulo tocado —se trabaje en él o solo se mire— arrastra las
+      // lecturas de aquellos de los que depende para pintarse.
+      const modulosDeApoyo = new Set(
+        [...new Set(ids.map((id) => byId.get(id)?.module))].flatMap(
+          (module) => (module ? (MODULOS_DE_APOYO[module] ?? []) : []),
+        ),
+      );
+      const lecturas = [...modulosQueTrabajan, ...modulosDeApoyo].flatMap(
+        (module) =>
+          LECTURAS.map((action) => byModuleAction.get(`${module}:${action}`)),
       );
       return [
         ...new Set([
@@ -160,7 +189,11 @@ export function PermissionMatrixInput({
     LECTURAS.includes(action) &&
     selected.some((id) => {
       const permiso = byId.get(id);
-      return permiso?.module === module && !LECTURAS.includes(permiso.action);
+      if (!permiso) return false;
+      if (permiso.module === module && !LECTURAS.includes(permiso.action)) {
+        return true;
+      }
+      return (MODULOS_DE_APOYO[permiso.module] ?? []).includes(module);
     });
 
   const toggleId = (id: string) => {

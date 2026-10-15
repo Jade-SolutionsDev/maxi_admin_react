@@ -36,8 +36,16 @@ const RoleFilterInput = ({ source }: { source: string; alwaysOn?: boolean }) => 
     sort: { field: "name", order: "ASC" },
   });
 
+  /**
+   * Los tres niveles van primero y con su propio nombre. «Empleado» es una
+   * categoría, no un rol: filtrar por él saca a todo el que tenga cualquier
+   * rol creado aquí, y puesto a secas entre los roles concretos se leía como
+   * uno más. QA lo señaló en MxH-0103, así que el desplegable lo dice.
+   */
   const choices = [
-    ...roleChoices,
+    ...roleChoices.map((c) =>
+      c.id === "STAFF" ? { ...c, name: "users.filters.role_staff" } : c,
+    ),
     ...customRoles.map((r) => ({ id: String(r.id), name: r.name })),
   ];
 

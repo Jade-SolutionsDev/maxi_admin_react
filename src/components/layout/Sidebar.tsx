@@ -134,6 +134,12 @@ const navGroups: NavGroup[] = [
         resource: "orders",
       },
       {
+        labelKey: "app.menu.cobros",
+        icon: <Banknote size={20} />,
+        path: "/collections",
+        resource: "collections",
+      },
+      {
         labelKey: "app.menu.devoluciones",
         icon: <Banknote size={20} />,
         path: "/refunds",

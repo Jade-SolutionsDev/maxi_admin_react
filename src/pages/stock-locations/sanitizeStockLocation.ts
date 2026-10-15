@@ -9,6 +9,9 @@ export function sanitizeStockLocation(data: Record<string, unknown>) {
         .map((a) => ({
           label: a.label?.trim() || undefined,
           address: (a.address ?? "").trim(),
+          // Vacío se manda como ausente: la API lo guarda como nulo y la tienda
+          // no enseña ninguna línea de horario (MxH-0160).
+          hours: a.hours?.trim() || undefined,
         }))
         .filter((a) => a.address)
     : undefined;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetList, useGetOne, useTranslate } from "ra-core";
+import { useQuery } from "@tanstack/react-query";
+import { useDataProvider, useGetList, useGetOne, useTranslate } from "ra-core";
 import {
   ArrowLeft,
   CalendarDays,
@@ -9,6 +10,7 @@ import {
   Phone,
   ShoppingCart,
   UserRound,
+  Users,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import type { OrderPaymentStatus, OrderStatus } from "@/providers/dataProvider";
+import type {
+  Beneficiary,
+  ExtendedDataProvider,
+  OrderPaymentStatus,
+  OrderStatus,
+} from "@/providers/dataProvider";
 import {
   OrderStatusBadge,
   PaymentStatusBadge,
@@ -50,7 +57,7 @@ interface OrderRow {
   createdAt: string;
 }
 
-type TabKey = "general" | "orders";
+type TabKey = "general" | "orders" | "beneficiaries";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -77,6 +84,11 @@ export default function ClientDetailPage() {
   const tabs: { key: TabKey; label: string; icon: typeof UserRound }[] = [
     { key: "general", label: "clients.tabs.general", icon: UserRound },
     { key: "orders", label: "clients.tabs.orders", icon: ShoppingCart },
+    {
+      key: "beneficiaries",
+      label: "clients.tabs.beneficiaries",
+      icon: Users,
+    },
   ];
 
   return (
@@ -150,11 +162,9 @@ export default function ClientDetailPage() {
         ))}
       </div>
 
-      {tab === "general" ? (
-        <GeneralTab client={client} />
-      ) : (
-        <OrdersTab clientId={client.id} />
-      )}
+      {tab === "general" && <GeneralTab client={client} />}
+      {tab === "orders" && <OrdersTab clientId={client.id} />}
+      {tab === "beneficiaries" && <BeneficiariesTab clientId={client.id} />}
     </div>
   );
 }
@@ -289,5 +299,123 @@ function OrdersTab({ clientId }: { clientId: string }) {
         </TableBody>
       </Table>
     </section>
+  );
+}
+
+/**
+ * A quién le manda pedidos este cliente.
+ *
+ * Sale del historial de pedidos y no de la libreta de direcciones: en una
+ * recogida no hay dirección ninguna, y la recogida es casi toda la venta, así
+ * que la libreta está casi siempre vacía.
+ */
+function BeneficiariesTab({ clientId }: { clientId: string }) {
+  const translate = useTranslate();
+  const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const { data, isPending } = useQuery({
+    queryKey: ["clients", clientId, "beneficiaries"],
+    queryFn: () =>
+      dataProvider.getClientBeneficiaries(clientId).then((r) => r.data),
+  });
+
+  if (isPending) {
+    return <div className="h-40 animate-pulse rounded-lg bg-muted" />;
+  }
+
+  const beneficiarios = data?.beneficiaries ?? [];
+  const sinDestinatario = data?.ordersWithoutRecipient ?? 0;
+
+  /**
+   * El aviso va **también cuando la lista trae gente**, y a propósito: sin él,
+   * una lista más corta que el historial de pedidos del cliente se lee como si
+   * faltaran datos. Los pedidos anteriores a MxH-0104 no guardan a quién se
+   * entregaba, y en staging son 132 de 188.
+   */
+  const aviso = sinDestinatario > 0 && (
+    <p className="mt-3 text-sm text-muted-foreground">
+      {translate("clients.beneficiaries.missing", {
+        smart_count: sinDestinatario,
+        _:
+          sinDestinatario === 1
+            ? "1 pedido de este cliente no guarda a quién se entregaba, así que no sale aquí."
+            : `${sinDestinatario} pedidos de este cliente no guardan a quién se entregaba, así que no salen aquí.`,
+      })}
+    </p>
+  );
+
+  if (beneficiarios.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-12 text-center">
+        <Users className="mb-3 h-9 w-9 text-muted-foreground" />
+        <p className="font-medium text-foreground">
+          {translate("clients.beneficiaries.empty_title", {
+            _: "Sin beneficiarios",
+          })}
+        </p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          {translate("clients.beneficiaries.empty_hint", {
+            _: "Ninguno de sus pedidos guarda a quién se entregaba.",
+          })}
+        </p>
+        {aviso}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <section className="rounded-lg border border-border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                {translate("clients.beneficiaries.name", { _: "Nombre" })}
+              </TableHead>
+              <TableHead>
+                {translate("clients.beneficiaries.idCard", { _: "Carné" })}
+              </TableHead>
+              <TableHead>
+                {translate("list.fields.phone", { _: "Teléfono" })}
+              </TableHead>
+              <TableHead className="text-right">
+                {translate("clients.beneficiaries.times", { _: "Pedidos" })}
+              </TableHead>
+              <TableHead className="text-right">
+                {translate("clients.beneficiaries.last", { _: "Último" })}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {beneficiarios.map((b: Beneficiary) => (
+              <TableRow key={`${b.idCard ?? ""}|${b.name}|${b.phone ?? ""}`}>
+                <TableCell className="font-medium">
+                  {b.name}
+                  {b.samePhoneAsClient && (
+                    <Badge variant="secondary" className="ml-2 align-middle">
+                      {translate("clients.beneficiaries.same_phone", {
+                        _: "Mismo teléfono que el cliente",
+                      })}
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {b.idCard ?? "—"}
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {b.phone ?? "—"}
+                </TableCell>
+                <TableCell className="text-right font-medium tabular-nums">
+                  {b.timesReceived}
+                </TableCell>
+                <TableCell className="text-right text-sm text-muted-foreground">
+                  {new Date(b.lastOrderAt).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </section>
+      {aviso}
+    </>
   );
 }

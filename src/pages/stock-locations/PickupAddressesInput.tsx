@@ -8,6 +8,12 @@ export interface PickupAddress {
   id?: string;
   label?: string | null;
   address: string;
+  /**
+   * Horario del mostrador, tal cual se le dice al cliente (MxH-0160). Texto
+   * libre: «9:00 am a 3:00 pm, de lunes a viernes» es lo que hay que poder
+   * escribir, y los sábados hasta mediodía también.
+   */
+  hours?: string | null;
 }
 
 /**
@@ -25,7 +31,7 @@ export function PickupAddressesInput({
   const rows: PickupAddress[] = Array.isArray(field.value) ? field.value : [];
 
   const update = (next: PickupAddress[]) => field.onChange(next);
-  const addRow = () => update([...rows, { label: "", address: "" }]);
+  const addRow = () => update([...rows, { label: "", address: "", hours: "" }]);
   const removeRow = (i: number) => update(rows.filter((_, idx) => idx !== i));
   const patchRow = (i: number, patch: Partial<PickupAddress>) =>
     update(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
@@ -64,6 +70,19 @@ export function PickupAddressesInput({
                     "stockLocations.pickupAddresses.address",
                     { _: "Dirección" },
                   )}
+                />
+                {/*
+                  El horario ocupa la fila entera debajo: es lo que el cliente
+                  pregunta por correo cuando ya compró, y hasta ahora no existía
+                  en ninguna parte del sistema (MxH-0160).
+                */}
+                <Input
+                  className="sm:col-span-2"
+                  value={row.hours ?? ""}
+                  onChange={(e) => patchRow(i, { hours: e.target.value })}
+                  placeholder={translate("stockLocations.pickupAddresses.hours", {
+                    _: "Horario (opcional) — ej. 9:00 am a 3:00 pm, de lunes a viernes",
+                  })}
                 />
               </div>
               <Button

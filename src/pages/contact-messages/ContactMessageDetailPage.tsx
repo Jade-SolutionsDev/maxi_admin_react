@@ -110,9 +110,21 @@ export default function ContactMessageDetailPage() {
       templateId?: string;
       body?: string;
     }) => dataProvider.postContactReply(id as string, payload),
-    onSuccess: () => {
+    /**
+     * Vaciar lo que se acaba de registrar. QA lo reportó en MxH-0115: tras
+     * enviar, el cuadro conservaba el texto y la misma respuesta se podía
+     * mandar otra vez sin darse cuenta. Se limpia el campo del canal usado —
+     * la nota interna tiene el suyo— y no el otro, para no borrar un borrador
+     * que no se ha enviado.
+     */
+    onSuccess: (_datos, variables) => {
       notify("contact-messages.reply_logged", { type: "info" });
-      setNote("");
+      if (variables.channel === "nota") {
+        setNote("");
+      } else {
+        setBody("");
+        setTemplateId("");
+      }
       refresh();
     },
     onError: (error: unknown) => {
@@ -328,13 +340,21 @@ export default function ContactMessageDetailPage() {
                     </a>
                   </>
                 )}
+                {/* El guard de MxH-0115 dejó fuera este botón porque entonces
+                    estaba apagado por falta de credenciales de Resend. Ya
+                    manda de verdad, así que con el cuadro vacío enviaría un
+                    correo en blanco: el mismo defecto que arregló la tarjeta. */}
                 <Button
                   type="button"
-                  disabled={!platformReplyEnabled || logReply.isPending}
+                  disabled={
+                    !platformReplyEnabled || sinTexto || logReply.isPending
+                  }
                   title={
-                    platformReplyEnabled
-                      ? undefined
-                      : translate("contact-messages.platform_disabled")
+                    !platformReplyEnabled
+                      ? translate("contact-messages.platform_disabled")
+                      : sinTexto
+                        ? avisoSinTexto
+                        : undefined
                   }
                   onClick={() => recordAction("plataforma")}
                 >

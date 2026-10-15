@@ -334,3 +334,20 @@ input:-webkit-autofill:active {
 .dark .login-input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px #1a2535 inset;
 }
+/* Los filtros de una lista se quedaban abiertos unos encima de otros: con uno
+   desplegado se podía pulsar el siguiente, y el primero nunca se enteraba de
+   que había habido un clic fuera, así que no se cerraba. QA lo reportó en
+   MxH-0103 con una captura de tres desplegados a la vez.
+
+   La causa es del andamiaje del kit (`filter-form.tsx`): el formulario es
+   `pointer-events-none` y cada campo lo rehabilita con `pointer-events-auto`,
+   lo cual también anula el bloqueo que Radix pone en el <body> mientras un
+   desplegable está abierto. Esto devuelve ese bloqueo solo mientras lo hay,
+   que es justo el caso roto; el resto del tiempo los filtros siguen como
+   estaban.
+
+   Medido en staging: sin esta regla se llegaba a tres paneles abiertos, con
+   ella nunca pasa de uno. */
+body[style*="pointer-events: none"] .filter-field {
+  pointer-events: none;
+}

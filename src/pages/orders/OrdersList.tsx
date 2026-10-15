@@ -70,17 +70,57 @@ const NumberCell = () => {
   );
 };
 
+/**
+ * Para comparar dos nombres escritos por personas distintas: sin tildes, sin
+ * mayúsculas y sin espacios de más. Solo sirve para decidir si son el mismo
+ * nombre; nunca se muestra.
+ */
+const comoClave = (valor: string) =>
+  valor
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+
 const ClientCell = () => {
   const record = useRecordContext();
+  const translate = useTranslate();
   if (!record) return null;
+
+  const titular = (record.clientName as string) || "";
+  const contacto = record.contactSnapshot as {
+    recipientName?: string | null;
+  } | null;
+  const recibe = contacto?.recipientName?.trim() || "";
+
+  /**
+   * Quién recoge, cuando no es el titular.
+   *
+   * El buscador ya encuentra por este nombre, pero la fila no lo enseñaba: se
+   * buscaba «Merlinda» y salía el pedido de «QA Direcciones» sin que nada en
+   * pantalla explicara por qué (MxH-0133, punto 1). Y en el mostrador es el
+   * dato que se compara con el carnet, así que importa verlo antes de abrir el
+   * pedido.
+   *
+   * Si coincide con el titular la línea sobra: repetir el mismo nombre dos
+   * veces en cada fila estorba más de lo que informa.
+   */
+  const mostrarRecibe = recibe && comoClave(recibe) !== comoClave(titular);
+
   return (
     <div className="min-w-0">
       <p className="truncate text-sm font-medium text-foreground">
-        {(record.clientName as string) || "—"}
+        {titular || "—"}
       </p>
       <p className="truncate text-xs text-muted-foreground">
         {(record.clientEmail as string) || ""}
       </p>
+      {mostrarRecibe && (
+        <p className="truncate text-xs text-muted-foreground">
+          {translate("orders.recipient.title", { _: "Recibe" })}: {recibe}
+        </p>
+      )}
     </div>
   );
 };

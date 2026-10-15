@@ -5,6 +5,7 @@ import {
   ArrowUpDown,
   CalendarClock,
   Coins,
+  Gift,
   Heading,
   Truck,
 } from "lucide-react";
@@ -34,6 +35,11 @@ const sanitizeDeliveryOption = (data: Record<string, unknown>) => ({
     data.promiseDays === "" || data.promiseDays == null
       ? null
       : Number(data.promiseDays),
+  // Vacío es «sin promoción», no cero: cero sería regalar el envío siempre.
+  freeDeliveryThreshold:
+    data.freeDeliveryThreshold === "" || data.freeDeliveryThreshold == null
+      ? null
+      : Number(data.freeDeliveryThreshold),
   sortOrder: Number(data.sortOrder ?? 0),
   enabled: data.enabled ?? false,
   zones: coverageToZones(
@@ -125,6 +131,17 @@ function DeliveryOptionFormFields() {
         max={60}
         icon={<CalendarClock />}
         helperText="delivery-options.form.hints.promiseDays"
+      />
+
+      <NumberInput
+        source="freeDeliveryThreshold"
+        label={translate("delivery-options.fields.freeDeliveryThreshold", {
+          _: "Envío gratis a partir de (USD)",
+        })}
+        min={0.01}
+        step={0.01}
+        icon={<Gift />}
+        helperText="delivery-options.form.hints.freeDeliveryThreshold"
       />
 
       <NumberInput

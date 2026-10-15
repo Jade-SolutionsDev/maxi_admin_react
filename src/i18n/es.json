@@ -191,7 +191,8 @@
       "inactive": "Inactivos",
       "pending": "Por aprobar",
       "status": "Estado",
-      "show_deleted": "Mostrar eliminados"
+      "show_deleted": "Mostrar eliminados",
+      "role_staff": "Empleado (cualquier rol)"
     },
     "roles": {
       "SUPER_ADMIN": "Súper administrador",
@@ -405,8 +406,8 @@
       "cmsServices": "Servicios",
       "cmsStaff": "Equipo",
       "cmsFaq": "Preguntas frecuentes",
-      "cmsSettings": "Sitio web",
-      "cms": "CMS",
+      "cmsSettings": "Ajustes del sitio",
+      "cms": "Sitio web",
       "metodos_pago": "Métodos de pago",
       "group": {
         "ventas": "Ventas",
@@ -424,7 +425,8 @@
       "nomencladores": "Nomencladores",
       "entregas": "Entregas",
       "devoluciones": "Devoluciones",
-      "cmsHomeNotices": "Avisos"
+      "cmsHomeNotices": "Avisos",
+      "cobros": "Cobros"
     },
     "user": {
       "profile": "Perfil"
@@ -484,18 +486,19 @@
       "orders": "Pedidos",
       "clients": "Clientes",
       "contact": "Contacto (mensajes y plantillas)",
-      "cms-home": "CMS — Portada",
-      "cms-pages": "CMS — Textos (páginas y avisos)",
-      "cms-banners": "CMS — Banners",
-      "cms-services": "CMS — Servicios",
-      "cms-staff": "CMS — Equipo",
-      "cms-settings": "CMS — Ajustes del sitio",
+      "cms-home": "Sitio web — Portada",
+      "cms-pages": "Sitio web — Textos (páginas y avisos)",
+      "cms-banners": "Sitio web — Banners",
+      "cms-services": "Sitio web — Servicios",
+      "cms-staff": "Sitio web — Equipo",
+      "cms-settings": "Sitio web — Ajustes del sitio",
       "nomenclators": "Nomencladores",
       "delivery-options": "Opciones de entrega",
       "fulfillment-settings": "Ajustes de entrega",
       "payment-methods": "Métodos de pago",
       "dashboard": "Panel (indicadores)",
-      "uploads": "Subida de imágenes"
+      "uploads": "Subida de imágenes",
+      "payments": "Cobros de la tienda"
     },
     "actions": {
       "list": "Listar",
@@ -543,7 +546,9 @@
       "save": "Guardar",
       "saved": "Roles actualizados",
       "error": "No se pudieron actualizar los roles"
-    }
+    },
+    "base": "Base",
+    "base_hint": "Rol que viene con la plataforma. Se puede editar y renombrar como cualquier otro."
   },
   "invitation": {
     "brand_tagline": "Panel de Proveedores",
@@ -703,6 +708,7 @@
       "empty": "No hay direcciones de recogida.",
       "label": "Etiqueta (opcional)",
       "address": "Dirección",
+      "hours": "Horario (opcional) — ej. 9:00 am a 3:00 pm, de lunes a viernes",
       "add": "Agregar dirección"
     },
     "coverage": {
@@ -887,7 +893,8 @@
       "pdf_error": "No se pudo generar el PDF",
       "report": "Exportar a PDF",
       "report_loading": "Generando…",
-      "report_error": "No se pudo generar el reporte"
+      "report_error": "No se pudo generar el reporte",
+      "picked_up_id_invalid": "El carné debe tener 11 dígitos."
     },
     "payment": {
       "provider": "Proveedor",
@@ -927,7 +934,7 @@
     },
     "fulfillment": {
       "delivery": "A domicilio",
-      "pickup": "Recogida en tienda",
+      "pickup": "Recogida en la tienda",
       "between": "Entre"
     },
     "recipient": {
@@ -1076,7 +1083,7 @@
       "paymentMethod": "Método de pago",
       "fulfillment": "Tipo de entrega",
       "delivery": "A domicilio",
-      "pickup": "Recogida en tienda",
+      "pickup": "Recogida en la tienda",
       "pickupLocation": "Punto de recogida",
       "groupBy": "Resumen por",
       "noGroup": "Sin resumen",
@@ -1118,7 +1125,7 @@
       "fulfillment_needs_municipality": "Elige un municipio para ver qué se le puede ofrecer.",
       "fulfillment_loading": "Consultando qué se puede ofrecer…",
       "fulfillment_error": "No se pudo consultar las opciones de entrega.",
-      "fulfillment_unavailable_fallback": "Esta zona no admite entrega a domicilio ni recogida en tienda.",
+      "fulfillment_unavailable_fallback": "Esta zona no admite entrega a domicilio ni recogida en la tienda.",
       "delivery_municipality": "Municipio",
       "delivery_municipality_placeholder": "Elige un municipio…",
       "delivery_option": "Forma de entrega",
@@ -1165,6 +1172,9 @@
       "copy": "Copiar enlace",
       "copied": "Enlace copiado",
       "copy_failed": "No se pudo copiar el enlace"
+    },
+    "paid_pending": {
+      "notice": "Cobrado y pendiente de confirmar. El stock sigue apartado para este pedido y se compromete al confirmarlo: un cobro no confirma el pedido solo, tampoco cuando viene de la pasarela."
     }
   },
   "dashboard": {
@@ -1213,7 +1223,8 @@
     "search_placeholder": "Buscar por nombre, apellidos, correo o teléfono",
     "tabs": {
       "general": "Datos generales",
-      "orders": "Pedidos"
+      "orders": "Pedidos",
+      "beneficiaries": "Beneficiarios"
     },
     "status": {
       "active": "Activo",
@@ -1259,6 +1270,16 @@
         "title": "Retirar invitación",
         "description": "¿Retirar la invitación de %{email}? El enlace dejará de servir."
       }
+    },
+    "beneficiaries": {
+      "name": "Nombre",
+      "idCard": "Carné",
+      "times": "Pedidos",
+      "last": "Último",
+      "same_phone": "Mismo teléfono que el cliente",
+      "empty_title": "Sin beneficiarios",
+      "empty_hint": "Ninguno de sus pedidos guarda a quién se entregaba.",
+      "missing": "%{smart_count} pedido de este cliente no guarda a quién se entregaba, así que no sale aquí. |||| %{smart_count} pedidos de este cliente no guardan a quién se entregaba, así que no salen aquí."
     }
   },
   "cms-pages": {
@@ -1675,19 +1696,23 @@
     "everywhere": "Disponible en todo el país",
     "zone_count": "%{smart_count} zona |||| %{smart_count} zonas",
     "free": "Gratis",
+    "promise_days_badge": "%{smart_count} día hábil |||| %{smart_count} días hábiles",
+    "free_from_badge": "Gratis desde $%{amount}",
     "fields": {
       "label": "Nombre",
       "description": "Descripción",
       "fee": "Costo de envío",
       "enabled": "Activa",
-      "promiseDays": "Plazo (días hábiles)"
+      "promiseDays": "Plazo (días hábiles)",
+      "freeDeliveryThreshold": "Envío gratis a partir de (USD)"
     },
     "form": {
       "note": "Sin zonas seleccionadas la forma de entrega se ofrece en todo el país.",
       "hints": {
         "fee": "Se suma al total del pedido. Déjalo en 0 si la entrega es gratis.",
         "enabled": "Solo las formas activas aparecen al finalizar la compra.",
-        "promiseDays": "Días hábiles desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha."
+        "promiseDays": "Días hábiles desde que entra el pago, de lunes a sábado y sin feriados. Vacío: no se promete fecha.",
+        "freeDeliveryThreshold": "Subtotal de productos desde el que esta entrega no se cobra, sin contar el envío. Vacío: se cobra siempre."
       }
     },
     "confirm": {
@@ -1703,14 +1728,14 @@
   },
   "fulfillment": {
     "pickup": {
-      "title": "Recogida en tienda",
+      "title": "Recogida en la tienda",
       "subtitle": "Permítele al cliente buscar su pedido en un almacén.",
-      "toggle": "Permitir recoger pedidos en tienda",
+      "toggle": "Permitir recoger pedidos en la tienda",
       "no_addresses": "La recogida está activa, pero ningún almacén activo tiene dirección de recogida configurada. El cliente no puede elegir nada.",
       "confirm": {
-        "on_title": "¿Permitir recogida en tienda?",
+        "on_title": "¿Permitir la recogida en la tienda?",
         "on_desc": "Los clientes podrán elegir buscar su pedido en un almacén con dirección de recogida configurada.",
-        "off_title": "¿Desactivar la recogida en tienda?",
+        "off_title": "¿Desactivar la recogida en la tienda?",
         "off_desc": "Si no hay ninguna forma de entrega activa, los clientes no podrán completar ningún pedido.",
         "on_cta": "Activar",
         "off_cta": "Desactivar"
@@ -1830,6 +1855,40 @@
       "lookup_hint": "Elige la fecha y hora de una compra para ver la versión que estaba publicada.",
       "lookup_result": "El %{date} la tienda mostraba la versión %{version}, publicada el %{published} por %{name}.",
       "lookup_none": "En esa fecha este texto aún no se había publicado."
+    }
+  },
+  "collections": {
+    "title": "Cobros de la tienda",
+    "export": "Exportar la página",
+    "from": "Desde",
+    "to": "Hasta",
+    "status": "Estado",
+    "origin": "Origen",
+    "method": "Método",
+    "any": "Todos",
+    "date": "Fecha",
+    "order": "Pedido",
+    "client": "Cliente",
+    "amount": "Importe",
+    "unreconciled": "Sin cobro registrado",
+    "empty_title": "Sin cobros",
+    "empty_hint": "No hay pedidos con actividad de pago en este periodo.",
+    "showing": "%{mostradas} de %{total}",
+    "statuses": {
+      "cobrado": "Cobrado",
+      "pendiente": "Pendiente",
+      "reembolsado": "Reembolsado"
+    },
+    "origins": {
+      "pasarela": "Pasarela",
+      "manual": "A mano"
+    },
+    "totals": {
+      "collected": "Cobrado",
+      "pending": "Pendiente",
+      "refunded": "Reembolsado",
+      "unreconciled": "Sin cobro registrado",
+      "unreconciled_count": "%{smart_count} pedido |||| %{smart_count} pedidos"
     }
   }
 }
