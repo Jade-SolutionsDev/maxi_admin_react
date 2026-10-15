@@ -22,6 +22,12 @@ export interface DeliveryOptionRecord {
   fee: number;
   /** Días hábiles que promete esta opción. `null` = no se promete fecha. */
   promiseDays: number | null;
+  /**
+   * Subtotal de productos desde el que esta entrega sale gratis, en USD.
+   * `null` = sin promoción, que es distinto de cero: cero sería regalar el
+   * envío siempre.
+   */
+  freeDeliveryThreshold: number | null;
   sortOrder: number;
   enabled: boolean;
   zones: DeliveryZone[];
@@ -112,6 +118,21 @@ export function DeliveryOptionsPage() {
                           })}
                         </Badge>
                       )}
+                      {/*
+                        Sin umbral no se pinta nada: la ausencia ya dice que el
+                        envío se cobra siempre (MxH-0043). Lleva el texto
+                        entero, al contrario que la tarifa, porque dos cifras
+                        seguidas en la misma línea no se distinguirían.
+                      */}
+                      {option.freeDeliveryThreshold != null &&
+                        option.freeDeliveryThreshold > 0 && (
+                          <Badge variant="outline">
+                            {translate("delivery-options.free_from_badge", {
+                              amount: option.freeDeliveryThreshold.toFixed(2),
+                              _: `Gratis desde $${option.freeDeliveryThreshold.toFixed(2)}`,
+                            })}
+                          </Badge>
+                        )}
                     </p>
                     {option.description && (
                       <p className="text-sm text-muted-foreground">
