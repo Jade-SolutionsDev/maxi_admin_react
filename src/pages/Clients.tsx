@@ -9,7 +9,6 @@ import {
 } from "@/components/admin";
 import { DataTable } from "@/components/admin/data-table";
 import { List } from "@/components/admin/list";
-import { ReferenceField } from "@/components/admin/reference-field";
 import { RowNumberField } from "@/components/admin/row-number-field";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { personInitials } from "@/lib/initials";
@@ -140,17 +139,6 @@ export const ClientList = () => {
         <DataTable.Col source="email" label="list.fields.email" />
         <DataTable.Col source="firstName" label="list.fields.firstName" />
         <DataTable.Col source="lastName" label="list.fields.lastName" />
-        <DataTable.Col source="phone" label="list.fields.phone" disableSort />
-        <DataTable.Col
-          source="defaultMunicipalityId"
-          label="list.fields.defaultMunicipality"
-          disableSort
-        >
-          <ReferenceField
-            source="defaultMunicipalityId"
-            reference="defaultMunicipalities"
-          />
-        </DataTable.Col>
         <DataTable.Col source="isActive" label="list.fields.isActive">
           <ClientStatusCell />
         </DataTable.Col>
