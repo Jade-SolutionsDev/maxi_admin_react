@@ -735,10 +735,12 @@
     "products": {
       "title": "Warehouse products",
       "coming_soon": "Inventory management is coming soon.",
-      "subtitle": "Products and available quantity in this storage.",
+      "subtitle": "What this storage holds, what is reserved for undelivered orders and what is left to move out or transfer.",
       "search": "Search product",
       "product_name": "Product name",
-      "available": "Available quantity",
+      "on_hand": "On hand",
+      "reserved": "Reserved",
+      "available": "Available",
       "empty_title": "No stock yet",
       "empty_hint": "Use \"Operations\" to register a stock-in and add quantities.",
       "unknown": "Product"

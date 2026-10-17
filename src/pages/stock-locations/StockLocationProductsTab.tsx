@@ -87,7 +87,7 @@ export function StockLocationProductsTab({
           </h2>
           <p className="text-sm text-muted-foreground">
             {translate("stockLocations.products.subtitle", {
-              _: "Listado de productos y cantidad disponible en este almacén.",
+              _: "Lo que hay en el almacén, lo que está reservado para pedidos sin entregar y lo que queda disponible para sacar o transferir.",
             })}
           </p>
         </div>
@@ -115,8 +115,18 @@ export function StockLocationProductsTab({
                 })}
               </TableHead>
               <TableHead className="text-right">
+                {translate("stockLocations.products.on_hand", {
+                  _: "En almacén",
+                })}
+              </TableHead>
+              <TableHead className="text-right">
+                {translate("stockLocations.products.reserved", {
+                  _: "Reservado",
+                })}
+              </TableHead>
+              <TableHead className="text-right">
                 {translate("stockLocations.products.available", {
-                  _: "Cantidad disponible",
+                  _: "Disponible",
                 })}
               </TableHead>
             </TableRow>
@@ -150,8 +160,14 @@ export function StockLocationProductsTab({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-medium tabular-nums">
+                  <TableCell className="text-right tabular-nums text-muted-foreground">
                     {row.quantity as number}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-muted-foreground">
+                    {(row.reservedQuantity as number) || "—"}
+                  </TableCell>
+                  <TableCell className="text-right font-medium tabular-nums">
+                    {(row.available as number) ?? (row.quantity as number)}
                   </TableCell>
                 </TableRow>
               );
