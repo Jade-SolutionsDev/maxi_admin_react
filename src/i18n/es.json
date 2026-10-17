@@ -737,10 +737,12 @@
     "products": {
       "title": "Productos del almacén",
       "coming_soon": "La gestión de inventario estará disponible próximamente.",
-      "subtitle": "Listado de productos y cantidad disponible en este almacén.",
+      "subtitle": "Lo que hay en el almacén, lo que está reservado para pedidos sin entregar y lo que queda disponible para sacar o transferir.",
       "search": "Buscar producto",
       "product_name": "Nombre del producto",
-      "available": "Cantidad disponible",
+      "on_hand": "En almacén",
+      "reserved": "Reservado",
+      "available": "Disponible",
       "empty_title": "Sin productos en existencia",
       "empty_hint": "Use \"Operaciones\" para registrar una entrada y añadir existencias.",
       "unknown": "Producto"

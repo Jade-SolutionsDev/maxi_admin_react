@@ -315,13 +315,17 @@ export function CreateOperationWizard() {
     const nameById = new Map(
       (invProducts ?? []).map((p) => [String(p.id), String(p.name ?? "")]),
     );
+    // `available` y no `quantity`: lo reservado por pedidos sin entregar no se
+    // puede sacar ni transferir, y la API lo rechaza. Ofrecer la cifra física
+    // dejaba pedir 1000 de algo con 10 reservadas y estrellarse contra un 400
+    // (MxH-0173). Un producto con todo reservado ya no sale en la lista.
     return (invRows ?? [])
-      .filter((r) => Number(r.quantity) > 0)
       .map((r) => ({
         id: String(r.productId),
         name: nameById.get(String(r.productId)) ?? "",
-        available: Number(r.quantity),
-      }));
+        available: Number(r.available ?? r.quantity),
+      }))
+      .filter((p) => p.available > 0);
   }, [invRows, invProducts]);
 
   // A deep-linked transfer fills its rows once the stock list can name them;
