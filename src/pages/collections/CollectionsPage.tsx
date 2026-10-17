@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDataProvider, useTranslate } from "ra-core";
 import { useQuery } from "@tanstack/react-query";
@@ -31,6 +31,59 @@ const money = (amount: string): string =>
     maximumFractionDigits: 2,
   })}`;
 
+/** El techo que admite `GET /payments/collections`. */
+const MAXIMO_POR_PETICION = 500;
+
+/**
+ * Hasta dónde se exporta de una vez. No es un límite de la API: es para que
+ * un filtro vacío sobre el histórico no se traiga decenas de miles de filas al
+ * navegador en silencio. Si se alcanza, el fichero se marca «-parcial» y se
+ * dice cuántas quedaron fuera.
+ */
+const TOPE_DE_EXPORTACION = 5000;
+
+const escapaCsv = (valor: string | null) =>
+  valor === null ? "" : `"${valor.replace(/"/g, '""')}"`;
+
+const aCsv = (filas: CollectionRow[]): string => {
+  const cabecera = [
+    "fecha",
+    "pedido",
+    "cliente",
+    "metodo",
+    "estado",
+    "origen",
+    "sin_cobro_registrado",
+    "referencia",
+    "importe",
+  ].join(",");
+  const cuerpo = filas.map((f) =>
+    [
+      new Date(f.date).toISOString().slice(0, 10),
+      escapaCsv(f.orderNumber),
+      escapaCsv(f.clientName),
+      escapaCsv(f.method),
+      f.status,
+      f.origin,
+      f.unreconciled ? "si" : "no",
+      escapaCsv(f.reference),
+      f.amount,
+    ].join(","),
+  );
+  return [cabecera, ...cuerpo].join("\n");
+};
+
+const descargaCsv = (csv: string, nombre: string) => {
+  const url = URL.createObjectURL(
+    new Blob([csv], { type: "text/csv;charset=utf-8" }),
+  );
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  enlace.click();
+  URL.revokeObjectURL(url);
+};
+
 const ESTADOS: CollectionStatus[] = ["cobrado", "pendiente", "reembolsado"];
 const ORIGENES: CollectionOrigin[] = ["pasarela", "manual"];
 
@@ -53,66 +106,61 @@ export default function CollectionsPage() {
     page: 1,
     limit: 50,
   });
+  const [exportando, setExportando] = useState(false);
 
   const { data, isPending } = useQuery({
     queryKey: ["collections", filtros],
     queryFn: () => dataProvider.getCollections(filtros).then((r) => r.data),
   });
 
-  // En su propio `useMemo` para que no se recree en cada render: entra como
-  // dependencia del `useMemo` del CSV, y con un array nuevo cada vez el CSV se
-  // recalculaba siempre. Lo avisó el linter.
-  const filas = useMemo(() => data?.rows ?? [], [data?.rows]);
+  const filas = data?.rows ?? [];
   const totales = data?.totals;
 
   const cambia = (cambio: Partial<CollectionsFilters>) =>
     setFiltros((previo) => ({ ...previo, ...cambio, page: 1 }));
 
   /**
-   * El CSV se arma con lo que hay en pantalla, y el botón lo dice: «exportar
-   * la página». Exportar el periodo entero necesitaría traérselo todo al
-   * navegador, y con un filtro ancho eso son miles de filas — prometer
-   * «exportar todo» y dar la página sería peor que no prometerlo.
+   * Exporta **el periodo filtrado entero**, no la página.
+   *
+   * Es lo que pide `MxH-0063`, y exportar solo lo que se ve engaña: con 50
+   * filas por página, un informe del mes se queda en el primer puñado sin que
+   * nada lo avise. El periodo se trae paginando de `MAXIMO_POR_PETICION` en
+   * `MAXIMO_POR_PETICION` —el tope que admite la API— y con un techo por si
+   * alguien filtra el histórico completo.
    */
-  const csv = useMemo(() => {
-    const cabecera = [
-      "fecha",
-      "pedido",
-      "cliente",
-      "metodo",
-      "estado",
-      "origen",
-      "sin_cobro_registrado",
-      "referencia",
-      "importe",
-    ].join(",");
-    const escapa = (valor: string | null) =>
-      valor === null ? "" : `"${valor.replace(/"/g, '""')}"`;
-    const cuerpo = filas.map((f) =>
-      [
-        new Date(f.date).toISOString().slice(0, 10),
-        escapa(f.orderNumber),
-        escapa(f.clientName),
-        escapa(f.method),
-        f.status,
-        f.origin,
-        f.unreconciled ? "si" : "no",
-        escapa(f.reference),
-        f.amount,
-      ].join(","),
-    );
-    return [cabecera, ...cuerpo].join("\n");
-  }, [filas]);
+  const descarga = async () => {
+    setExportando(true);
+    try {
+      const todas: CollectionRow[] = [];
+      let page = 1;
+      let total = Number.POSITIVE_INFINITY;
 
-  const descarga = () => {
-    const url = URL.createObjectURL(
-      new Blob([csv], { type: "text/csv;charset=utf-8" }),
-    );
-    const enlace = document.createElement("a");
-    enlace.href = url;
-    enlace.download = `cobros-${new Date().toISOString().slice(0, 10)}.csv`;
-    enlace.click();
-    URL.revokeObjectURL(url);
+      while (todas.length < Math.min(total, TOPE_DE_EXPORTACION)) {
+        const pagina = await dataProvider
+          .getCollections({ ...filtros, page, limit: MAXIMO_POR_PETICION })
+          .then((r) => r.data);
+        total = pagina.total;
+        if (pagina.rows.length === 0) break;
+        todas.push(...pagina.rows);
+        page += 1;
+      }
+
+      const recortado = todas.length >= TOPE_DE_EXPORTACION && total > todas.length;
+      descargaCsv(
+        aCsv(todas.slice(0, TOPE_DE_EXPORTACION)),
+        `cobros-${new Date().toISOString().slice(0, 10)}${recortado ? "-parcial" : ""}.csv`,
+      );
+      if (recortado) {
+        window.alert(
+          translate("collections.export_truncated", {
+            smart_count: TOPE_DE_EXPORTACION,
+            _: `El periodo tiene ${total} filas y se exportaron las primeras ${TOPE_DE_EXPORTACION}. Acota las fechas para llevártelo entero.`,
+          }),
+        );
+      }
+    } finally {
+      setExportando(false);
+    }
   };
 
   return (
@@ -126,10 +174,12 @@ export default function CollectionsPage() {
           type="button"
           variant="outline"
           onClick={descarga}
-          disabled={filas.length === 0}
+          disabled={filas.length === 0 || exportando}
         >
           <Download size={16} className="mr-2" />
-          {translate("collections.export", { _: "Exportar la página" })}
+          {exportando
+            ? translate("collections.exporting", { _: "Exportando…" })
+            : translate("collections.export", { _: "Exportar" })}
         </Button>
       </div>
 
@@ -389,7 +439,7 @@ function Fila({
       </TableCell>
       <TableCell>
         <Link
-          to={`/orders/${fila.orderId}/show`}
+          to={`/orders/${fila.orderId}`}
           className="font-medium text-primary hover:underline"
         >
           {fila.orderNumber ?? fila.orderId.slice(0, 8)}
@@ -398,7 +448,7 @@ function Fila({
       <TableCell>
         {fila.clientId ? (
           <Link
-            to={`/clients/${fila.clientId}/show`}
+            to={`/clients/${fila.clientId}`}
             className="hover:underline"
           >
             {fila.clientName ?? "—"}
