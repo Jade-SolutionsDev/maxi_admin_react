@@ -1857,7 +1857,9 @@
   },
   "collections": {
     "title": "Store collections",
-    "export": "Export this page",
+    "export": "Export",
+    "exporting": "Exporting…",
+    "export_truncated": "This period has more rows than one export allows: the first %{smart_count} were downloaded. Narrow the dates to take it all.",
     "from": "From",
     "to": "To",
     "status": "Status",

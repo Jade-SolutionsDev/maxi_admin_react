@@ -1861,7 +1861,9 @@
   },
   "collections": {
     "title": "Cobros de la tienda",
-    "export": "Exportar la página",
+    "export": "Exportar",
+    "exporting": "Exportando…",
+    "export_truncated": "El periodo tiene más filas de las que se exportan de una vez: se bajaron las primeras %{smart_count}. Acota las fechas para llevártelo entero.",
     "from": "Desde",
     "to": "Hasta",
     "status": "Estado",
