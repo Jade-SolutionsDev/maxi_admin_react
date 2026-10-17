@@ -635,16 +635,17 @@ export default function OrderDetailPage() {
   }
 
   // Legal next statuses for this order, restricted for non-managers.
-  // Confirmar ya no es un botón: lo hace el pago (MxH-0170). Se queda fuera de
-  // las acciones para que nadie lo adelante a mano, y vuelve —solo como salto
-  // directo— cuando un pedido cobrado se quedó sin confirmar, que es lo que no
-  // debería pasar pero necesita salida.
-  const targets = STATUS_TRANSITIONS[order.status]
-    .filter((t) => t !== "confirmed")
-    .filter((t) => isManager || STAFF_TARGETS.includes(t));
-
   const cobradoSinConfirmar =
     order.status === "pending" && order.paymentStatus === "paid";
+
+  // Confirmar ya no es un botón del flujo normal: lo hace el pago (MxH-0170).
+  // Sigue estando para un pedido cobrado que se quedó sin confirmar —los
+  // anteriores al cambio, o uno cuya confirmación automática falló—, porque es
+  // la única salida que tiene todo el mundo: «Saltar a estado…» depende del
+  // permiso `orders:update-status-direct`, que no todos tienen.
+  const targets = STATUS_TRANSITIONS[order.status]
+    .filter((t) => t !== "confirmed" || cobradoSinConfirmar)
+    .filter((t) => isManager || STAFF_TARGETS.includes(t));
 
   // «Restablecer orden»: managers only, and only for a cancelled order that
   // can still be served. The paid-after-expiry case needs a refund instead.
@@ -658,12 +659,7 @@ export default function OrderDetailPage() {
   // step-by-step buttons stay the safe path for everyone else.
   const chainIndex = FORWARD_CHAIN.indexOf(order.status);
   const directTargets =
-    canDirectJump && chainIndex >= 0
-      ? [
-          ...(cobradoSinConfirmar ? (["confirmed"] as OrderStatus[]) : []),
-          ...FORWARD_CHAIN.slice(chainIndex + 2),
-        ]
-      : [];
+    canDirectJump && chainIndex >= 0 ? FORWARD_CHAIN.slice(chainIndex + 2) : [];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">

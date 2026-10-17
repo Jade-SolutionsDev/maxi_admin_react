@@ -1172,7 +1172,7 @@
       "copy_failed": "Could not copy the link"
     },
     "paid_pending": {
-      "notice": "Paid and unconfirmed. It should have confirmed itself when the payment landed: the stock is still held and has not been decremented. Move it on from “Jump to status…”."
+      "notice": "Paid and unconfirmed. It should have confirmed itself when the payment landed: the stock is still held and has not been decremented. Confirm it here to decrement it."
     },
     "pending_payment": {
       "notice": "Awaiting payment. The order confirms itself as soon as the payment lands, and the stock held for it is decremented then."
