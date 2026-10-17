@@ -635,9 +635,16 @@ export default function OrderDetailPage() {
   }
 
   // Legal next statuses for this order, restricted for non-managers.
-  const targets = STATUS_TRANSITIONS[order.status].filter(
-    (t) => isManager || STAFF_TARGETS.includes(t),
-  );
+  // Confirmar ya no es un botón: lo hace el pago (MxH-0170). Se queda fuera de
+  // las acciones para que nadie lo adelante a mano, y vuelve —solo como salto
+  // directo— cuando un pedido cobrado se quedó sin confirmar, que es lo que no
+  // debería pasar pero necesita salida.
+  const targets = STATUS_TRANSITIONS[order.status]
+    .filter((t) => t !== "confirmed")
+    .filter((t) => isManager || STAFF_TARGETS.includes(t));
+
+  const cobradoSinConfirmar =
+    order.status === "pending" && order.paymentStatus === "paid";
 
   // «Restablecer orden»: managers only, and only for a cancelled order that
   // can still be served. The paid-after-expiry case needs a refund instead.
@@ -651,7 +658,12 @@ export default function OrderDetailPage() {
   // step-by-step buttons stay the safe path for everyone else.
   const chainIndex = FORWARD_CHAIN.indexOf(order.status);
   const directTargets =
-    canDirectJump && chainIndex >= 0 ? FORWARD_CHAIN.slice(chainIndex + 2) : [];
+    canDirectJump && chainIndex >= 0
+      ? [
+          ...(cobradoSinConfirmar ? (["confirmed"] as OrderStatus[]) : []),
+          ...FORWARD_CHAIN.slice(chainIndex + 2),
+        ]
+      : [];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -709,17 +721,24 @@ export default function OrderDetailPage() {
         </p>
       )}
 
-      {/* Cobrar no confirma. QA lo leyó como un defecto en MxH-0111 —«al marcar
-          pagado el stock no se descuenta si no das a confirmar»— porque la
-          pantalla no lo decía en ninguna parte. Es a propósito y vale igual
-          para la pasarela: `propagateToOrder` pone el pago en «pagado» y no
-          toca el estado del pedido, así que confirmar sigue siendo un acto de
-          una persona. En staging hay 7 pedidos esperando justo aquí. */}
-      {order.status === "pending" && order.paymentStatus === "paid" && (
-        <p className="mb-6 flex items-start gap-2 text-sm text-muted-foreground">
+      {/* Desde MxH-0170 el pago confirma el pedido. Si uno aparece aquí
+          cobrado y sin confirmar es que la confirmación automática no pudo
+          completarse —o que el pedido es anterior al cambio—, así que el
+          aviso dice qué hacer en vez de explicar una regla que ya no existe. */}
+      {cobradoSinConfirmar && (
+        <p className="mb-6 flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400">
           <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           {translate("orders.paid_pending.notice", {
-            _: "Cobrado y pendiente de confirmar. El stock sigue apartado para este pedido y se compromete al confirmarlo: un cobro no confirma el pedido solo, tampoco cuando viene de la pasarela.",
+            _: "Cobrado y sin confirmar. Debería haberse confirmado solo al entrar el pago: el stock sigue apartado y no se ha descontado. Avánzalo desde «Saltar a estado…».",
+          })}
+        </p>
+      )}
+
+      {order.status === "pending" && order.paymentStatus !== "paid" && (
+        <p className="mb-6 flex items-start gap-2 text-sm text-muted-foreground">
+          <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          {translate("orders.pending_payment.notice", {
+            _: "Pendiente de pago. El pedido se confirmará solo en cuanto entre el cobro, y entonces se descontará el stock que hoy está apartado.",
           })}
         </p>
       )}
