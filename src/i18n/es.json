@@ -1176,7 +1176,7 @@
       "copy_failed": "No se pudo copiar el enlace"
     },
     "paid_pending": {
-      "notice": "Cobrado y sin confirmar. Debería haberse confirmado solo al entrar el pago: el stock sigue apartado y no se ha descontado. Avánzalo desde «Saltar a estado…»."
+      "notice": "Cobrado y sin confirmar. Debería haberse confirmado solo al entrar el pago: el stock sigue apartado y no se ha descontado. Confírmalo aquí para descontarlo."
     },
     "pending_payment": {
       "notice": "Pendiente de pago. El pedido se confirmará solo en cuanto entre el cobro, y entonces se descontará el stock que hoy está apartado."
