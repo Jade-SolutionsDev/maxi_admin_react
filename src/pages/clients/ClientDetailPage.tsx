@@ -7,7 +7,6 @@ import {
   CalendarDays,
   Mail,
   MapPin,
-  Phone,
   ShoppingCart,
   UserRound,
   Users,
@@ -176,11 +175,6 @@ function GeneralTab({ client }: { client: ClientRecord }) {
       icon: Mail,
       label: translate("list.fields.email", { _: "Email" }),
       value: client.email ?? "—",
-    },
-    {
-      icon: Phone,
-      label: translate("list.fields.phone", { _: "Teléfono" }),
-      value: client.phone ?? "—",
     },
     {
       icon: MapPin,
