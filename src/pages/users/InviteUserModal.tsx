@@ -3,7 +3,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { useDataProvider, useRefresh, useTranslate } from "ra-core";
+import {
+  useDataProvider,
+  useGetIdentity,
+  useRefresh,
+  useTranslate,
+} from "ra-core";
 import { toast } from "sonner";
 import { Info, Mail, Shield, User, UserPlus } from "lucide-react";
 
@@ -33,7 +38,7 @@ import { Button } from "@/components/ui/button";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
 import { ROLE_IDS } from "./roleChoices";
 import { RolesChecklist } from "./RolesChecklist";
-import { backendMessage } from "./errors";
+import { backendMessage, usuarioBorradoARestaurar } from "./errors";
 
 const inviteSchema = z
   .object({
@@ -62,6 +67,7 @@ export default function InviteUserModal() {
   const translate = useTranslate();
   const dataProvider = useDataProvider() as ExtendedDataProvider;
   const refresh = useRefresh();
+  const { data: identity } = useGetIdentity();
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
@@ -93,11 +99,58 @@ export default function InviteUserModal() {
       // El motivo real viene del servidor ("ya hay un usuario activo con ese
       // correo…"); `error.message` de un HttpError llega vacío y la alerta
       // salía sin decir nada.
+      const mensaje = backendMessage(
+        error,
+        translate("users.actions.invite_error", {
+          _: "No se pudo enviar la invitación",
+        }),
+      );
+
+      // El correo es de un usuario borrado (MxH-0122): su cuenta de Clerk
+      // sigue viva y no admite invitación, pero restaurarlo lo devuelve tal
+      // cual estaba. Restaurar es de SUPER_ADMIN, igual que en la lista; a
+      // los demás se les dice a quién pedírselo en vez de ofrecer un botón
+      // que fallaría.
+      const usuarioBorrado = usuarioBorradoARestaurar(error);
+      if (usuarioBorrado && identity?.role === "SUPER_ADMIN") {
+        toast.error(mensaje, {
+          duration: 15_000,
+          action: {
+            label: translate("users.actions.restore", { _: "Restaurar" }),
+            onClick: () => void restaurar(usuarioBorrado),
+          },
+        });
+        return;
+      }
+      if (usuarioBorrado) {
+        toast.error(
+          `${mensaje} ${translate(
+            "users.actions.invite_deleted_ask_super_admin",
+            {
+              _: "Pídele a un superadministrador que lo restaure.",
+            },
+          )}`,
+        );
+        return;
+      }
+      toast.error(mensaje);
+    }
+  };
+
+  const restaurar = async (userId: string) => {
+    try {
+      await dataProvider.restoreUser(userId);
+      toast.success(
+        translate("users.actions.restore_success", { _: "Usuario restaurado" }),
+      );
+      refresh();
+      navigate("/users");
+    } catch (error) {
       toast.error(
         backendMessage(
           error,
-          translate("users.actions.invite_error", {
-            _: "No se pudo enviar la invitación",
+          translate("users.actions.restore_error", {
+            _: "No se pudo restaurar al usuario",
           }),
         ),
       );
