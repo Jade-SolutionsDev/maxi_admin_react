@@ -66,7 +66,19 @@ export default function MapaDeEntrega({
     const marcador = L.marker([latitude, longitude], { icon: pin }).addTo(
       instancia,
     );
-    if (etiqueta) marcador.bindPopup(etiqueta);
+
+    if (etiqueta) {
+      /**
+       * Un nodo, no una cadena: `bindPopup` interpreta lo que recibe **como
+       * HTML**, y esta etiqueta es la calle que escribió el cliente al comprar.
+       * Con una cadena, una dirección con `<img src=x onerror=…>` se ejecutaría
+       * en el panel en cuanto quien reparte abriera el mapa. Con `textContent`
+       * el navegador no interpreta nada.
+       */
+      const contenido = document.createElement("span");
+      contenido.textContent = etiqueta;
+      marcador.bindPopup(contenido);
+    }
 
     mapa.current = instancia;
 
