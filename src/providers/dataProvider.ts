@@ -1,4 +1,5 @@
 import { DataProvider, HttpError, fetchUtils } from "ra-core";
+import type { RaRecord } from "ra-core";
 import { getApiToken } from "../lib/clerk/clerkRefs";
 import { backendMessage } from "@/pages/users/errors";
 import { resetIdentityCache } from "./authProvider";
@@ -453,6 +454,9 @@ export interface ExtendedDataProvider extends DataProvider {
   }>;
   getCmsHomeChanges: () => Promise<{ data: CmsHomeChange[] }>;
   /** Puts a text's draft on the store as a new version. */
+  /** Saca el aviso emergente a la tienda, o lo retira sin borrarlo. */
+  publishPopup: (id: string) => Promise<{ data: RaRecord }>;
+  unpublishPopup: (id: string) => Promise<{ data: RaRecord }>;
   publishCmsText: (
     resource: CmsTextResource,
     id: string,
@@ -566,6 +570,7 @@ const RESOURCE_PATHS: Record<string, string> = {
   // Per-storage inventory rows (Almacenes → Productos tab, operation wizard).
   "storage-inventory": "inventory",
   "cms-pages": "cms/pages",
+  "cms-popups": "cms/popups",
   "cms-home-notices": "cms/home-notices",
   "cms-banners": "cms/banners",
   "cms-services": "cms/services",
@@ -941,6 +946,20 @@ export const dataProvider: DataProvider = {
       method: "GET",
     });
     return { data: unwrapOne(json) as CmsHomeChange[] };
+  },
+
+  async publishPopup(id: string) {
+    const { json } = await httpClient(`${API_URL}/cms/popups/${id}/publish`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as RaRecord };
+  },
+
+  async unpublishPopup(id: string) {
+    const { json } = await httpClient(`${API_URL}/cms/popups/${id}/unpublish`, {
+      method: "POST",
+    });
+    return { data: unwrapOne(json) as RaRecord };
   },
 
   async publishCmsText(resource: CmsTextResource, id: string) {

@@ -127,6 +127,10 @@
     "cms-home-notices": {
       "name": "Aviso",
       "name_plural": "Avisos de portada"
+    },
+    "cms-popups": {
+      "name": "Aviso emergente",
+      "name_plural": "Avisos emergentes"
     }
   },
   "list": {
@@ -428,7 +432,8 @@
       "entregas": "Entregas",
       "devoluciones": "Devoluciones",
       "cmsHomeNotices": "Avisos",
-      "cobros": "Cobros"
+      "cobros": "Cobros",
+      "cmsPopups": "Avisos emergentes"
     },
     "user": {
       "profile": "Perfil"
@@ -1898,6 +1903,69 @@
       "refunded": "Reembolsado",
       "unreconciled": "Sin cobro registrado",
       "unreconciled_count": "%{smart_count} pedido |||| %{smart_count} pedidos"
+    }
+  },
+  "cms-popups": {
+    "title": "Avisos emergentes",
+    "states": {
+      "borrador": "Borrador",
+      "programado": "Programado",
+      "vigente": "Vigente",
+      "caducado": "Caducado"
+    },
+    "fields": {
+      "state": "Estado",
+      "image": "Imagen",
+      "title": "Título",
+      "body": "Texto",
+      "buttonLabel": "Texto del botón",
+      "buttonHref": "A dónde lleva",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "dates": "Vigencia",
+      "repeatAfterHours": "Si lo cierran, vuelve a salir",
+      "updatedAt": "Actualizado",
+      "actions": "Acciones",
+      "no_dates": "Sin fechas"
+    },
+    "actions": {
+      "publish": "Publicar",
+      "unpublish": "Retirar"
+    },
+    "repeat": {
+      "day": "A las 24 horas",
+      "week": "A los 7 días",
+      "never": "Nunca, hasta que cambie el aviso"
+    },
+    "notify": {
+      "published": "El aviso ya se ve en la tienda",
+      "unpublished": "El aviso se retiró de la tienda",
+      "failed": "No se pudo cambiar el estado del aviso"
+    },
+    "form": {
+      "subtitle": "Se guarda como borrador: para que salga en la tienda hay que publicarlo.",
+      "schedule_title": "Cuándo se ve",
+      "schedule_hint": "Con fecha de fin se retira solo: nadie tiene que acordarse de apagarlo.",
+      "images_title": "Imagen",
+      "images_hint": "Opcional, pero si pones una van las tres medidas: así no se recorta en el teléfono.",
+      "preview_title": "Así lo verá quien entre",
+      "preview_title_empty": "El título del aviso",
+      "preview_body_empty": "El texto que lo acompaña.",
+      "variants": {
+        "desktop": "Escritorio",
+        "tablet": "Tableta",
+        "mobile": "Teléfono"
+      },
+      "hints": {
+        "title": "Lo primero que se lee. Corto y concreto.",
+        "body": "Una o dos frases. Qué ganas y hasta cuándo.",
+        "buttonLabel": "Sin texto no hay botón: el aviso solo informa.",
+        "buttonHref": "Una ruta de la tienda (/catalog) o una dirección http(s).",
+        "startsAt": "Vacío: desde que lo publiques.",
+        "endsAt": "Vacío: hasta que lo retires a mano.",
+        "repeatAfterHours": "Lo recuerda el navegador de cada visitante.",
+        "isActive": "Apagarlo lo quita de la tienda sin borrarlo."
+      }
     }
   }
 }

@@ -44,6 +44,9 @@ import { CmsBannersLayout } from "./pages/cms-banners/CmsBannersLayout";
 import CmsBannerCreate from "./pages/cms-banners/CmsBannerCreate";
 import CmsBannerEdit from "./pages/cms-banners/CmsBannerEdit";
 import { CmsBannerDetailModal } from "./pages/cms-banners/CmsBannerDetailModal";
+import { CmsPopupsLayout } from "./pages/cms-popups/CmsPopupsLayout";
+import CmsPopupCreate from "./pages/cms-popups/CmsPopupCreate";
+import CmsPopupEdit from "./pages/cms-popups/CmsPopupEdit";
 import { CmsPagesLayout } from "./pages/cms-pages/CmsPagesLayout";
 import CmsPageCreate from "./pages/cms-pages/CmsPageCreate";
 import CmsPageEdit from "./pages/cms-pages/CmsPageEdit";
@@ -184,6 +187,17 @@ const AdminApp = () => (
         <Route path="create" element={<CmsHomeNoticeCreate />} />
         <Route path="edit/:id" element={<CmsHomeNoticeEdit />} />
         <Route path=":id" element={<CmsHomeNoticeDetailModal />} />
+      </Route>
+      <Route
+        path="/cms-popups/*"
+        element={
+          <RequireAccess resource="cms-popups">
+            <CmsPopupsLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<CmsPopupCreate />} />
+        <Route path="edit/:id" element={<CmsPopupEdit />} />
       </Route>
       <Route
         path="/cms-banners/*"
