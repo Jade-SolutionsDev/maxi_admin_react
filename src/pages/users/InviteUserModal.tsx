@@ -111,8 +111,14 @@ export default function InviteUserModal() {
       // cual estaba. Restaurar es de SUPER_ADMIN, igual que en la lista; a
       // los demás se les dice a quién pedírselo en vez de ofrecer un botón
       // que fallaría.
+      //
+      // El modal se cierra ANTES de enseñar el aviso con el botón. Un diálogo
+      // modal de Radix bloquea los clics fuera de su contenido, y el aviso de
+      // sonner queda fuera: el botón se veía y no se podía pulsar. Medido en
+      // staging el 18-oct-2026 con el modal abierto.
       const usuarioBorrado = usuarioBorradoARestaurar(error);
       if (usuarioBorrado && identity?.role === "SUPER_ADMIN") {
+        navigate("/users");
         toast.error(mensaje, {
           duration: 15_000,
           action: {
