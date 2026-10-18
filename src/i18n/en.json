@@ -229,6 +229,8 @@
       "reject_success": "Request rejected",
       "restore": "Restore",
       "restore_success": "User restored",
+      "restore_error": "Could not restore the user",
+      "invite_deleted_ask_super_admin": "Ask a super admin to restore them.",
       "enable": "Enable",
       "enable_success": "User enabled",
       "disable": "Disable",

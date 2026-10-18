@@ -229,6 +229,8 @@
       "reject_success": "Solicitud rechazada",
       "restore": "Restaurar",
       "restore_success": "Usuario restaurado",
+      "restore_error": "No se pudo restaurar al usuario",
+      "invite_deleted_ask_super_admin": "Pídele a un superadministrador que lo restaure.",
       "enable": "Activar",
       "enable_success": "Usuario activado",
       "disable": "Desactivar",
