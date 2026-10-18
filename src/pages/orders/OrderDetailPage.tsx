@@ -79,6 +79,8 @@ import { OrderItemsEditor } from "./OrderItemsEditor";
 import { OrderHistorySection } from "./OrderHistorySection";
 import { OrderRefundsCard } from "./OrderRefundsCard";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
+import { leerPunto } from "./punto-de-entrega";
+import { UbicacionDeEntrega } from "./UbicacionDeEntrega";
 
 interface OrderItemRow {
   productId: string;
@@ -243,6 +245,15 @@ function DeliveryDetails({ order }: { order: OrderRecord }) {
       {order.deliveryOptionLabel && (
         <dd className="pt-1">{order.deliveryOptionLabel}</dd>
       )}
+      {/* El punto en el mapa (MxH-0073). Va dentro del bloque de la dirección
+          y no aparte: **complementa el texto, no lo sustituye**, y quien sale a
+          repartir necesita leer las dos cosas juntas. */}
+      <dd>
+        <UbicacionDeEntrega
+          punto={leerPunto(address.location)}
+          etiqueta={text(address.street) || undefined}
+        />
+      </dd>
     </dl>
   );
 }
