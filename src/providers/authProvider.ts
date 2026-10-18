@@ -73,6 +73,10 @@ const RESOURCE_RULES: Record<
   // Home notices are store texts too: same draft/publish module as pages.
   "cms-home-notices": { module: "cms-pages" },
   "cms-banners": { module: "cms-banners" },
+  // El aviso emergente es contenido del sitio web y va con los permisos de
+  // las páginas: así nace con dueño («Responsable de la web» ya los tiene)
+  // en vez de quedar a oscuras hasta que alguien conceda un módulo nuevo.
+  "cms-popups": { module: "cms-pages" },
   "cms-services": { module: "cms-services" },
   "cms-staff": { module: "cms-staff" },
   "cms-settings": {

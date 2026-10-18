@@ -8,6 +8,7 @@ import {
   Settings2,
   UsersRound,
   type LucideIcon,
+  MessageSquareWarning,
 } from "lucide-react";
 
 export interface CmsTab {
@@ -47,6 +48,12 @@ export const CMS_TABS: CmsTab[] = [
     path: "/cms-home-notices",
     resource: "cms-home-notices",
     icon: Megaphone,
+  },
+  {
+    labelKey: "app.menu.cmsPopups",
+    path: "/cms-popups",
+    resource: "cms-popups",
+    icon: MessageSquareWarning,
   },
   {
     labelKey: "app.menu.cmsServices",

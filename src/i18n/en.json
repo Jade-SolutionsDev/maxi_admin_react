@@ -127,6 +127,10 @@
     "cms-home-notices": {
       "name": "Notice",
       "name_plural": "Home notices"
+    },
+    "cms-popups": {
+      "name": "Pop-up notice",
+      "name_plural": "Pop-up notices"
     }
   },
   "list": {
@@ -426,7 +430,8 @@
       "entregas": "Delivery",
       "devoluciones": "Refunds",
       "cmsHomeNotices": "Notices",
-      "cobros": "Collections"
+      "cobros": "Collections",
+      "cmsPopups": "Pop-up notices"
     },
     "user": {
       "profile": "Profile"
@@ -1894,6 +1899,69 @@
       "refunded": "Refunded",
       "unreconciled": "No charge on record",
       "unreconciled_count": "%{smart_count} order |||| %{smart_count} orders"
+    }
+  },
+  "cms-popups": {
+    "title": "Pop-up notices",
+    "states": {
+      "borrador": "Draft",
+      "programado": "Scheduled",
+      "vigente": "Live",
+      "caducado": "Ended"
+    },
+    "fields": {
+      "state": "Status",
+      "image": "Image",
+      "title": "Title",
+      "body": "Text",
+      "buttonLabel": "Button label",
+      "buttonHref": "Links to",
+      "startsAt": "From",
+      "endsAt": "Until",
+      "dates": "Schedule",
+      "repeatAfterHours": "Show again after dismissal",
+      "updatedAt": "Updated",
+      "actions": "Actions",
+      "no_dates": "No dates"
+    },
+    "actions": {
+      "publish": "Publish",
+      "unpublish": "Take down"
+    },
+    "repeat": {
+      "day": "After 24 hours",
+      "week": "After 7 days",
+      "never": "Never, until the notice changes"
+    },
+    "notify": {
+      "published": "The notice is live in the store",
+      "unpublished": "The notice was taken down",
+      "failed": "Could not change the notice"
+    },
+    "form": {
+      "subtitle": "Saved as a draft: publish it to show it in the store.",
+      "schedule_title": "When it shows",
+      "schedule_hint": "With an end date it retires itself.",
+      "images_title": "Image",
+      "images_hint": "Optional, but one image means all three sizes.",
+      "preview_title": "What shoppers will see",
+      "preview_title_empty": "The notice title",
+      "preview_body_empty": "The text that goes with it.",
+      "variants": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Phone"
+      },
+      "hints": {
+        "title": "The first thing read. Short and concrete.",
+        "body": "One or two sentences.",
+        "buttonLabel": "No label, no button: the notice only informs.",
+        "buttonHref": "A store path (/catalog) or an http(s) address.",
+        "startsAt": "Empty: from the moment you publish.",
+        "endsAt": "Empty: until you take it down.",
+        "repeatAfterHours": "Remembered by each visitor's browser.",
+        "isActive": "Turning it off removes it without deleting it."
+      }
     }
   }
 }
