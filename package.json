@@ -34,6 +34,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "diacritic": "^0.0.2",
+    "leaflet": "1.9.4",
     "lodash": "^4.18.1",
     "lucide-react": "^1.21.0",
     "query-string": "^9.4.0",
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
+    "@types/leaflet": "1.9.20",
     "@types/lodash": "^4.17.24",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
