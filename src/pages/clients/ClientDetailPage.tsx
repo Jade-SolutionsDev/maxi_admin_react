@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDataProvider, useGetList, useGetOne, useTranslate } from "ra-core";
 import {
   ArrowLeft,
+  BookUser,
   CalendarDays,
   Mail,
   MapPin,
@@ -25,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import type {
   Beneficiary,
+  ClientAddressRow,
   ExtendedDataProvider,
   OrderPaymentStatus,
   OrderStatus,
@@ -34,6 +36,8 @@ import {
   PaymentStatusBadge,
 } from "@/pages/orders/OrderBadges";
 import { money } from "@/pages/orders/orderStatus";
+import { leerPunto } from "@/pages/orders/punto-de-entrega";
+import { UbicacionDeEntrega } from "@/pages/orders/UbicacionDeEntrega";
 
 interface ClientRecord {
   id: string;
@@ -56,7 +60,7 @@ interface OrderRow {
   createdAt: string;
 }
 
-type TabKey = "general" | "orders" | "beneficiaries";
+type TabKey = "general" | "orders" | "beneficiaries" | "addresses";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -88,6 +92,7 @@ export default function ClientDetailPage() {
       label: "clients.tabs.beneficiaries",
       icon: Users,
     },
+    { key: "addresses", label: "clients.tabs.addresses", icon: BookUser },
   ];
 
   return (
@@ -164,6 +169,7 @@ export default function ClientDetailPage() {
       {tab === "general" && <GeneralTab client={client} />}
       {tab === "orders" && <OrdersTab clientId={client.id} />}
       {tab === "beneficiaries" && <BeneficiariesTab clientId={client.id} />}
+      {tab === "addresses" && <AddressesTab clientId={client.id} />}
     </div>
   );
 }
@@ -292,6 +298,121 @@ function OrdersTab({ clientId }: { clientId: string }) {
           ))}
         </TableBody>
       </Table>
+    </section>
+  );
+}
+
+/**
+ * La libreta de direcciones del cliente (MxH-0178).
+ *
+ * **Solo lectura, y no dice a dónde se entregó nada.** La libreta la mantiene
+ * el cliente desde la tienda y puede cambiarla cuando quiera; cada pedido
+ * guarda su propia copia congelada al comprar, y esa es la que vale para
+ * repartir. Esto sirve para atención al cliente: «¿qué direcciones tiene
+ * guardadas?».
+ */
+function AddressesTab({ clientId }: { clientId: string }) {
+  const translate = useTranslate();
+  const dataProvider = useDataProvider<ExtendedDataProvider>();
+  const { data, isPending } = useQuery({
+    queryKey: ["clients", clientId, "addresses"],
+    queryFn: () =>
+      dataProvider.getClientAddresses(clientId).then((r) => r.data),
+  });
+
+  if (isPending) {
+    return <div className="h-40 animate-pulse rounded-lg bg-muted" />;
+  }
+
+  const direcciones = data ?? [];
+
+  // El caso más común, y conviene que lo diga sin sonar a avería: en una
+  // recogida no hay dirección ninguna, así que un cliente sin libreta es
+  // normal, no un fallo.
+  if (direcciones.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-12 text-center">
+        <BookUser className="mb-3 h-9 w-9 text-muted-foreground" />
+        <p className="font-medium text-foreground">
+          {translate("clients.addresses.empty_title", {
+            _: "Sin direcciones guardadas",
+          })}
+        </p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          {translate("clients.addresses.empty_hint", {
+            _: "Este cliente no ha guardado ninguna dirección en la tienda. Si compra para recoger, no necesita ninguna.",
+          })}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {direcciones.map((direccion) => (
+        <DireccionGuardada key={direccion.id} direccion={direccion} />
+      ))}
+    </div>
+  );
+}
+
+/** Lo que no viene, o viene en blanco, no se enseña. */
+const texto = (valor: string | null) => valor?.trim() || "";
+
+function DireccionGuardada({ direccion }: { direccion: ClientAddressRow }) {
+  const translate = useTranslate();
+
+  const calle = texto(direccion.street);
+  const entre = texto(direccion.betweenStreets);
+  const referencia = texto(direccion.reference);
+  const telefono = texto(direccion.contactPhone);
+  const destinatario = texto(direccion.recipientName);
+  const carne = texto(direccion.idCard);
+  const lugar = [direccion.municipalityName, direccion.provinceName]
+    .filter(Boolean)
+    .join(", ");
+
+  return (
+    <section className="rounded-lg border border-border p-4">
+      <header className="mb-2 flex flex-wrap items-center gap-2">
+        <MapPin size={16} className="text-muted-foreground" />
+        <h3 className="font-medium text-foreground">
+          {texto(direccion.label) || calle}
+        </h3>
+        {direccion.isDefault && (
+          <Badge variant="secondary">
+            {translate("clients.addresses.default", { _: "Predeterminada" })}
+          </Badge>
+        )}
+      </header>
+
+      <dl className="text-sm text-muted-foreground">
+        <dd>{calle}</dd>
+        {entre && (
+          <dd>
+            {translate("orders.fulfillment.between", { _: "Entre" })} {entre}
+          </dd>
+        )}
+        {lugar && <dd>{lugar}</dd>}
+        {referencia && <dd>{referencia}</dd>}
+        {destinatario && (
+          <dd className="pt-1">
+            {destinatario}
+            {carne && <span className="tabular-nums"> · {carne}</span>}
+          </dd>
+        )}
+        {telefono && <dd className="tabular-nums">{telefono}</dd>}
+        {/* El mismo componente del detalle del pedido, tal cual: el texto
+            manda, el mapa va detrás de un botón —pintar uno por dirección
+            violaría la política de uso de las teselas de OpenStreetMap— y la
+            ausencia de punto la anuncia él solo. */}
+        <dd>
+          <UbicacionDeEntrega
+            punto={leerPunto(direccion.location)}
+            etiqueta={calle || undefined}
+          />
+        </dd>
+      </dl>
     </section>
   );
 }

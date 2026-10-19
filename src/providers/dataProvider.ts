@@ -200,6 +200,30 @@ export interface ClientBeneficiaries {
   ordersWithoutRecipient: number;
 }
 
+/**
+ * MxH-0178 · Una dirección de la libreta del cliente.
+ *
+ * **No es la dirección de un pedido.** El pedido guarda su propia copia
+ * congelada al comprar; esta es la que el cliente mantiene en la tienda y puede
+ * cambiar cuando quiera. `location` viaja sin tipar a propósito: es una columna
+ * `jsonb` y se valida con `leerPunto`, igual que en el detalle del pedido.
+ */
+export interface ClientAddressRow {
+  id: string;
+  label: string | null;
+  street: string;
+  betweenStreets: string | null;
+  reference: string | null;
+  municipalityName: string;
+  provinceName: string;
+  recipientName: string | null;
+  idCard: string | null;
+  contactPhone: string | null;
+  location: unknown;
+  isDefault: boolean;
+  createdAt: string;
+}
+
 /** MxH-0063 · Una línea de la pantalla de cobros: un pedido con actividad de pago. */
 export type CollectionStatus = "cobrado" | "pendiente" | "reembolsado";
 export type CollectionOrigin = "pasarela" | "manual";
@@ -413,6 +437,10 @@ export interface ExtendedDataProvider extends DataProvider {
   getClientBeneficiaries: (
     clientId: string,
   ) => Promise<{ data: ClientBeneficiaries }>;
+  /** Las direcciones que el cliente tiene guardadas en la tienda. */
+  getClientAddresses: (
+    clientId: string,
+  ) => Promise<{ data: ClientAddressRow[] }>;
   getRefunds: (orderId: string) => Promise<{ data: Refund[] }>;
   /** Cobrado, devuelto, comprometido y lo que aún se puede devolver. */
   getRefundSummary: (orderId: string) => Promise<{ data: RefundSummary }>;
@@ -1265,6 +1293,15 @@ export const dataProvider: DataProvider = {
       `${API_URL}/clients/${clientId}/beneficiaries`,
     );
     return { data: unwrapOne(json) as ClientBeneficiaries };
+  },
+
+  async getClientAddresses(clientId: string) {
+    const { json } = await httpClient(
+      `${API_URL}/clients/${clientId}/addresses`,
+    );
+    // `unwrapList` y no `unwrapOne`: la API contesta un array dentro de `data`,
+    // sin `meta` — la libreta tiene techo por cliente y no se pagina.
+    return { data: unwrapList(json).rows as ClientAddressRow[] };
   },
 
   async getRefunds(orderId: string) {
