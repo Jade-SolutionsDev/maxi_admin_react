@@ -36,6 +36,7 @@ import {
   PaymentStatusBadge,
 } from "@/pages/orders/OrderBadges";
 import { money } from "@/pages/orders/orderStatus";
+import { tituloDeLaDireccion } from "./libreta";
 import { leerPunto } from "@/pages/orders/punto-de-entrega";
 import { UbicacionDeEntrega } from "@/pages/orders/UbicacionDeEntrega";
 
@@ -371,14 +372,13 @@ function DireccionGuardada({ direccion }: { direccion: ClientAddressRow }) {
   const lugar = [direccion.municipalityName, direccion.provinceName]
     .filter(Boolean)
     .join(", ");
+  const { titulo, calleAparte } = tituloDeLaDireccion(direccion.label, calle);
 
   return (
     <section className="rounded-lg border border-border p-4">
       <header className="mb-2 flex flex-wrap items-center gap-2">
         <MapPin size={16} className="text-muted-foreground" />
-        <h3 className="font-medium text-foreground">
-          {texto(direccion.label) || calle}
-        </h3>
+        <h3 className="font-medium text-foreground">{titulo}</h3>
         {direccion.isDefault && (
           <Badge variant="secondary">
             {translate("clients.addresses.default", { _: "Predeterminada" })}
@@ -387,7 +387,9 @@ function DireccionGuardada({ direccion }: { direccion: ClientAddressRow }) {
       </header>
 
       <dl className="text-sm text-muted-foreground">
-        <dd>{calle}</dd>
+        {/* Sin alias el título ya es la calle, y repetirla debajo era lo que
+            se veía en staging: la misma línea dos veces. */}
+        {calleAparte && <dd>{calle}</dd>}
         {entre && (
           <dd>
             {translate("orders.fulfillment.between", { _: "Entre" })} {entre}
