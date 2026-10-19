@@ -1,7 +1,9 @@
 # Comprobaciones en cada propuesta de cambios.
 #
-# Capa 1 de la integración continua: compilar el panel, que es lo que atrapa
-# un error de tipos o un import roto antes de que llegue a staging.
+# Capa 1 de la integración continua: compilar el panel —que atrapa un error de
+# tipos o un import roto antes de que llegue a staging— y **correr las pruebas
+# unitarias**, que desde MxH-0177 existen y cubren la lógica pura: transiciones
+# de estado, validación de lo que llega de la API y aritmética de indicadores.
 #
 # El linter va como aviso y no bloquea: la rama arrastra 64 avisos heredados
 # y bloquear con ellos dejaría el flujo en rojo desde el primer día, que es
@@ -19,7 +21,7 @@ concurrency:
 
 jobs:
   comprobar:
-    name: Compilar el panel
+    name: Compilar y probar el panel
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -38,6 +40,23 @@ jobs:
         # `tsc -b && vite build`: los tipos y el empaquetado en un solo paso.
         run: yarn build
 
+      - name: Pruebas unitarias
+        # Esta sí bloquea. El linter de abajo no puede —arrastra avisos
+        # heredados—, pero una prueba en rojo es un fallo de verdad y tiene que
+        # parar la propuesta: si no, la red no sirve de nada.
+        run: yarn test
+
       - name: Linter (informativo)
         continue-on-error: true
         run: yarn lint
+
+# Las pruebas de navegador de `e2e/` **no entran aquí**, y es una decisión, no
+# un olvido (MxH-0177):
+#
+#   - necesitan un entorno en pie, con su base de datos sembrada y credenciales
+#     de una cuenta real, que es infraestructura de CI y no un paso más;
+#   - la tienda hace lo mismo: en cada propuesta corren sus unitarias, y las de
+#     navegador van por el cron del VPS.
+#
+# Si algún día se quieren aquí, lo que hay que resolver primero es contra qué
+# entorno corren y de dónde salen sus secretos.
