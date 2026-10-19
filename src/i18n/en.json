@@ -1232,7 +1232,8 @@
     "tabs": {
       "general": "General",
       "orders": "Orders",
-      "beneficiaries": "Recipients"
+      "beneficiaries": "Recipients",
+      "addresses": "Addresses"
     },
     "status": {
       "active": "Active",
@@ -1288,6 +1289,11 @@
       "empty_title": "No recipients",
       "empty_hint": "None of their orders records who it was delivered to.",
       "missing": "%{smart_count} of this customer’s orders does not record who it was delivered to, so it is not listed here. |||| %{smart_count} of this customer’s orders do not record who they were delivered to, so they are not listed here."
+    },
+    "addresses": {
+      "default": "Default",
+      "empty_title": "No saved addresses",
+      "empty_hint": "This customer has not saved any address in the storefront. Buying for pickup needs none."
     }
   },
   "cms-pages": {
