@@ -131,6 +131,10 @@
     "cms-popups": {
       "name": "Pop-up notice",
       "name_plural": "Pop-up notices"
+    },
+    "complaints": {
+      "name": "Complaint",
+      "name_plural": "Complaints"
     }
   },
   "list": {
@@ -431,7 +435,8 @@
       "devoluciones": "Refunds",
       "cmsHomeNotices": "Notices",
       "cobros": "Collections",
-      "cmsPopups": "Pop-up notices"
+      "cmsPopups": "Pop-up notices",
+      "quejas": "Complaints"
     },
     "user": {
       "profile": "Profile"
@@ -1969,5 +1974,69 @@
         "isActive": "Turning it off removes it without deleting it."
       }
     }
+  },
+  "complaints": {
+    "status": {
+      "abierta": "Open",
+      "en_gestion": "In progress",
+      "resuelta": "Resolved"
+    },
+    "fields": {
+      "client": "Customer",
+      "order": "Order",
+      "motive": "Reason",
+      "description": "What happened",
+      "assigned": "Handled by",
+      "resolution": "How it was resolved",
+      "createdFrom": "From",
+      "createdTo": "To"
+    },
+    "form": {
+      "title": "Log a complaint",
+      "subtitle": "What the customer said, as they said it.",
+      "note": "It starts open. Resolving it is a separate action with its own permission.",
+      "eligeClientePrimero": "Pick the customer first to link one of their orders.",
+      "hints": {
+        "client": "Whose complaint this is.",
+        "order": "Only if the complaint is about a specific order.",
+        "motive": "The administrator edits these under Nomenclators.",
+        "description": "The more specific, the less you have to ask again."
+      }
+    },
+    "history": {
+      "registrada": "Logged the complaint",
+      "estado": "Changed the status: %{from} → %{to}",
+      "asignada": "Changed who handles it",
+      "editada": "Corrected the complaint details",
+      "nota": "Added a note"
+    },
+    "mover": {
+      "abierta": "Reopen it",
+      "en_gestion": "Mark in progress"
+    },
+    "notify": {
+      "estado": "Status updated",
+      "resuelta": "Complaint resolved",
+      "nota": "Note added"
+    },
+    "empty": {
+      "title": "No complaints logged",
+      "hint": "When the Call Center logs one, it will show up here with its history."
+    },
+    "acciones": "What to do with it",
+    "historial": "History",
+    "sinHistorial": "Nothing else has happened yet.",
+    "sinAsignar": "Unassigned",
+    "sinPedido": "No order",
+    "volver": "Back to complaints",
+    "anotar": "Add note",
+    "notaPlaceholder": "A note for the history: what was discussed, what was checked…",
+    "resolver": "Mark as resolved",
+    "resolverAviso": "Say how it was resolved: whoever takes this customer's next call will read it.",
+    "resolucionPlaceholder": "The missing product was replaced and the customer was notified.",
+    "alguien": "Someone",
+    "delCliente": "This customer's complaints",
+    "sinQuejasDelCliente": "This customer has not filed any complaint.",
+    "delPedido": "This order has %{smart_count} complaint |||| This order has %{smart_count} complaints"
   }
 }

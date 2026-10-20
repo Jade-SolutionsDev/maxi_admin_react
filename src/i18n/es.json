@@ -131,6 +131,10 @@
     "cms-popups": {
       "name": "Aviso emergente",
       "name_plural": "Avisos emergentes"
+    },
+    "complaints": {
+      "name": "Queja",
+      "name_plural": "Quejas"
     }
   },
   "list": {
@@ -433,7 +437,8 @@
       "devoluciones": "Devoluciones",
       "cmsHomeNotices": "Avisos",
       "cobros": "Cobros",
-      "cmsPopups": "Avisos emergentes"
+      "cmsPopups": "Avisos emergentes",
+      "quejas": "Quejas"
     },
     "user": {
       "profile": "Perfil"
@@ -1973,5 +1978,69 @@
         "isActive": "Apagarlo lo quita de la tienda sin borrarlo."
       }
     }
+  },
+  "complaints": {
+    "status": {
+      "abierta": "Abierta",
+      "en_gestion": "En gestión",
+      "resuelta": "Resuelta"
+    },
+    "fields": {
+      "client": "Cliente",
+      "order": "Pedido",
+      "motive": "Motivo",
+      "description": "Qué pasó",
+      "assigned": "Quién la atiende",
+      "resolution": "Cómo se resolvió",
+      "createdFrom": "Desde",
+      "createdTo": "Hasta"
+    },
+    "form": {
+      "title": "Registrar una queja",
+      "subtitle": "Lo que contó el cliente, tal como lo contó.",
+      "note": "Nace abierta. Darla por resuelta es otra acción y pide su propio permiso.",
+      "eligeClientePrimero": "Elige primero el cliente para poder enlazar uno de sus pedidos.",
+      "hints": {
+        "client": "De quién es la queja.",
+        "order": "Solo si la queja es de un pedido concreto.",
+        "motive": "Los edita el administrador en Nomencladores.",
+        "description": "Cuanto más concreto, menos hay que volver a preguntar."
+      }
+    },
+    "history": {
+      "registrada": "Registró la queja",
+      "estado": "Cambió el estado: %{from} → %{to}",
+      "asignada": "Cambió a quién la atiende",
+      "editada": "Corrigió los datos de la queja",
+      "nota": "Añadió una nota"
+    },
+    "mover": {
+      "abierta": "Volver a abrirla",
+      "en_gestion": "Ponerla en gestión"
+    },
+    "notify": {
+      "estado": "Estado actualizado",
+      "resuelta": "Queja resuelta",
+      "nota": "Nota añadida"
+    },
+    "empty": {
+      "title": "No hay ninguna queja registrada",
+      "hint": "Cuando el Call Center registre una, aparecerá aquí con su historial."
+    },
+    "acciones": "Qué hacer con ella",
+    "historial": "Historial",
+    "sinHistorial": "Todavía no ha pasado nada más.",
+    "sinAsignar": "Sin asignar",
+    "sinPedido": "Sin pedido",
+    "volver": "Volver a las quejas",
+    "anotar": "Añadir nota",
+    "notaPlaceholder": "Una nota para el historial: qué se habló, qué se comprobó…",
+    "resolver": "Dar por resuelta",
+    "resolverAviso": "Di cómo se resolvió: lo lee quien atienda la próxima llamada de este cliente.",
+    "resolucionPlaceholder": "Se repuso el producto faltante y se avisó al cliente.",
+    "alguien": "Alguien",
+    "delCliente": "Quejas de este cliente",
+    "sinQuejasDelCliente": "Este cliente no ha puesto ninguna queja.",
+    "delPedido": "Este pedido tiene %{smart_count} queja |||| Este pedido tiene %{smart_count} quejas"
   }
 }

@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useDataProvider, useGetList, useGetOne, useTranslate } from "ra-core";
+import {
+  useCanAccess,
+  useDataProvider,
+  useGetList,
+  useGetOne,
+  useTranslate,
+} from "ra-core";
 import {
   ArrowLeft,
   BookUser,
   CalendarDays,
   Mail,
   MapPin,
+  MessageSquareWarning,
   ShoppingCart,
   UserRound,
   Users,
@@ -37,6 +44,8 @@ import {
 } from "@/pages/orders/OrderBadges";
 import { money } from "@/pages/orders/orderStatus";
 import { tituloDeLaDireccion } from "./libreta";
+import { ComplaintStatusBadge } from "@/pages/complaints/ComplaintBadges";
+import type { ComplaintStatus } from "@/pages/complaints/complaintStatus";
 import { leerPunto } from "@/pages/orders/punto-de-entrega";
 import { UbicacionDeEntrega } from "@/pages/orders/UbicacionDeEntrega";
 
@@ -52,6 +61,15 @@ interface ClientRecord {
   createdAt: string;
 }
 
+interface ComplaintRow {
+  id: string;
+  motiveLabel: string | null;
+  orderNumber: string | null;
+  description: string;
+  status: ComplaintStatus;
+  createdAt: string;
+}
+
 interface OrderRow {
   id: string;
   orderNumber: string | null;
@@ -61,7 +79,12 @@ interface OrderRow {
   createdAt: string;
 }
 
-type TabKey = "general" | "orders" | "beneficiaries" | "addresses";
+type TabKey =
+  | "general"
+  | "orders"
+  | "beneficiaries"
+  | "addresses"
+  | "complaints";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +96,10 @@ export default function ClientDetailPage() {
     "clients",
     { id: id as string },
   );
+  const { canAccess: puedeVerQuejas } = useCanAccess({
+    resource: "complaints",
+    action: "list",
+  });
 
   if (isPending || !client) {
     return (
@@ -95,6 +122,16 @@ export default function ClientDetailPage() {
     },
     { key: "addresses", label: "clients.tabs.addresses", icon: BookUser },
   ];
+
+  // La pestaña solo existe para quien puede ver quejas: a los demás, una
+  // pestaña que devuelve 403 solo les dice que hay algo que no pueden mirar.
+  if (puedeVerQuejas) {
+    tabs.push({
+      key: "complaints",
+      label: "clients.tabs.complaints",
+      icon: MessageSquareWarning,
+    });
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
@@ -171,6 +208,7 @@ export default function ClientDetailPage() {
       {tab === "orders" && <OrdersTab clientId={client.id} />}
       {tab === "beneficiaries" && <BeneficiariesTab clientId={client.id} />}
       {tab === "addresses" && <AddressesTab clientId={client.id} />}
+      {tab === "complaints" && <ComplaintsTab clientId={client.id} />}
     </div>
   );
 }
@@ -534,5 +572,66 @@ function BeneficiariesTab({ clientId }: { clientId: string }) {
       </section>
       {aviso}
     </>
+  );
+}
+
+/**
+ * Las quejas anteriores de este cliente (MxH-0064).
+ *
+ * Quien atiende una llamada nueva necesita saber si ya se quejó antes y de
+ * qué, sin irse a otra pantalla a buscarlo.
+ */
+function ComplaintsTab({ clientId }: { clientId: string }) {
+  const translate = useTranslate();
+  const { data, isPending } = useGetList<ComplaintRow>("complaints", {
+    filter: { clientId },
+    pagination: { page: 1, perPage: 25 },
+    sort: { field: "createdAt", order: "DESC" },
+  });
+
+  if (isPending) {
+    return <div className="h-32 animate-pulse rounded-lg bg-muted" />;
+  }
+
+  const quejas = data ?? [];
+  if (quejas.length === 0) {
+    return (
+      <section className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+        {translate("complaints.sinQuejasDelCliente", {
+          _: "Este cliente no ha puesto ninguna queja.",
+        })}
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-lg border border-border">
+      <ul className="divide-y divide-border">
+        {quejas.map((queja) => (
+          <li key={queja.id}>
+            <Link
+              to={`/complaints/${queja.id}`}
+              className="flex flex-wrap items-start justify-between gap-3 p-4 hover:bg-muted/50"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">
+                  {queja.motiveLabel || "—"}
+                  {queja.orderNumber ? ` · ${queja.orderNumber}` : ""}
+                </p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                  {queja.description}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                <ComplaintStatusBadge status={queja.status} />
+                <span className="text-xs text-muted-foreground">
+                  {new Date(queja.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

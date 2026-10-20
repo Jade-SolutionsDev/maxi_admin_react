@@ -364,6 +364,15 @@ export interface ExtendedDataProvider extends DataProvider {
   }) => Promise<{ data: DashboardTopProducts }>;
   /** «Restablecer orden»: cancelada → pendiente, re-apartando su stock. */
   reinstateOrder: (id: string) => Promise<{ data: unknown }>;
+  /** Mover una queja entre abierta y en gestión. */
+  changeComplaintStatus: (
+    id: string,
+    status: string,
+    note?: string,
+  ) => Promise<{ data: unknown }>;
+  /** Darla por resuelta. Pide `complaints:close` y exige decir cómo. */
+  resolveComplaint: (id: string, note: string) => Promise<{ data: unknown }>;
+  addComplaintNote: (id: string, note: string) => Promise<{ data: unknown }>;
   /** Historial del pedido, del más antiguo al más reciente. */
   getOrderEvents: (id: string) => Promise<{ data: OrderEvent[] }>;
   /** Corrección de superadmin: cualquier estado, con motivo. */
@@ -608,6 +617,7 @@ const RESOURCE_PATHS: Record<string, string> = {
   "contact-messages": "contact/messages",
   "contact-templates": "contact/templates",
   "contact-motives": "nomenclators",
+  "complaint-motives": "nomenclators",
 };
 
 function resourcePath(resource: string): string {
@@ -1403,6 +1413,30 @@ export const dataProvider: DataProvider = {
   async reinstateOrder(id: string) {
     const { json } = await httpClient(`${API_URL}/orders/${id}/reinstate`, {
       method: "POST",
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async changeComplaintStatus(id: string, status: string, note?: string) {
+    const { json } = await httpClient(`${API_URL}/complaints/${id}/status`, {
+      method: "POST",
+      body: JSON.stringify(note ? { status, note } : { status }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async resolveComplaint(id: string, note: string) {
+    const { json } = await httpClient(`${API_URL}/complaints/${id}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ status: "resuelta", note }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async addComplaintNote(id: string, note: string) {
+    const { json } = await httpClient(`${API_URL}/complaints/${id}/notes`, {
+      method: "POST",
+      body: JSON.stringify({ note }),
     });
     return { data: unwrapOne(json) };
   },

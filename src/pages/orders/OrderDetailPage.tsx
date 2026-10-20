@@ -76,6 +76,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { OrderCorrectionCard } from "./OrderCorrectionCard";
 import { OrderItemsEditor } from "./OrderItemsEditor";
+import { OrderComplaintsNotice } from "@/pages/complaints/OrderComplaintsNotice";
 import { OrderHistorySection } from "./OrderHistorySection";
 import { OrderRefundsCard } from "./OrderRefundsCard";
 import { PaymentDetailsSection } from "./PaymentDetailsSection";
@@ -1019,6 +1020,8 @@ export default function OrderDetailPage() {
           </p>
         </section>
       </div>
+
+      <OrderComplaintsNotice orderId={order.id} />
 
       <OrderHistorySection orderId={order.id} />
 

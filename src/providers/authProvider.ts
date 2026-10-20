@@ -93,6 +93,10 @@ const RESOURCE_RULES: Record<
   },
   // Inbox + reply templates share the backend `contact` module.
   "contact-messages": { module: "contact" },
+  // Quejas del Call Center. `close` no se mapea aquí: resolver no es una
+  // acción de ra-core, se pregunta con useCanAccess en la ficha (MxH-0064).
+  complaints: { module: "complaints" },
+  "complaint-motives": { module: "nomenclators" },
   "contact-templates": { module: "contact" },
   orders: {
     module: "orders",
