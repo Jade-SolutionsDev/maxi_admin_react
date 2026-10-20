@@ -64,6 +64,9 @@ import { CmsHomePage } from "./pages/cms-home/CmsHomePage";
 import { PaymentMethodsPage } from "./pages/payment-methods/PaymentMethodsPage";
 import ContactMessagesList from "./pages/contact-messages/ContactMessagesList";
 import ContactMessageDetailPage from "./pages/contact-messages/ContactMessageDetailPage";
+import { ComplaintsLayout } from "./pages/complaints/ComplaintsLayout";
+import ComplaintCreate from "./pages/complaints/ComplaintCreate";
+import ComplaintDetailPage from "./pages/complaints/ComplaintDetailPage";
 import { ContactTemplatesLayout } from "./pages/contact-templates/ContactTemplatesLayout";
 import ContactTemplateCreate from "./pages/contact-templates/ContactTemplateCreate";
 import ContactTemplateEdit from "./pages/contact-templates/ContactTemplateEdit";
@@ -344,6 +347,24 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="contact-messages" action="read">
             <ContactMessageDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/complaints"
+        element={
+          <RequireAccess resource="complaints">
+            <ComplaintsLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<ComplaintCreate />} />
+      </Route>
+      <Route
+        path="/complaints/:id"
+        element={
+          <RequireAccess resource="complaints" action="read">
+            <ComplaintDetailPage />
           </RequireAccess>
         }
       />

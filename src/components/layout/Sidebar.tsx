@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   ListTree,
   LogOut,
+  MessageSquareWarning,
   NotebookPen,
   Package,
   PanelsTopLeft,
@@ -214,6 +215,13 @@ const navGroups: NavGroup[] = [
         path: "/contact-messages",
         activePrefix: "/contact-messages",
         resource: "contact-messages",
+      },
+      {
+        labelKey: "app.menu.quejas",
+        icon: <MessageSquareWarning size={20} />,
+        path: "/complaints",
+        activePrefix: "/complaints",
+        resource: "complaints",
       },
       {
         labelKey: "app.menu.contactoPlantillas",
