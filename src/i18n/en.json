@@ -135,6 +135,10 @@
     "complaints": {
       "name": "Complaint",
       "name_plural": "Complaints"
+    },
+    "tickets": {
+      "name": "Ticket",
+      "name_plural": "Tickets"
     }
   },
   "list": {
@@ -436,7 +440,8 @@
       "cmsHomeNotices": "Notices",
       "cobros": "Collections",
       "cmsPopups": "Pop-up notices",
-      "quejas": "Complaints"
+      "quejas": "Complaints",
+      "tickets": "Tickets"
     },
     "user": {
       "profile": "Profile"
@@ -2038,5 +2043,88 @@
     "delCliente": "This customer's complaints",
     "sinQuejasDelCliente": "This customer has not filed any complaint.",
     "delPedido": "This order has %{smart_count} complaint |||| This order has %{smart_count} complaints"
+  },
+  "tickets": {
+    "status": {
+      "abierto": "Open",
+      "en_curso": "In progress",
+      "resuelto": "Resolved",
+      "cerrado": "Closed"
+    },
+    "priority": {
+      "baja": "Low",
+      "media": "Medium",
+      "alta": "High"
+    },
+    "fields": {
+      "title": "What happened",
+      "description": "Describe it in detail",
+      "category": "Category",
+      "priority": "Priority",
+      "assigned": "Handled by",
+      "openedBy": "Opened by",
+      "images": "Photos",
+      "resolution": "What was done",
+      "createdFrom": "From",
+      "createdTo": "To"
+    },
+    "form": {
+      "title": "Open a ticket",
+      "subtitle": "What happened, where, and what it takes to fix it.",
+      "note": "It starts open. If you assign it, that person gets an email.",
+      "hints": {
+        "title": "One line that reads well in a list of fifty.",
+        "category": "The administrator edits these in Nomenclators.",
+        "priority": "High means it is blocking someone's work right now.",
+        "assigned": "You can leave it unassigned for someone to pick up.",
+        "description": "What happened, when it started, and what you already tried."
+      }
+    },
+    "imagenes": {
+      "anadir": "Add photos",
+      "quitar": "Remove this image",
+      "ayuda": "Up to %{max} images · %{formatos} · max %{peso} each",
+      "completo": "There are already %{max} images, the maximum per ticket.",
+      "tope": "A ticket holds %{max} images; the extra ones were not uploaded."
+    },
+    "history": {
+      "abierto": "Opened the ticket",
+      "estado": "Changed the status: %{from} → %{to}",
+      "asignado": "Changed who handles it",
+      "editado": "Edited the ticket",
+      "comentario": "Commented"
+    },
+    "mover": {
+      "abierto": "Reopen it",
+      "en_curso": "Start working on it"
+    },
+    "notify": {
+      "estado": "Status updated",
+      "resuelto": "Ticket resolved",
+      "cerrado": "Ticket closed",
+      "reabierto": "Ticket reopened",
+      "comentario": "Comment added"
+    },
+    "empty": {
+      "title": "No open incidents",
+      "hint": "When something breaks or is missing, open it here and it keeps its history."
+    },
+    "acciones": "What to do with it",
+    "historial": "History",
+    "sinHistorial": "Nothing else has happened yet.",
+    "sinAsignar": "Unassigned",
+    "alguien": "Someone",
+    "volver": "Back to tickets",
+    "cerradoEl": "Closed on",
+    "resolver": "Mark as resolved",
+    "resolverAviso": "Say what you did: whoever confirms it reads this, and so does the next person who hits the same thing.",
+    "resolucionPlaceholder": "It was the print head: cleaned it and it prints again.",
+    "cerrar": "Close the ticket",
+    "cerrarAviso": "Closing it confirms that what was resolved is resolved. It does not erase what the fixer wrote.",
+    "reabrir": "Reopen the ticket",
+    "reabrirAviso": "Reopening sends it back to «in progress» and clears the previous resolution, which no longer describes the truth. Say why.",
+    "reaperturaPlaceholder": "It happened again this morning.",
+    "comentar": "Comment",
+    "comentarioPlaceholder": "What you tried, what you saw, what is missing…"
   }
 }

@@ -135,6 +135,10 @@
     "complaints": {
       "name": "Queja",
       "name_plural": "Quejas"
+    },
+    "tickets": {
+      "name": "Ticket",
+      "name_plural": "Tickets"
     }
   },
   "list": {
@@ -438,7 +442,8 @@
       "cmsHomeNotices": "Avisos",
       "cobros": "Cobros",
       "cmsPopups": "Avisos emergentes",
-      "quejas": "Quejas"
+      "quejas": "Quejas",
+      "tickets": "Tickets"
     },
     "user": {
       "profile": "Perfil"
@@ -2042,5 +2047,88 @@
     "delCliente": "Quejas de este cliente",
     "sinQuejasDelCliente": "Este cliente no ha puesto ninguna queja.",
     "delPedido": "Este pedido tiene %{smart_count} queja |||| Este pedido tiene %{smart_count} quejas"
+  },
+  "tickets": {
+    "status": {
+      "abierto": "Abierto",
+      "en_curso": "En curso",
+      "resuelto": "Resuelto",
+      "cerrado": "Cerrado"
+    },
+    "priority": {
+      "baja": "Baja",
+      "media": "Media",
+      "alta": "Alta"
+    },
+    "fields": {
+      "title": "Qué pasa",
+      "description": "Cuéntalo con detalle",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "assigned": "Lo atiende",
+      "openedBy": "Lo abrió",
+      "images": "Fotos de la incidencia",
+      "resolution": "Qué se hizo",
+      "createdFrom": "Desde",
+      "createdTo": "Hasta"
+    },
+    "form": {
+      "title": "Abrir un ticket",
+      "subtitle": "Qué pasó, dónde y qué hace falta para arreglarlo.",
+      "note": "Nace abierto. Si lo asignas, esa persona recibe un correo.",
+      "hints": {
+        "title": "Una línea que se entienda en un listado de cincuenta.",
+        "category": "Las edita el administrador en Nomencladores.",
+        "priority": "Alta es lo que para el trabajo de alguien ahora mismo.",
+        "assigned": "Puedes dejarlo sin asignar para que alguien lo coja.",
+        "description": "Qué pasó, cuándo empezó y qué has probado ya."
+      }
+    },
+    "imagenes": {
+      "anadir": "Añadir fotos",
+      "quitar": "Quitar esta imagen",
+      "ayuda": "Hasta %{max} imágenes · %{formatos} · máx. %{peso} cada una",
+      "completo": "Ya hay %{max} imágenes, el máximo por ticket.",
+      "tope": "Caben %{max} imágenes por ticket; las de más no se subieron."
+    },
+    "history": {
+      "abierto": "Abrió el ticket",
+      "estado": "Cambió el estado: %{from} → %{to}",
+      "asignado": "Cambió a quién lo atiende",
+      "editado": "Corrigió los datos del ticket",
+      "comentario": "Comentó"
+    },
+    "mover": {
+      "abierto": "Volver a abrirlo",
+      "en_curso": "Ponerlo en curso"
+    },
+    "notify": {
+      "estado": "Estado actualizado",
+      "resuelto": "Ticket resuelto",
+      "cerrado": "Ticket cerrado",
+      "reabierto": "Ticket reabierto",
+      "comentario": "Comentario añadido"
+    },
+    "empty": {
+      "title": "No hay ninguna incidencia abierta",
+      "hint": "Cuando algo se rompa o falte, ábrelo aquí y queda con su historial."
+    },
+    "acciones": "Qué hacer con él",
+    "historial": "Historial",
+    "sinHistorial": "Todavía no ha pasado nada más.",
+    "sinAsignar": "Sin asignar",
+    "alguien": "Alguien",
+    "volver": "Volver a los tickets",
+    "cerradoEl": "Cerrado el",
+    "resolver": "Marcar como resuelto",
+    "resolverAviso": "Di qué hiciste: lo lee quien tenga que confirmarlo y el próximo que se tropiece con lo mismo.",
+    "resolucionPlaceholder": "Era el cabezal: lo limpié y volvió a imprimir.",
+    "cerrar": "Cerrar el ticket",
+    "cerrarAviso": "Cerrarlo confirma que lo resuelto está resuelto. No borra lo que escribió quien lo arregló.",
+    "reabrir": "Reabrir el ticket",
+    "reabrirAviso": "Reabrirlo lo devuelve a «en curso» y borra la resolución anterior, que ya no describe la verdad. Di por qué.",
+    "reaperturaPlaceholder": "Volvió a pasar esta mañana.",
+    "comentar": "Comentar",
+    "comentarioPlaceholder": "Qué probaste, qué viste, qué falta…"
   }
 }

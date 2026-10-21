@@ -67,6 +67,9 @@ import ContactMessageDetailPage from "./pages/contact-messages/ContactMessageDet
 import { ComplaintsLayout } from "./pages/complaints/ComplaintsLayout";
 import ComplaintCreate from "./pages/complaints/ComplaintCreate";
 import ComplaintDetailPage from "./pages/complaints/ComplaintDetailPage";
+import { TicketsLayout } from "./pages/tickets/TicketsLayout";
+import TicketCreate from "./pages/tickets/TicketCreate";
+import TicketDetailPage from "./pages/tickets/TicketDetailPage";
 import { ContactTemplatesLayout } from "./pages/contact-templates/ContactTemplatesLayout";
 import ContactTemplateCreate from "./pages/contact-templates/ContactTemplateCreate";
 import ContactTemplateEdit from "./pages/contact-templates/ContactTemplateEdit";
@@ -365,6 +368,24 @@ const AdminApp = () => (
         element={
           <RequireAccess resource="complaints" action="read">
             <ComplaintDetailPage />
+          </RequireAccess>
+        }
+      />
+      <Route
+        path="/tickets"
+        element={
+          <RequireAccess resource="tickets">
+            <TicketsLayout />
+          </RequireAccess>
+        }
+      >
+        <Route path="create" element={<TicketCreate />} />
+      </Route>
+      <Route
+        path="/tickets/:id"
+        element={
+          <RequireAccess resource="tickets" action="read">
+            <TicketDetailPage />
           </RequireAccess>
         }
       />
