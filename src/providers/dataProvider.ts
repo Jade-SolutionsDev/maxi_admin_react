@@ -1462,10 +1462,12 @@ export const dataProvider: DataProvider = {
   },
 
   async closeTicket(id: string) {
-    // El estado lo decide la ruta; el cuerpo solo lleva la nota si la hay.
+    // Sin `status`: lo decide la ruta, y la API lo rechaza si viene —valida
+    // con `forbidNonWhitelisted`—. Mandarlo era pedirle al cliente que se
+    // inventara un dato que el servidor ignora.
     const { json } = await httpClient(`${API_URL}/tickets/${id}/close`, {
       method: "POST",
-      body: JSON.stringify({ status: "cerrado" }),
+      body: JSON.stringify({}),
     });
     return { data: unwrapOne(json) };
   },
@@ -1473,7 +1475,7 @@ export const dataProvider: DataProvider = {
   async reopenTicket(id: string, note: string) {
     const { json } = await httpClient(`${API_URL}/tickets/${id}/reopen`, {
       method: "POST",
-      body: JSON.stringify({ status: "en_curso", note }),
+      body: JSON.stringify({ note }),
     });
     return { data: unwrapOne(json) };
   },
