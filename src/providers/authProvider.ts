@@ -96,6 +96,10 @@ const RESOURCE_RULES: Record<
   // Quejas del Call Center. `close` no se mapea aquí: resolver no es una
   // acción de ra-core, se pregunta con useCanAccess en la ficha (MxH-0064).
   complaints: { module: "complaints" },
+  // Incidencias internas. `close` no se mapea aquí: cerrar no es una acción de
+  // ra-core, se pregunta con useCanAccess en la ficha (MxH-0065).
+  tickets: { module: "tickets" },
+  "ticket-categories": { module: "nomenclators" },
   "complaint-motives": { module: "nomenclators" },
   "contact-templates": { module: "contact" },
   orders: {

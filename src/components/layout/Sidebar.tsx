@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   Tags,
+  Ticket as TicketIcon,
   Truck,
   User,
   UserRound,
@@ -222,6 +223,13 @@ const navGroups: NavGroup[] = [
         path: "/complaints",
         activePrefix: "/complaints",
         resource: "complaints",
+      },
+      {
+        labelKey: "app.menu.tickets",
+        icon: <TicketIcon size={20} />,
+        path: "/tickets",
+        activePrefix: "/tickets",
+        resource: "tickets",
       },
       {
         labelKey: "app.menu.contactoPlantillas",

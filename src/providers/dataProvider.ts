@@ -373,6 +373,17 @@ export interface ExtendedDataProvider extends DataProvider {
   /** Darla por resuelta. Pide `complaints:close` y exige decir cómo. */
   resolveComplaint: (id: string, note: string) => Promise<{ data: unknown }>;
   addComplaintNote: (id: string, note: string) => Promise<{ data: unknown }>;
+  /** Mover un ticket entre abierto, en curso y resuelto. */
+  changeTicketStatus: (
+    id: string,
+    status: string,
+    note?: string,
+  ) => Promise<{ data: unknown }>;
+  /** El visto bueno. Pide `tickets:close` y solo vale desde «resuelto». */
+  closeTicket: (id: string) => Promise<{ data: unknown }>;
+  /** Deshacer el visto bueno. Pide `tickets:close` y exige decir por qué. */
+  reopenTicket: (id: string, note: string) => Promise<{ data: unknown }>;
+  addTicketComment: (id: string, note: string) => Promise<{ data: unknown }>;
   /** Historial del pedido, del más antiguo al más reciente. */
   getOrderEvents: (id: string) => Promise<{ data: OrderEvent[] }>;
   /** Corrección de superadmin: cualquier estado, con motivo. */
@@ -618,6 +629,7 @@ const RESOURCE_PATHS: Record<string, string> = {
   "contact-templates": "contact/templates",
   "contact-motives": "nomenclators",
   "complaint-motives": "nomenclators",
+  "ticket-categories": "nomenclators",
 };
 
 function resourcePath(resource: string): string {
@@ -1435,6 +1447,39 @@ export const dataProvider: DataProvider = {
 
   async addComplaintNote(id: string, note: string) {
     const { json } = await httpClient(`${API_URL}/complaints/${id}/notes`, {
+      method: "POST",
+      body: JSON.stringify({ note }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async changeTicketStatus(id: string, status: string, note?: string) {
+    const { json } = await httpClient(`${API_URL}/tickets/${id}/status`, {
+      method: "POST",
+      body: JSON.stringify(note ? { status, note } : { status }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async closeTicket(id: string) {
+    // El estado lo decide la ruta; el cuerpo solo lleva la nota si la hay.
+    const { json } = await httpClient(`${API_URL}/tickets/${id}/close`, {
+      method: "POST",
+      body: JSON.stringify({ status: "cerrado" }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async reopenTicket(id: string, note: string) {
+    const { json } = await httpClient(`${API_URL}/tickets/${id}/reopen`, {
+      method: "POST",
+      body: JSON.stringify({ status: "en_curso", note }),
+    });
+    return { data: unwrapOne(json) };
+  },
+
+  async addTicketComment(id: string, note: string) {
+    const { json } = await httpClient(`${API_URL}/tickets/${id}/comments`, {
       method: "POST",
       body: JSON.stringify({ note }),
     });
