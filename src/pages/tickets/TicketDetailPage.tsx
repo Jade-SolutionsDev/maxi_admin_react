@@ -25,6 +25,7 @@ import { DateField } from "@/components/admin/date-field";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ExtendedDataProvider } from "@/providers/dataProvider";
+import { esImagenSegura } from "./imagenSegura";
 import { TicketPriorityBadge, TicketStatusBadge } from "./TicketBadges";
 import {
   SIGUIENTES,
@@ -182,6 +183,8 @@ export default function TicketDetailPage() {
 
   const siguientes = SIGUIENTES[data.status];
   const eventos = data.events ?? [];
+  // No se pinta lo que no se puede pintar sin riesgo: ver `imagenSegura`.
+  const imagenes = data.images.filter(esImagenSegura);
   const hayAcciones =
     puedeComentar ||
     (puedeGestionar && (siguientes.length > 0 || data.status !== "cerrado")) ||
@@ -253,9 +256,9 @@ export default function TicketDetailPage() {
           </p>
         </div>
 
-        {data.images.length > 0 && (
+        {imagenes.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-2">
-            {data.images.map((url) => (
+            {imagenes.map((url) => (
               <li key={url}>
                 {/* Se abre a tamaño completo en otra pestaña: una foto de una
                     pantalla de error no se lee en 96 píxeles. */}
